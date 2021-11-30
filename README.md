@@ -1,5 +1,6 @@
 # KARMADA
-Thanks to KubeSphere and Harvester for providing back-end support for this system.
+This is the dashboard for Karmada, a multi-cluster management project.
+
 ## 电脑需要安装 node 环境
 
 ## 安装依赖命令
