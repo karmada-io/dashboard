@@ -16,7 +16,7 @@ const getDistributionList = () => {
           name: n.metadata.name,
           status: '',
           namespace: n.metadata.namespace,
-          kind: n.kind === 'PropagationPolicy' ? '否' : '是',
+          kind: n.kind === 'PropagationPolicy' ? 'no' : 'yes',
           clusterNames: n.spec.placement.clusterAffinity.clusterNames.join('/'),
           replicaDivisionPreference: n.spec.placement.replicaScheduling.replicaDivisionPreference,
           replicaSchedulingType: n.spec.placement.replicaScheduling.replicaSchedulingType
@@ -30,7 +30,7 @@ const getDistributionList = () => {
             name: n.metadata.name,
             status: '',
             namespace: n.metadata.namespace,
-            kind: n.kind === 'PropagationPolicy' ? '否' : '是',
+            kind: n.kind === 'PropagationPolicy' ? 'no' : 'yes',
             clusterNames: n.spec.placement.clusterAffinity.clusterNames.join('/'),
             replicaDivisionPreference: n.spec.placement.replicaScheduling.replicaDivisionPreference,
             replicaSchedulingType: n.spec.placement.replicaScheduling.replicaSchedulingType

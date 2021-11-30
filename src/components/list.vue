@@ -27,21 +27,21 @@
             <el-date-picker
               v-model="filterData[key]"
               type="daterange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
+              :range-separator="$t('common.to')"
+              :start-placeholder="$t('common.startDate')"
+              :end-placeholder="$t('common.endDate')"
             />
           </template>
           <el-input
             v-else
             v-model="filterData[key]"
-            placeholder="请输入内容"
+            :placeholder="$t('common.enter')"
             @enter="onSearchClick"
           />
         </template>
       </div>
-      <el-button type="primary" @click="onSearchClick"> 搜索 </el-button>
-      <el-button class="add-btn"> 新增 </el-button>
+      <el-button type="primary" @click="onSearchClick"> {{ $t('common.search') }} </el-button>
+      <el-button class="add-btn"> {{ $t('common.add') }} </el-button>
     </div>
     <slot name="filterBtns" />
     <el-table

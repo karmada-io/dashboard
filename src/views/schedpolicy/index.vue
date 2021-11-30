@@ -2,7 +2,7 @@
   <div>
     <el-card shadow="never">
       <el-tabs v-model="activeName" type="card" @tab-click="switchTab">
-        <el-tab-pane key="propagationPolicies" label="分发策略">
+        <el-tab-pane key="propagationPolicies" :label="$t('schedpolicy.propagation')">
           <List
             ref="multipleTable"
             class="multipleTable"
@@ -13,7 +13,7 @@
             tooltip-effect="dark"
           />
         </el-tab-pane>
-        <el-tab-pane key="overridePolicies" label="Override策略">
+        <el-tab-pane key="overridePolicies" :label="$t('schedpolicy.override')">
           <List
             ref="multipleTable"
             class="multipleTable"
@@ -27,7 +27,7 @@
       </el-tabs>
     </el-card>
     <el-dialog
-      title="详情查询"
+      :title="$t('schedpolicy.details')"
       :visible.sync="dialogVisible"
       width="50%"
     >
@@ -41,7 +41,7 @@
         />
       </span>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">关 闭</el-button>
+        <el-button type="primary" @click="dialogVisible = false">{{ $t('common.close') }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -69,27 +69,27 @@ export default {
         [
           {
             prop: 'name',
-            label: '策略名称'
+            label: this.$t('clusterConfig.policy_name')
           },
           {
             prop: 'status',
-            label: '状态'
+            label: this.$t('common.status')
           },
           {
             prop: 'namespace',
             label: 'NAMESPACE'
           },
-          { prop: 'kind', label: '是否全局'
+          { prop: 'kind', label: this.$t('schedpolicy.global')
           },
           {
             prop: 'replicaDivisionPreference',
             label: 'replicaDivisionPreference'
           },
           { prop: 'replicaSchedulingType', label: 'replicaSchedulingType' },
-          { prop: 'clusterNames', label: '作用集群' },
+          { prop: 'clusterNames', label: this.$t('schedpolicy.targetCluster') },
           {
             prop: 'more',
-            label: '操作',
+            label: this.$t('common.operation'),
             formatter: row => {
               return (
                 <div>
@@ -102,7 +102,7 @@ export default {
                     ></el-button>
                     <el-dropdown-menu slot='dropdown'>
                       <span>
-                        <el-dropdown-item> 查询</el-dropdown-item>
+                        <el-dropdown-item> {this.$t('common.search')}</el-dropdown-item>
                       </span>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -114,11 +114,11 @@ export default {
         [
           {
             prop: 'name',
-            label: '策略名称'
+            label: this.$t('clusterConfig.policy_name')
           },
           {
             prop: 'status',
-            label: '状态'
+            label: this.$t('common.status')
           },
           {
             prop: 'namespace',
@@ -126,15 +126,15 @@ export default {
           },
           {
             prop: 'resourceSelectors',
-            label: '作用资源类型/名称'
+            label: this.$t('schedpolicy.targetResource')
           },
           {
             prop: 'targetCluster',
-            label: '作用集群标签/集群名称'
+            label: this.$t('schedpolicy.targetLabelName')
           },
           {
             prop: 'more',
-            label: '操作',
+            label: this.$t('common.operation'),
             formatter: row => {
               return (
                 <div>
@@ -147,7 +147,7 @@ export default {
                     ></el-button>
                     <el-dropdown-menu slot='dropdown'>
                       <span onClick={() => { this.dialogVisible = true; this.content = row.content }}>
-                        <el-dropdown-item> 查询</el-dropdown-item>
+                        <el-dropdown-item> {this.$t('common.search')}</el-dropdown-item>
                       </span>
                     </el-dropdown-menu>
                   </el-dropdown>

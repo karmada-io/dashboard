@@ -3,15 +3,29 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          admin
+          {{ $t("user.lang") }}
+          <i class="el-icon-arrow-down" />
+        </div>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item @click.native="langToggle('zh')">
+            {{ $t("user.chinese") }}
+          </el-dropdown-item>
+          <el-dropdown-item @click.native="langToggle('en')">
+            {{ $t("user.english") }}
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+        <div class="avatar-wrapper">
+          {{ $t("user.userName") }}
           <i class="el-icon-arrow-down" />
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">
-            <el-dropdown-item>集群管理</el-dropdown-item>
+            <el-dropdown-item>{{ $t("user.clusterManagement") }}</el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">退出登录</span>
+            <span style="display:block;">{{ $t("user.logout") }}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -26,6 +40,11 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    langToggle(lang) {
+      this.$i18n.locale = lang
+      localStorage.setItem('lang', lang)
+      this.$router.go(0)
     }
   }
 }
