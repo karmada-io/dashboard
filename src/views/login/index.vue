@@ -3,8 +3,8 @@
     <div class="manufacturer">
       <el-row :gutter="50" class="login-part">
         <el-col :span="12">
-          <p class="title">欢迎使用KARMADA</p>
-          <p>云际容器集群调度</p>
+          <p class="title">云际容器集群调度</p>
+          <p>欢迎使用KARMADA</p>
           <img src="@/assets/left_img.png">
         </el-col>
         <el-col :span="12">
