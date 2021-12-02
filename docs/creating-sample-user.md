@@ -4,7 +4,12 @@ In this guide, we will find out how to create a new user using Service Account m
 
 **IMPORTANT:** Make sure that you know what you are doing before proceeding. Granting admin privileges to Dashboard's Service Account might be a security risk.
 
-For each of the following snippets for `ServiceAccount` and `ClusterRoleBinding`, you should copy them to new manifest files like `dashboard-adminuser.yaml` and use `kubectl apply -f dashboard-adminuser.yaml` to create them.
+Please switch your context to karmada before creating Service Account
+
+```shell
+export KUBECONFIG="$HOME/.kube/karmada.config"
+kubectl config use-context karmada-apiserver
+```
 
 ## Creating a Service Account
 
