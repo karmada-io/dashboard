@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: karmada-dashboard-configmap
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+data:
+  dev.yaml: |-
+    docker_registries: []
+    chart_registries: []
+    menu_configs:
+      - path: /overview
+        enable: true
+        sidebar_key: OVERVIEW
+      - path: /multicloud-resource-manage
+        enable: true
+        sidebar_key: MULTICLOUD-RESOURCE-MANAGE
+        children:
+          - path: namespace
+            enable: true
+            sidebar_key: NAMESPACE
+          - path: workload
+            enable: true
+            sidebar_key: WORKLOAD
+          - path: service
+            enable: true
+            sidebar_key: SERVICE
+          - path: config
+            enable: true
+            sidebar_key: CONFIG
+      - path: /multicloud-policy-manage
+        enable: true
+        sidebar_key: MULTICLOUD-POLICY-MANAGE
+        children:
+          - path: propagation-policy
+            enable: true
+            sidebar_key: PROPAGATION-POLICY
+          - path: override-policy
+            enable: true
+            sidebar_key: OVERRIDE-POLICY
+      - path: /cluster-manage
+        enable: true
+        sidebar_key: CLUSTER-MANAGE
+      - path: /basic-config
+        enable: true
+        sidebar_key: BASIC-CONFIG
+        children:
+          - path: oem
+            enable: false
+            sidebar_key: OEM
+          - path: upgrade
+            enable: false
+            sidebar_key: UPGRADE
+          - path: karmada-config
+            enable: true
+            sidebar_key: KARMADA-CONFIG
+          - path: helm
+            enable: true
+            sidebar_key: HELM
+          - path: registry
+            enable: true
+            sidebar_key: REGISTRY
+      - path: /advanced-config
+        enable: false
+        sidebar_key: ADVANCED-CONFIG
+        children:
+          - path: failover
+            enable: true
+            sidebar_key: FAILOVER
+          - path: reschedule
+            enable: true
+            sidebar_key: RESCHEDULE
+          - path: permission
+            enable: true
+            sidebar_key: PERMISSION
+      - path: /addon
+        enable: false
+        sidebar_key: ADDON
+        children:
+          - path: buildin
+            enable: true
+            sidebar_key: BUILDIN
+          - path: thirdparty
+            enable: true
+            sidebar_key: THIRDPARTY
+  prod.yaml: |-
+    docker_registries: [ ]
+    chart_registries: [ ]
+    menu_configs:
+      - path: /overview
+        enable: true
+        sidebar_key: OVERVIEW
+      - path: /multicloud-resource-manage
+        enable: true
+        sidebar_key: MULTICLOUD-RESOURCE-MANAGE
+        children:
+          - path: namespace
+            enable: true
+            sidebar_key: NAMESPACE
+          - path: workload
+            enable: true
+            sidebar_key: WORKLOAD
+          - path: service
+            enable: true
+            sidebar_key: SERVICE
+          - path: config
+            enable: true
+            sidebar_key: CONFIG
+      - path: /multicloud-policy-manage
+        enable: true
+        sidebar_key: MULTICLOUD-POLICY-MANAGE
+        children:
+          - path: propagation-policy
+            enable: true
+            sidebar_key: PROPAGATION-POLICY
+          - path: override-policy
+            enable: true
+            sidebar_key: OVERRIDE-POLICY
+      - path: /cluster-manage
+        enable: true
+        sidebar_key: CLUSTER-MANAGE
+      - path: /basic-config
+        enable: false
+        sidebar_key: BASIC-CONFIG
+        children:
+          - path: oem
+            enable: false
+            sidebar_key: OEM
+          - path: upgrade
+            enable: false
+            sidebar_key: UPGRADE
+          - path: karmada-config
+            enable: true
+            sidebar_key: KARMADA-CONFIG
+          - path: helm
+            enable: true
+            sidebar_key: HELM
+          - path: registry
+            enable: true
+            sidebar_key: REGISTRY
+      - path: /advanced-config
+        enable: false
+        sidebar_key: ADVANCED-CONFIG
+        children:
+          - path: failover
+            enable: true
+            sidebar_key: FAILOVER
+          - path: reschedule
+            enable: true
+            sidebar_key: RESCHEDULE
+          - path: permission
+            enable: true
+            sidebar_key: PERMISSION
+      - path: /addon
+        enable: false
+        sidebar_key: ADDON
+        children:
+          - path: buildin
+            enable: true
+            sidebar_key: BUILDIN
+          - path: thirdparty
+            enable: true
+            sidebar_key: THIRDPARTY

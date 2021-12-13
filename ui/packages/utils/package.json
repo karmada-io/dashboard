@@ -1,0 +1,27 @@
+{
+  "name": "@karmada/utils",
+  "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "tsup --config ./tsup.config.ts",
+    "build": "tsup --config ./tsup.config.ts"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

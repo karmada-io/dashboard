@@ -1,0 +1,103 @@
+@-zindex: 999;
+@-font-family-normal: 'Helvetica Neue', Arial, 'Source Han Sans SC',
+  'San Francisco', 'Microsoft YaHei';
+
+.navbar {
+  font-size: 13px;
+  line-height: 1.5;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  .header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    min-width: 1200px;
+    height: 48px;
+    z-index: @-zindex;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 2px 4px rgba(27, 31, 35, 0.08);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: row;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    .left {
+      width: 288px;
+      height: 48px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex: 0 0 288px;
+      .logo {
+        height: 25px;
+        position: relative;
+      }
+      .brand {
+        display: flex;
+        flex-direction: row;
+        height: 22px;
+        .logoWrap {
+          display: inline-block;
+          height: 22px;
+          line-height: 22px;
+          overflow: hidden;
+          margin-right: 8px;
+        }
+        .text {
+          display: inline-block;
+          font-family: @-font-family-normal;
+          font-style: normal;
+          font-weight: 500;
+          font-size: 13px;
+          letter-spacing: 0.2px;
+          color: #141414;
+          line-height: 22px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .center {
+      flex: 1 1;
+    }
+
+    .right {
+      flex: 0 0 342px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      .extra {
+        display: flex;
+      }
+    }
+  }
+
+  .placeholder {
+    padding-top: 48px;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+}
+
+.terminalIcon {
+  font-size: 18px;
+  margin-right: 4px;
+  cursor: pointer;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #1890ff;
+  }
+}
+

@@ -1,0 +1,5 @@
+cd /root/OSPP/karmada-dashboard-v2 
+docker compose up -d 
+检查容器状态：
+docker ps | grep karmada-dashboard
+如果看到两个容器都在运行，就可以直接访问网址了。

@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../dashboard
+
+configMapGenerator:
+  - name: karmada-dashboard-configmap
+    namespace: karmada-system
+    behavior: replace
+    files:
+      - prod.yaml=dashboard-config.yaml
+
+patches:
+  - target:
+      kind: Service
+      name: karmada-dashboard-web
+      namespace: karmada-system
+      version: v1
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 32000  # you can change the nodePort value

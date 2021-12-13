@@ -1,0 +1,30 @@
+{
+  "name": "@karmada/eslint-config-ts",
+  "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/parser": "^5.40.1",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-log-filenames": "^1.0.6",
+    "eslint-plugin-prettier": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.4.7"
+  },
+  "peerDependencies": {
+    "eslint": "^8.26.0"
+  }
+}

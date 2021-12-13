@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: karmada-dashboard-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - /root/.kube/karmada-apiserver.config:/etc/kubeconfig/karmada.config:ro
+    environment:
+      - KUBECONFIG=/etc/kubeconfig/karmada.config
+      - KARMADA_CTX=karmada-admin@karmada-apiserver
+      - HOST_CTX=karmada-admin@karmada-apiserver
+    command: >
+      ./karmada-dashboard-api
+      --karmada-kubeconfig=/etc/kubeconfig/karmada.config
+      --karmada-context=karmada-admin@karmada-apiserver
+      --kubeconfig=/etc/kubeconfig/karmada.config
+      --context=karmada-admin@karmada-apiserver
+      --insecure-port=8000
+      --bind-address=0.0.0.0
+      --insecure-bind-address=0.0.0.0
+    restart: unless-stopped
+    networks:
+      - karmada-dashboard
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: karmada-dashboard-ui
+    ports:
+      - "5173:5173"
+    volumes:
+        - ./hack:/hack:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - karmada-dashboard
+
+networks:
+  karmada-dashboard:
+    driver: bridge

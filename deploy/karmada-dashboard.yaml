@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend
+  name: karmada-dashboard
+  namespace: karmada-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - image: swr.ap-southeast-1.myhuaweicloud.com/karmada/karmada-dashboard:latest
+          name: frontend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: frontend
+  name: karmada-dashboard
+  namespace: karmada-system
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30486
+  selector:
+    app: frontend
+  type: NodePort

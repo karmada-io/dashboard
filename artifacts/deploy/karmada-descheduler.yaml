@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karmada-descheduler
+  namespace: karmada-system
+  labels:
+    app: karmada-descheduler
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: karmada-descheduler
+  template:
+    metadata:
+      labels:
+        app: karmada-descheduler
+    spec:
+      automountServiceAccountToken: false
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+      containers:
+        - name: karmada-descheduler
+          image: docker.io/karmada/karmada-descheduler:{{KARMADA_VERSION}}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/karmada-descheduler
+            - --kubeconfig=/etc/kubeconfig
+            - --bind-address=0.0.0.0
+            - --v=4
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 10358
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: kubeconfig
+              subPath: kubeconfig
+              mountPath: /etc/kubeconfig
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: kubeconfig
