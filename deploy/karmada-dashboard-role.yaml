@@ -1,7 +1,7 @@
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: admin
+  name: karmada-dashboard
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "true"
 roleRef:
@@ -10,13 +10,13 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
-    name: admin
+    name: karmada-dashboard
     namespace: karmada-system
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: admin
+  name: karmada-dashboard
   namespace: karmada-system
   labels:
     kubernetes.io/cluster-service: "true"
