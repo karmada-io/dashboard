@@ -3,8 +3,8 @@
     <div class="manufacturer">
       <el-row :gutter="50" class="login-part">
         <el-col :span="12">
-          <p class="title">云际容器集群调度</p>
-          <p>欢迎使用KARMADA</p>
+          <p class="title">{{ $t('login.karmada_title') }}</p>
+          <p>{{ $t('login.welcome') }}</p>
           <img src="@/assets/left_img.png">
         </el-col>
         <el-col :span="12">
@@ -18,7 +18,7 @@
               label-position="left"
             >
               <div class="title-container">
-                <p>Token登录</p>
+                <p>{{ $t('login.tokenLogin') }}</p>
               </div>
 
               <el-form-item prop="token" label="">
@@ -26,7 +26,7 @@
                   v-model="loginForm.token"
                   type="textarea"
                   :rows="6"
-                  placeholder="输入token"
+                  :placeholder="$t('login.enterToken')"
                 />
               </el-form-item>
 
@@ -70,7 +70,7 @@
                 type="primary"
                 style="width: 100%; margin-bottom: 30px"
                 @click.native.prevent="handleLogin"
-              >登录</el-button>
+              >{{ $t('login.login') }}</el-button>
             </el-form>
           </el-card>
         </el-col>
@@ -104,7 +104,7 @@ export default {
       loginForm: {},
       loginRules: {
         token: [
-          { required: true, trigger: 'blur', message: '请输入token' }
+          { required: true, trigger: 'blur', message: this.$t('login.enterToken') }
         ]
         // username: [
         //   { required: true, trigger: 'blur', validator: validateUsername }

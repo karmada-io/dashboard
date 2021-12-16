@@ -28,11 +28,11 @@ export default {
     return {
       createFormVisible: false,
       tabMapOptions: [
-        { label: '集群发现', key: '1' },
-        { label: '标签管理', key: '2' },
-        { label: '聚合API（预留）', key: '3' },
-        { label: '集群网络打通（预留）', key: '4' },
-        { label: '集群身份认证（预留）', key: '5' }
+        { label: this.$t('clusterConfig.discovery'), key: '1' },
+        { label: this.$t('clusterConfig.label'), key: '2' },
+        { label: this.$t('clusterConfig.aggregation'), key: '3' },
+        { label: this.$t('clusterConfig.network'), key: '4' },
+        { label: this.$t('clusterConfig.authentication'), key: '5' }
       ],
       filterMap: {
         name: {
@@ -41,15 +41,15 @@ export default {
       },
       columns: [
         [
-          { prop: 'name', label: '策略名称' },
-          { prop: 'status', label: '状态' },
-          { prop: 'more', label: '操作', formatter: (row) => {
+          { prop: 'name', label: this.$t('clusterConfig.policy_name') },
+          { prop: 'status', label: this.$t('common.status') },
+          { prop: 'more', label: this.$t('common.operation'), formatter: (row) => {
             return <div>
               <el-dropdown>
                 <el-button size='mini' className='el-dropdown-link' icon='el-icon-more' circle>
                 </el-button>
                 <el-dropdown-menu slot='dropdown'>
-                  <span> <el-dropdown-item> 查询</el-dropdown-item> </span>
+                  <span> <el-dropdown-item> {this.$t('common.search')}</el-dropdown-item> </span>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>

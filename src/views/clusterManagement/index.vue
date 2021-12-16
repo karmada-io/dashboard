@@ -4,9 +4,9 @@
       <div class="top-div">
         <div class="header-title">
           <img src="@/assets/clusterManage/icon.png">
-          <h4>集群拓扑展示</h4>
+          <h4>{{ $t('clusterManagement.topology') }}</h4>
         </div>
-        <el-select v-model="value" placeholder="按标签分类">
+        <el-select v-model="value" :placeholder="$t('clusterManagement.sort')">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -24,15 +24,15 @@
               {{ colony.name }}
             </div>
             <div>CPU {{ colony.cpu }} <img src="@/assets/clusterManage/up.png"></div>
-            <div>内存 {{ colony.memory }} <img src="@/assets/clusterManage/down.png"></div>
-            <div>存储 {{ colony.storage }} <img src="@/assets/clusterManage/line.png"></div>
-            <div>pod {{ colony.pod }} </div>
+            <div>{{ $t('clusterManagement.memory') }} {{ colony.memory }} <img src="@/assets/clusterManage/down.png"></div>
+            <div>{{ $t('clusterManagement.storage') }} {{ colony.storage }} <img src="@/assets/clusterManage/line.png"></div>
+            <div>POD {{ colony.pod }} </div>
           </div>
         </div>
       </div>
     </el-card>
     <el-card shadow="never">
-      集群列表
+      {{ $t('clusterManagement.list') }}
       <List
         v-if="tableListData.length>=1"
         ref="multipleTable"
@@ -59,32 +59,32 @@ export default {
       createFormVisible: false,
       options: [{
         value: '111',
-        label: '标签'
+        label: this.$t('clusterManagement.tag')
       }],
       value: '',
       tableListData: [],
       tagItems: [],
       columns: [
-        { prop: 'name', label: '集群名称' },
-        { prop: 'tag', label: '标签' },
-        { prop: 'desc', label: '描述' },
-        { prop: 'node', label: '可用节点/节点数' },
-        { prop: 'method', label: '集群加入方式' },
-        { prop: 'tactics', label: '调度策咯' },
-        { prop: 'status', label: '集群状态' },
-        { prop: 'version', label: 'kubernetes版本' },
-        { prop: 'time', label: '创建时间' },
-        { prop: 'more', label: '操作', formatter: (row) => {
+        { prop: 'name', label: this.$t('clusterManagement.clusterName'), width: '150' },
+        { prop: 'tag', label: this.$t('clusterManagement.tag'), width: '100' },
+        { prop: 'desc', label: this.$t('clusterManagement.desc'), width: '150' },
+        { prop: 'node', label: this.$t('clusterManagement.nodeNumber'), width: '220' },
+        { prop: 'method', label: this.$t('clusterManagement.joiningMode'), width: '150' },
+        { prop: 'tactics', label: this.$t('clusterManagement.schedulingPolicy'), width: '150' },
+        { prop: 'status', label: this.$t('clusterManagement.state'), width: '100' },
+        { prop: 'version', label: this.$t('clusterManagement.k8sVersion'), width: '135' },
+        { prop: 'time', label: this.$t('clusterManagement.creationTime'), width: '150' },
+        { prop: 'more', label: this.$t('common.operation'), formatter: (row) => {
           return <div>
             <el-dropdown>
               <el-button size='mini' className='el-dropdown-link' icon='el-icon-more' circle>
               </el-button>
               <el-dropdown-menu slot='dropdown'>
-                <span> <el-dropdown-item> 查询</el-dropdown-item> </span>
+                <span> <el-dropdown-item> {this.$t('common.search')}</el-dropdown-item> </span>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
-        } }
+        }, width: '80' }
       ],
       activeName: '0'
     }
@@ -119,11 +119,11 @@ export default {
           })
         })
         this.tagItems.push({
-          tagIndex: '标签一',
+          tagIndex: this.$t('clusterManagement.tag'),
           colonys: colonys
         })
         this.tagItems.push({
-          tagIndex: '标签二',
+          tagIndex: this.$t('clusterManagement.tag'),
           colonys: colonys
         })
         this.tableListData = listResult
@@ -170,7 +170,7 @@ export default {
   align-items: center;
   .header-title{
     display: flex;
-    width: 180px;
+    min-width: 180px;
     justify-content: space-between;
     margin-left: 43%;
     img{

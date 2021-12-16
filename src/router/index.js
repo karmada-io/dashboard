@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import i18n from '@/utils/lang/index'
 
 Vue.use(Router)
 
@@ -34,7 +35,7 @@ export const constantRoutes = [
         path: '',
         component: () => import('@/views/clusterManagement/index'),
         name: 'clusterManagement',
-        meta: { title: '集群管理', icon: 'el-icon-s-finance', affix: true }
+        meta: { title: i18n.t('user.clusterManagement'), icon: 'el-icon-s-finance', affix: true }
       }
     ]
   },
@@ -47,7 +48,7 @@ export const constantRoutes = [
         path: '',
         component: () => import('@/views/schedpolicy/index'),
         name: 'Schedpolicy',
-        meta: { title: '调度策略管理', icon: 'el-icon-s-cooperation', affix: true }
+        meta: { title: i18n.t('router.schedulingPolicy'), icon: 'el-icon-s-cooperation', affix: true }
       }
     ]
   },
@@ -60,7 +61,7 @@ export const constantRoutes = [
         path: '',
         component: () => import('@/views/clusterConfig/index'),
         name: 'clusterConfig',
-        meta: { title: '集群统一配置', icon: 'el-icon-s-operation', affix: true }
+        meta: { title: i18n.t('router.configuration'), icon: 'el-icon-s-operation', affix: true }
       }
     ]
   }

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Cookies from 'js-cookie'
 import JsonViewer from 'vue-json-viewer'
 import Element from 'element-ui'
+import i18n from '@/utils/lang/index'
 import './styles/element-variables.scss'
 
 import '@/styles/index.scss' // global css
@@ -20,6 +21,7 @@ Vue.prototype.$echarts = echarts
 Vue.prototype.$HandleFunc = HandleFunc
 
 Vue.use(Element, {
+  i18n: (key, value) => i18n.t(key, value),
   size: Cookies.get('size') || 'small' // set element-ui default size
 })
 Vue.use(JsonViewer)
@@ -28,5 +30,6 @@ new Vue({
   el: '#app',
   router,
   store,
+  i18n,
   render: h => h(App)
 })

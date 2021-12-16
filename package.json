@@ -20,6 +20,7 @@
     "qs": "^6.9.4",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "vue": "^2.6.11",
+    "vue-i18n": "^8.26.7",
     "vue-json-viewer": "^2.2.20",
     "vue-router": "^3.4.4",
     "vuex": "^3.5.1"
@@ -34,6 +35,8 @@
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^6.2.2",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.2",
     "sass": "^1.44.0",
     "sass-loader": "^10.2.0",
     "script-ext-html-webpack-plugin": "2.1.3",
@@ -49,6 +52,17 @@
       "eslint:recommended",
       "@vue/airbnb"
     ],
+    "husky": {
+      "hooks": {
+        "pre-commit": "lint-staged"
+      }
+    },
+    "lint-staged": {
+      "src/**/*.{js,vue}": [
+        "eslint --fix",
+        "git add"
+      ]
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     },
