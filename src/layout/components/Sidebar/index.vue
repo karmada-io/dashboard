@@ -10,6 +10,7 @@
         :unique-opened="false"
         :active-text-color="variables.menuActiveText"
         :collapse-transition="false"
+        :class="this.$i18n.locale === 'en' ? 'english' : ''"
         mode="vertical"
       >
         <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />
@@ -53,3 +54,11 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+  .english{
+    .el-menu-item {
+      line-height: 24px;
+      white-space: normal;
+    }
+  }
+</style>

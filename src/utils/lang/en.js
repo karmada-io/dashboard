@@ -39,7 +39,7 @@ const clusterManagement = {
 }
 
 const login = {
-  karmada_title: 'Joint-cloud Container Cluster scheduling',
+  karmada_title: 'Joint-cloud Container Cluster Scheduling',
   welcome: 'Welcome to KARMADA',
   tokenLogin: 'Token Login',
   enterToken: 'Please enter your token',
@@ -57,7 +57,7 @@ const schedpolicy = {
 }
 
 const user = {
-  lang: 'Translations',
+  lang: 'Language',
   chinese: '中文',
   english: 'English',
   userName: 'Admin',

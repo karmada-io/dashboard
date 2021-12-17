@@ -84,7 +84,7 @@ export default {
               </el-dropdown-menu>
             </el-dropdown>
           </div>
-        }, width: '80' }
+        } }
       ],
       activeName: '0'
     }
