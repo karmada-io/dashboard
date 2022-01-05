@@ -1,0 +1,39 @@
+name: Image-Build-And-Push
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    # prevent job running from forked repository, otherwise
+    # 1. running on the forked repository would fail as missing necessary secret.
+    # 2. running on the forked repository would use unnecessary GitHub Action time.
+    if: ${{ github.repository == 'karmada-io/dashboard' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.18.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build
+        run: |
+          echo "start build"
+          npm install
+          npm run build
+          docker build . --file Dockerfile --tag ${{ secrets.IMAGE_REPOSITORY }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_VERSION }}
+      - name: Login in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push image
+        run: |
+          echo "push image"
+          docker push ${{ secrets.IMAGE_REPOSITORY }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_VERSION }}

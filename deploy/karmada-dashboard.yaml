@@ -17,9 +17,9 @@ spec:
         app: frontend
     spec:
       containers:
-        - image: jcce/karmada-dashboard:v0.1.0
+        - image: jcce/karmada-dashboard:latest
           name: frontend
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
               protocol: TCP
