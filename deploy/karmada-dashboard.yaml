@@ -17,7 +17,7 @@ spec:
         app: frontend
     spec:
       containers:
-        - image: jcce/karmada-dashboard:latest
+        - image: swr.ap-southeast-1.myhuaweicloud.com/karmada/karmada-dashboard:latest
           name: frontend
           imagePullPolicy: Always
           ports:
