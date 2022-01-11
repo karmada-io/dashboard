@@ -27,7 +27,7 @@ kubectl config use-context karmada-host
 ```
 #### 2.Deploy Karmada-dashboard
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/JCCE-nudt/karmada-dashboard/main/deploy/karmada-dashboard.yaml
+kubectl apply -f https://raw.githubusercontent.com/karmada-io/dashboard/main/deploy/karmada-dashboard.yaml
 ```
 When finish Karmada-dashboard can be accessed by http://your-karmada-host:30486
 
@@ -41,7 +41,7 @@ kubectl config use-context karmada-apiserver
 ```
 Create Service Account:
 ```bash
-kubectl apply -f  https://raw.githubusercontent.com/JCCE-nudt/karmada-dashboard/main/deploy/karmada-dashboard-role.yaml
+kubectl apply -f  https://raw.githubusercontent.com/karmada-io/dashboard/main/deploy/karmada-dashboard-role.yaml
 ```
 
 #### 4.Get Bearer Token
