@@ -69,6 +69,11 @@ This project is just getting started, we are happy to see more contributors join
 
 Please feel free to submit issues or pull requests to our repository.
 
+## 💻Development
+You can switch to `ng-dashboard` branch
+1. Run `npm install` to install all the dependencies
+2. Run `npm start` to start the dev server
+
 ## License
 
 Karmada-dashboard is under the Apache 2.0 license. See the [LICENSE](LICENSE) file for details.

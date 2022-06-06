@@ -1,76 +1,76 @@
 {
-  "name": "karmada-dashboard",
+  "name": "dashboard",
   "version": "0.1.0",
-  "description": "",
-  "author": "nudt",
-  "scripts": {
-    "dev": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
+  "private": true,
   "dependencies": {
-    "axios": "^0.20.0",
-    "compression-webpack-plugin": "^6.0.4",
-    "core-js": "^3.6.5",
-    "echarts": "^4.9.0",
-    "element-ui": "^2.13.2",
-    "filemanager-webpack-plugin": "^3.0.0-alpha.4",
-    "js-cookie": "^3.0.0",
-    "nprogress": "0.2.0",
-    "qs": "^6.9.4",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "vue": "^2.6.11",
-    "vue-i18n": "^8.26.7",
-    "vue-json-viewer": "^2.2.20",
-    "vue-router": "^3.4.4",
-    "vuex": "^3.5.1"
+    "@fontsource/roboto": "^4.5.7",
+    "@mui/icons-material": "^5.8.2",
+    "@mui/material": "^5.8.2",
+    "@mui/styled-engine-sc": "^5.8.0",
+    "@reduxjs/toolkit": "^1.8.2",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^0.27.2",
+    "i18next": "^21.8.5",
+    "i18next-browser-languagedetector": "^6.1.4",
+    "i18next-http-backend": "^1.4.1",
+    "js-cookie": "^3.0.1",
+    "prop-types": "^15.8.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-helmet-async": "^1.3.0",
+    "react-i18next": "^11.16.9",
+    "react-redux": "^8.0.2",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^9.0.3",
+    "redux-logger": "^3.0.6",
+    "redux-persist": "^6.0.0",
+    "styled-components": "^5.3.5",
+    "web-vitals": "^2.1.4"
   },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "^4.5.6",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/eslint-config-airbnb": "^5.0.2",
-    "autoprefixer": "9.5.1",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "husky": "^1.3.1",
-    "lint-staged": "8.1.5",
-    "sass": "^1.44.0",
-    "sass-loader": "^10.2.0",
-    "script-ext-html-webpack-plugin": "2.1.3",
-    "vue-template-compiler": "^2.6.11"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix",
+    "lint-staged": "lint-staged --config lint-staged.js",
+    "husky-install": "husky install",
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,json}' --config ./.prettierrc"
   },
   "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
     "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended",
-      "@vue/airbnb"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
-  },
-  "lint-staged": {
-    "src/**/*.{js,vue}": [
-      "eslint --fix",
-      "git add"
+      "react-app",
+      "react-app/jest"
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "devDependencies": {
+    "@redux-devtools/extension": "^3.2.2",
+    "eslint": "^8.17.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.0",
+    "prettier": "^2.6.2"
+  }
 }

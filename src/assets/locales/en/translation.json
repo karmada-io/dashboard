@@ -1,0 +1,13 @@
+{
+  "karmada_title": "Joint-cloud Container Cluster Scheduling",
+  "welcome_to_karmada_dashboard": "Welcome to the Karmada Dashboard",
+  "token_login": "Token Login",
+  "kube_config_login": "Kubeconfig Login",
+  "token_help_text": "Please enter your token here",
+  "kube_config_helper_text": "Choose Kubeconfig file",
+  "login": "Login",
+  "token_auth_mode": "Token",
+  "kube_config_auth_mode": "Kubeconfig",
+  "token_login_note": "Every service account has a Secret with valid Bearer token that can be used to log in to the Dashboard.",
+  "kube_config_note": "Please select the kubeconfig file that you created to configure access to the cluster."
+}
