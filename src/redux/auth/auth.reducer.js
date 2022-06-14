@@ -16,7 +16,7 @@ const initialState = {
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case AuthActionTypes.LOGIN_SUCCESS:
-      cookieOps.setKeyValue(action.payload.token);
+      cookieOps.setKeyValue(TOKEN, action.payload.token);
       localStorage.setItem(IS_AUTHENTICATED, true);
       return {
         ...state,

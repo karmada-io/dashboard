@@ -1,10 +1,10 @@
-import UserActionTypes from "./auth.types";
+import AuthActionTypes from "./auth.types";
 
-export const loginSuccess = (items) => ({
-  type: UserActionTypes.LOGIN_SUCCESS,
-  payload: items
+export const loginSuccess = (payload) => ({
+  type: AuthActionTypes.LOGIN_SUCCESS,
+  payload: payload
 });
 
 export const logout = () => ({
-  type: UserActionTypes.LOGOUT
+  type: AuthActionTypes.LOGOUT
 });

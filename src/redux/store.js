@@ -1,5 +1,4 @@
 import logger from "redux-logger";
-import { persistStore } from "redux-persist";
 import { configureStore } from "@reduxjs/toolkit";
 import indexReducer from "./index-reducer";
 
@@ -14,5 +13,3 @@ export const store = configureStore({
   middleware: middlewares,
   enhancers: window.devToolsExtension ? window.devToolsExtension() : (f) => f
 });
-
-export const persistor = persistStore(store);

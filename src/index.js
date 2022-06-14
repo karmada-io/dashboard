@@ -1,4 +1,3 @@
-import { PersistGate } from "redux-persist/integration/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { StyledEngineProvider } from "@mui/material";
@@ -7,7 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { Provider } from "react-redux";
 import App from "./App";
-import { store, persistor } from "./redux/store";
+import { store } from "./redux/store";
 import "./i18nextConf";
 import GlobalStyles from "./assets/styles/GlobalStyles";
 import THEME from "./assets/styles/theme";
@@ -19,13 +18,11 @@ root.render(
     <HelmetProvider>
       <Provider store={store}>
         <BrowserRouter>
-          <PersistGate persistor={persistor}>
-            <StyledEngineProvider injectFirst>
-              <ThemeProvider theme={THEME}>
-                <App />
-              </ThemeProvider>
-            </StyledEngineProvider>
-          </PersistGate>
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={THEME}>
+              <App />
+            </ThemeProvider>
+          </StyledEngineProvider>
         </BrowserRouter>
       </Provider>
     </HelmetProvider>

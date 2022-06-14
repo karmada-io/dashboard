@@ -5,8 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { MoreHoriz as MoreHorizIcon } from "@mui/icons-material";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import cookieOps from "../utils/cookieOps";
-import { AUTH_MODE, AUTH_MODE_TOKEN } from "../constants/index";
+import {
+  AUTH_MODE,
+  AUTH_MODE_TOKEN,
+  IS_AUTHENTICATED,
+  TOKEN
+} from "../constants/index";
 import { loginApi } from "../apis/login";
 import { loginSuccess } from "../redux/auth/auth.actions";
 import {
@@ -33,6 +37,7 @@ import {
   setLoadingTrue,
   setStatus
 } from "../redux/root/root.action";
+import cookieOps from "../utils/cookieOps";
 
 function LoginPage() {
   const { t } = useTranslation();
@@ -64,8 +69,13 @@ function LoginPage() {
 
   const handleFileUploadChange = (event) => {
     const fileUploaded = event.target.files[0];
-    console.log(fileUploaded);
     setKubeConfigFile(fileUploaded);
+    dispatch(
+      setStatus({
+        status: "File uploaded successfully",
+        statusType: "success"
+      })
+    );
   };
 
   const handleLogin = (event) => {
@@ -77,9 +87,7 @@ function LoginPage() {
         const { items } = res;
         dispatch(setLoadingFalse());
         if (items) {
-          console.log(items);
-
-          dispatch(loginSuccess(items));
+          dispatch(loginSuccess({ item: items, token: authToken }));
           dispatch(
             setStatus({
               status: "Login Success!!",
@@ -108,7 +116,7 @@ function LoginPage() {
   };
   return (
     <div>
-      {cookieOps.getValue("isAuthenticated") === "true" ? (
+      {localStorage.getItem(IS_AUTHENTICATED) && cookieOps.getValue(TOKEN) ? (
         <Navigate to="/" />
       ) : (
         <LoginPageContainer>

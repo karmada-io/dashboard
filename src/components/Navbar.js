@@ -11,19 +11,22 @@ import {
 
 function Navbar() {
   const location = useLocation();
+  const availablePaths = ["/", "/work", "/propogation"];
 
   return (
     <NavbarMainContainer>
       <NavbarSubContainer>
         <div>
-          <img
-            src={require("../assets/images/karmada-horizontal-color-logo.png")}
-            alt="karmada-logo"
-          />
+          <Link href="/" rel="noreferrer">
+            <img
+              src={require("../assets/images/karmada-horizontal-color-logo.png")}
+              alt="karmada-logo"
+            />
+          </Link>
         </div>
 
         <NavbarOpsContainer>
-          {location.pathname !== "/login" ? (
+          {availablePaths.includes(location.pathname) ? (
             <div>
               <div className="operations">SearchBar</div>
               <div className="operations">Namespaces</div>
