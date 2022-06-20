@@ -1,0 +1,8 @@
+const RootActionTypes = {
+  SET_IS_LOADING_TRUE: "SET_IS_LOADING_TRUE",
+  SET_IS_LOADING_FALSE: "SET_IS_LOADING_FALSE",
+  SET_STATUS: "SET_STATUS",
+  REMOVE_STATUS: "REMOVE_STATUS"
+};
+
+export default RootActionTypes;

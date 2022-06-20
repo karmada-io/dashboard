@@ -69,6 +69,61 @@ This project is just getting started, we are happy to see more contributors join
 
 Please feel free to submit issues or pull requests to our repository.
 
+## 💻Development
+You can switch to `main` branch
+1. Run `npm install` to install all the dependencies
+2. Run `npm start` to start the dev server
+3. For locally testing the developed feature, create a build of the project using `npm run build`
+4. Then create a docker image using the dockerfile present in the project.
+5. Start the Karmada project locally.
+6. Switch user-context to karmada-host.
+
+    ```bash 
+    export KUBECONFIG="$HOME/.kube/karmada.config"
+    kubectl config use-context karmada-host
+    ```
+
+7. Update `image` & `imagePullPolicy` key in the `kamada-dashboard.yaml` file to the image name that you have created with tag & `Never` value resprectively.
+
+    ```yaml
+    spec:
+        containers:
+            - image: swr.ap-southeast-1.myhuaweicloud.com/karmada/karmada-dashboard:latest
+            name: frontend
+            imagePullPolicy: Always
+            ports:
+                - containerPort: 80
+                protocol: TCP
+    ```
+
+    After change it should look like this
+
+    ```yaml
+    spec:
+        containers:
+            - image: imageName:tag
+            name: frontend
+            imagePullPolicy: Never
+            ports:
+                - containerPort: 80
+                protocol: TCP
+
+    ```
+
+8. Now deploy the karmada dashboard using 
+    ```bash
+    kubectl apply -f ./deploy/karmada-dashboard.yaml
+    ```
+9. Load the docker image using `kind`.
+    ```bash
+    kind load docker-image imageName --name=karmada-host
+    ```
+10. If you see `ErrImageNeverPull` error while viewing the pods status. Try to redeploy the the dashboard using the command defined in `step 8`.
+
+11. Now follow the step mentioned above to create service account & get access token. 
+
+12. Now open Karmada-dashboard with url http://your-karmada-host:30486. Copy the token you just generated and paste it into the Enter token field on the login page.
+
 ## License
 
 Karmada-dashboard is under the Apache 2.0 license. See the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,13 @@
+{
+  "karmada_title": "云际容器集群调度",
+  "welcome_to_karmada_dashboard": "欢迎来到 Karmada 仪表板",
+  "token_login": "Token 登录",
+  "kube_config_login": "Kubeconfig 登录",
+  "token_help_text": "请输入您的 token 这里",
+  "kube_config_helper_text": "选择 Kubeconfig 文件",
+  "login": "登录",
+  "token_auth_mode": "Token",
+  "kube_config_auth_mode": "Kubeconfig",
+  "token_login_note": "每个服务帐户都有一个带有有效 Bearer 令牌的 Secret，可用于登录 Dashboard",
+  "kube_config_note": "请选择您创建的 kubeconfig 文件来配置对集群的访问权限"
+}
