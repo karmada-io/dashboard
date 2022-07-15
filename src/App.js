@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import Overview from "./pages/overview";
 import PageNotFound from "./pages/pagenotfound";
 import ProtectedRoute from "./routes/ProtectedRoutes";
+import Playground from "./pages/Playground";
 
 import Notify from "./components/Notify";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -26,6 +27,7 @@ function App() {
           }
         />
         <Route path="login" element={<LoginPage />} />
+        <Route path="playground" element={<Playground />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <ToastContainer />
