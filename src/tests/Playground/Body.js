@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Switch from "@mui/material/Switch";
+import CustomPaginationActionsTable from "components/UI/Table";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -92,6 +93,9 @@ export default function Body() {
       <Typography gutterBottom variant="h2">
         Table
       </Typography>
+      <Box display="flex" gap={1} mb={2} sx={{ border: 1 }}>
+        <CustomPaginationActionsTable />
+      </Box>
     </Main>
   );
 }
