@@ -4,7 +4,6 @@ node_modules
 *.zip
 /build
 
-
 # local env files
 .env.local
 .env.*.local
@@ -23,3 +22,4 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+package-lock.json
