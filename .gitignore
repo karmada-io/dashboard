@@ -3,7 +3,7 @@ node_modules
 /dist
 *.zip
 /build
-/__snapshots__
+*.snap
 
 # local env files
 .env.local
