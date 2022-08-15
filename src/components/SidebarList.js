@@ -1,5 +1,6 @@
 import * as React from "react";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
@@ -8,22 +9,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
-
-const listItems = [
-  {
-    key: "Cluster Management",
-    sub: [{ key: "Cluster" }, { key: "Other Cluster Resources" }]
-  },
-  {
-    key: "Propagation Policy",
-    sub: [{ key: "Cluster Propagation Policy" }]
-  },
-  { key: "Override Policy", sub: [{ key: "Cluster Override Policy" }] },
-  { key: "Resource Binding", sub: [{ key: "Cluster Resource Binding" }] },
-  { key: "Work" },
-  { key: "Settings" },
-  { key: "About" }
-];
+import { listItems } from "routes/sidebarListItems";
 
 const generateList = (listItem, open, handleClick) => {
   return (
@@ -44,8 +30,12 @@ const generateList = (listItem, open, handleClick) => {
                 };
               }}
             >
-              {listItem.sub.map(({ key }) => (
-                <ListItemButton key={key} sx={{ pl: 4 }}>
+              {listItem.sub.map(({ key, to = undefined }) => (
+                <ListItemButton
+                  to={to ? "/" + to : ""}
+                  key={key}
+                  sx={{ pl: 4 }}
+                >
                   <ListItemText primary={key} />
                 </ListItemButton>
               ))}
@@ -55,6 +45,7 @@ const generateList = (listItem, open, handleClick) => {
       ) : (
         <ListItem key={listItem.key} disablePadding>
           <ListItemButton
+            to={listItem.to ? "/" + listItem.to : ""}
             sx={(theme) => {
               return {
                 border: "0.5px",

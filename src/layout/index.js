@@ -2,14 +2,17 @@ import * as React from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
-
+import PropTypes from "prop-types";
 import { default as theme } from "../assets/styles/theme";
 import Navbar from "../components/Navbar";
 import Header from "./header/index";
 import Sidebar from "./sidebar/index";
 import Body from "./body/index";
 
-function DashboardContent() {
+Dashboard.propTypes = {
+  children: PropTypes.element
+};
+export default function Dashboard({ children }) {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -45,14 +48,10 @@ function DashboardContent() {
             }}
           >
             <Sidebar open={open} />
-            <Body />
+            <Body>{children}</Body>
           </Box>
         </Box>
       </CssBaseline>
     </ThemeProvider>
   );
-}
-
-export default function Dashboard() {
-  return <DashboardContent />;
 }

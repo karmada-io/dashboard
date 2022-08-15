@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 
@@ -30,12 +31,15 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   })
 );
 
-export default function Body() {
+Body.propTypes = {
+  children: PropTypes.element
+};
+export default function Body({ children }) {
   return (
     <Main open={open}>
       <DrawerHeader>
         <Typography gutterBottom variant="h1">
-          {"Placeholder"}
+          {children}
         </Typography>
       </DrawerHeader>
     </Main>
