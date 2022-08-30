@@ -6,7 +6,7 @@ import cookieOps from "../utils/cookieOps";
 function ProtectedRoute({ redirectPath = "/login", children }) {
   let authToken = cookieOps.getValue(TOKEN);
 
-  if (!authToken && process.env.REACT_APP_STAGE === "TEST2") {
+  if (!authToken && process.env.REACT_APP_STAGE === "TEST") {
     authToken = "SECRETE_PASSWORDS1234";
   }
 
