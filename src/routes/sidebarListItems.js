@@ -5,14 +5,23 @@ export const listItems = [
   },
   {
     key: "Propagation Policy",
-    sub: [{ key: "Cluster Propagation Policy" }]
+    sub: [{ key: "Propagation Policy" }]
   },
   {
     key: "Override Policy",
-    sub: [{ key: "Cluster Override Policy", to: "overridepolicy" }]
+    sub: [
+      { key: "Override Policy", to: "overridePolicy" },
+      { key: "Cluster Override Policy", to: "clusterOverridePolicy" }
+    ]
   },
-  { key: "Resource Binding", sub: [{ key: "Cluster Resource Binding" }] },
-  { key: "Work", to: "work" },
+  {
+    key: "Resource Binding",
+    sub: [
+      { key: "Resource Binding", to: "resourceBinding" },
+      { key: "Cluster Resource Binding", to: "clusterResourceBinding" }
+    ]
+  },
+  { key: "Works", to: "works" },
   { key: "Settings" },
   { key: "About" }
 ];

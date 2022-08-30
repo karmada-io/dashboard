@@ -2,7 +2,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { TOKEN } from "../constants";
 import cookieOps from "./cookieOps";
-
 import "react-toastify/dist/ReactToastify.css";
 
 // create an axios instance
@@ -33,7 +32,7 @@ service.interceptors.response.use(
   (response) => {
     const res = response.data;
 
-    // if the custom code is not 20000, it is judged as an error.
+    // if the custom code is not 200, it is judged as an error.
     if (
       response.status !== 200 &&
       response.status !== 201 &&
@@ -61,5 +60,21 @@ service.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export function getRequest(requestAPI) {
+  return new Promise((resolve, reject) => {
+    requestAPI()
+      .catch((err) => {
+        reject(err);
+        toast({
+          message: "Error",
+          type: "error",
+          duration: 10 * 1000
+        });
+        return Promise.reject(err);
+      })
+      .then((res) => resolve(res));
+  });
+}
 
 export default service;

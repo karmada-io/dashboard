@@ -8,8 +8,12 @@ import PageNotFound from "./pages/Pagenotfound";
 import ProtectedRoute from "./routes/ProtectedRoutes";
 import Notify from "./components/Notify";
 import LoadingSpinner from "./components/LoadingSpinner";
-import DashboardTest from "./tests/Playground/DashboardTest";
 import Dashboard from "layout";
+import OverridePolicy from "pages/OverridePolicy";
+import ClusterOverridePolicy from "pages/ClusterOverridePolicy";
+import ResourceBinding from "pages/ResourceBinding";
+import ClusterResourceBinding from "pages/ClusterResourceBinding";
+import Work from "pages/Work";
 
 function App() {
   const status = useSelector((state) => state.root.status);
@@ -29,18 +33,19 @@ function App() {
           }
         >
           <Route path="" element={<Overview />} />
-          <Route path="overridepolicy" element={"123"} />
-          <Route path="work" element={"123"} />
+          <Route path="overridePolicy" element={<OverridePolicy />} />
+          <Route
+            path="clusterOverridePolicy"
+            element={<ClusterOverridePolicy />}
+          />
+          <Route path="resourceBinding" element={<ResourceBinding />} />
+          <Route
+            path="clusterResourceBinding"
+            element={<ClusterResourceBinding />}
+          />
+          <Route path="works" element={<Work />} />
         </Route>
-
         <Route path="login" element={<LoginPage />} />
-        {
-          // playground is a dev feature, remove playground before offciail release
-          process.env.NODE_ENV === "development" ||
-          process.env.NODE_ENV === "test" ? (
-            <Route exact path="/playground" element={DashboardTest()} />
-          ) : null
-        }
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <ToastContainer />

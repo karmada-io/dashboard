@@ -1,16 +1,6 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-start"
-}));
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
@@ -35,13 +25,5 @@ Body.propTypes = {
   children: PropTypes.element
 };
 export default function Body({ children }) {
-  return (
-    <Main open={open}>
-      <DrawerHeader>
-        <Typography gutterBottom variant="h1">
-          {children}
-        </Typography>
-      </DrawerHeader>
-    </Main>
-  );
+  return <Main open={open}>{children}</Main>;
 }
