@@ -125,7 +125,7 @@ You can switch to `main` branch
 kubectl config use-context karmada-apiserver
 ```
 
-Edit karmada-dashboard-role.yaml by replace everything original with the following code:
+If your kubernetes version is v1.24+, you have to manually createt a secret. You should edit karmada-dashboard-role.yaml by replace everything original with the following code:
 
 ```yaml
 kind: ClusterRoleBinding
@@ -152,12 +152,12 @@ metadata:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 secrets:
-  - name: dashboardSecrete
+  - name: dashboardSecret
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: dashboardSecrete
+  name: dashboardSecret
   namespace: karmada-system
   annotations: 
     kubernetes.io/service-account.name: Karmada-dashboard
