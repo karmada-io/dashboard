@@ -5,8 +5,10 @@
   "dependencies": {
     "@fontsource/roboto": "^4.5.7",
     "@mui/icons-material": "^5.8.2",
+    "@mui/lab": "^5.0.0-alpha.96",
     "@mui/material": "^5.8.2",
     "@mui/styled-engine-sc": "^5.8.0",
+    "@mui/x-data-grid": "^5.15.2",
     "@reduxjs/toolkit": "^1.8.2",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
@@ -27,6 +29,7 @@
     "react-toastify": "^9.0.3",
     "redux-logger": "^3.0.6",
     "styled-components": "^5.3.5",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -70,6 +73,7 @@
     "eslint-plugin-react-hooks": "^4.5.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "react-test-renderer": "^18.2.0"
   }
 }

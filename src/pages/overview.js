@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import Navbar from "../components/Navbar";
 
 function Overview() {
   return (
@@ -9,8 +8,6 @@ function Overview() {
         <title>Overview | Karmada</title>
         <meta name="description" content="Overview page of Karmada Dashboard" />
       </Helmet>
-      <Navbar />
-      Overview Page
     </div>
   );
 }

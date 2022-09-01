@@ -1,4 +1,4 @@
-import request from "../utils/request";
+import request from "utils/request";
 
 export function loginApi(token) {
   return request({
