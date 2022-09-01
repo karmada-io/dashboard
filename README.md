@@ -152,12 +152,12 @@ metadata:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 secrets:
-  - name: dashboardSecret
+  - name: dashboardsecret
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: dashboardSecret
+  name: dashboardsecret
   namespace: karmada-system
   annotations: 
     kubernetes.io/service-account.name: Karmada-dashboard
