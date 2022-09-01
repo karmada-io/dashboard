@@ -11,6 +11,7 @@ import { getOverrideListSummary } from "utils/generateResponseSummary";
 import { useTestFetchList } from "tests/hooks/useTestFetchList";
 import TreeViewer from "components/UI/TreeViewer";
 import Body from ".";
+import { columnTemplate } from "./template";
 
 export default function ClusterOverridePolicyMain() {
   let data = {};
@@ -33,29 +34,11 @@ export default function ClusterOverridePolicyMain() {
 
   const columns = useMemo(
     () => [
-      { field: "id", hide: true, type: "number" },
+      ...columnTemplate,
       {
-        field: "name",
-        headerName: "Name",
-        type: "string",
-        width: 200,
-        align: "center",
-        headerAlign: "center",
-        disableColumnMenu: true
-      },
-      {
-        field: "uid",
-        headerName: "UID",
-        type: "string",
-        width: 200,
-        align: "center",
-        headerAlign: "center",
-        disableColumnMenu: true
-      },
-      {
-        field: "namespace",
-        headerName: "Namespace",
-        type: "string",
+        field: "overrideRules",
+        headerName: "# of Override Rules",
+        type: "number",
         width: 200,
         align: "center",
         headerAlign: "center",
@@ -64,15 +47,6 @@ export default function ClusterOverridePolicyMain() {
       {
         field: "resourceSelectors",
         headerName: "Resource Selectors",
-        type: "string",
-        width: 250,
-        align: "center",
-        headerAlign: "center",
-        disableColumnMenu: true
-      },
-      {
-        field: "targetCluster",
-        headerName: "Target Cluster",
         type: "string",
         width: 250,
         align: "center",

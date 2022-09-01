@@ -35,6 +35,7 @@ export default function DataGrid({ columns, rows }) {
         pageSize={10}
         rowsPerPageOptions={[10]}
         disableSelectionOnClick
+        getRowHeight={() => "auto"}
         experimentalFeatures={{ newEditingApi: true }}
       />
     </Box>

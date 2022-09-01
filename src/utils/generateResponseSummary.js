@@ -8,7 +8,7 @@ export function getOverrideListSummary(data) {
         resourceSelectors: item.spec.resourceSelectors
           .map((r) => r.kind + "/" + r.name)
           .join("、"),
-        targetCluster: item.spec.targetCluster.clusterNames
+        overrideRules: item.spec.overrideRules.length
       }))
     : [];
 }

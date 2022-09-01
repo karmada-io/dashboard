@@ -34,7 +34,7 @@ export function getClusterResourceBinding(query) {
 
 export function getWorks(query) {
   return request({
-    url: "/apis/cluster.karmada.io/v1alpha1/works",
+    url: "/apis/work.karmada.io/v1alpha1/works",
     method: "get",
     params: query
   });

@@ -11,6 +11,7 @@ import { getResourceBindingSummary } from "utils/generateResponseSummary";
 import { useTestFetchList } from "tests/hooks/useTestFetchList";
 import TreeViewer from "components/UI/TreeViewer";
 import Body from ".";
+import { columnTemplate } from "./template";
 
 export default function ResourceBindingMain() {
   let data = {};
@@ -32,34 +33,7 @@ export default function ResourceBindingMain() {
 
   const columns = useMemo(
     () => [
-      { field: "id", hide: true, type: "number" },
-      {
-        field: "name",
-        headerName: "Name",
-        type: "string",
-        width: 200,
-        align: "center",
-        headerAlign: "center",
-        disableColumnMenu: true
-      },
-      {
-        field: "uid",
-        headerName: "UID",
-        type: "string",
-        width: 200,
-        align: "center",
-        headerAlign: "center",
-        disableColumnMenu: true
-      },
-      {
-        field: "namespace",
-        headerName: "Namespace",
-        type: "string",
-        width: 200,
-        align: "center",
-        headerAlign: "center",
-        disableColumnMenu: true
-      },
+      ...columnTemplate,
       {
         field: "clusters",
         headerName: "Clusters",
