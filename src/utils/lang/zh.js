@@ -53,7 +53,15 @@ const schedpolicy = {
   global: '是否全局',
   targetCluster: '作用集群',
   targetResource: '作用资源类型/名称',
-  targetLabelName: '作用集群标签/集群名称'
+  targetLabelName: '作用集群标签/集群名称',
+  scope: '作用范围',
+  namespace: '命名空间',
+  cluster: '集群',
+  replicaSchedulingType: '副本调度策略',
+  replicaDivisionPreference: '拆分策略',
+  Divided: '拆分',
+  Aggregated: '聚合',
+  Weighted: '权重'
 }
 
 const user = {

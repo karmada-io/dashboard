@@ -16,10 +16,10 @@ const getDistributionList = () => {
           name: n.metadata.name,
           status: '',
           namespace: n.metadata.namespace,
-          kind: n.kind === 'PropagationPolicy' ? 'no' : 'yes',
-          clusterNames: n.spec.placement.clusterAffinity.clusterNames.join('/'),
-          replicaDivisionPreference: n.spec.placement.replicaScheduling.replicaDivisionPreference,
-          replicaSchedulingType: n.spec.placement.replicaScheduling.replicaSchedulingType
+          kind: 'namespace',
+          clusterNames: n?.spec?.placement?.clusterAffinity?.clusterNames?.join('/'),
+          replicaDivisionPreference: n?.spec?.placement?.replicaScheduling?.replicaDivisionPreference,
+          replicaSchedulingType: n?.spec?.placement?.replicaScheduling?.replicaSchedulingType
         })
       })
       total += items.length
@@ -30,10 +30,10 @@ const getDistributionList = () => {
             name: n.metadata.name,
             status: '',
             namespace: n.metadata.namespace,
-            kind: n.kind === 'PropagationPolicy' ? 'no' : 'yes',
-            clusterNames: n.spec.placement.clusterAffinity.clusterNames.join('/'),
-            replicaDivisionPreference: n.spec.placement.replicaScheduling.replicaDivisionPreference,
-            replicaSchedulingType: n.spec.placement.replicaScheduling.replicaSchedulingType
+            kind: 'cluster',
+            clusterNames: n?.spec?.placement?.clusterAffinity?.clusterNames?.join('/'),
+            replicaDivisionPreference: n?.spec.placement?.replicaScheduling?.replicaDivisionPreference,
+            replicaSchedulingType: n?.spec?.placement?.replicaScheduling?.replicaSchedulingType
           })
         })
         total += items.length
