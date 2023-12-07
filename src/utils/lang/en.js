@@ -53,7 +53,15 @@ const schedpolicy = {
   global: 'Global',
   targetCluster: 'Target Cluster',
   targetResource: 'Target Resource Type/Name',
-  targetLabelName: 'Target Cluster Label/Name'
+  targetLabelName: 'Target Cluster Label/Name',
+  scope: 'Affect Scope',
+  namespace: 'Namepace',
+  cluster: 'Cluster',
+  replicaSchedulingType: 'Replica Scheduling Type',
+  replicaDivisionPreference: 'Division Preference',
+  Divided: 'Divided',
+  Aggregated: 'Aggregated',
+  Weighted: 'Weighted'
 }
 
 const user = {
