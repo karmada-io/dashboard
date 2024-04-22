@@ -75,3 +75,6 @@ This section shows more detaied view of the function described in the section of
   Repo of helm and docker are under the spec of OCI, so we put it together:
   ![basic-config-oci.png](../images/basic-config-oci.png)
   ![basic-config-oci-add-helm.png](../images/basic-config-oci-add-helm.png)
+
+# Credits
+Proposed by [@a](https://github.com/a).
