@@ -77,4 +77,5 @@ This section shows more detaied view of the function described in the section of
   ![basic-config-oci-add-helm.png](../images/basic-config-oci-add-helm.png)
 
 # Credits
+The origin design file of Karmada dashboard can be visit [here](../images/karmada-dashboard.fig), it's in format of [figma](https://www.figma.com/), you can view it with figma locally, or you can visit it online, follow the [link](https://www.figma.com/file/Bhr3HPgEpdpFJ6bDZyCwGj/karmada-dashboard?type=design&node-id=0%3A1&mode=design&t=YEoDYyUWN8hW2Kje-1)
 Proposed by [@a](https://github.com/a).
