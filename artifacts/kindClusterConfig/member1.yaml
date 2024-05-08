@@ -1,0 +1,9 @@
+# nonk8s
+kind: Cluster
+apiVersion: "kind.x-k8s.io/v1alpha4"
+networking:
+  apiServerAddress: "{{host_ipaddress}}"
+  podSubnet: "10.10.0.0/16"
+  serviceSubnet: "10.11.0.0/16"
+nodes:
+  - role: control-plane
