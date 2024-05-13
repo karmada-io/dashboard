@@ -12,5 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.12.11"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.11"
   }
 }
