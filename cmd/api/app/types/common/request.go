@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"strconv"
 	"strings"
 )
@@ -37,4 +38,20 @@ func ParseDataSelectPathParameter(request *gin.Context) *dataselect.DataSelectQu
 	sortQuery := parseSortPathParameter(request)
 	filterQuery := parseFilterPathParameter(request)
 	return dataselect.NewDataSelectQuery(paginationQuery, sortQuery, filterQuery)
+}
+
+// parseNamespacePathParameter parses namespace selector for list pages in path parameter.
+// The namespace selector is a comma separated list of namespaces that are trimmed.
+// No namespaces mean "view all user namespaces", i.e., everything except kube-system.
+func ParseNamespacePathParameter(request *gin.Context) *common.NamespaceQuery {
+	namespace := request.Param("namespace")
+	namespaces := strings.Split(namespace, ",")
+	var nonEmptyNamespaces []string
+	for _, n := range namespaces {
+		n = strings.Trim(n, " ")
+		if len(n) > 0 {
+			nonEmptyNamespaces = append(nonEmptyNamespaces, n)
+		}
+	}
+	return common.NewNamespaceQuery(nonEmptyNamespaces)
 }

@@ -13,6 +13,7 @@ require (
 	k8s.io/client-go v0.28.5
 	k8s.io/component-base v0.28.5
 	k8s.io/klog/v2 v2.100.1
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
@@ -112,5 +113,4 @@ require (
 	sigs.k8s.io/kustomize/api v0.13.5-0.20230601165947-6ce0bf390ce3 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.14.3-0.20230601165947-6ce0bf390ce3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
-	sigs.k8s.io/yaml v1.3.0 // indirect
 )

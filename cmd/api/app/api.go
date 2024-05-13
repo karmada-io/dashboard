@@ -15,6 +15,7 @@ import (
 
 	// Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
 )
 
 // NewApiCommand creates a *cobra.Command object with default parameters
