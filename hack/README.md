@@ -8,3 +8,6 @@ Differences from the main repository are:
 5. Modularization of the original monolithic in `util.sh`: the implementation has been split into modules based on functionality and services, making maintenance easier.
 6. Adding more comments to shell functions.
 
+
+# Usage
+## start a mininal karmada environment
