@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	kubernetesRestConfig   *rest.Config
-	kubernetesApiConfig    *clientcmdapi.Config
-	inClusterClient        kubeclient.Interface
-	karmadaRestConfig      *rest.Config
-	karmadaApiConfig       *clientcmdapi.Config
-	inClusterKarmadaClient karmadaclientset.Interface
+	kubernetesRestConfig               *rest.Config
+	kubernetesApiConfig                *clientcmdapi.Config
+	inClusterClient                    kubeclient.Interface
+	karmadaRestConfig                  *rest.Config
+	karmadaApiConfig                   *clientcmdapi.Config
+	inClusterKarmadaClient             karmadaclientset.Interface
+	inClusterClientForKarmadaApiServer kubeclient.Interface
 )
 
 type configBuilder struct {
@@ -196,4 +197,25 @@ func GetKarmadaConfig() (*rest.Config, *clientcmdapi.Config, error) {
 		return nil, nil, fmt.Errorf("client package not initialized")
 	}
 	return karmadaRestConfig, karmadaApiConfig, nil
+}
+
+func InClusterClientForKarmadaApiServer() kubeclient.Interface {
+	if !isKarmadaInitialized() {
+		return nil
+	}
+	if inClusterClientForKarmadaApiServer != nil {
+		return inClusterClientForKarmadaApiServer
+	}
+	restConfig, _, err := GetKarmadaConfig()
+	if err != nil {
+		klog.ErrorS(err, "Could not get karmada restConfig")
+		return nil
+	}
+	c, err := kubeclient.NewForConfig(restConfig)
+	if err != nil {
+		klog.ErrorS(err, "Could not init kubernetes in-cluster client for karmada apiserver")
+		return nil
+	}
+	inClusterClientForKarmadaApiServer = c
+	return inClusterClientForKarmadaApiServer
 }
