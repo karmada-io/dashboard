@@ -1,0 +1,16 @@
+{
+  "name": "karmada-dashboard-ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dashboard:dev": "cd apps/dashboard && pnpm run dev",
+    "dashboard:build": "cd apps/dashboard && pnpm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.11"
+  }
+}
