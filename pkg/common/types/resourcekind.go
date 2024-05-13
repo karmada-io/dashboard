@@ -8,6 +8,7 @@ type ResourceKind string
 // List of all resource kinds supported by the UI.
 const (
 	ResourceKindCluster                  = "cluster"
+	ResourceKindPropagationPolicy        = "propagationpolicy"
 	ResourceKindConfigMap                = "configmap"
 	ResourceKindDaemonSet                = "daemonset"
 	ResourceKindDeployment               = "deployment"
