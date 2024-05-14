@@ -16,10 +16,12 @@ export async function GetResource(params: UnstructuredParams) {
     return resp.data
 }
 
-export async function PutResource(params: UnstructuredParams) {
+export async function PutResource(params: UnstructuredParams & {
+    content: Record<string, any>
+}) {
     const url = generateUrlForUnstructuredParams((params))
     const resp = await karmadaClient.put<IResponse<any>>(
-        url,
+        url,params.content
     )
     return resp.data
 }

@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"github.com/gobuffalo/flect"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -29,7 +30,13 @@ type resourceVerber struct {
 }
 
 func (v *resourceVerber) groupVersionResourceFromUnstructured(object *unstructured.Unstructured) schema.GroupVersionResource {
-	return schema.GroupVersionResource{}
+	gvk := object.GetObjectKind().GroupVersionKind()
+
+	return schema.GroupVersionResource{
+		Group:    gvk.Group,
+		Version:  gvk.Version,
+		Resource: flect.Pluralize(strings.ToLower(gvk.Kind)),
+	}
 }
 
 func (v *resourceVerber) groupVersionResourceFromKind(kind string) (schema.GroupVersionResource, error) {
