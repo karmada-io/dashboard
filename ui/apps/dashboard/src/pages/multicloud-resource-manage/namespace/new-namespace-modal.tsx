@@ -2,7 +2,6 @@ import {FC} from 'react';
 import {Modal, Form, Radio, Input} from 'antd'
 import {CreateNamespace} from "@/services/namespace.ts";
 import {IResponse} from "@/services/base.ts";
-
 interface NewNamespaceModalProps {
     open?: boolean;
     onOk?: (ret: IResponse<string>) => Promise<void>;
@@ -15,6 +14,7 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
         name: string,
         skipAutoPropagation: boolean,
     }>()
+
     return (
         <Modal
             open={open}
@@ -33,7 +33,6 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
                 } catch (e) {
                     console.log('e', e)
                 }
-                //
             }}
             onCancel={async () => {
                 form.resetFields()

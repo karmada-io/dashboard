@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
@@ -95,6 +96,20 @@ func ToEvent(event v1.Event) common.Event {
 	}
 
 	return result
+}
+
+// GetResourceEvents gets events associated to specified resource.
+func GetResourceEvents(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuery, namespace, name string) (
+	*common.EventList, error) {
+	resourceEvents, err := GetEvents(client, namespace, name)
+	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
+	if criticalError != nil {
+		return EmptyEventList, err
+	}
+
+	events := CreateEventList(resourceEvents, dsQuery)
+	events.Errors = nonCriticalErrors
+	return &events, nil
 }
 
 // GetNamespaceEvents gets events associated to a namespace with given name.

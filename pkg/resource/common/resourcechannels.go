@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	apps "k8s.io/api/apps/v1"
 	autoscaling "k8s.io/api/autoscaling/v1"
 	batch "k8s.io/api/batch/v1"
@@ -119,10 +120,74 @@ type ReplicaSetListChannel struct {
 	Error chan error
 }
 
+// GetReplicaSetListChannel returns a pair of channels to a ReplicaSet list and
+// errors that both must be read numReads times.
+func GetReplicaSetListChannel(client client.Interface,
+	nsQuery *NamespaceQuery, numReads int) ReplicaSetListChannel {
+	return GetReplicaSetListChannelWithOptions(client, nsQuery, helpers.ListEverything, numReads)
+}
+
+// GetReplicaSetListChannelWithOptions returns a pair of channels to a ReplicaSet list filtered
+// by provided options and errors that both must be read numReads times.
+func GetReplicaSetListChannelWithOptions(client client.Interface, nsQuery *NamespaceQuery,
+	options metaV1.ListOptions, numReads int) ReplicaSetListChannel {
+	channel := ReplicaSetListChannel{
+		List:  make(chan *apps.ReplicaSetList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.AppsV1().ReplicaSets(nsQuery.ToRequestParam()).
+			List(context.TODO(), options)
+		var filteredItems []apps.ReplicaSet
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // DeploymentListChannel is a list and error channels to Deployments.
 type DeploymentListChannel struct {
 	List  chan *apps.DeploymentList
 	Error chan error
+}
+
+// GetDeploymentListChannel returns a pair of channels to a Deployment list and errors
+// that both must be read numReads times.
+func GetDeploymentListChannel(client client.Interface,
+	nsQuery *NamespaceQuery, numReads int) DeploymentListChannel {
+
+	channel := DeploymentListChannel{
+		List:  make(chan *apps.DeploymentList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.AppsV1().Deployments(nsQuery.ToRequestParam()).
+			List(context.TODO(), helpers.ListEverything)
+		var filteredItems []apps.Deployment
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
 }
 
 // DaemonSetListChannel is a list and error channels to Daemon Sets.
@@ -167,10 +232,51 @@ type PodListChannel struct {
 	Error chan error
 }
 
+// GetPodListChannel returns a pair of channels to a Pod list and errors that both must be read
+// numReads times.
+func GetPodListChannel(client client.Interface,
+	nsQuery *NamespaceQuery, numReads int) PodListChannel {
+	return GetPodListChannelWithOptions(client, nsQuery, helpers.ListEverything, numReads)
+}
+
+// GetPodListChannelWithOptions is GetPodListChannel plus listing options.
+func GetPodListChannelWithOptions(client client.Interface, nsQuery *NamespaceQuery,
+	options metaV1.ListOptions, numReads int) PodListChannel {
+
+	channel := PodListChannel{
+		List:  make(chan *v1.PodList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.CoreV1().Pods(nsQuery.ToRequestParam()).List(context.TODO(), options)
+		var filteredItems []v1.Pod
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // EventListChannel is a list and error channels to Events.
 type EventListChannel struct {
 	List  chan *v1.EventList
 	Error chan error
+}
+
+// GetEventListChannel returns a pair of channels to an Event list and errors that both must be read
+// numReads times.
+func GetEventListChannel(client client.Interface,
+	nsQuery *NamespaceQuery, numReads int) EventListChannel {
+	return GetEventListChannelWithOptions(client, nsQuery, helpers.ListEverything, numReads)
 }
 
 // GetEventListChannelWithOptions is GetEventListChannel plus list options.

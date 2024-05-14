@@ -5,6 +5,10 @@ import i18n from "i18next";
 import detector from "i18next-browser-languagedetector";
 import backend from "i18next-http-backend";
 import {initReactI18next} from "react-i18next";
+import { loader } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import yamlWorker from '@/utils/workaround-yaml.worker?worker'
 
 i18n
     .use(detector)
@@ -25,6 +29,15 @@ i18n
         saveMissing: true, // send not translated keys to endpoint,
     });
 
+window.MonacoEnvironment = {
+    getWorker(_, label) {
+        if (label === 'yaml') {
+            return new yamlWorker();
+        }
+        return new editorWorker();
+    },
+};
+loader.config({ monaco });
 
 ReactDOM
     .createRoot(document.getElementById('root')!)
