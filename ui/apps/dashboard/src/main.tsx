@@ -8,6 +8,7 @@ import {initReactI18next} from "react-i18next";
 import { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+// https://github.com/remcohaszing/monaco-yaml/issues/150
 import yamlWorker from '@/utils/workaround-yaml.worker?worker'
 
 i18n

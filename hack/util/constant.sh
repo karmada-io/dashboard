@@ -54,6 +54,11 @@ KARMADA_OPENSEARCH_LABEL="karmada-opensearch"
 KARMADA_OPENSEARCH_DASHBOARDS_LABEL="karmada-opensearch-dashboards"
 KARMADA_METRICS_ADAPTER_LABEL="karmada-metrics-adapter"
 
+KARMADA_GO_PACKAGE="github.com/karmada-io/dashboard"
+KARMADA_TARGET_SOURCE=(
+  karmada-dashboard-api=cmd/api
+  karmada-dashboard-web=cmd/web
+)
 
 
 #https://textkool.com/en/ascii-art-generator?hl=default&vl=default&font=DOS%20Rebel&text=KARMADA

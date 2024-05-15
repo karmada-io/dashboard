@@ -215,6 +215,17 @@ function util::misc::get_os_arch() {
   echo "${aliased_arch}"
 }
 
+# This function will return host_platform info
+# NOTICE:
+#   this function need golang as requirement
+# Parameters:
+# Return:
+#   host_platform info
+function util::misc::host_platform() {
+  echo "$(go env GOHOSTOS)/$(go env GOHOSTARCH)"
+}
+
+
 ############################
 # kind util
 ############################

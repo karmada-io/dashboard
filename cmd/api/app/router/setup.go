@@ -18,6 +18,13 @@ func init() {
 	router = gin.Default()
 	_ = router.SetTrustedProxies(nil)
 	v1 = router.Group("/api/v1")
+
+	router.GET("/livez", func(c *gin.Context) {
+		c.String(200, "livez")
+	})
+	router.GET("/readyz", func(c *gin.Context) {
+		c.String(200, "readyz")
+	})
 }
 
 func V1() *gin.RouterGroup {
