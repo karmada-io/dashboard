@@ -1,9 +1,12 @@
 package cluster
 
 import (
-	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"context"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"log"
 )
 
 type ClusterAllocatedResources struct {
@@ -25,7 +28,7 @@ type ClusterAllocatedResources struct {
 	PodFraction float64 `json:"podFraction"`
 }
 
-func getclusterAllocatedResources(cluster v1alpha1.Cluster) (ClusterAllocatedResources, error) {
+func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedResources, error) {
 	if cluster.Status.ResourceSummary == nil {
 		return ClusterAllocatedResources{}, nil
 	}
@@ -65,12 +68,19 @@ func getclusterAllocatedResources(cluster v1alpha1.Cluster) (ClusterAllocatedRes
 }
 
 type ClusterDetail struct {
-	NodeReadyNum int32 `json:"nodeReadyNum"`
-	NodeTotalNum int32 `json:"nodeTotalNum"`
+	Cluster `json:",inline"`
+	Taints  []corev1.Taint `json:"taints,omitempty"`
 }
 
 // GetNodeDetail gets node details.
-func GetClusterDetail(client karmadaclientset.Interface, name string,
-	dsQuery *dataselect.DataSelectQuery) (*ClusterDetail, error) {
-	return nil, nil
+func GetClusterDetail(client karmadaclientset.Interface, clusterName string) (*ClusterDetail, error) {
+	log.Printf("Getting details of %s cluster", clusterName)
+	cluster, err := client.ClusterV1alpha1().Clusters().Get(context.TODO(), clusterName, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterDetail{
+		Cluster: toCluster(cluster),
+		Taints:  cluster.Spec.Taints,
+	}, nil
 }

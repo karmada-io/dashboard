@@ -7,7 +7,7 @@ import path from "path";
 export default defineConfig(({mode}) => {
     const env = loadEnv(mode, process.cwd(), '')
     return {
-        base: '/static',
+        base: process.env.NODE_ENV === 'development' ? '' : '/static',
         plugins: [
             react(),
             svgr()

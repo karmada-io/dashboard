@@ -34,6 +34,9 @@ import {
     SlidersHorizontal,
     Blocks,
     Upload,
+    Trash2,
+    ChevronUp,
+    ChevronDown,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -54,6 +57,9 @@ export const Icons = {
     basicConfig: Settings2,
     advancedConfig: SlidersHorizontal,
     addon: Blocks,
+    delete: Trash2,
+    up: ChevronUp,
+    down: ChevronDown,
     gitHub: ({...props}: LucideProps) => (
         <svg
             aria-hidden="true"
