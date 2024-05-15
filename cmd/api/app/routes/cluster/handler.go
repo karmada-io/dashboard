@@ -10,11 +10,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/resource/cluster"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
-	"net/http"
 	"time"
 )
 
@@ -24,23 +24,22 @@ func handleGetClusterList(c *gin.Context) {
 	result, err := cluster.GetClusterList(karmadaClient, dataSelect)
 	if err != nil {
 		klog.ErrorS(err, "GetClusterList failed")
-		c.JSON(http.StatusInternalServerError, err)
+		common.Fail(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	common.Success(c, result)
 }
 
 func handleGetClusterDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
-	dataSelect := common.ParseDataSelectPathParameter(c)
 	name := c.Param("name")
-	result, err := cluster.GetClusterDetail(karmadaClient, name, dataSelect)
+	result, err := cluster.GetClusterDetail(karmadaClient, name)
 	if err != nil {
 		klog.ErrorS(err, "GetClusterDetail failed")
 		common.Fail(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	common.Success(c, result)
 }
 
 func handlePostCluster(c *gin.Context) {
@@ -50,6 +49,13 @@ func handlePostCluster(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
+	memberClusterEndpoint, err := parseEndpointFromKubeconfig(clusterRequest.MemberClusterKubeConfig)
+	if err != nil {
+		klog.ErrorS(err, "Could not parse member cluster endpoint")
+		common.Fail(c, err)
+		return
+	}
+	clusterRequest.MemberClusterEndpoint = memberClusterEndpoint
 	karmadaClient := client.InClusterKarmadaClient()
 
 	if clusterRequest.SyncMode == v1alpha1.Pull {
@@ -113,7 +119,49 @@ func handlePostCluster(c *gin.Context) {
 }
 
 func handlePutCluster(c *gin.Context) {
+	clusterRequest := new(v1.PutClusterRequest)
+	name := c.Param("name")
+	if err := c.ShouldBind(clusterRequest); err != nil {
+		klog.ErrorS(err, "Could not read handlePutCluster request")
+		common.Fail(c, err)
+		return
+	}
+	karmadaClient := client.InClusterKarmadaClient()
+	memberCluster, err := karmadaClient.ClusterV1alpha1().Clusters().Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil {
+		klog.ErrorS(err, "Get cluster failed")
+		common.Fail(c, err)
+		return
+	}
 
+	// assume that the frontend can fetch the whole labels and taints
+	labels := make(map[string]string)
+	if clusterRequest.Labels != nil {
+		for _, labelItem := range *clusterRequest.Labels {
+			labels[labelItem.Key] = labelItem.Value
+		}
+		memberCluster.Labels = labels
+	}
+
+	taints := make([]corev1.Taint, 0)
+	if clusterRequest.Taints != nil {
+		for _, taintItem := range *clusterRequest.Taints {
+			taints = append(taints, corev1.Taint{
+				Key:    taintItem.Key,
+				Value:  taintItem.Value,
+				Effect: taintItem.Effect,
+			})
+		}
+		memberCluster.Spec.Taints = taints
+	}
+
+	_, err = karmadaClient.ClusterV1alpha1().Clusters().Update(context.TODO(), memberCluster, metav1.UpdateOptions{})
+	if err != nil {
+		klog.ErrorS(err, "Update cluster failed")
+		common.Fail(c, err)
+		return
+	}
+	common.Success(c, "ok")
 }
 
 func handleDeleteCluster(c *gin.Context) {
@@ -160,11 +208,19 @@ func handleDeleteCluster(c *gin.Context) {
 	return
 }
 
+func parseEndpointFromKubeconfig(kubeconfigContents string) (string, error) {
+	restConfig, err := client.LoadeRestConfigFromKubeConfig(kubeconfigContents)
+	if err != nil {
+		return "", err
+	}
+	return restConfig.Host, nil
+}
+
 func init() {
 	r := router.V1()
 	r.GET("/cluster", handleGetClusterList)
-	r.GET("/cluster/:memberClusterName", handleGetClusterDetail)
+	r.GET("/cluster/:name", handleGetClusterDetail)
 	r.POST("/cluster", handlePostCluster)
-	r.PUT("/cluster/:memberClusterName", handlePutCluster)
-	r.DELETE("/cluster/:memberClusterName", handleDeleteCluster)
+	r.PUT("/cluster/:name", handlePutCluster)
+	r.DELETE("/cluster/:name", handleDeleteCluster)
 }

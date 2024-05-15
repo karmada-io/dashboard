@@ -53,12 +53,12 @@ func toClusterList(client karmadaclientset.Interface, clusters []v1alpha1.Cluste
 	clusters = fromCells(clusterCells)
 	clusterList.ListMeta = types.ListMeta{TotalItems: filteredTotal}
 	for _, cluster := range clusters {
-		clusterList.Clusters = append(clusterList.Clusters, toCluster(cluster))
+		clusterList.Clusters = append(clusterList.Clusters, toCluster(&cluster))
 	}
 	return clusterList
 }
 
-func toCluster(cluster v1alpha1.Cluster) Cluster {
+func toCluster(cluster *v1alpha1.Cluster) Cluster {
 	allocatedResources, err := getclusterAllocatedResources(cluster)
 	if err != nil {
 		log.Printf("Couldn't get allocated resources of %s cluster: %s\n", cluster.Name, err)
@@ -75,7 +75,7 @@ func toCluster(cluster v1alpha1.Cluster) Cluster {
 	}
 }
 
-func getClusterConditionStatus(cluster v1alpha1.Cluster, conditionType metav1.ConditionStatus) metav1.ConditionStatus {
+func getClusterConditionStatus(cluster *v1alpha1.Cluster, conditionType metav1.ConditionStatus) metav1.ConditionStatus {
 	for _, condition := range cluster.Status.Conditions {
 		if condition.Status == conditionType {
 			return condition.Status
