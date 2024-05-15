@@ -20,7 +20,8 @@ func handleGetPropagationPolicyList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	namespace := common.ParseNamespacePathParameter(c)
-	propagationList, err := propagationpolicy.GetPropagationPolicyList(karmadaClient, namespace, dataSelect)
+	k8sClient := client.InClusterClientForKarmadaApiServer()
+	propagationList, err := propagationpolicy.GetPropagationPolicyList(karmadaClient, k8sClient, namespace, dataSelect)
 	if err != nil {
 		klog.ErrorS(err, "Failed to GetPropagationPolicyList")
 		common.Fail(c, err)
@@ -159,7 +160,7 @@ func handleDeletePropagationPolicy(c *gin.Context) {
 func init() {
 	r := router.V1()
 	r.GET("/propagationpolicy", handleGetPropagationPolicyList)
-	r.GET("/propagationpolicy/namespace/:namespace/name/:propagationPolicyName", handleGetPropagationPolicyDetail)
+	r.GET("/propagationpolicy/namespace/:namespace/:propagationPolicyName", handleGetPropagationPolicyDetail)
 	r.POST("/propagationpolicy", handlePostPropagationPolicy)
 	r.PUT("/propagationpolicy", handlePutPropagationPolicy)
 	r.DELETE("/propagationpolicy", handleDeletePropagationPolicy)

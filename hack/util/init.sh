@@ -27,7 +27,7 @@ REPO_ROOT=$(cd ../../ && pwd)
 # Parameters:
 # Return:
 function util:init:init_scripts() {
-  for script in "b-log.sh" "verify.sh" "constant.sh" "misc.sh"
+  for script in "b-log.sh" "verify.sh" "constant.sh" "misc.sh" "git.sh"
   do
     # shellcheck disable=SC1090
     source "${REPO_ROOT}"/hack/util/"${script}"
