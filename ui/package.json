@@ -7,6 +7,9 @@
     "dashboard:dev": "cd apps/dashboard && pnpm run dev",
     "dashboard:build": "cd apps/dashboard && pnpm run build"
   },
+  "engines": {
+    "node": ">=18.14.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
