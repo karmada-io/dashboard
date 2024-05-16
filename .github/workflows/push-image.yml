@@ -1,39 +1,130 @@
-name: LatestImage
+name: Build Images
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - refactor/dashboard
+      - feature/*
 
 jobs:
-  build-and-push:
-    # prevent job running from forked repository, otherwise
-    # 1. running on the forked repository would fail as missing necessary secret.
-    # 2. running on the forked repository would use unnecessary GitHub Action time.
-    if: ${{ github.repository == 'karmada-io/dashboard' && github.ref == 'refs/heads/main' }}
+  build-fronted:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.18.x]
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Build
+          node-version: 20
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.6
+      - name: Build dashboard
         run: |
-          echo "start build"
-          npm install
-          npm run build
-          docker build . --file Dockerfile --tag ${{ secrets.SWR_REGISTRY }}/karmada-dashboard:latest
-      - name: Login in to Docker Hub
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+          echo "Start build"
+          pnpm --version
+          cd ui
+          pnpm install -w
+          pnpm run dashboard:build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          registry: ${{ secrets.SWR_REGISTRY }}
-          username: ${{ secrets.SWR_REGISTRY_USER_NAME }}
-          password: ${{ secrets.SWR_REGISTRY_PASSWORD }}
+          path: ui/apps/dashboard/dist
+          name: dashboard_artifact
 
-      - name: Push image
+  build-and-push-web:
+    runs-on: ubuntu-latest
+    needs: [ "build-fronted" ]
+    env:
+      IMAGE_NAME: warjiang/karmada-dashboard-web
+      BINARY_NAME: karmada-dashboard-web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '^1.22.2'
+      - name: Detect misc info
+        id: misc
         run: |
-          echo "push image"
-          docker push ${{ secrets.SWR_REGISTRY }}/karmada-dashboard:latest
+          echo "os=$(go env GOHOSTOS)" >> $GITHUB_OUTPUT
+          echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build karmada-dashboard-web binary
+        run: make bin-karmada-dashboard-web
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dashboard_artifact
+          path: .
+      - name: Unzip Artifact
+        run: |
+          pwd
+          mkdir -p _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+          tar xf ./artifact.tar -C _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+          ls -al _output/bin
+          ls -al _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+      - name: Extract metadata for the Docker image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.misc.outputs.image_name }}
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          file: "cluster/images/build-web.Dockerfile"
+          context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BINARY=${{ steps.misc.outputs.binary_name }}
+            BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}
+
+
+  build-and-push-api:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: warjiang/karmada-dashboard-api
+      BINARY_NAME: karmada-dashboard-api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '^1.22.2'
+      - name: Detect misc info
+        id: misc
+        run: |
+          echo "os=$(go env GOHOSTOS)" >> $GITHUB_OUTPUT
+          echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Extract metadata for the Docker image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.misc.outputs.image_name }}
+      - name: Build karmada-dashboard-api binary
+        run: make karmada-dashboard-api
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          file: "cluster/images/Dockerfile"
+          context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BINARY=${{ steps.misc.outputs.binary_name }}
+            BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}

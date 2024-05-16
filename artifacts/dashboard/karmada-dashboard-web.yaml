@@ -28,7 +28,7 @@ spec:
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
           name: karmada-dashboard-web
-          image: docker.io/karmada/karmada-dashboard-web:refactor-dashboard
+          image: warjiang/karmada-dashboard-web:refactor-dashboard
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 8
