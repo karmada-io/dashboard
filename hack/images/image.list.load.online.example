@@ -1,0 +1,29 @@
+# hack/ops/load-images.sh script will load image (from online or offline source)
+# and rename the image to image name as described. Each line should in the following format:
+# component-name;image-name;online-image-name;offline-image-name;
+# restrictions:
+# - `component-name` and `image-name` are required fields.
+# - each line must have four field or four semicolons.
+# - if `online-image-name` is empty, it will share the field as `image-name`,
+#   which have the same effect of `component-name;image-name;image-name;`
+# - if use `online-image-name` and `offline-image-name`, `online-image-name` has more priority,
+#   means only `online-image-name` will be loaded
+# - the offline images must be stored under the fold: ${REPO_ROOT}/hack/images/
+
+# third-party dependencies
+etcd;registry.k8s.io/etcd:3.5.9-0;;;
+karmada-apiserver;registry.k8s.io/kube-apiserver:v1.27.11;;;
+kube-controller-manager;registry.k8s.io/kube-controller-manager:v1.27.11;;;
+kind;docker.io/kindest/node:v1.27.11;;;
+metrics-server;registry.k8s.io/metrics-server/metrics-server:v0.6.3;;;
+
+# karmada
+karmada-controller-manager;docker.io/karmada/karmada-controller-manager:v1.9.0;;;
+karmada-scheduler;docker.io/karmada/karmada-scheduler:v1.9.0;;;
+karmada-descheduler;docker.io/karmada/karmada-descheduler:v1.9.0;;;
+karmada-webhook;docker.io/karmada/karmada-webhook:v1.9.0;;;
+karmada-scheduler-estimator;docker.io/karmada/karmada-scheduler-estimator:v1.9.0;;;
+karmada-aggregated-apiserver;docker.io/karmada/karmada-aggregated-apiserver:v1.9.0;;;
+karmada-search;docker.io/karmada/karmada-search:v1.9.0;;;
+karmada-metrics-adapter;docker.io/karmada/karmada-metrics-adapter:v1.9.0;;;
+karmada-agent;docker.io/karmada/karmada-agent:v1.9.0;;;

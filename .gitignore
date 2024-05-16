@@ -25,3 +25,4 @@ pnpm-debug.log*
 _output
 # sub chart tgz
 charts/*/charts
+cmd/ops
