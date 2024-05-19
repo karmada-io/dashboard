@@ -5,7 +5,10 @@ go 1.22.2
 require (
 	github.com/emicklei/go-restful/v3 v3.11.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/gobuffalo/flect v1.0.2
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/karmada-io/karmada v1.9.0
+	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	k8s.io/api v0.28.5
@@ -40,7 +43,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
-	github.com/gobuffalo/flect v1.0.2 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -80,7 +82,6 @@ require (
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.39.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect

@@ -24,7 +24,7 @@ export default defineConfig(({mode}) => {
                     changeOrigin: true,
                     headers: {
                         // cookie: env.VITE_COOKIES,
-                        Authorization: `Bearer ${env.VITE_TOKEN}`
+                        // Authorization: `Bearer ${env.VITE_TOKEN}`
                     },
                 },
             }

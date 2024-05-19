@@ -14,6 +14,7 @@ import (
 	"os"
 
 	// Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
