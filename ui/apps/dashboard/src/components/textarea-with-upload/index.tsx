@@ -9,6 +9,7 @@ export type TextareaWithUploadProps = EditorProps & {
     // for customize form item element
     value?: string;
     onChange?: (value: string) => void;
+    hideUploadButton?: boolean;
 }
 
 function tryReadBlob(file: Blob): Promise<{
@@ -43,6 +44,7 @@ const TextareaWithUpload: FC<TextareaWithUploadProps> = (props) => {
         checkContent,
         value: _value,
         onChange,
+        hideUploadButton = false,
         ...restProps
     } = props;
     const triggerChange = (changedValue: string) => {
@@ -57,30 +59,33 @@ const TextareaWithUpload: FC<TextareaWithUploadProps> = (props) => {
                 value={_value}
                 theme={'vs-dark'}
                 onChange={(v) => {
-                    triggerChange(v||'')
+                    triggerChange(v || '')
                 }}
                 {...restProps}
             />
-            <Upload
-                className='absolute top-[8px] right-[6px]'
-                beforeUpload={async (file) => {
-                    const d = await readBlob(file)
-                    const isValid = checkContent(d)
-                    if (isValid) {
-                        triggerChange(d.data as string)
-                    }
-                    return false
-                }}
-                showUploadList={false}
-            >
-                <Button
-                    type={'primary'}
-                    icon={<Icons.uploadFile width={16} height={16}/>}
-                    className='flex flex-row items-center'
+            {
+                !hideUploadButton &&
+                <Upload
+                    className='absolute top-[8px] right-[6px] z-[100]'
+                    beforeUpload={async (file) => {
+                        const d = await readBlob(file)
+                        const isValid = checkContent(d)
+                        if (isValid) {
+                            triggerChange(d.data as string)
+                        }
+                        return false
+                    }}
+                    showUploadList={false}
                 >
-                    选择kubeconfig文件
-                </Button>
-            </Upload>
+                    <Button
+                        type={'primary'}
+                        icon={<Icons.uploadFile width={16} height={16}/>}
+                        className='flex flex-row items-center'
+                    >
+                        选择kubeconfig文件
+                    </Button>
+                </Upload>
+            }
         </div>
     )
 }

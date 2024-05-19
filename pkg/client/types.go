@@ -14,6 +14,16 @@ const (
 	DefaultBurst = 1e6
 	// DefaultUserAgent is the default http header for user-agent
 	DefaultUserAgent = "dashboard"
+	// DefaultCmdConfigName is the default cluster/context/auth name to be set in clientcmd config
+	DefaultCmdConfigName = "kubernetes"
+	// ImpersonateUserHeader is the header name to identify username to act as.
+	ImpersonateUserHeader = "Impersonate-User"
+	// ImpersonateGroupHeader is the header name to identify group name to act as.
+	// Can be provided multiple times to set multiple groups.
+	ImpersonateGroupHeader = "Impersonate-Group"
+	// ImpersonateUserExtraHeader is the header name used to associate extra fields with the user.
+	// It is optional, and it requires ImpersonateUserHeader to be set.
+	ImpersonateUserExtraHeader = "Impersonate-Extra-"
 )
 
 // ResourceVerber is responsible for performing generic CRUD operations on all supported resources.

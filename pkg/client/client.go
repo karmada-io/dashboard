@@ -2,11 +2,13 @@ package client
 
 import (
 	"fmt"
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
+	"net/http"
 )
 
 // LoadRestConfig creates a rest.Config using the passed kubeconfig. If context is empty, current context in kubeconfig will be used.
@@ -86,4 +88,20 @@ func KubeClientSetFromKubeConfig(kubeconfig string) (*kubeclient.Clientset, erro
 	}
 	kubeClient := kubeclient.NewForConfigOrDie(restConfig)
 	return kubeClient, nil
+}
+
+func GetKarmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface, error) {
+	if !isKarmadaInitialized() {
+		return nil, fmt.Errorf("client package not initialized")
+	}
+	return karmadaClientFromRequest(request)
+}
+
+func karmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface, error) {
+	config, err := karmadaConfigFromRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return karmadaclientset.NewForConfig(config)
 }
