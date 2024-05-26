@@ -2,9 +2,11 @@ package cluster
 
 import (
 	"context"
+	"fmt"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
 )
@@ -37,15 +39,17 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	var cpuCapacity int64 = allocatableCPU.Value()
 	var cpuFraction float64 = 0
 	if cpuCapacity > 0 {
-		cpuFraction = float64(allocatedCPU.Value()) / float64(cpuCapacity) * 100
+		cpuFraction = float64(allocatedCPU.ScaledValue(resource.Micro)) / float64(allocatableCPU.ScaledValue(resource.Micro)) * 100
 	}
 
 	allocatableMemory := cluster.Status.ResourceSummary.Allocatable.Memory()
 	allocatedMemory := cluster.Status.ResourceSummary.Allocated.Memory()
+	fmt.Println(allocatableMemory.String())
+	fmt.Println(allocatedMemory.Value())
 	var memoryCapacity int64 = allocatableMemory.Value()
 	var memoryFraction float64 = 0
 	if memoryCapacity > 0 {
-		memoryFraction = float64(allocatedMemory.Value()) / float64(memoryCapacity) * 100
+		memoryFraction = float64(allocatedMemory.ScaledValue(resource.Micro)) / float64(allocatableMemory.ScaledValue(resource.Micro)) * 100
 	}
 
 	allocatablePod := cluster.Status.ResourceSummary.Allocatable.Pods()
@@ -57,9 +61,9 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 		podFraction = float64(allocatedPod.Value()) / float64(podCapacity) * 100
 	}
 	return ClusterAllocatedResources{
-		CPUCapacity:    allocatableCPU.MilliValue(),
+		CPUCapacity:    allocatableCPU.Value(),
 		CPUFraction:    cpuFraction,
-		MemoryCapacity: allocatedMemory.MilliValue(),
+		MemoryCapacity: allocatedMemory.Value(),
 		MemoryFraction: memoryFraction,
 		AllocatedPods:  allocatedPod.Value(),
 		PodCapacity:    podCapacity,

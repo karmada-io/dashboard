@@ -106,20 +106,33 @@ func isKubeInitialized() bool {
 
 func InitKubeConfig(options ...Option) {
 	builder := newConfigBuilder(options...)
+	// prefer InClusterConfig, if something wrong, use explict kubeconfig path
+	restConfig, err := rest.InClusterConfig()
+	if err == nil {
+		klog.Infof("InitKubeConfig by InClusterConfig method")
+		restConfig.UserAgent = DefaultUserAgent + "/" + builder.userAgent
+		restConfig.TLSClientConfig.Insecure = builder.insecure
+		kubernetesRestConfig = restConfig
 
-	restConfig, err := builder.buildRestConfig()
-	if err != nil {
-		klog.Errorf("Could not init client config: %s", err)
-		os.Exit(1)
+		apiConfig := ConvertRestConfigToAPIConfig(restConfig)
+		kubernetesApiConfig = apiConfig
+	} else {
+		klog.Infof("InClusterConfig error: %+v", err)
+		klog.Infof("InitKubeConfig by explict kubeconfig path")
+		restConfig, err = builder.buildRestConfig()
+		if err != nil {
+			klog.Errorf("Could not init client config: %s", err)
+			os.Exit(1)
+		}
+		kubernetesRestConfig = restConfig
+		apiConfig, err := builder.buildApiConfig()
+		if err != nil {
+			klog.Errorf("Could not init api config: %s", err)
+			os.Exit(1)
+		}
+		kubernetesApiConfig = apiConfig
 	}
-	kubernetesRestConfig = restConfig
 
-	apiConfig, err := builder.buildApiConfig()
-	if err != nil {
-		klog.Errorf("Could not init api config: %s", err)
-		os.Exit(1)
-	}
-	kubernetesApiConfig = apiConfig
 }
 
 func InClusterClient() kubeclient.Interface {
@@ -218,4 +231,25 @@ func InClusterClientForKarmadaApiServer() kubeclient.Interface {
 	}
 	inClusterClientForKarmadaApiServer = c
 	return inClusterClientForKarmadaApiServer
+}
+
+func ConvertRestConfigToAPIConfig(restConfig *rest.Config) *clientcmdapi.Config {
+	// 将 rest.Config 转换为 clientcmdapi.Config
+	clientcmdConfig := clientcmdapi.NewConfig()
+	clientcmdConfig.Clusters["clusterName"] = &clientcmdapi.Cluster{
+		Server:                   restConfig.Host,
+		InsecureSkipTLSVerify:    restConfig.Insecure,
+		CertificateAuthorityData: restConfig.TLSClientConfig.CAData,
+	}
+
+	clientcmdConfig.AuthInfos["authInfoName"] = &clientcmdapi.AuthInfo{
+		ClientCertificateData: restConfig.TLSClientConfig.CertData,
+		ClientKeyData:         restConfig.TLSClientConfig.KeyData,
+	}
+	clientcmdConfig.Contexts["contextName"] = &clientcmdapi.Context{
+		Cluster:  "clusterName",
+		AuthInfo: "authInfoName",
+	}
+	clientcmdConfig.CurrentContext = "contextName"
+	return clientcmdConfig
 }

@@ -20,7 +20,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 SHELL_FOLDER=$(pwd)
 REPO_ROOT=$(cd ../../ && pwd)
 
-source "${REPO_ROOT}"/hack/utils/init.sh && utils:init:init_scripts
+source "${REPO_ROOT}"/hack/util/init.sh && util:init:init_scripts
 
 function usage() {
   echo "This script is used to load images which will be used for karmada."
