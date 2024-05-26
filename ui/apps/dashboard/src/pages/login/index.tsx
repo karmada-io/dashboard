@@ -1,4 +1,4 @@
-import {Alert, Button, Card, Input, message} from "antd";
+import {Alert, Button, Card, Collapse, Input, message} from "antd";
 import styles from './index.module.less';
 import {cn} from "@/utils/cn.ts";
 import {useState} from "react";
@@ -18,12 +18,32 @@ const LoginPage = () => {
                 <Card
                     className={cn('w-1/2', styles['login-card'])}
                     title={
-                        <div className={'bg-blue-500 text-white h-[56px] flex items-center px-[16px] text-xl'}>
+                        <div
+                            className={'bg-blue-500 text-white h-[56px] flex items-center px-[16px] text-xl rounded-t-[8px]'}>
                             Karmada Dashboard
                         </div>
                     }
                 >
-                    <Alert message="参考文档生成jwt token" type="info"/>
+                    {/*<Alert message="参考文档生成jwt token" type="info"/>*/}
+                    <Alert
+                        message={<>
+                            <Collapse
+                                bordered={true}
+                                size="small"
+                                // expandIcon={() => null}
+                                // expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                                items={[
+                                    {
+                                        key: '1',
+                                        label: "参考文档生成jwt token",
+                                        children: <code>!!todo</code>
+                                    }
+                                ]}
+                            />
+                        </>}
+                        type='info'
+                    />
+
                     <Input.TextArea
                         className={"mt-4"}
                         rows={6}

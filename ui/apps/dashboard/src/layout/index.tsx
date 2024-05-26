@@ -18,7 +18,7 @@ export const MainLayout: FC = () => {
     }
     return <>
         <Header/>
-        <AntdLayout className={cn('h-[calc(100vh-48px)]')}>
+        <AntdLayout className={cn('h-[calc(100vh-48px)]', 'overflow-hidden')}>
             <AntdSider width={256}>
                 <Sidebar/>
             </AntdSider>
