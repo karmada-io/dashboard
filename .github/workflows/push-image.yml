@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Use Node.js 20
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
       - uses: pnpm/action-setup@v4
@@ -27,7 +27,7 @@ jobs:
           pnpm install -w
           pnpm run dashboard:build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           path: ui/apps/dashboard/dist
           name: dashboard_artifact
@@ -58,16 +58,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build karmada-dashboard-web binary
         run: make bin-karmada-dashboard-web
-      - name: Download a Build Artifact
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: dashboard_artifact
-          path: .
-      - name: Unzip Artifact
+          path: _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+      - name: Display artifact
         run: |
-          pwd
-          mkdir -p _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
-          tar xf ./artifact.tar -C _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
           ls -al _output/bin
           ls -al _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
       - name: Extract metadata for the Docker image
