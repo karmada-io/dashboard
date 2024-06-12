@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - refactor/dashboard
       - feature/*
 
 jobs:
@@ -37,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ "build-fronted" ]
     env:
-      IMAGE_NAME: warjiang/karmada-dashboard-web
+      IMAGE_NAME: karmada/karmada-dashboard-web
       BINARY_NAME: karmada-dashboard-web
     steps:
       - name: Checkout
@@ -52,10 +51,10 @@ jobs:
           echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USER_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build karmada-dashboard-web binary
         run: make bin-karmada-dashboard-web
@@ -88,10 +87,11 @@ jobs:
             BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}
 
 
+
   build-and-push-api:
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: warjiang/karmada-dashboard-api
+      IMAGE_NAME: karmada/karmada-dashboard-api
       BINARY_NAME: karmada-dashboard-api
     steps:
       - name: Checkout
@@ -106,10 +106,10 @@ jobs:
           echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USER_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Extract metadata for the Docker image
         id: meta

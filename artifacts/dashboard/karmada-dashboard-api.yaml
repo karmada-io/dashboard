@@ -32,7 +32,7 @@ spec:
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
           name: karmada-dashboard-api
-          image: warjiang/karmada-dashboard-api:refactor-dashboard
+          image: karmada/karmada-dashboard-api:refactor-dashboard
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 8

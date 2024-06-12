@@ -98,7 +98,7 @@ func (in *configBuilder) buildApiConfig() (*clientcmdapi.Config, error) {
 
 func isKubeInitialized() bool {
 	if kubernetesRestConfig == nil || kubernetesApiConfig == nil {
-		klog.Errorf(`warjiang/karmada-dashboard/client' package has not been initialized properly. Run 'client.InitKubeConfig(...)' to initialize it. `)
+		klog.Errorf(`karmada/karmada-dashboard/client' package has not been initialized properly. Run 'client.InitKubeConfig(...)' to initialize it. `)
 		return false
 	}
 	return true
@@ -164,7 +164,7 @@ func GetKubeConfig() (*rest.Config, *clientcmdapi.Config, error) {
 
 func isKarmadaInitialized() bool {
 	if karmadaRestConfig == nil || karmadaApiConfig == nil {
-		klog.Errorf(`warjiang/karmada-dashboard/client' package has not been initialized properly. Run 'client.InitKarmadaConfig(...)' to initialize it. `)
+		klog.Errorf(`karmada/karmada-dashboard/client' package has not been initialized properly. Run 'client.InitKarmadaConfig(...)' to initialize it. `)
 		return false
 	}
 	return true
