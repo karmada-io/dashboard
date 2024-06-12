@@ -1,0 +1,114 @@
+package app
+
+import (
+	"context"
+	"fmt"
+	"github.com/karmada-io/dashboard/cmd/api/app/options"
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/environment"
+	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
+	"github.com/spf13/cobra"
+	cliflag "k8s.io/component-base/cli/flag"
+	"k8s.io/klog/v2"
+	"os"
+
+	// Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/unstructured"
+)
+
+// NewApiCommand creates a *cobra.Command object with default parameters
+func NewApiCommand(ctx context.Context) *cobra.Command {
+	opts := options.NewOptions()
+	cmd := &cobra.Command{
+		Use:  "karmada-dashboard-api",
+		Long: `The karmada-dashboard-api provide api for karmada-dashboard web ui. It need to access host cluster apiserver and karmada apiserver internally, it will access host cluster apiserver for creating some resource like configmap in host cluster, meanwhile it will access karmada apiserver for interactiving for purpose of managing karmada-specific resources, like cluster、override policy、propagation policy and so on.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// validate options
+			//if errs := opts.Validate(); len(errs) != 0 {
+			//	return errs.ToAggregate()
+			//}
+			if err := run(ctx, opts); err != nil {
+				return err
+			}
+			return nil
+		},
+		Args: func(cmd *cobra.Command, args []string) error {
+			for _, arg := range args {
+				if len(arg) > 0 {
+					return fmt.Errorf("%q does not take any arguments, got %q", cmd.CommandPath(), args)
+				}
+			}
+			return nil
+		},
+	}
+	fss := cliflag.NamedFlagSets{}
+
+	genericFlagSet := fss.FlagSet("generic")
+	opts.AddFlags(genericFlagSet)
+
+	// Set klog flags
+	logsFlagSet := fss.FlagSet("logs")
+	klogflag.Add(logsFlagSet)
+
+	cmd.Flags().AddFlagSet(genericFlagSet)
+	cmd.Flags().AddFlagSet(logsFlagSet)
+	return cmd
+}
+
+func run(ctx context.Context, opts *options.Options) error {
+	klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
+
+	client.InitKarmadaConfig(
+		client.WithUserAgent(environment.UserAgent()),
+		client.WithKubeconfig(opts.KarmadaKubeConfig),
+		client.WithKubeContext(opts.KarmadaContext),
+		client.WithInsecureTLSSkipVerify(opts.SkipKarmadaApiserverTLSVerify),
+	)
+
+	client.InitKubeConfig(
+		client.WithUserAgent(environment.UserAgent()),
+		client.WithKubeconfig(opts.KubeConfig),
+		client.WithKubeContext(opts.KubeContext),
+		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
+	)
+	ensureAPIServerConnectionOrDie()
+	serve(opts)
+	select {
+	case <-ctx.Done():
+		os.Exit(0)
+	}
+	return nil
+}
+
+func ensureAPIServerConnectionOrDie() {
+	versionInfo, err := client.InClusterClient().Discovery().ServerVersion()
+	if err != nil {
+		klog.Fatalf("Error while initializing connection to Kubernetes apiserver. "+
+			"This most likely means that the cluster is misconfigured. Reason: %s\n", err)
+		os.Exit(1)
+	}
+	klog.InfoS("Successful initial request to the Kubernetes apiserver", "version", versionInfo.String())
+
+	karmadaVersionInfo, err := client.InClusterKarmadaClient().Discovery().ServerVersion()
+	if err != nil {
+		klog.Fatalf("Error while initializing connection to Karmada apiserver. "+
+			"This most likely means that the cluster is misconfigured. Reason: %s\n", err)
+		os.Exit(1)
+	}
+	klog.InfoS("Successful initial request to the Karmada apiserver", "version", karmadaVersionInfo.String())
+}
+
+func serve(opts *options.Options) {
+	insecureAddress := fmt.Sprintf("%s:%d", opts.InsecureBindAddress, opts.InsecurePort)
+	klog.V(1).InfoS("Listening and serving on", "address", insecureAddress)
+	go func() {
+		klog.Fatal(router.Router().Run(insecureAddress))
+	}()
+}

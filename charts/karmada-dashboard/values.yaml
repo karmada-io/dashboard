@@ -1,0 +1,182 @@
+# Default values for karmada-dashboard.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+nameOverride: ""
+fullnameOverride: ""
+
+## @param global karmada-dashboard global config
+global:
+  ## @param global.imageRegistry Global Docker image registry
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  imagePullSecrets: [ ]
+
+## @karmadaDashboardImageVersion the image version of each karmada-dashboard components
+## "latest" is a default value for local installation.
+## If update this anchors("&karmadaDashboardImageVersion"), also update hack/package-helm-chart.sh.
+## See https://yaml.org/spec/1.2/spec.html#id2765878 and
+## https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#yaml-anchors-and-aliases-sharing-variable-values
+## for more details about yaml anchors and aliases.
+karmadaDashboardImageVersion: &karmadaDashboardImageVersion latest
+
+## Specify the imagePullPolicy of karmada-dashboard images
+## Defaults to 'IfNotPresent', you can set to 'Always' in cases of special needs
+karmadaDashboardImagePullPolicy: &karmadaDashboardImagePullPolicy IfNotPresent
+
+podDisruptionBudget: &podDisruptionBudget { }
+
+## @param installMode "host" and "agent" are provided
+## "host" means install karmada in the control-cluster
+## "agent" means install agent client in the member cluster
+## "component" means install selected components in the control-cluster
+installMode: "host"
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+api:
+  ## @param api.labels labels of the api deployment
+  labels: {}
+  replicaCount: 1
+  ## @param api.podAnnotations annotations of the api pods
+  podAnnotations: { }
+  ## @param api.podLabels labels of the api pods
+  podLabels: { }
+  ## @param api.image.registry api image registry
+  ## @param api.image.repository api image repository
+  ## @param api.image.tag karmada api image tag (immutable tags are recommended)
+  ## @param api.image.pullPolicy apir image pull policy
+  ## @param api.image.pullSecrets Specify docker-registry secret names as an array
+  ##
+  image:
+    registry: docker.io
+    repository: karmada/karmada-dashboard-api
+    tag: *karmadaDashboardImageVersion
+    pullPolicy: *karmadaDashboardImagePullPolicy
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: [ ]
+  ## @param api.resources resource quota of the api
+  resources: { }
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  ## @param api.nodeSelector node selector of the api
+  anodeSelector: { }
+  ## @param api.affinity affinity of the api
+  affinity: { }
+  ## @param api.tolerations tolerations of the api
+  tolerations: [ ]
+  # - key: node-role.kubernetes.io/master
+  #   operator: Exists
+  ## @param api.strategy strategy of the api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 50%
+  ## @param apikubeconfig kubeconfig of the api
+  kubeconfig: karmada-kubeconfig
+  ## @param api.podDisruptionBudget
+  podDisruptionBudget: *podDisruptionBudget
+  podSecurityContext: { }
+  # fsGroup: 2000
+  securityContext: { }
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  service:
+    type: ClusterIP
+    port: 8000
+
+web:
+  ## @param web.labels labels of the api deployment
+  labels: {}
+  replicaCount: 1
+  ## @param web.podAnnotations annotations of the api pods
+  podAnnotations: { }
+  ## @param web.podLabels labels of the api pods
+  podLabels: { }
+  ## @param web.image.registry web image registry
+  ## @param web.image.repository web image repository
+  ## @param web.image.tag karmada web image tag (immutable tags are recommended)
+  ## @param web.image.pullPolicy web image pull policy
+  ## @param web.image.pullSecrets Specify docker-registry secret names as an array
+  ##
+  image:
+    registry: docker.io
+    repository: karmada/karmada-dashboard-web
+    tag: *karmadaDashboardImageVersion
+    pullPolicy: *karmadaDashboardImagePullPolicy
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: [ ]
+  ## @param web.resources resource quota of the web
+  resources: { }
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  ## @param web.nodeSelector node selector of the web
+  nodeSelector: { }
+  ## @param web.affinity affinity of the web
+  affinity: { }
+  ## @param web.tolerations tolerations of the web
+  tolerations: [ ]
+  # - key: node-role.kubernetes.io/master
+  #   operator: Exists
+  ## @param web.strategy strategy of the web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 50%
+  ## @param web.podDisruptionBudget
+  podDisruptionBudget: *podDisruptionBudget
+  podSecurityContext: { }
+  # fsGroup: 2000
+  securityContext: { }
+    # capabilities:
+    #   drop:
+    #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  service:
+    type: ClusterIP
+    port: 8000

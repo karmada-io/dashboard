@@ -1,0 +1,96 @@
+{{- $name := include "karmada-dashboard.name" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-web
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.web.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "karmada-dashboard.web.labels" . | nindent 6 }}
+  replicas: {{ .Values.web.replicaCount }}
+  {{- with .Values.web.strategy }}
+  strategy:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with .Values.web.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "karmada-dashboard.web.labels" . | nindent 8 }}
+        {{- with .Values.web.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "karmada-dashboard.imagePullSecrets" . | nindent 6 }}
+      securityContext:
+        {{- toYaml .Values.web.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.web.securityContext | nindent 12 }}
+          image: {{ template "karmada-dashboard.web.image" . }}
+          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.web.service.port }}
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 8
+            httpGet:
+              path: /livez
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}
+          command:
+            - karmada-dashboard-web
+            - --static-dir=/static
+            - --insecure-bind-address=0.0.0.0
+            - --bind-address=0.0.0.0
+      {{- with .Values.web.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.web.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.web.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+{{ if .Values.web.podDisruptionBudget }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}-web
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.web.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "karmada-dashboard.web.labels" . | nindent 6 }}
+  {{ toYaml .Values.web.podDisruptionBudget | nindent 2 }}
+{{- end -}}

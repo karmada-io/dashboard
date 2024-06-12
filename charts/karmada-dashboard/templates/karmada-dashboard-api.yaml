@@ -1,0 +1,105 @@
+{{- $name := include "karmada-dashboard.name" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-api
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.api.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "karmada-dashboard.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.api.replicaCount }}
+  {{- with .Values.api.strategy }}
+  strategy:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with .Values.api.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "karmada-dashboard.api.labels" . | nindent 8 }}
+        {{- with .Values.api.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "karmada-dashboard.imagePullSecrets" . | nindent 6 }}
+      securityContext:
+        {{- toYaml .Values.api.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.api.securityContext | nindent 12 }}
+          image: {{ template "karmada-dashboard.api.image" . }}
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.api.service.port }}
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 8
+            httpGet:
+              path: /livez
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+          volumeMounts:
+            - name: kubeconfig-secret
+              subPath: kubeconfig
+              mountPath: /etc/kubeconfig
+          command:
+            - karmada-dashboard-api
+            - --karmada-kubeconfig=/etc/kubeconfig
+            - --karmada-context=karmada
+            - --kubeconfig=/etc/kubeconfig
+            - --context=karmada
+            - --insecure-bind-address=0.0.0.0
+            - --bind-address=0.0.0.0
+      volumes:
+      {{- include "karmada-dashboard.api.kubeconfig.volume" . | nindent 8 }}
+      {{- with .Values.api.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+{{ if .Values.api.podDisruptionBudget }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}-api
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.api.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "karmada-dashboard.api.labels" . | nindent 6 }}
+  {{ toYaml .Values.api.podDisruptionBudget | nindent 2 }}
+{{- end -}}
