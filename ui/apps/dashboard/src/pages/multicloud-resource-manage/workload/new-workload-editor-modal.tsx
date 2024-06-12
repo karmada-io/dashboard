@@ -2,9 +2,10 @@ import {FC, useEffect, useState} from 'react';
 import {Modal} from "antd";
 import Editor from '@monaco-editor/react';
 import {editor} from "monaco-editor";
-import {parse} from "yaml";
+import {parse,stringify} from "yaml";
 import _ from 'lodash';
 import {PutResource} from '@/services/unstructured';
+import {CreateDeployment} from '@/services/workload';
 import {IResponse} from "@/services/base.ts";
 
 export interface NewWorkloadEditorModalProps {
@@ -19,19 +20,20 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
     const {mode, open, workloadContent = '', onOk, onCancel} = props;
     const [content, setContent] = useState<string>(workloadContent)
     useEffect(() => {
+        console.log('workloadContent', workloadContent)
         setContent(workloadContent)
     }, [workloadContent])
 
     function handleEditorChange(value: string | undefined, _: editor.IModelContentChangedEvent) {
         setContent(value || '')
     }
-
     return <Modal
         title={`${mode === 'create' ? '新增' : '编辑'}工作负载`}
         open={open}
         width={1000}
         okText='确定'
         cancelText='取消'
+        destroyOnClose={true}
         onOk={async () => {
             // await onOk()
             try {
@@ -39,17 +41,31 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
                 const kind = _.get(yamlObject, 'kind')
                 const namespace = _.get(yamlObject, 'metadata.namespace')
                 const name = _.get(yamlObject, 'metadata.name')
-
-                const ret = await PutResource({
-                    kind, name, namespace,
-                    content: yamlObject
-                })
-                await onOk(ret)
+                if (mode === 'create') {
+                    if((kind as string).toLowerCase() === "deployment") {
+                        const ret = await CreateDeployment({
+                            namespace, name,
+                            content: stringify(yamlObject)
+                        })
+                        await onOk(ret)
+                        setContent('')
+                    }
+                } else {
+                    const ret = await PutResource({
+                        kind, name, namespace,
+                        content: yamlObject
+                    })
+                    await onOk(ret)
+                    setContent('')
+                }
             } catch (e) {
                 console.log('e', e)
             }
         }}
-        onCancel={onCancel}
+        onCancel={async () => {
+            await onCancel();
+            setContent('')
+        }}
     >
         <Editor
             height="600px"
