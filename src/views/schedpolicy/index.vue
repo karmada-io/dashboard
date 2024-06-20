@@ -69,24 +69,34 @@ export default {
         [
           {
             prop: 'name',
-            label: this.$t('clusterConfig.policy_name')
-          },
-          {
-            prop: 'status',
-            label: this.$t('common.status')
+            label: this.$t('clusterConfig.policy_name'),
+            width: 250,
+            showOverflowTooltip: true
           },
           {
             prop: 'namespace',
-            label: 'NAMESPACE'
+            label: 'NAMESPACE',
+            width: 200,
+            showOverflowTooltip: true
           },
-          { prop: 'kind', label: this.$t('schedpolicy.global')
+          { prop: 'kind', label: this.$t('schedpolicy.scope'),
+            formatter: row => {
+              return (<div> {this.$t('schedpolicy.' + row.kind)}</div>)
+            }
+          },
+          { prop: 'replicaSchedulingType', label: this.$t('schedpolicy.replicaSchedulingType'),
+            formatter: row => {
+              return (<div> {row.replicaSchedulingType == null ? '' : this.$t('schedpolicy.' + row.replicaSchedulingType)}</div>)
+            }
           },
           {
             prop: 'replicaDivisionPreference',
-            label: 'replicaDivisionPreference'
+            label: this.$t('schedpolicy.replicaDivisionPreference'),
+            formatter: row => {
+              return (<div> {row.replicaDivisionPreference == null ? '' : this.$t('schedpolicy.' + row.replicaDivisionPreference)}</div>)
+            }
           },
-          { prop: 'replicaSchedulingType', label: 'replicaSchedulingType' },
-          { prop: 'clusterNames', label: this.$t('schedpolicy.targetCluster') },
+          { prop: 'clusterNames', label: this.$t('schedpolicy.targetCluster'), showOverflowTooltip: true },
           {
             prop: 'more',
             label: this.$t('common.operation'),
