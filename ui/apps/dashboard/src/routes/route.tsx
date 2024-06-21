@@ -41,226 +41,231 @@ const IconStyles = {
     width: 20,
     height: 20
 }
-export const routes: RouteObject[] = [
-    {
-        path: "/",
-        element: <MainLayout/>,
-        errorElement: <ErrorBoundary/>,
-        children: [
-            {
-                path: "/",
-                loader: redirectToHomepage,
-            },
-            {
-                path: "/overview",
-                element: <Overview/>,
-                handle: {
-                    sidebarKey: 'OVERVIEW',
-                    sidebarName: '概览',
-                    icon: <Icons.overview {...IconStyles}/>
+
+export function getRoutes() {
+    const routes: RouteObject[] = [
+        {
+            path: "/",
+            element: <MainLayout/>,
+            errorElement: <ErrorBoundary/>,
+            children: [
+                {
+                    path: "/",
+                    loader: redirectToHomepage,
+                },
+                {
+                    path: "/overview",
+                    element: <Overview/>,
+                    handle: {
+                        sidebarKey: 'OVERVIEW',
+                        sidebarName: '概览',
+                        icon: <Icons.overview {...IconStyles}/>
+                    }
+                },
+                {
+                    path: "/multicloud-resource-manage",
+                    handle: {
+                        sidebarKey: 'MULTICLOUD-RESOURCE-MANAGE',
+                        sidebarName: '多云资源管理',
+                        isPage: false,
+                        icon: <Icons.resource  {...IconStyles}/>
+                    },
+                    children: [
+                        {
+                            path: "namespace",
+                            element: <MultiCloudNamespace/>,
+                            handle: {
+                                sidebarKey: 'NAMESPACE',
+                                sidebarName: '命名空间',
+                            },
+                        },
+                        {
+                            path: "workload",
+                            element: <MultiCloudworkload/>,
+                            handle: {
+                                sidebarKey: 'WORKLOAD',
+                                sidebarName: '工作负载',
+                            },
+                        },
+                        {
+                            path: "service",
+                            element: <MultiCloudService/>,
+                            handle: {
+                                sidebarKey: 'SERVICE',
+                                sidebarName: '服务管理',
+                            },
+                        },
+                        {
+                            path: "config",
+                            element: <MultiCloudConfig/>,
+                            handle: {
+                                sidebarKey: 'CONFIG',
+                                sidebarName: '配置管理',
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "/multicloud-policy-manage",
+                    handle: {
+                        sidebarKey: 'MULTICLOUD-POLICY-MANAGE',
+                        sidebarName: '策略管理',
+                        icon: <Icons.policy {...IconStyles}/>,
+                        isPage: false,
+                    },
+                    children: [
+                        {
+                            path: "propagation-policy",
+                            element: <MultiCloudPropagationPolicy/>,
+                            handle: {
+                                sidebarKey: 'PROPAGTION-POLICY',
+                                sidebarName: '调度策略',
+                            },
+                        },
+                        {
+                            path: "override-policy",
+                            element: <MultiCloudOverridePolicy/>,
+                            handle: {
+                                sidebarKey: 'OVERRIDE-POLICY',
+                                sidebarName: '差异化策略',
+                            },
+                        }
+                    ]
+                },
+                {
+                    path: "/cluster-manage",
+                    element: <ClusterManage/>,
+                    handle: {
+                        sidebarKey: 'CLUSTER-MANAGE',
+                        sidebarName: '集群管理',
+                        icon: <Icons.clusters {...IconStyles}/>,
+                        isPage: false,
+                    },
+                },
+                {
+                    path: "/basic-config",
+                    handle: {
+                        sidebarKey: 'BASIC-CONFIG',
+                        sidebarName: '基本配置',
+                        icon: <Icons.basicConfig  {...IconStyles} />,
+                        isPage: false,
+                    },
+                    children: [
+                        {
+                            path: "oem",
+                            element: <Oem/>,
+                            handle: {
+                                sidebarKey: 'OEM',
+                                sidebarName: 'OEM配置',
+                            },
+                        },
+                        {
+                            path: "upgrade",
+                            element: <Upgrade/>,
+                            handle: {
+                                sidebarKey: 'UPGRADE',
+                                sidebarName: '升级管理',
+                            },
+                        },
+                        {
+                            path: "karmada-config",
+                            element: <KarmadaConfig/>,
+                            handle: {
+                                sidebarKey: 'KARMADA-CONFIG',
+                                sidebarName: 'Karmada配置',
+                            },
+                        },
+                        {
+                            path: "helm",
+                            element: <Helm/>,
+                            handle: {
+                                sidebarKey: 'HELM',
+                                sidebarName: 'Helm配置',
+                            },
+                        },
+                        {
+                            path: "registry",
+                            element: <Registry/>,
+                            handle: {
+                                sidebarKey: 'REGISTRY',
+                                sidebarName: 'Registry配置',
+                            },
+                        }
+                    ]
+                },
+                {
+                    path: "/advanced-config",
+                    handle: {
+                        sidebarKey: 'ADVANCED-CONFIG',
+                        sidebarName: '高级配置',
+                        icon: <Icons.advancedConfig  {...IconStyles} />,
+                        isPage: false,
+                    },
+                    children: [
+                        {
+                            path: "failover",
+                            element: <Failover/>,
+                            handle: {
+                                sidebarKey: 'FAILOVER',
+                                sidebarName: 'Failover配置',
+                            },
+                        },
+                        {
+                            path: "reschedule",
+                            element: <Reschedule/>,
+                            handle: {
+                                sidebarKey: 'RESCHEDULE',
+                                sidebarName: '重调度配置',
+                            },
+                        },
+                        {
+                            path: "permission",
+                            element: <Permission/>,
+                            handle: {
+                                sidebarKey: 'PERMISSION',
+                                sidebarName: '权限管理',
+                            },
+                        }
+                    ]
+                },
+                {
+                    path: "/addon",
+                    handle: {
+                        sidebarKey: 'ADDON',
+                        sidebarName: '扩展管理',
+                        icon: <Icons.addon   {...IconStyles}/>,
+                        isPage: false,
+                    },
+                    children: [
+                        {
+                            path: "buildin",
+                            element: <BuildInAddon/>,
+                            handle: {
+                                sidebarKey: 'BUILDIN',
+                                sidebarName: '内置扩展',
+                            },
+                        },
+                        {
+                            path: "thirdparty",
+                            element: <ThridPartyAddon/>,
+                            handle: {
+                                sidebarKey: 'THIRDPARTY',
+                                sidebarName: '第三方扩展',
+                            },
+                        }
+                    ]
                 }
-            },
-            {
-                path: "/multicloud-resource-manage",
-                handle: {
-                    sidebarKey: 'MULTICLOUD-RESOURCE-MANAGE',
-                    sidebarName: '多云资源管理',
-                    isPage: false,
-                    icon: <Icons.resource  {...IconStyles}/>
-                },
-                children: [
-                    {
-                        path: "namespace",
-                        element: <MultiCloudNamespace/>,
-                        handle: {
-                            sidebarKey: 'NAMESPACE',
-                            sidebarName: '命名空间',
-                        },
-                    },
-                    {
-                        path: "workload",
-                        element: <MultiCloudworkload/>,
-                        handle: {
-                            sidebarKey: 'WORKLOAD',
-                            sidebarName: '工作负载',
-                        },
-                    },
-                    {
-                        path: "service",
-                        element: <MultiCloudService/>,
-                        handle: {
-                            sidebarKey: 'SERVICE',
-                            sidebarName: '服务管理',
-                        },
-                    },
-                    {
-                        path: "config",
-                        element: <MultiCloudConfig/>,
-                        handle: {
-                            sidebarKey: 'CONFIG',
-                            sidebarName: '配置管理',
-                        },
-                    },
-                ]
-            },
-            {
-                path: "/multicloud-policy-manage",
-                handle: {
-                    sidebarKey: 'MULTICLOUD-POLICY-MANAGE',
-                    sidebarName: '策略管理',
-                    icon: <Icons.policy {...IconStyles}/>,
-                    isPage: false,
-                },
-                children: [
-                    {
-                        path: "propagation-policy",
-                        element: <MultiCloudPropagationPolicy/>,
-                        handle: {
-                            sidebarKey: 'PROPAGTION-POLICY',
-                            sidebarName: '调度策略',
-                        },
-                    },
-                    {
-                        path: "override-policy",
-                        element: <MultiCloudOverridePolicy/>,
-                        handle: {
-                            sidebarKey: 'OVERRIDE-POLICY',
-                            sidebarName: '差异化策略',
-                        },
-                    }
-                ]
-            },
-            {
-                path: "/cluster-manage",
-                element: <ClusterManage/>,
-                handle: {
-                    sidebarKey: 'CLUSTER-MANAGE',
-                    sidebarName: '集群管理',
-                    icon: <Icons.clusters {...IconStyles}/>,
-                    isPage: false,
-                },
-            },
-            {
-                path: "/basic-config",
-                handle: {
-                    sidebarKey: 'BASIC-CONFIG',
-                    sidebarName: '基本配置',
-                    icon: <Icons.basicConfig  {...IconStyles} />,
-                    isPage: false,
-                },
-                children: [
-                    {
-                        path: "oem",
-                        element: <Oem/>,
-                        handle: {
-                            sidebarKey: 'OEM',
-                            sidebarName: 'OEM配置',
-                        },
-                    },
-                    {
-                        path: "upgrade",
-                        element: <Upgrade/>,
-                        handle: {
-                            sidebarKey: 'UPGRADE',
-                            sidebarName: '升级管理',
-                        },
-                    },
-                    {
-                        path: "karmada-config",
-                        element: <KarmadaConfig/>,
-                        handle: {
-                            sidebarKey: 'KARMADA-CONFIG',
-                            sidebarName: 'Karmada配置',
-                        },
-                    },
-                    {
-                        path: "helm",
-                        element: <Helm/>,
-                        handle: {
-                            sidebarKey: 'HELM',
-                            sidebarName: 'Helm配置',
-                        },
-                    },
-                    {
-                        path: "registry",
-                        element: <Registry/>,
-                        handle: {
-                            sidebarKey: 'REGISTRY',
-                            sidebarName: 'Registry配置',
-                        },
-                    }
-                ]
-            },
-            {
-                path: "/advanced-config",
-                handle: {
-                    sidebarKey: 'ADVANCED-CONFIG',
-                    sidebarName: '高级配置',
-                    icon: <Icons.advancedConfig  {...IconStyles} />,
-                    isPage: false,
-                },
-                children: [
-                    {
-                        path: "failover",
-                        element: <Failover/>,
-                        handle: {
-                            sidebarKey: 'FAILOVER',
-                            sidebarName: 'Failover配置',
-                        },
-                    },
-                    {
-                        path: "reschedule",
-                        element: <Reschedule/>,
-                        handle: {
-                            sidebarKey: 'RESCHEDULE',
-                            sidebarName: '重调度配置',
-                        },
-                    },
-                    {
-                        path: "permission",
-                        element: <Permission/>,
-                        handle: {
-                            sidebarKey: 'PERMISSION',
-                            sidebarName: '权限管理',
-                        },
-                    }
-                ]
-            },
-            {
-                path: "/addon",
-                handle: {
-                    sidebarKey: 'ADDON',
-                    sidebarName: '扩展管理',
-                    icon: <Icons.addon   {...IconStyles}/>,
-                    isPage: false,
-                },
-                children: [
-                    {
-                        path: "buildin",
-                        element: <BuildInAddon/>,
-                        handle: {
-                            sidebarKey: 'BUILDIN',
-                            sidebarName: '内置扩展',
-                        },
-                    },
-                    {
-                        path: "thirdparty",
-                        element: <ThridPartyAddon/>,
-                        handle: {
-                            sidebarKey: 'THIRDPARTY',
-                            sidebarName: '第三方扩展',
-                        },
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        path: "/login",
-        errorElement: <ErrorBoundary/>,
-        element: <Login/>
-    }
-]
+            ]
+        },
+        {
+            path: "/login",
+            errorElement: <ErrorBoundary/>,
+            element: <Login/>
+        }
+    ]
+    return routes
+}
+export const routes: RouteObject[] = getRoutes()
 
 export let flattenRoutes: Record<string, string> = {}
 
@@ -321,13 +326,15 @@ function convertRouteToMenuItem(route: RouteObject, keypaths: string[] = []): Me
 
 let menuItems: MenuItem[] = []
 
-function initRoute() {
-    if (!routes[0].children) return
-    menuItems = (routes[0].children)
+export function initRoute() {
+    const rs = getRoutes()
+    if (!rs[0].children) return
+
+    menuItems = (rs[0].children)
         .map(route => convertRouteToMenuItem(route))
         .filter(menuItem => !_.isNull(menuItem));
 
-    (routes[0].children)
+    (rs[0].children)
         .map(route => tranverseRoutes(route))
 
 }

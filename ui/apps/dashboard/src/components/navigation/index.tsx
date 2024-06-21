@@ -1,7 +1,14 @@
 import {FC, CSSProperties} from 'react';
 import styles from './index.module.less'
 import karmadaLogo from '@/assets/karmada-logo.svg';
-
+import {
+    setLang,
+    getLangIcon,
+    getLang,
+    supportedLangConfig,
+    getLangTitle
+} from '@/utils/i18n';
+import {Dropdown} from "antd";
 
 export interface IUserInfo {
     id: number;
@@ -45,7 +52,25 @@ const Navigation: FC<INavigationProps> = (props) => {
                 <div className={styles.right}>
                     {/* extra components */}
                     <div className={styles.extra}>
-
+                        <Dropdown
+                            menu={{
+                                onClick: async (v) => {
+                                    await setLang(v.key)
+                                    window.location.reload()
+                                },
+                                selectedKeys:[getLang()],
+                                items: Object.keys(supportedLangConfig).map(lang => {
+                                    return {
+                                        key: lang,
+                                        label: getLangTitle(lang)
+                                    }
+                                })
+                            }}
+                            placement="bottomLeft"
+                            arrow
+                        >
+                            {getLangIcon(getLang())}
+                        </Dropdown>
                     </div>
                     {/* user info */}
                     {
