@@ -22,7 +22,6 @@ const AuthProvider = ({children}: {
         localStorage.setItem("token", newToken);
         setToken_(newToken);
     }
-    console.log('token', token)
     const {data, isLoading} = useQuery({
         queryKey: ['Me', token],
         queryFn: async () => {

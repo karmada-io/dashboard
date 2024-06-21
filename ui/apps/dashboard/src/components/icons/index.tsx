@@ -129,5 +129,40 @@ export const Icons = {
     eyeOff: EyeOff,
     pdf: FileText,
     upload: PlusCircle,
-    uploadFile: Upload
+    uploadFile: Upload,
+    zh: ({...props}: LucideProps) => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 48 48"
+            width="24"
+            height="24"
+            fill="none"
+            {...props}
+        >
+            <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#333" strokeWidth="4"
+                  strokeLinecap="round" strokeLinejoin="round"/>
+            <rect x="14" y="18" width="20" height="10" fill="none" stroke="#333" strokeWidth="4" strokeLinecap="round"
+                  strokeLinejoin="round"/>
+            <path d="M24 14V35" stroke="#333" strokeWidth="4" strokeLinecap="round"/>
+        </svg>
+    ),
+    en: ({...props}: LucideProps) => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 48 48"
+            width="24"
+            height="24"
+            fill="none"
+            {...props}
+        >
+            <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#333" strokeWidth="4"
+                  strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M13 31V17H21" stroke="#333" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M13 24H20.5" stroke="#333" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M13 31H20.5" stroke="#333" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M26 31L26 19" stroke="#333" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M26 31L26 24.5C26 22.0147 28.0147 20 30.5 20V20C32.9853 20 35 22.0147 35 24.5L35 31" stroke="#333"
+                  strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    )
 }

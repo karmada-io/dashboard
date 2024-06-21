@@ -12,7 +12,6 @@ const {Sider: AntdSider, Content: AntdContent} = AntdLayout;
 
 export const MainLayout: FC = () => {
     const {authenticated} = useAuth();
-    console.log('authenticated', authenticated)
     if (!authenticated) {
         return <Navigate to="/login"/>;
     }
