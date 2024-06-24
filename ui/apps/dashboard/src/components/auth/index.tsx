@@ -23,8 +23,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     queryKey: ['Me', token],
     queryFn: async () => {
       if (token) {
-        karmadaClient.defaults.headers.common['Authorization'] =
-          `Bearer ${token}`;
+        karmadaClient.defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${token}`;
         // localStorage.setItem("token", token);
         const ret = await Me();
         return ret.data;
