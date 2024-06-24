@@ -5,7 +5,7 @@ import Header from './header';
 import Sidebar from './sidebar';
 import { cn } from '@/utils/cn.ts';
 import { useAuth } from '@/components/auth';
-import {getSidebarWidth} from "@/utils/i18n.tsx";
+import { getSidebarWidth } from '@/utils/i18n.tsx';
 
 const { Sider: AntdSider, Content: AntdContent } = AntdLayout;
 

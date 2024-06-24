@@ -33,7 +33,11 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
   }
   return (
     <Modal
-      title={`${mode === 'create' ? i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191') : i18nInstance.t('95b351c86267f3aedf89520959bce689')}工作负载`}
+      title={`${
+        mode === 'create'
+          ? i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191')
+          : i18nInstance.t('95b351c86267f3aedf89520959bce689')
+      }工作负载`}
       open={open}
       width={1000}
       okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}

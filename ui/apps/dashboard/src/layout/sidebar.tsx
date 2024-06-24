@@ -8,7 +8,7 @@ import {
 import { useMatches, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import _ from 'lodash';
-import {getSidebarWidth} from "@/utils/i18n.tsx";
+import { getSidebarWidth } from '@/utils/i18n.tsx';
 
 const Sidebar = () => {
   const navigate = useNavigate();

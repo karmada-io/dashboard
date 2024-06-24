@@ -17,7 +17,7 @@ export async function setLang(lang: string) {
 interface LangConfig {
   title: string;
   icon: JSX.Element;
-  sidebarWidth: number
+  sidebarWidth: number;
 }
 
 export const supportedLangConfig: Record<string, LangConfig> = {
