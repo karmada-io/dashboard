@@ -77,6 +77,7 @@ export const Icons = {
       ></path>
     </svg>
   ),
+
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
@@ -94,6 +95,7 @@ export const Icons = {
       />
     </svg>
   ),
+
   help: HelpCircle,
   laptop: Laptop,
   media: Image,
@@ -122,6 +124,7 @@ export const Icons = {
       />
     </svg>
   ),
+
   user: User,
   warning: AlertTriangle,
   open: ArrowRightFromLine,
@@ -153,6 +156,7 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <rect
         x="14"
         y="18"
@@ -164,9 +168,11 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path d="M24 14V35" stroke="#333" strokeWidth="4" strokeLinecap="round" />
     </svg>
   ),
+
   en: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -188,6 +194,7 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M13 31V17H21"
         stroke="#333"
@@ -195,6 +202,7 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M13 24H20.5"
         stroke="#333"
@@ -202,6 +210,7 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M13 31H20.5"
         stroke="#333"
@@ -209,6 +218,7 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M26 31L26 19"
         stroke="#333"
@@ -216,6 +226,7 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M26 31L26 24.5C26 22.0147 28.0147 20 30.5 20V20C32.9853 20 35 22.0147 35 24.5L35 31"
         stroke="#333"

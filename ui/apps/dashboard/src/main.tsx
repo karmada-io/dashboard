@@ -8,8 +8,8 @@ import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 // https://github.com/remcohaszing/monaco-yaml/issues/150
 import yamlWorker from '@/utils/workaround-yaml.worker?worker';
-import enTexts from '../locales/en.json';
-import zhTexts from '../locales/zh.json';
+import enTexts from '../locales/en-US.json';
+import zhTexts from '../locales/zh-CN.json';
 import { initRoute } from '@/routes/route.tsx';
 
 window.MonacoEnvironment = {
@@ -27,7 +27,7 @@ i18nInstance
   .init({
     debug: true,
     lng: getLang(), // if you're using a language detector, do not define the lng option
-    fallbackLng: ['zh'],
+    fallbackLng: ['zh-CN'],
     resources: {
       zh: {
         translation: zhTexts,

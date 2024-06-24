@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { useState } from 'react';
 import Panel from '@/components/panel';
 import {
@@ -54,7 +55,7 @@ const PropagationPolicyManage = () => {
   });
   const columns: TableColumnProps<PropagationPolicy>[] = [
     {
-      title: '命名空间',
+      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -62,7 +63,7 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: '策略名称',
+      title: i18nInstance.t('53cf41060c577315071a7c14bb612852'),
       key: 'policyName',
       width: 200,
       render: (_, r) => {
@@ -70,13 +71,13 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: '调度器名称',
+      title: i18nInstance.t('915f48c8fcbe25e3dc5875c471b0ce3e'),
       key: 'schedulerName',
       dataIndex: 'schedulerName',
       width: 200,
     },
     {
-      title: '关联集群',
+      title: i18nInstance.t('ab7e397dd8c88360e441f1c1525a5758'),
       key: 'cluster',
       render: (_, r) => {
         if (!r?.clusterAffinity?.clusterNames) {
@@ -92,7 +93,7 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: '关联资源',
+      title: i18nInstance.t('8c0921045b741bc4e19d61426b99c938'),
       key: 'deployments',
       render: (_, r) => {
         return r.deployments.map((d) => (
@@ -101,7 +102,7 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: '操作',
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
       key: 'op',
       width: 200,
       render: (_, r) => {
@@ -126,7 +127,7 @@ const PropagationPolicyManage = () => {
                 });
               }}
             >
-              查看
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
             </Button>
             <Button
               size={'small'}
@@ -147,7 +148,7 @@ const PropagationPolicyManage = () => {
                 });
               }}
             >
-              编辑
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
             </Button>
             <Popconfirm
               placement="topRight"
@@ -159,17 +160,21 @@ const PropagationPolicyManage = () => {
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
-                  messageApi.success('删除成功');
+                  messageApi.success(
+                    i18nInstance.t('0007d170de017dafc266aa03926d7f00'),
+                  );
                   refetch();
                 } else {
-                  messageApi.error('删除失败');
+                  messageApi.error(
+                    i18nInstance.t('acf0664a54dc58d9d0377bb56e162092'),
+                  );
                 }
               }}
-              okText="确认"
-              cancelText="取消"
+              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
+              cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
             >
               <Button size={'small'} type="link" danger>
-                删除
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
               </Button>
             </Popconfirm>
           </Space.Compact>
@@ -177,6 +182,7 @@ const PropagationPolicyManage = () => {
       },
     },
   ];
+
   const [messageApi, messageContextHolder] = message.useMessage();
 
   function resetEditorDrawerData() {
@@ -197,17 +203,21 @@ const PropagationPolicyManage = () => {
         onChange={(value) => setPolicyScope(value as PolicyScope)}
         options={[
           {
-            label: '命名空间级别',
+            label: i18nInstance.t('bf15e71b2553d369585ace795d15ac3b'),
             value: 'namespace-scope',
           },
           {
-            label: '集群级别',
+            label: i18nInstance.t('860f29d8fc7a68113902db52885111d4'),
             value: 'cluster-scope',
           },
         ]}
       />
+
       <div className={'flex flex-row justify-between mb-4'}>
-        <Input.Search placeholder={'按命名空间搜索'} className={'w-[400px]'} />
+        <Input.Search
+          placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
+          className={'w-[400px]'}
+        />
         <Button
           type={'primary'}
           icon={<Icons.add width={16} height={16} />}
@@ -220,8 +230,8 @@ const PropagationPolicyManage = () => {
           }}
         >
           {policyScope === 'namespace-scope'
-            ? '新增调度策略'
-            : '新增集群调度策略'}
+            ? i18nInstance.t('5ac6560da4f54522d590c5f8e939691b')
+            : i18nInstance.t('929e0cda9f7fdc960dafe6ef742ab088')}
         </Button>
       </div>
       <Table
@@ -230,6 +240,7 @@ const PropagationPolicyManage = () => {
         loading={isLoading}
         dataSource={data?.propagationpolicys || []}
       />
+
       <PropagationPolicyEditorDrawer
         open={editorDrawerData.open}
         name={editorDrawerData.name}
@@ -264,6 +275,7 @@ const PropagationPolicyManage = () => {
           }
         }}
       />
+
       {messageContextHolder}
     </Panel>
   );

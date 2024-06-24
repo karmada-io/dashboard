@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import { Modal } from 'antd';
 import Editor from '@monaco-editor/react';
@@ -32,11 +33,11 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
   }
   return (
     <Modal
-      title={`${mode === 'create' ? '新增' : '编辑'}工作负载`}
+      title={`${mode === 'create' ? i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191') : i18nInstance.t('95b351c86267f3aedf89520959bce689')}工作负载`}
       open={open}
       width={1000}
-      okText="确定"
-      cancelText="取消"
+      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
+      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
       destroyOnClose={true}
       onOk={async () => {
         // await onOk()

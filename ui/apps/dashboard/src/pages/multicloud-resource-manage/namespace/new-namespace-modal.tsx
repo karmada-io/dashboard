@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { FC } from 'react';
 import { Modal, Form, Radio, Input } from 'antd';
 import { CreateNamespace } from '@/services/namespace.ts';
@@ -18,10 +19,10 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
   return (
     <Modal
       open={open}
-      title={'新增命名空间'}
+      title={i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3')}
       width={600}
-      okText="确定"
-      cancelText="取消"
+      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
+      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
       onOk={async () => {
         try {
           const submitData = await form.validateFields();
@@ -44,26 +45,32 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
         form={form}
         className={'h-[100px]'}
         validateMessages={{
-          required: "'${name}' 是必选字段",
+          required: i18nInstance.t('e0a23c19b8a0044c5defd167b441d643'),
         }}
       >
         <Form.Item
-          label="命名空间名称"
+          label={i18nInstance.t('06ff2e9eba7ae422587c6536e337395f')}
           name="name"
           required
           rules={[{ required: true }]}
         >
-          <Input placeholder={'请输入命名空间名称'} />
+          <Input
+            placeholder={i18nInstance.t('6375184207a6497c71d305f93908c8a1')}
+          />
         </Form.Item>
         <Form.Item
-          label="是否跳过自动分发"
+          label={i18nInstance.t('d41f6609ddbfa15fb95074a463f3b71a')}
           name="skipAutoPropagation"
           required
           rules={[{ required: true }]}
         >
           <Radio.Group>
-            <Radio value={true}>是</Radio>
-            <Radio value={false}>否</Radio>
+            <Radio value={true}>
+              {i18nInstance.t('0a60ac8f02ccd2cf723f927284877851')}
+            </Radio>
+            <Radio value={false}>
+              {i18nInstance.t('c9744f45e76d885ae1c74d4f4a934b2e')}
+            </Radio>
           </Radio.Group>
         </Form.Item>
       </Form>

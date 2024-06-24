@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -27,7 +28,7 @@ const NamespacePage = () => {
   });
   const columns: TableColumnProps<Namespace>[] = [
     {
-      title: '命名空间名称',
+      title: i18nInstance.t('06ff2e9eba7ae422587c6536e337395f'),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -35,7 +36,7 @@ const NamespacePage = () => {
       },
     },
     {
-      title: '标签',
+      title: i18nInstance.t('14d342362f66aa86e2aa1c1e11aa1204'),
       key: 'label',
       align: 'left',
       render: (_, r) => {
@@ -54,7 +55,7 @@ const NamespacePage = () => {
       },
     },
     {
-      title: '是否跳过自动调度',
+      title: i18nInstance.t('1d5fc011c19d35d08186afc4bad14be9'),
       key: 'skipAutoPropagation',
       render: (_, r) => {
         return r.skipAutoPropagation ? (
@@ -65,12 +66,12 @@ const NamespacePage = () => {
       },
     },
     {
-      title: '运行状态',
+      title: i18nInstance.t('e4b51d5cd0e4f199e41c25be1c7591d3'),
       key: 'phase',
       dataIndex: 'phase',
     },
     {
-      title: '创建时间',
+      title: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3'),
       key: 'creationTimestamp',
       render: (_, r) => {
         return dayjs(r.objectMeta.creationTimestamp).format(
@@ -79,17 +80,17 @@ const NamespacePage = () => {
       },
     },
     {
-      title: '操作',
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
       key: 'op',
       width: 200,
       render: (_, r) => {
         return (
           <Space.Compact>
             <Button size={'small'} type="link">
-              查看
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
             </Button>
             <Button size={'small'} type="link">
-              编辑
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
             </Button>
             <Button
               size={'small'}
@@ -101,26 +102,34 @@ const NamespacePage = () => {
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
-                  messageApi.error('删除命名空间成功');
+                  messageApi.error(
+                    i18nInstance.t('919994bf077d49f68f016811ffb5600e'),
+                  );
                   await refetch();
                 } else {
-                  messageApi.error('删除命名空间失败');
+                  messageApi.error(
+                    i18nInstance.t('9cdd00dbaa024d64a8b8134ae57974a6'),
+                  );
                 }
               }}
             >
-              删除
+              {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
             </Button>
           </Space.Compact>
         );
       },
     },
   ];
+
   const [showModal, toggleShowModal] = useToggle(false);
   const [messageApi, messageContextHolder] = message.useMessage();
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
-        <Input.Search placeholder={'按命名空间搜索'} className={'w-[400px]'} />
+        <Input.Search
+          placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
+          className={'w-[400px]'}
+        />
         <Button
           type={'primary'}
           icon={<Icons.add width={16} height={16} />}
@@ -129,7 +138,7 @@ const NamespacePage = () => {
             toggleShowModal(true);
           }}
         >
-          新增命名空间
+          {i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3')}
         </Button>
       </div>
       <Table
@@ -138,21 +147,27 @@ const NamespacePage = () => {
         loading={isLoading}
         dataSource={data?.namespaces || []}
       />
+
       <NewNamespaceModal
         open={showModal}
         onOk={async (ret) => {
           if (ret.code === 200) {
-            messageApi.success('创建命名空间成功');
+            messageApi.success(
+              i18nInstance.t('03b7ea4ba52a71e18764013f4696afe0'),
+            );
             toggleShowModal(false);
             await refetch();
           } else {
-            messageApi.error('创建命名空间失败');
+            messageApi.error(
+              i18nInstance.t('ca0f9765a014b2d0bcaef7b90c6eddd9'),
+            );
           }
         }}
         onCancel={async () => {
           toggleShowModal(false);
         }}
       />
+
       {messageContextHolder}
     </Panel>
   );

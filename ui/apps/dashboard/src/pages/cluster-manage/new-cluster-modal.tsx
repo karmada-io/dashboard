@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import { Modal, Form, Input, Radio, Button, Select, Divider } from 'antd';
 import TextareaWithUpload from '@/components/textarea-with-upload';
@@ -76,10 +77,14 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
   return (
     <Modal
       open={open}
-      title={mode === 'create' ? '新增集群' : '编辑集群'}
+      title={
+        mode === 'create'
+          ? i18nInstance.t('4cd980b26c5c76cdd4a5c5e44064d6da')
+          : i18nInstance.t('8d3d771ab6d38cf457a832763a5203a0')
+      }
       width={800}
-      okText="确定"
-      cancelText="取消"
+      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
+      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
       destroyOnClose={true}
       confirmLoading={confirmLoading}
       onOk={async () => {
@@ -116,23 +121,28 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
         form={form}
         className={mode === 'create' ? 'min-h-[500px]' : 'min-h-[200px]'}
         validateMessages={{
-          required: "'${name}' 是必选字段",
+          required: i18nInstance.t('e0a23c19b8a0044c5defd167b441d643'),
         }}
       >
         <Form.Item
-          label="集群名称"
+          label={i18nInstance.t('c3f28b34bbdec501802fa403584267e6')}
           name="clusterName"
           required
           rules={[{ required: true }]}
           {...formItemLayout}
         >
           <Input
-            placeholder={'请输入集群名称'}
+            placeholder={i18nInstance.t('debdfce08462b0261ed58925fe915450')}
             disabled={mode !== 'create'}
             className={'w-[200px]'}
           />
         </Form.Item>
-        <Form.Item label="接入模式" name="mode" required {...formItemLayout}>
+        <Form.Item
+          label={i18nInstance.t('e8d733d77271dd37b33820f5eafeb2c2')}
+          name="mode"
+          required
+          {...formItemLayout}
+        >
           <Radio.Group disabled={mode !== 'create'}>
             <Radio value={'Push'}>Push</Radio>
             <Radio value={'Pull'}>Pull</Radio>
@@ -164,6 +174,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
             />
           </Form.Item>
         )}
+
         <Divider>
           <div
             className={'flex flex-row items-center space-x-4 cursor-pointer'}
@@ -171,7 +182,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
               setShowAdvancedConfig(!showAdvancedConfig);
             }}
           >
-            <span>高级配置</span>
+            <span>{i18nInstance.t('1f318234cab713b51b5172d91770bc11')}</span>
             <Icons.up
               width={16}
               height={16}
@@ -199,7 +210,11 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                     {...(index === 0
                       ? formItemLayout
                       : formItemLayoutWithOutLabel)}
-                    label={index === 0 ? '集群标签' : ''}
+                    label={
+                      index === 0
+                        ? i18nInstance.t('b5a42b0552078d909538b09290dac33b')
+                        : ''
+                    }
                     required
                     key={key}
                   >
@@ -209,13 +224,17 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                         rules={[
                           {
                             required: true,
-                            message: 'label key必填',
+                            message: i18nInstance.t(
+                              '645e18caca231e11428f48afbcc33f12',
+                            ),
                           },
                         ]}
                         noStyle
                       >
                         <Input
-                          placeholder="请输出label的key"
+                          placeholder={i18nInstance.t(
+                            '38fe9f04343da51a22f32b08fda176e2',
+                          )}
                           className={'w-[150px]'}
                         />
                       </Form.Item>
@@ -224,13 +243,17 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                         rules={[
                           {
                             required: true,
-                            message: 'label value必填',
+                            message: i18nInstance.t(
+                              '95ef866ba7b4dccef30d67b9d0573f4c',
+                            ),
                           },
                         ]}
                         noStyle
                       >
                         <Input
-                          placeholder="请输出label的value"
+                          placeholder={i18nInstance.t(
+                            '8728e41e53f5447795926bfe80e547df',
+                          )}
                           className={'w-[150px]'}
                         />
                       </Form.Item>
@@ -250,7 +273,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                     icon={<Icons.add />}
                     className="flex flex-row items-center justify-center h-[32px]"
                   >
-                    新增集群标签
+                    {i18nInstance.t('c1153b413b26be76aa95cce9ce3ce588')}
                   </Button>
                 </Form.Item>
               </>
@@ -267,7 +290,11 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                         {...(index === 0
                           ? formItemLayout
                           : formItemLayoutWithOutLabel)}
-                        label={index === 0 ? '集群污点' : ''}
+                        label={
+                          index === 0
+                            ? i18nInstance.t('7e9edd6aac5f7394babb5825093d0b2f')
+                            : ''
+                        }
                         required
                         key={field.key}
                       >
@@ -278,31 +305,35 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                             noStyle
                           >
                             <Input
-                              placeholder="请输出taint的key"
+                              placeholder={i18nInstance.t(
+                                'af4d4438625e0bd7915a63a9cf48d6cb',
+                              )}
                               className={'w-[200px]'}
                             />
                           </Form.Item>
                           {/*
-                                                <Form.Item
-                                                    name={[field.name, 'operator']}
-                                                    noStyle
-                                                >
-                                                    <Select
-                                                        style={{width: 100}}
-                                                        options={[
-                                                            {label: '=', value: '='},
-                                                            {label: 'none', value: 'none'},
-                                                        ]}
-                                                    />
-                                                </Form.Item>
-                                                */}
+                                                 <Form.Item
+                                                     name={[field.name, 'operator']}
+                                                     noStyle
+                                                 >
+                                                     <Select
+                                                         style={{width: 100}}
+                                                         options={[
+                                                             {label: '=', value: '='},
+                                                             {label: 'none', value: 'none'},
+                                                         ]}
+                                                     />
+                                                 </Form.Item>
+                                                 */}
                           <Form.Item
                             name={[field.name, 'value']}
                             rules={[{ required: true }]}
                             noStyle
                           >
                             <Input
-                              placeholder="请输出taint的value"
+                              placeholder={i18nInstance.t(
+                                'dc74ee6676ae5689ef91a6a1f6ca4e17',
+                              )}
                               className={'w-[200px]'}
                             />
                           </Form.Item>
@@ -350,7 +381,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                       icon={<Icons.add />}
                       className="flex flex-row items-center justify-center h-[32px]"
                     >
-                      新增集群污点
+                      {i18nInstance.t('a8c0e7f3a8bbae7c553d25aab4f68978')}
                     </Button>
                   </Form.Item>
                 </>

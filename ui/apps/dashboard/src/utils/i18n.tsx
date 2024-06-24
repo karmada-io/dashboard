@@ -6,7 +6,7 @@ import enUS from 'antd/locale/en_US';
 const i18nInstance = createInstance({});
 
 export function getLang() {
-  return window.localStorage.getItem('i18next-lang') || 'en';
+  return window.localStorage.getItem('i18next-lang') || 'en-US';
 }
 
 export async function setLang(lang: string) {
@@ -20,11 +20,11 @@ interface LangConfig {
 }
 
 export const supportedLangConfig: Record<string, LangConfig> = {
-  en: {
+  'en-US': {
     title: 'English',
     icon: <Icons.en width={20} height={20} />,
   },
-  zh: {
+  'zh-CN': {
     title: '中文',
     icon: <Icons.zh width={20} height={20} />,
   },
@@ -41,9 +41,9 @@ export function getLangTitle(lang: string) {
 export function getAntdLocale(lang?: string) {
   lang = lang || getLang();
   switch (lang) {
-    case 'zh_CN':
+    case 'zh-CN':
       return zhCN;
-    case 'en_US':
+    case 'en-US':
       return enUS;
     default:
       return enUS;
