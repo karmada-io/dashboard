@@ -1,2 +1,2 @@
-export {GetClusters} from './cluster.ts'
-export {karmadaClient} from './base.ts'
+export { GetClusters } from './cluster.ts';
+export { karmadaClient } from './base.ts';
