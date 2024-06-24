@@ -73,7 +73,7 @@ jobs:
         with:
           images: ${{ steps.misc.outputs.image_name }}
       - name: Build and push image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           file: "cluster/images/build-web.Dockerfile"
           context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
@@ -116,7 +116,7 @@ jobs:
       - name: Build karmada-dashboard-api binary
         run: make karmada-dashboard-api
       - name: Build and push image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           file: "cluster/images/Dockerfile"
           context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
