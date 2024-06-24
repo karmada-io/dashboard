@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
 import {
   Button,
@@ -77,7 +78,7 @@ const WorkloadPage = () => {
   }, [editorState]);
   const columns: TableColumnProps<DeploymentWorkload>[] = [
     {
-      title: '命名空间',
+      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -85,7 +86,7 @@ const WorkloadPage = () => {
       },
     },
     {
-      title: '负载名称',
+      title: i18nInstance.t('89d19c60880d35c2bd88af0d9cc0497b'),
       key: 'workloadName',
       width: 200,
       render: (_, r) => {
@@ -93,7 +94,7 @@ const WorkloadPage = () => {
       },
     },
     {
-      title: '标签信息',
+      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd'),
       key: 'labelName',
       align: 'left',
       width: '30%',
@@ -113,7 +114,7 @@ const WorkloadPage = () => {
       },
     },
     {
-      title: '分发策略',
+      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619'),
       key: 'propagationPolicies',
       render: (_, r) => {
         if (!r?.objectMeta?.annotations?.[propagationpolicyKey]) {
@@ -123,7 +124,7 @@ const WorkloadPage = () => {
       },
     },
     {
-      title: '覆盖策略',
+      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f'),
       key: 'overridePolicies',
       width: 150,
       render: () => {
@@ -131,7 +132,7 @@ const WorkloadPage = () => {
       },
     },
     {
-      title: '操作',
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
       key: 'op',
       width: 200,
       render: (_, r) => {
@@ -149,7 +150,7 @@ const WorkloadPage = () => {
                 });
               }}
             >
-              查看
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
             </Button>
             <Button
               size={'small'}
@@ -167,7 +168,7 @@ const WorkloadPage = () => {
                 toggleShowModal(true);
               }}
             >
-              编辑
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
             </Button>
 
             <Popconfirm
@@ -185,11 +186,11 @@ const WorkloadPage = () => {
                 } else {
                 }
               }}
-              okText="确认"
-              cancelText="取消"
+              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
+              cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
             >
               <Button size={'small'} type="link" danger>
-                删除
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
               </Button>
             </Popconfirm>
           </Space.Compact>
@@ -197,15 +198,18 @@ const WorkloadPage = () => {
       },
     },
   ];
+
   const [messageApi, messageContextHolder] = message.useMessage();
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
         <div className={'flex flex-row justify-center space-x-4'}>
-          <h3 className={'leading-[32px]'}>命名空间：</h3>
+          <h3 className={'leading-[32px]'}>
+            {i18nInstance.t('280c56077360c204e536eb770495bc5f')}
+          </h3>
           <Select options={nsOptions} className={'w-[200px]'} />
           <Input.Search
-            placeholder={'按命名空间搜索'}
+            placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
             className={'w-[300px]'}
           />
         </div>
@@ -218,7 +222,7 @@ const WorkloadPage = () => {
             toggleShowModal(true);
           }}
         >
-          新增工作负载
+          {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0')}
         </Button>
       </div>
       <Table
@@ -227,12 +231,16 @@ const WorkloadPage = () => {
         loading={isLoading}
         dataSource={data?.deployments || []}
       />
+
       <NewWorkloadEditorModal
         mode={editorState.mode}
         workloadContent={editorState.content}
         open={showModal}
         onOk={async (ret) => {
-          const msg = editorState.mode === 'edit' ? '修改' : '新增';
+          const msg =
+            editorState.mode === 'edit'
+              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0')
+              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191');
           if (ret.code === 200) {
             messageApi.success(`工作负载${msg}成功`);
             toggleShowModal(false);
@@ -247,6 +255,7 @@ const WorkloadPage = () => {
           toggleShowModal(false);
         }}
       />
+
       <WorkloadDetailDrawer
         open={drawerData.open}
         kind={drawerData.kind}
@@ -261,6 +270,7 @@ const WorkloadPage = () => {
           });
         }}
       />
+
       {messageContextHolder}
     </Panel>
   );

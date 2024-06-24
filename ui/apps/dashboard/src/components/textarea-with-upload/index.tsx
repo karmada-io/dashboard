@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { FC } from 'react';
 import { Button, Upload } from 'antd';
 import { Icons } from '@/components/icons';
@@ -62,6 +63,7 @@ const TextareaWithUpload: FC<TextareaWithUploadProps> = (props) => {
         }}
         {...restProps}
       />
+
       {!hideUploadButton && (
         <Upload
           className="absolute top-[8px] right-[6px] z-[100]"
@@ -80,7 +82,7 @@ const TextareaWithUpload: FC<TextareaWithUploadProps> = (props) => {
             icon={<Icons.uploadFile width={16} height={16} />}
             className="flex flex-row items-center"
           >
-            选择kubeconfig文件
+            {i18nInstance.t('aba41769112ffcc08cb563e29f460770')}
           </Button>
         </Upload>
       )}

@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { Button, Drawer, Space } from 'antd';
@@ -24,7 +25,7 @@ function getTitle(
 ) {
   switch (mode) {
     case 'create':
-      return '新增调度策略';
+      return i18nInstance.t('5ac6560da4f54522d590c5f8e939691b');
     case 'edit':
       return `编辑${name}调度策略`;
     case 'detail':
@@ -71,7 +72,9 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
       footer={
         <div className={'flex flex-row justify-end'}>
           <Space>
-            <Button onClick={onClose}>取消</Button>
+            <Button onClick={onClose}>
+              {i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+            </Button>
             <Button
               type="primary"
               onClick={async () => {
@@ -97,7 +100,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
                 }
               }}
             >
-              确定
+              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
             </Button>
           </Space>
         </div>
