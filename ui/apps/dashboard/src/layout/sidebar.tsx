@@ -8,6 +8,7 @@ import {
 import { useMatches, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import _ from 'lodash';
+import {getSidebarWidth} from "@/utils/i18n.tsx";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Sidebar = () => {
     <div className={'w-full h-full overflow-y-auto'}>
       <Menu
         onClick={onClick}
-        style={{ width: 256 }}
+        style={{ width: getSidebarWidth() }}
         selectedKeys={selectKeys}
         defaultOpenKeys={
           selectKeys.length > 0
