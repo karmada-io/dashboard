@@ -17,16 +17,19 @@ export async function setLang(lang: string) {
 interface LangConfig {
   title: string;
   icon: JSX.Element;
+  sidebarWidth: number
 }
 
 export const supportedLangConfig: Record<string, LangConfig> = {
   'en-US': {
     title: 'English',
     icon: <Icons.en width={20} height={20} />,
+    sidebarWidth: 330,
   },
   'zh-CN': {
     title: '中文',
     icon: <Icons.zh width={20} height={20} />,
+    sidebarWidth: 256,
   },
 };
 
@@ -48,6 +51,11 @@ export function getAntdLocale(lang?: string) {
     default:
       return enUS;
   }
+}
+
+export function getSidebarWidth(lang?: string) {
+  lang = lang || getLang();
+  return supportedLangConfig[lang]?.sidebarWidth || '';
 }
 
 export default i18nInstance;
