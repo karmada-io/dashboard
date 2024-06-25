@@ -2,7 +2,6 @@ import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { Button, Drawer, Space } from 'antd';
-import { editor } from 'monaco-editor';
 import { CreatePropagationPolicy } from '@/services/propagationpolicy.ts';
 import { PutResource } from '@/services/unstructured';
 import { IResponse } from '@/services/base.ts';
@@ -55,7 +54,6 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
 
   function handleEditorChange(
     value: string | undefined,
-    _: editor.IModelContentChangedEvent,
   ) {
     setContent(value || '');
   }
@@ -78,7 +76,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
             <Button
               type="primary"
               onClick={async () => {
-                const yamlObject = parse(content);
+                const yamlObject = parse(content) as Record<string, string>;
                 if (mode === 'edit') {
                   const updateRet = await PutResource({
                     kind: 'propagationpolicy',
@@ -86,7 +84,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
                     namespace: namespace || '',
                     content: yamlObject,
                   });
-                  onUpdate(updateRet);
+                  onUpdate(updateRet as IResponse<string>);
                 } else {
                   const name = _.get(yamlObject, 'metadata.name');
                   const namespace = _.get(yamlObject, 'metadata.namespace');

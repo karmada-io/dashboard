@@ -55,7 +55,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
   }, [mode]);
   useEffect(() => {
     if (mode === 'edit') {
-      let initData = {
+      const initData = {
         clusterName: clusterDetail?.objectMeta?.name,
         mode: clusterDetail?.syncMode,
         taints: clusterDetail?.taints,

@@ -1,0 +1,9 @@
+package-lock.json
+pnpm-lock.yaml
+public
+dist
+build
+node_modules
+vite.config.ts
+scripts/*.js
+*.config.js

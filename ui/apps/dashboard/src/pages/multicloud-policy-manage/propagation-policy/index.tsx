@@ -160,12 +160,12 @@ const PropagationPolicyManage = () => {
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
-                  messageApi.success(
+                  await messageApi.success(
                     i18nInstance.t('0007d170de017dafc266aa03926d7f00'),
                   );
-                  refetch();
+                  await refetch();
                 } else {
-                  messageApi.error(
+                  await messageApi.error(
                     i18nInstance.t('acf0664a54dc58d9d0377bb56e162092'),
                   );
                 }
@@ -256,22 +256,22 @@ const PropagationPolicyManage = () => {
             propagationContent: '',
           });
         }}
-        onCreate={(ret) => {
+        onCreate={async (ret) => {
           if (ret.code === 200) {
-            messageApi.success(`新增调度策略成功`);
+            await messageApi.success(`新增调度策略成功`);
             resetEditorDrawerData();
-            refetch();
+            await refetch();
           } else {
-            messageApi.error(`新增调度策略失败`);
+            await messageApi.error(`新增调度策略失败`);
           }
         }}
-        onUpdate={(ret) => {
+        onUpdate={async (ret) => {
           if (ret.code === 200) {
-            messageApi.success(`编辑调度策略成功`);
+            await messageApi.success(`编辑调度策略成功`);
             resetEditorDrawerData();
-            refetch();
+            await refetch();
           } else {
-            messageApi.error(`编辑调度策略失败`);
+            await messageApi.error(`编辑调度策略失败`);
           }
         }}
       />

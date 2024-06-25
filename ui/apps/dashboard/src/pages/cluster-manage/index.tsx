@@ -187,10 +187,10 @@ const ClusterManagePage = () => {
               onConfirm={async () => {
                 const ret = await DeleteCluster(r.objectMeta.name);
                 if (ret.code === 200) {
-                  messageApi.success(`集群${r.objectMeta.name}删除成功`);
-                  refetch();
+                  await messageApi.success(`集群${r.objectMeta.name}删除成功`);
+                  await refetch();
                 } else {
-                  messageApi.error(
+                  await messageApi.error(
                     i18nInstance.t('9e7856e9c5938b9200dbdc174e97cf8a'),
                   );
                 }
@@ -239,18 +239,18 @@ const ClusterManagePage = () => {
       <NewClusterModal
         mode={clusterModalData.mode}
         open={clusterModalData.open}
-        onOk={(ret) => {
+        onOk={async (ret) => {
           if (ret.code === 200) {
             if (clusterModalData.mode === 'create') {
-              messageApi.success(
+              await messageApi.success(
                 i18nInstance.t('dca2754f7a646ef40f495f75145428d0'),
               );
             } else if (clusterModalData.mode === 'edit') {
-              messageApi.success(
+              await messageApi.success(
                 i18nInstance.t('474162cdce4e540d3a4d97c6de92cd68'),
               );
             }
-            refetch();
+            await refetch();
             setModalData({
               clusterDetail: undefined,
               mode: 'create',
@@ -258,11 +258,11 @@ const ClusterManagePage = () => {
             });
           } else {
             if (clusterModalData.mode === 'create') {
-              messageApi.error(
+              await messageApi.error(
                 i18nInstance.t('3b0b5df2e18ef97b7f948c60906a7821'),
               );
             } else if (clusterModalData.mode === 'edit') {
-              messageApi.error(
+              await messageApi.error(
                 i18nInstance.t('01812e386ab69ce4391769918e32d6d1'),
               );
             }

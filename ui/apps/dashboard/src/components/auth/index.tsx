@@ -1,4 +1,11 @@
-import { createContext, useContext, ReactNode, useMemo, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { Me } from '@/services/auth.ts';
 import { karmadaClient } from '@/services';
 import { useQuery } from '@tanstack/react-query';
@@ -15,10 +22,10 @@ const AuthContext = createContext<{
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken_] = useState(localStorage.getItem('token'));
-  const setToken = function (newToken: string) {
+  const setToken = useCallback((newToken: string) => {
     localStorage.setItem('token', newToken);
     setToken_(newToken);
-  };
+  }, []);
   const { data, isLoading } = useQuery({
     queryKey: ['Me', token],
     queryFn: async () => {

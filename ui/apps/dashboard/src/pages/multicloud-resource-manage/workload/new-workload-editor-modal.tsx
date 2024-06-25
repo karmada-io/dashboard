@@ -2,7 +2,6 @@ import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import { Modal } from 'antd';
 import Editor from '@monaco-editor/react';
-import { editor } from 'monaco-editor';
 import { parse, stringify } from 'yaml';
 import _ from 'lodash';
 import { PutResource } from '@/services/unstructured';
@@ -14,7 +13,7 @@ export interface NewWorkloadEditorModalProps {
   open: boolean;
   workloadContent?: string;
   onOk: (ret: IResponse<any>) => Promise<void>;
-  onCancel: () => Promise<void>;
+  onCancel: () => Promise<void> | void;
 }
 
 const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
@@ -27,7 +26,6 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
 
   function handleEditorChange(
     value: string | undefined,
-    _: editor.IModelContentChangedEvent,
   ) {
     setContent(value || '');
   }
@@ -46,12 +44,12 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
       onOk={async () => {
         // await onOk()
         try {
-          const yamlObject = parse(content);
+          const yamlObject = parse(content) as Record<string, string>;
           const kind = _.get(yamlObject, 'kind');
           const namespace = _.get(yamlObject, 'metadata.namespace');
           const name = _.get(yamlObject, 'metadata.name');
           if (mode === 'create') {
-            if ((kind as string).toLowerCase() === 'deployment') {
+            if (kind.toLowerCase() === 'deployment') {
               const ret = await CreateDeployment({
                 namespace,
                 name,

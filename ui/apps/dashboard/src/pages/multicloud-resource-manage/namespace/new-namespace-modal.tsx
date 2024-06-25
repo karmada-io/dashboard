@@ -6,7 +6,7 @@ import { IResponse } from '@/services/base.ts';
 interface NewNamespaceModalProps {
   open?: boolean;
   onOk?: (ret: IResponse<string>) => Promise<void>;
-  onCancel?: () => Promise<void>;
+  onCancel?: () => Promise<void> | void;
 }
 
 const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
