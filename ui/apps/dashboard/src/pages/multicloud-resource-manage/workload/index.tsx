@@ -75,7 +75,7 @@ const WorkloadPage = () => {
       mode: 'create',
       content: '',
     });
-  }, [editorState]);
+  }, []);
   const columns: TableColumnProps<DeploymentWorkload>[] = [
     {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
@@ -183,7 +183,6 @@ const WorkloadPage = () => {
                 });
                 if (ret.code === 200) {
                   await refetch();
-                } else {
                 }
               }}
               okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
@@ -242,15 +241,15 @@ const WorkloadPage = () => {
               ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0')
               : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191');
           if (ret.code === 200) {
-            messageApi.success(`工作负载${msg}成功`);
+            await messageApi.success(`工作负载${msg}成功`);
             toggleShowModal(false);
             resetEditorState();
             await refetch();
           } else {
-            messageApi.error(`工作负载${msg}失败`);
+            await messageApi.error(`工作负载${msg}失败`);
           }
         }}
-        onCancel={async () => {
+        onCancel={() => {
           resetEditorState();
           toggleShowModal(false);
         }}

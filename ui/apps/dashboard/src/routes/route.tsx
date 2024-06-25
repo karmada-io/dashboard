@@ -279,7 +279,7 @@ export function getRoutes() {
 }
 export const routes: RouteObject[] = getRoutes();
 
-export let flattenRoutes: Record<string, string> = {};
+export const flattenRoutes: Record<string, string> = {};
 
 function concatPathSegment(paths: string[] = []) {
   return paths.map((p) => (p.startsWith('/') ? p : `/${p}`)).join('');

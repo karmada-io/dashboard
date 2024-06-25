@@ -65,7 +65,7 @@ const LoginPage = () => {
                 try {
                   const ret = await Login(authToken);
                   if (ret.code === 200) {
-                    messageApi.success(
+                    await messageApi.success(
                       i18nInstance.t('11427a1edb98cf7efe26ca229d6f2626'),
                     );
                     setTimeout(() => {
@@ -73,12 +73,12 @@ const LoginPage = () => {
                       navigate('/overview');
                     }, 1000);
                   } else {
-                    messageApi.error(
+                    await messageApi.error(
                       i18nInstance.t('a831066e2d289e126ff7cbf483c3bad1'),
                     );
                   }
                 } catch (e) {
-                  messageApi.error(
+                  await messageApi.error(
                     i18nInstance.t('b6076a055fe6cc0473e0d313dc58a049'),
                   );
                 }

@@ -102,12 +102,12 @@ const NamespacePage = () => {
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
-                  messageApi.error(
+                  await messageApi.error(
                     i18nInstance.t('919994bf077d49f68f016811ffb5600e'),
                   );
                   await refetch();
                 } else {
-                  messageApi.error(
+                  await messageApi.error(
                     i18nInstance.t('9cdd00dbaa024d64a8b8134ae57974a6'),
                   );
                 }
@@ -152,18 +152,18 @@ const NamespacePage = () => {
         open={showModal}
         onOk={async (ret) => {
           if (ret.code === 200) {
-            messageApi.success(
+            await messageApi.success(
               i18nInstance.t('03b7ea4ba52a71e18764013f4696afe0'),
             );
             toggleShowModal(false);
             await refetch();
           } else {
-            messageApi.error(
+            await messageApi.error(
               i18nInstance.t('ca0f9765a014b2d0bcaef7b90c6eddd9'),
             );
           }
         }}
-        onCancel={async () => {
+        onCancel={() => {
           toggleShowModal(false);
         }}
       />
