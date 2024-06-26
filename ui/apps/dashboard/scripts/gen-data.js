@@ -11,7 +11,7 @@ console.log(JSON.stringify(data))
 */
 
 const data = {
-    "propagationData": `apiVersion: policy.karmada.io/v1alpha1
+  propagationData: `apiVersion: policy.karmada.io/v1alpha1
 kind: PropagationPolicy
 metadata:
   name: nginx-propagation
@@ -34,8 +34,8 @@ spec:
                 - member1
             weight: 1
 `,
-    "isClusterScope": false,
-    "namespace": "default",
-    "name": "nginx-propagation",
-}
-console.log(JSON.stringify(data))
+  isClusterScope: false,
+  namespace: 'default',
+  name: 'nginx-propagation',
+};
+console.log(JSON.stringify(data));

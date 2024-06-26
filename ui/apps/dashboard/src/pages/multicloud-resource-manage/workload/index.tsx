@@ -1,247 +1,278 @@
-import Panel from '@/components/panel'
-import {Button, Input, message, Popconfirm, Select, Space, Table, TableColumnProps, Tag} from "antd";
-import {Icons} from "@/components/icons";
-import {GetNamespaces,} from '@/services/namespace';
-import {GetWorkloads} from '@/services/workload'
-import type {DeploymentWorkload} from '@/services/workload'
-import {useQuery} from "@tanstack/react-query";
-import {useCallback, useMemo, useState} from "react";
-import {DeleteResource, GetResource} from "@/services/unstructured.ts";
-import NewWorkloadEditorModal from './new-workload-editor-modal.tsx'
-import WorkloadDetailDrawer, {WorkloadDetailDrawerProps} from './workload-detail-drawer.tsx'
-import {useToggle} from "@uidotdev/usehooks";
-import {stringify} from 'yaml'
+import i18nInstance from '@/utils/i18n';
+import Panel from '@/components/panel';
+import {
+  Button,
+  Input,
+  message,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  TableColumnProps,
+  Tag,
+} from 'antd';
+import { Icons } from '@/components/icons';
+import { GetNamespaces } from '@/services/namespace';
+import { GetWorkloads } from '@/services/workload';
+import type { DeploymentWorkload } from '@/services/workload';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { DeleteResource, GetResource } from '@/services/unstructured.ts';
+import NewWorkloadEditorModal from './new-workload-editor-modal.tsx';
+import WorkloadDetailDrawer, {
+  WorkloadDetailDrawerProps,
+} from './workload-detail-drawer.tsx';
+import { useToggle } from '@uidotdev/usehooks';
+import { stringify } from 'yaml';
 
 /*
 propagationpolicy.karmada.io/name: "nginx-propagation"
 propagationpolicy.karmada.io/namespace: "default"
 */
-const propagationpolicyKey = 'propagationpolicy.karmada.io/name'
+const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
 const WorkloadPage = () => {
-    const {data: nsData} = useQuery({
-        queryKey: ['GetNamespaces'],
-        queryFn: async () => {
-            const clusters = await GetNamespaces()
-            return clusters.data || {}
+  const { data: nsData } = useQuery({
+    queryKey: ['GetNamespaces'],
+    queryFn: async () => {
+      const clusters = await GetNamespaces();
+      return clusters.data || {};
+    },
+  });
+  const nsOptions = useMemo(() => {
+    if (!nsData?.namespaces) return [];
+    return nsData.namespaces.map((item) => {
+      return {
+        title: item.objectMeta.name,
+        value: item.objectMeta.name,
+      };
+    });
+  }, [nsData]);
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['GetWorkloads'],
+    queryFn: async () => {
+      const clusters = await GetWorkloads({});
+      return clusters.data || {};
+    },
+  });
+  const [drawerData, setDrawerData] = useState<
+    Omit<WorkloadDetailDrawerProps, 'onClose'>
+  >({
+    open: false,
+    kind: '',
+    namespace: '',
+    name: '',
+  });
+  const [showModal, toggleShowModal] = useToggle(false);
+  const [editorState, setEditorState] = useState<{
+    mode: 'create' | 'edit';
+    content: string;
+  }>({
+    mode: 'create',
+    content: '',
+  });
+  const resetEditorState = useCallback(() => {
+    setEditorState({
+      mode: 'create',
+      content: '',
+    });
+  }, []);
+  const columns: TableColumnProps<DeploymentWorkload>[] = [
+    {
+      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
+      key: 'namespaceName',
+      width: 200,
+      render: (_, r) => {
+        return r.objectMeta.namespace;
+      },
+    },
+    {
+      title: i18nInstance.t('89d19c60880d35c2bd88af0d9cc0497b'),
+      key: 'workloadName',
+      width: 200,
+      render: (_, r) => {
+        return r.objectMeta.name;
+      },
+    },
+    {
+      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd'),
+      key: 'labelName',
+      align: 'left',
+      width: '30%',
+      render: (_, r) => {
+        if (!r?.objectMeta?.labels) {
+          return '-';
         }
-    })
-    const nsOptions = useMemo(() => {
-        if (!nsData?.namespaces) return []
-        return nsData.namespaces.map(item => {
-            return {
-                title: item.objectMeta.name,
-                value: item.objectMeta.name
-            }
-        })
-    }, [nsData]);
-    const {data, isLoading, refetch} = useQuery({
-        queryKey: ['GetWorkloads'],
-        queryFn: async () => {
-            const clusters = await GetWorkloads({})
-            return clusters.data || {}
+        return (
+          <div className="flex flex-wrap">
+            {Object.keys(r.objectMeta.labels).map((key) => (
+              <Tag className={'mb-2'} key={`${r.objectMeta.name}-${key}`}>
+                {key}:{r.objectMeta.labels[key]}
+              </Tag>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619'),
+      key: 'propagationPolicies',
+      render: (_, r) => {
+        if (!r?.objectMeta?.annotations?.[propagationpolicyKey]) {
+          return '-';
         }
-    })
-    const [drawerData, setDrawerData] = useState<Omit<WorkloadDetailDrawerProps, 'onClose'>>({
-        open: false,
-        kind: '',
-        namespace: '',
-        name: ''
-    })
-    const [showModal, toggleShowModal] = useToggle(false);
-    const [editorState, setEditorState] = useState<{
-        mode: 'create' | 'edit',
-        content: string
-    }>({
-        mode: 'create',
-        content: ''
-    })
-    const resetEditorState = useCallback(() => {
-        setEditorState({
-            mode: 'create',
-            content: ''
-        })
-    }, [editorState])
-    const columns: TableColumnProps<DeploymentWorkload>[] = [
-        {
-            title: '命名空间',
-            key: 'namespaceName',
-            width: 200,
-            render: (_, r) => {
-                return r.objectMeta.namespace
-            }
-        },
-        {
-            title: '负载名称',
-            key: 'workloadName',
-            width: 200,
-            render: (_, r) => {
-                return r.objectMeta.name
-            }
-        },
-        {
-            title: '标签信息',
-            key: 'labelName',
-            align: 'left',
-            width: '30%',
-            render: (_, r) => {
-                if (!r?.objectMeta?.labels) {
-                    return '-'
-                }
-                return <div className='flex flex-wrap'>
-                    {
-                        Object.keys(r.objectMeta.labels).map(key =>
-                            <Tag
-                                className={'mb-2'}
-                                key={`${r.objectMeta.name}-${key}`}>
-                                {key}:{r.objectMeta.labels[key]}
-                            </Tag>)
-                    }
-                </div>
-            }
-        },
-        {
-            title: '分发策略',
-            key: 'propagationPolicies',
-            render: (_, r) => {
-                if (!r?.objectMeta?.annotations?.[propagationpolicyKey]) {
-                    return '-'
-                }
-                return <Tag>{r?.objectMeta?.annotations?.[propagationpolicyKey]}</Tag>
-            }
-        },
-        {
-            title: '覆盖策略',
-            key: 'overridePolicies',
-            width: 150,
-            render: () => {
-                return '-'
-            }
-        },
-        {
-            title: '操作',
-            key: 'op',
-            width: 200,
-            render: (_, r) => {
-                return <Space.Compact>
-                    <Button
-                        size={'small'} type='link'
-                        onClick={() => {
-                            setDrawerData({
-                                open: true,
-                                kind: r.typeMeta.kind,
-                                name: r.objectMeta.name,
-                                namespace: r.objectMeta.namespace
-                            })
-                        }}
-                    >
-                        查看
-                    </Button>
-                    <Button
-                        size={'small'} type='link'
-                        onClick={async () => {
-                            const ret = await GetResource({
-                                kind: r.typeMeta.kind,
-                                name: r.objectMeta.name,
-                                namespace: r.objectMeta.namespace
-                            })
-                            setEditorState({
-                                mode: 'edit',
-                                content: stringify(ret.data)
-                            })
-                            toggleShowModal(true)
-                        }}
-                    >
-                        编辑
-                    </Button>
-
-                    <Popconfirm
-                        placement="topRight"
-                        title={`确认要删除${r.objectMeta.name}工作负载么`}
-                        onConfirm={async () => {
-                            // todo after delete, need to wait until resource deleted
-                            const ret = await DeleteResource({
-                                kind: r.typeMeta.kind,
-                                name: r.objectMeta.name,
-                                namespace: r.objectMeta.namespace,
-                            })
-                            if (ret.code === 200) {
-                                await refetch()
-                            } else {
-                            }
-                        }}
-                        okText="确认"
-                        cancelText="取消"
-                    >
-                        <Button size={'small'} type='link' danger>删除</Button>
-                    </Popconfirm>
-
-
-                </Space.Compact>
-            }
-        }
-    ]
-    const [messageApi, messageContextHolder] = message.useMessage();
-    return <Panel>
-        <div className={'flex flex-row justify-between mb-4'}>
-            <div className={'flex flex-row justify-center space-x-4'}>
-                <h3 className={'leading-[32px]'}>命名空间：</h3>
-                <Select options={nsOptions} className={'w-[200px]'}/>
-                <Input.Search placeholder={'按命名空间搜索'} className={'w-[300px]'}/>
-            </div>
-
+        return <Tag>{r?.objectMeta?.annotations?.[propagationpolicyKey]}</Tag>;
+      },
+    },
+    {
+      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f'),
+      key: 'overridePolicies',
+      width: 150,
+      render: () => {
+        return '-';
+      },
+    },
+    {
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
+      key: 'op',
+      width: 200,
+      render: (_, r) => {
+        return (
+          <Space.Compact>
             <Button
-                type={'primary'}
-                icon={<Icons.add width={16} height={16}/>}
-                className="flex flex-row items-center"
-                onClick={() => {
-                    toggleShowModal(true)
-                }}
-            >
-                新增工作负载
-            </Button>
-        </div>
-        <Table
-            rowKey={(r: DeploymentWorkload) => r.objectMeta.name || ''}
-            columns={columns}
-            loading={isLoading}
-            dataSource={data?.deployments || []}
-        />
-        <NewWorkloadEditorModal
-            mode={editorState.mode}
-            workloadContent={editorState.content}
-            open={showModal}
-            onOk={async (ret) => {
-                const msg = editorState.mode === 'edit' ? '修改' : '新增';
-                if (ret.code === 200) {
-                    messageApi.success(`工作负载${msg}成功`)
-                    toggleShowModal(false)
-                    resetEditorState()
-                    await refetch()
-                } else {
-                    messageApi.error(`工作负载${msg}失败`)
-                }
-            }}
-            onCancel={async () => {
-                resetEditorState()
-                toggleShowModal(false);
-            }}
-        />
-        <WorkloadDetailDrawer
-            open={drawerData.open}
-            kind={drawerData.kind}
-            name={drawerData.name}
-            namespace={drawerData.namespace}
-            onClose={() => {
+              size={'small'}
+              type="link"
+              onClick={() => {
                 setDrawerData({
-                    open: false,
-                    kind: '',
-                    namespace: '',
-                    name: ''
-                })
-            }}
-        />
-        {messageContextHolder}
+                  open: true,
+                  kind: r.typeMeta.kind,
+                  name: r.objectMeta.name,
+                  namespace: r.objectMeta.namespace,
+                });
+              }}
+            >
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
+            </Button>
+            <Button
+              size={'small'}
+              type="link"
+              onClick={async () => {
+                const ret = await GetResource({
+                  kind: r.typeMeta.kind,
+                  name: r.objectMeta.name,
+                  namespace: r.objectMeta.namespace,
+                });
+                setEditorState({
+                  mode: 'edit',
+                  content: stringify(ret.data),
+                });
+                toggleShowModal(true);
+              }}
+            >
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
+            </Button>
+
+            <Popconfirm
+              placement="topRight"
+              title={`确认要删除${r.objectMeta.name}工作负载么`}
+              onConfirm={async () => {
+                // todo after delete, need to wait until resource deleted
+                const ret = await DeleteResource({
+                  kind: r.typeMeta.kind,
+                  name: r.objectMeta.name,
+                  namespace: r.objectMeta.namespace,
+                });
+                if (ret.code === 200) {
+                  await refetch();
+                }
+              }}
+              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
+              cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+            >
+              <Button size={'small'} type="link" danger>
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
+              </Button>
+            </Popconfirm>
+          </Space.Compact>
+        );
+      },
+    },
+  ];
+
+  const [messageApi, messageContextHolder] = message.useMessage();
+  return (
+    <Panel>
+      <div className={'flex flex-row justify-between mb-4'}>
+        <div className={'flex flex-row justify-center space-x-4'}>
+          <h3 className={'leading-[32px]'}>
+            {i18nInstance.t('280c56077360c204e536eb770495bc5f')}
+          </h3>
+          <Select options={nsOptions} className={'w-[200px]'} />
+          <Input.Search
+            placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
+            className={'w-[300px]'}
+          />
+        </div>
+
+        <Button
+          type={'primary'}
+          icon={<Icons.add width={16} height={16} />}
+          className="flex flex-row items-center"
+          onClick={() => {
+            toggleShowModal(true);
+          }}
+        >
+          {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0')}
+        </Button>
+      </div>
+      <Table
+        rowKey={(r: DeploymentWorkload) => r.objectMeta.name || ''}
+        columns={columns}
+        loading={isLoading}
+        dataSource={data?.deployments || []}
+      />
+
+      <NewWorkloadEditorModal
+        mode={editorState.mode}
+        workloadContent={editorState.content}
+        open={showModal}
+        onOk={async (ret) => {
+          const msg =
+            editorState.mode === 'edit'
+              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0')
+              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191');
+          if (ret.code === 200) {
+            await messageApi.success(`工作负载${msg}成功`);
+            toggleShowModal(false);
+            resetEditorState();
+            await refetch();
+          } else {
+            await messageApi.error(`工作负载${msg}失败`);
+          }
+        }}
+        onCancel={() => {
+          resetEditorState();
+          toggleShowModal(false);
+        }}
+      />
+
+      <WorkloadDetailDrawer
+        open={drawerData.open}
+        kind={drawerData.kind}
+        name={drawerData.name}
+        namespace={drawerData.namespace}
+        onClose={() => {
+          setDrawerData({
+            open: false,
+            kind: '',
+            namespace: '',
+            name: '',
+          });
+        }}
+      />
+
+      {messageContextHolder}
     </Panel>
-}
+  );
+};
 
 export default WorkloadPage;

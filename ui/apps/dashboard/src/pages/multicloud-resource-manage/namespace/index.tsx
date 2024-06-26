@@ -1,134 +1,176 @@
-import Panel from '@/components/panel'
-import {useQuery} from "@tanstack/react-query";
-import {Button, Input, message, Space, Table, TableColumnProps, Tag} from "antd";
-import {GetNamespaces} from "@/services/namespace.ts";
-import type {Namespace} from "@/services/namespace.ts";
-import {Icons} from "@/components/icons";
-import dayjs from "dayjs";
-import {useToggle} from "@uidotdev/usehooks";
-import NewNamespaceModal from './new-namespace-modal.tsx'
-import {DeleteResource} from "@/services/unstructured";
+import i18nInstance from '@/utils/i18n';
+import Panel from '@/components/panel';
+import { useQuery } from '@tanstack/react-query';
+import {
+  Button,
+  Input,
+  message,
+  Space,
+  Table,
+  TableColumnProps,
+  Tag,
+} from 'antd';
+import { GetNamespaces } from '@/services/namespace.ts';
+import type { Namespace } from '@/services/namespace.ts';
+import { Icons } from '@/components/icons';
+import dayjs from 'dayjs';
+import { useToggle } from '@uidotdev/usehooks';
+import NewNamespaceModal from './new-namespace-modal.tsx';
+import { DeleteResource } from '@/services/unstructured';
 
 const NamespacePage = () => {
-    const {data, isLoading, refetch} = useQuery({
-        queryKey: ['GetNamespaces'],
-        queryFn: async () => {
-            const clusters = await GetNamespaces()
-            return clusters.data || {}
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['GetNamespaces'],
+    queryFn: async () => {
+      const clusters = await GetNamespaces();
+      return clusters.data || {};
+    },
+  });
+  const columns: TableColumnProps<Namespace>[] = [
+    {
+      title: i18nInstance.t('06ff2e9eba7ae422587c6536e337395f'),
+      key: 'namespaceName',
+      width: 200,
+      render: (_, r) => {
+        return r.objectMeta.name;
+      },
+    },
+    {
+      title: i18nInstance.t('14d342362f66aa86e2aa1c1e11aa1204'),
+      key: 'label',
+      align: 'left',
+      render: (_, r) => {
+        if (!r?.objectMeta?.labels) {
+          return '-';
         }
-    })
-    const columns: TableColumnProps<Namespace>[] = [
-        {
-            title: '命名空间名称',
-            key: 'namespaceName',
-            width: 200,
-            render: (_, r) => {
-                return r.objectMeta.name
-            }
-        },
-        {
-            title: '标签',
-            key: 'label',
-            align: 'left',
-            render: (_, r) => {
-                if (!r?.objectMeta?.labels) {
-                    return '-'
-                }
-                return <div>
-                    {
-                        Object.keys(r.objectMeta.labels).map(key => <Tag key={`${r.objectMeta.name}-${key}`}>{key}:{r.objectMeta.labels[key]}</Tag>)
-                    }
-                </div>
-            }
-        },
-        {
-            title: '是否跳过自动调度',
-            key: 'skipAutoPropagation',
-            render: (_, r) => {
-                return r.skipAutoPropagation ?
-                    <Tag color='blue'>yes</Tag> :
-                    <Tag color='purple'>no</Tag>
-            }
-        },
-        {
-            title: '运行状态',
-            key: 'phase',
-            dataIndex: 'phase',
-        },
-        {
-            title: '创建时间',
-            key: 'creationTimestamp',
-            render: (_, r) => {
-                return dayjs(r.objectMeta.creationTimestamp).format('YYYY/MM/DD HH:mm:ss')
-            }
-        },
-        {
-            title: '操作',
-            key: 'op',
-            width: 200,
-            render: (_, r) => {
-                return <Space.Compact>
-                    <Button size={'small'} type='link'>查看</Button>
-                    <Button size={'small'} type='link'>编辑</Button>
-                    <Button
-                        size={'small'} type='link' danger
-                        onClick={async () => {
-                            const ret = await DeleteResource({
-                                kind: 'namespace',
-                                name: r.objectMeta.name
-                            })
-                            if (ret.code === 200) {
-                                messageApi.error('删除命名空间成功')
-                                await refetch()
-                            } else {
-                                messageApi.error('删除命名空间失败')
-                            }
-                        }}>
-                        删除
-                    </Button>
-                </Space.Compact>
-            }
-        }
-    ]
-    const [showModal, toggleShowModal] = useToggle(false);
-    const [messageApi, messageContextHolder] = message.useMessage();
-    return <Panel>
-        <div className={'flex flex-row justify-between mb-4'}>
-            <Input.Search placeholder={'按命名空间搜索'} className={'w-[400px]'}/>
-            <Button
-                type={'primary'}
-                icon={<Icons.add width={16} height={16}/>}
-                className="flex flex-row items-center"
-                onClick={() => {
-                    toggleShowModal(true)
-                }}
-            >
-                新增命名空间
+        return (
+          <div>
+            {Object.keys(r.objectMeta.labels).map((key) => (
+              <Tag key={`${r.objectMeta.name}-${key}`}>
+                {key}:{r.objectMeta.labels[key]}
+              </Tag>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      title: i18nInstance.t('1d5fc011c19d35d08186afc4bad14be9'),
+      key: 'skipAutoPropagation',
+      render: (_, r) => {
+        return r.skipAutoPropagation ? (
+          <Tag color="blue">yes</Tag>
+        ) : (
+          <Tag color="purple">no</Tag>
+        );
+      },
+    },
+    {
+      title: i18nInstance.t('e4b51d5cd0e4f199e41c25be1c7591d3'),
+      key: 'phase',
+      dataIndex: 'phase',
+    },
+    {
+      title: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3'),
+      key: 'creationTimestamp',
+      render: (_, r) => {
+        return dayjs(r.objectMeta.creationTimestamp).format(
+          'YYYY/MM/DD HH:mm:ss',
+        );
+      },
+    },
+    {
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
+      key: 'op',
+      width: 200,
+      render: (_, r) => {
+        return (
+          <Space.Compact>
+            <Button size={'small'} type="link">
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
             </Button>
-        </div>
-        <Table
-            rowKey={(r: Namespace) => r.objectMeta.name || ''}
-            columns={columns}
-            loading={isLoading}
-            dataSource={data?.namespaces || []}
-        />
-        <NewNamespaceModal
-            open={showModal}
-            onOk={async (ret) => {
+            <Button size={'small'} type="link">
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
+            </Button>
+            <Button
+              size={'small'}
+              type="link"
+              danger
+              onClick={async () => {
+                const ret = await DeleteResource({
+                  kind: 'namespace',
+                  name: r.objectMeta.name,
+                });
                 if (ret.code === 200) {
-                    messageApi.success('创建命名空间成功')
-                    toggleShowModal(false)
-                    await refetch()
+                  await messageApi.error(
+                    i18nInstance.t('919994bf077d49f68f016811ffb5600e'),
+                  );
+                  await refetch();
                 } else {
-                    messageApi.error('创建命名空间失败')
+                  await messageApi.error(
+                    i18nInstance.t('9cdd00dbaa024d64a8b8134ae57974a6'),
+                  );
                 }
-            }}
-            onCancel={async () => {
-                toggleShowModal(false)
-            }}
+              }}
+            >
+              {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
+            </Button>
+          </Space.Compact>
+        );
+      },
+    },
+  ];
+
+  const [showModal, toggleShowModal] = useToggle(false);
+  const [messageApi, messageContextHolder] = message.useMessage();
+  return (
+    <Panel>
+      <div className={'flex flex-row justify-between mb-4'}>
+        <Input.Search
+          placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
+          className={'w-[400px]'}
         />
-        {messageContextHolder}
+        <Button
+          type={'primary'}
+          icon={<Icons.add width={16} height={16} />}
+          className="flex flex-row items-center"
+          onClick={() => {
+            toggleShowModal(true);
+          }}
+        >
+          {i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3')}
+        </Button>
+      </div>
+      <Table
+        rowKey={(r: Namespace) => r.objectMeta.name || ''}
+        columns={columns}
+        loading={isLoading}
+        dataSource={data?.namespaces || []}
+      />
+
+      <NewNamespaceModal
+        open={showModal}
+        onOk={async (ret) => {
+          if (ret.code === 200) {
+            await messageApi.success(
+              i18nInstance.t('03b7ea4ba52a71e18764013f4696afe0'),
+            );
+            toggleShowModal(false);
+            await refetch();
+          } else {
+            await messageApi.error(
+              i18nInstance.t('ca0f9765a014b2d0bcaef7b90c6eddd9'),
+            );
+          }
+        }}
+        onCancel={() => {
+          toggleShowModal(false);
+        }}
+      />
+
+      {messageContextHolder}
     </Panel>
-}
+  );
+};
 
 export default NamespacePage;
