@@ -1,0 +1,43 @@
+{
+  "name": "@karmada/xterm-addon-zmodem",
+  "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "tsup --config ./tsup.config.ts",
+    "build": "tsup --config ./tsup.config.ts"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "terminal",
+    "xterm",
+    "xterm.js"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@karmada/xterm-addon-zmodem": "link:",
+    "file-saver": "^2.0.5",
+    "trzsz": "^1.1.5",
+    "zmodem.js": "^0.1.10"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7"
+  },
+  "peerDependencies": {
+    "@xterm/xterm": "^5.0.0"
+  }
+}

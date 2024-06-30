@@ -28,5 +28,10 @@
   },
   "dependencies": {
     "dayjs": "^1.11.11"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "zmodem.js@0.1.10": "patches/zmodem.js@0.1.10.patch"
+    }
   }
 }
