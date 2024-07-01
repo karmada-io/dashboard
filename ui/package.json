@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dashboard:dev": "cd apps/dashboard && pnpm run dev",
-    "dashboard:build": "cd apps/dashboard && pnpm run build",
+    "dashboard:dev": "turbo dev --filter @karmada/dashboard",
+    "demos:dev": "turbo dev --filter @karmada/demos",
+    "dashboard:build": "turbo build --filter @karmada/dashboard",
     "prepare": "cd .. && husky install ui/.husky"
   },
   "engines": {
@@ -24,11 +25,13 @@
     "husky": "^8.0.0",
     "lint-staged": "^15.2.7",
     "tsup": "^8.1.0",
-    "tsx": "^4.15.6"
+    "tsx": "^4.15.6",
+    "turbo": "^2.0.6"
   },
   "dependencies": {
     "dayjs": "^1.11.11"
   },
+  "packageManager": "pnpm@9.1.2",
   "pnpm": {
     "patchedDependencies": {
       "zmodem.js@0.1.10": "patches/zmodem.js@0.1.10.patch"
