@@ -21,6 +21,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@changesets/cli": "^2.27.6",
     "@types/node": "^20.12.11",
     "husky": "^8.0.0",
     "lint-staged": "^15.2.7",
