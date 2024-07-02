@@ -7,5 +7,7 @@ export const TerminalContext = createContext<{
 }>({
   terminal: null,
 });
+export { default as ContainerTerminal } from './container';
 export { default as TtydTerminal } from './ttyd';
 export { default as BaseTerminal } from './base';
+export * from '@xterm/xterm';

@@ -151,6 +151,11 @@ class BaseTerminal implements IDisposable {
     }
   };
 
+  /**
+   * write support write a bunch of data into terminal, it will split input data
+   * by '\n' and iterate the return lines by writing line to the terminal
+   * @param data
+   */
   public write = (data: string) => {
     if (isEmpty(data)) return;
     data.split('\n').map((line) => {
@@ -158,6 +163,12 @@ class BaseTerminal implements IDisposable {
     });
   };
 
+  /**
+   * open method is used to initialize the BaseTerminal instance, inside the open
+   * method, we will pass the containerElement to initialize the xterm, loading build-in
+   * addons and init esssential listeners for the xterm
+   * @param containerElement dom element which is used to initialize Terminal
+   */
   public open = (containerElement: HTMLElement) => {
     if (this.isXtermOpened) return;
     log('execute open method');
@@ -184,6 +195,13 @@ class BaseTerminal implements IDisposable {
     this.initListeners();
     terminal.fit();
     this.isXtermOpened = true;
+  };
+
+  /**
+   * return the terminal object for some special use-cases
+   */
+  public getTerminal = () => {
+    return this.terminal;
   };
 }
 
