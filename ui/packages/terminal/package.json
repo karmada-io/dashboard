@@ -41,13 +41,15 @@
     "@xterm/addon-webgl": "^0.18.0",
     "@xterm/xterm": "^5.0.0",
     "debug": "^4.3.5",
-    "lodash.isempty": "^4.4.0"
+    "lodash.isempty": "^4.4.0",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/lodash.isempty": "^4.4.9",
     "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0"
+    "@types/react-dom": "^18.3.0",
+    "@types/sockjs-client": "^1.5.4"
   },
   "peerDependencies": {
     "react": "^18",
