@@ -9,5 +9,13 @@ export const TerminalContext = createContext<{
 });
 export { default as ContainerTerminal } from './container';
 export { default as TtydTerminal } from './ttyd';
+export type { FlowControl, Preferences, Command } from './ttyd';
 export { default as BaseTerminal } from './base';
-export * from '@xterm/xterm';
+export type { ITerminalOptions, ITheme } from '@xterm/xterm';
+export type {
+  AddonType,
+  AddonInfo,
+  ClientOptions,
+  BaseTerminalOptions,
+  RendererType,
+} from './typing.d.ts';

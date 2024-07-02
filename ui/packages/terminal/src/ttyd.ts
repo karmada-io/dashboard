@@ -5,7 +5,7 @@ import { BaseTerminalOptions, ClientOptions } from './typing';
 import OverlayAddon from '@karmada/xterm-addon-overlay';
 import ZmodemAddon from '@karmada/xterm-addon-zmodem';
 
-type Preferences = ITerminalOptions & ClientOptions;
+export type Preferences = ITerminalOptions & ClientOptions;
 
 const log = getDebugger('TtydTerminal');
 
@@ -21,7 +21,7 @@ export interface FlowControl {
   lowWater: number;
 }
 
-enum Command {
+export enum Command {
   // server side
   OUTPUT = '0',
   SET_WINDOW_TITLE = '1',
