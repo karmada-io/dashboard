@@ -1,4 +1,3 @@
-# Web-terminal for Karmada Dashboard
 
 | title | authors   | reviewers | approvers | creation-date |
 | --- |-----------| --- | --- | --- |
