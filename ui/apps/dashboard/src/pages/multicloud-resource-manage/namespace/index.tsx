@@ -14,11 +14,12 @@ import { GetNamespaces } from '@/services/namespace.ts';
 import type { Namespace } from '@/services/namespace.ts';
 import { Icons } from '@/components/icons';
 import dayjs from 'dayjs';
-import { useToggle } from '@uidotdev/usehooks';
+import { useToggle, useWindowSize } from '@uidotdev/usehooks';
 import NewNamespaceModal from './new-namespace-modal.tsx';
 import { DeleteResource } from '@/services/unstructured';
 import { useState } from 'react';
 import { DataSelectQuery } from '@/services/base.ts';
+import TagList from '@/components/tag-list';
 
 const NamespacePage = () => {
   const [searchFilter, setSearchFilter] = useState('');
@@ -33,6 +34,8 @@ const NamespacePage = () => {
       return clusters.data || {};
     },
   });
+  const size = useWindowSize();
+  console.log('size.width', size?.width);
   const columns: TableColumnProps<Namespace>[] = [
     {
       title: i18nInstance.t('06ff2e9eba7ae422587c6536e337395f'),
@@ -50,14 +53,17 @@ const NamespacePage = () => {
         if (!r?.objectMeta?.labels) {
           return '-';
         }
+        const params = Object.keys(r.objectMeta.labels).map((key) => {
+          return {
+            key: `${r.objectMeta.name}-${key}`,
+            value: `${key}:${r.objectMeta.labels[key]}`,
+          };
+        });
         return (
-          <div>
-            {Object.keys(r.objectMeta.labels).map((key) => (
-              <Tag key={`${r.objectMeta.name}-${key}`}>
-                {key}:{r.objectMeta.labels[key]}
-              </Tag>
-            ))}
-          </div>
+          <TagList
+            tags={params}
+            maxLen={size && size.width! > 1800 ? undefined : 1}
+          />
         );
       },
     },
