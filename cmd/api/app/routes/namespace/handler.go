@@ -12,14 +12,14 @@ import (
 
 func handleCreateNamespace(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaApiServer()
-	createNamesapceRequest := new(v1.CreateNamesapceRequest)
-	if err := c.ShouldBind(&createNamesapceRequest); err != nil {
+	createNamespaceRequest := new(v1.CreateNamesapceRequest)
+	if err := c.ShouldBind(&createNamespaceRequest); err != nil {
 		common.Fail(c, err)
 		return
 	}
 	spec := &ns.NamespaceSpec{
-		Name:                createNamesapceRequest.Name,
-		SkipAutoPropagation: createNamesapceRequest.SkipAutoPropagation,
+		Name:                createNamespaceRequest.Name,
+		SkipAutoPropagation: createNamespaceRequest.SkipAutoPropagation,
 	}
 	if err := ns.CreateNamespace(spec, k8sClient); err != nil {
 		common.Fail(c, err)

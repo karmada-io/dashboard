@@ -17,12 +17,19 @@ import dayjs from 'dayjs';
 import { useToggle } from '@uidotdev/usehooks';
 import NewNamespaceModal from './new-namespace-modal.tsx';
 import { DeleteResource } from '@/services/unstructured';
+import { useState } from 'react';
+import { DataSelectQuery } from '@/services/base.ts';
 
 const NamespacePage = () => {
+  const [searchFilter, setSearchFilter] = useState('');
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['GetNamespaces'],
+    queryKey: ['GetNamespaces', searchFilter],
     queryFn: async () => {
-      const clusters = await GetNamespaces();
+      const query: DataSelectQuery = {};
+      if (searchFilter) {
+        query.filterBy = ['name', searchFilter];
+      }
+      const clusters = await GetNamespaces(query);
       return clusters.data || {};
     },
   });
@@ -123,12 +130,17 @@ const NamespacePage = () => {
 
   const [showModal, toggleShowModal] = useToggle(false);
   const [messageApi, messageContextHolder] = message.useMessage();
+
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
         <Input.Search
           placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
           className={'w-[400px]'}
+          onPressEnter={(e) => {
+            const input = e.currentTarget.value;
+            setSearchFilter(input);
+          }}
         />
         <Button
           type={'primary'}
