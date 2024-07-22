@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Dropdown, Tag } from 'antd';
+import { cn } from '@/utils/cn.ts';
 
 interface ITagListProps {
   tags: {
@@ -18,12 +19,14 @@ const TagList: FC<ITagListProps> = (props) => {
       ) : tags.length <= maxLen ? (
         tags.map((t) => <Tag key={t.key}>{t.value}</Tag>)
       ) : (
-        <div className={'flex flex-row'}>
-          <div>
-            {tags.slice(0, maxLen).map((t) => (
-              <Tag key={t.key}>{t.value}</Tag>
-            ))}
-          </div>
+        <div
+          className={cn('flex', 'flex-row', {
+            'flex-no-wrap': tags.length > maxLen,
+          })}
+        >
+          {tags.slice(0, maxLen).map((t) => (
+            <Tag key={t.key}>{t.value}</Tag>
+          ))}
           <Dropdown
             menu={{
               items: tags.slice(maxLen).map((t) => ({
