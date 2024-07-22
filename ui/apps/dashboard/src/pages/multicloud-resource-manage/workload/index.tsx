@@ -22,8 +22,9 @@ import NewWorkloadEditorModal from './new-workload-editor-modal.tsx';
 import WorkloadDetailDrawer, {
   WorkloadDetailDrawerProps,
 } from './workload-detail-drawer.tsx';
-import { useToggle } from '@uidotdev/usehooks';
+import { useToggle, useWindowSize } from '@uidotdev/usehooks';
 import { stringify } from 'yaml';
+import TagList from '@/components/tag-list';
 
 /*
 propagationpolicy.karmada.io/name: "nginx-propagation"
@@ -76,6 +77,7 @@ const WorkloadPage = () => {
       content: '',
     });
   }, []);
+  const size = useWindowSize();
   const columns: TableColumnProps<DeploymentWorkload>[] = [
     {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
@@ -102,14 +104,17 @@ const WorkloadPage = () => {
         if (!r?.objectMeta?.labels) {
           return '-';
         }
+        const params = Object.keys(r.objectMeta.labels).map((key) => {
+          return {
+            key: `${r.objectMeta.name}-${key}`,
+            value: `${key}:${r.objectMeta.labels[key]}`,
+          };
+        });
         return (
-          <div className="flex flex-wrap">
-            {Object.keys(r.objectMeta.labels).map((key) => (
-              <Tag className={'mb-2'} key={`${r.objectMeta.name}-${key}`}>
-                {key}:{r.objectMeta.labels[key]}
-              </Tag>
-            ))}
-          </div>
+          <TagList
+            tags={params}
+            maxLen={size && size.width! > 1800 ? undefined : 2}
+          />
         );
       },
     },
