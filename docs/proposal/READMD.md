@@ -1,0 +1,1 @@
+proposal template: https://github.com/karmada-io/karmada/blob/master/docs/proposals/proposal-template/proposal-template.md
