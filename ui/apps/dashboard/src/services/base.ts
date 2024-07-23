@@ -55,3 +55,9 @@ export interface RollingUpdateStrategy {
   maxSurge: string;
   maxUnavailable: string;
 }
+
+export enum WorkloadKind {
+  Unknown = '',
+  Deployment = 'deployment',
+  Statefulset = 'statefulset',
+}
