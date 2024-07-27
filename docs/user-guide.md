@@ -17,7 +17,7 @@ The architecture of the test cluster is as follows:
 Run the following command to load images into the local docker space:
 
 ```shell
-cp hack/images/image.list.load.online.example cp hack/images/image.list.load.online
+cp hack/images/image.list.load.online.example hack/images/image.list.load.online
 bash hack/ops/load-images.sh hack/images/image.list.load.online
 ```
 
