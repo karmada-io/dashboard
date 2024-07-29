@@ -183,7 +183,7 @@ const ClusterManagePage = () => {
             </Button>
             <Popconfirm
                 placement="topRight"
-                title={`${i18nInstance.t('28f9bfb0c1f349d39a3f0e9c5040fbb8')} ${r.objectMeta.name} ${i18nInstance.t('3c8b3e5d432a454dbf9e5b737d7e7b62')} ?`}
+                title={`${i18nInstance.t('28f9bfb0c1f349d39a3f0e9c5040fbb8')} ${r.objectMeta.name} ${i18nInstance.t('3c8b3e5d432a454dbf9e5b737d7e7b62')}?`}
                 onConfirm={async () => {
                   const ret = await DeleteCluster(r.objectMeta.name);
                   if (ret.code === 200) {
