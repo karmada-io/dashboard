@@ -329,6 +329,33 @@ type StatefulSetListChannel struct {
 	Error chan error
 }
 
+// GetStatefulSetListChannel returns a pair of channels to a StatefulSet list and errors that both must be read
+// numReads times.
+func GetStatefulSetListChannel(client client.Interface,
+	nsQuery *NamespaceQuery, numReads int) StatefulSetListChannel {
+	channel := StatefulSetListChannel{
+		List:  make(chan *apps.StatefulSetList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		statefulSets, err := client.AppsV1().StatefulSets(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
+		var filteredItems []apps.StatefulSet
+		for _, item := range statefulSets.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		statefulSets.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- statefulSets
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // ConfigMapListChannel is a list and error channels to ConfigMaps.
 type ConfigMapListChannel struct {
 	List  chan *v1.ConfigMapList

@@ -1,8 +1,11 @@
 import {
+  convertDataSelectQuery,
+  DataSelectQuery,
   IResponse,
   karmadaClient,
   RollingUpdateStrategy,
   Selector,
+  WorkloadKind,
 } from '@/services/base.ts';
 import { ObjectMeta, TypeMeta } from '@/services/base';
 
@@ -13,6 +16,15 @@ export interface DeploymentWorkload {
   containerImages: string[];
   initContainerImages: any;
 }
+
+export interface StatefulsetWorkload {
+  objectMeta: ObjectMeta;
+  typeMeta: TypeMeta;
+  pods: Pods;
+  containerImages: string[];
+  initContainerImages: any;
+}
+export type Workload = DeploymentWorkload | StatefulsetWorkload;
 
 export interface Pods {
   current: number;
@@ -32,9 +44,17 @@ export interface WorkloadStatus {
   terminating: number;
 }
 
-export async function GetWorkloads(params: { namespace?: string }) {
-  const { namespace } = params;
-  const url = namespace ? `/deployment/${namespace}` : '/deployment';
+export async function GetWorkloads(params: {
+  namespace?: string;
+  kind: WorkloadKind;
+  keyword?: string;
+}) {
+  const { kind, namespace } = params;
+  const requestData = {} as DataSelectQuery;
+  if (params.keyword) {
+    requestData.filterBy = ['name', params.keyword];
+  }
+  const url = namespace ? `/${kind}/${namespace}` : `/${kind}`;
   const resp = await karmadaClient.get<
     IResponse<{
       errors: string[];
@@ -42,9 +62,12 @@ export async function GetWorkloads(params: { namespace?: string }) {
         totalItems: number;
       };
       status: WorkloadStatus;
-      deployments: DeploymentWorkload[];
+      deployments?: Workload[];
+      statefulSets?: Workload[];
     }>
-  >(url);
+  >(url, {
+    params: convertDataSelectQuery(requestData),
+  });
   return resp.data;
 }
 
@@ -73,16 +96,18 @@ export interface WorkloadStatusInfo {
 export async function GetWorkloadDetail(params: {
   namespace?: string;
   name: string;
+  kind: WorkloadKind;
 }) {
   // /deployment/:namespace/:deployment
-  const { name, namespace } = params;
+  const { kind, name, namespace } = params;
+  const url = `/${kind}/${namespace}/${name}`;
   const resp = await karmadaClient.get<
     IResponse<
       {
         errors: string[];
       } & WorkloadDetail
     >
-  >(`/deployment/${namespace}/${name}`);
+  >(url);
   return resp.data;
 }
 
@@ -106,8 +131,10 @@ export interface WorkloadEvent {
 export async function GetWorkloadEvents(params: {
   namespace: string;
   name: string;
+  kind: WorkloadKind;
 }) {
-  const { name, namespace } = params;
+  const { kind, name, namespace } = params;
+  const url = `/${kind}/${namespace}/${name}/event`;
   const resp = await karmadaClient.get<
     IResponse<{
       errors: string[];
@@ -116,7 +143,7 @@ export async function GetWorkloadEvents(params: {
       };
       events: WorkloadEvent[];
     }>
-  >(`/deployment/${namespace}/${name}/event`);
+  >(url);
   return resp.data;
 }
 

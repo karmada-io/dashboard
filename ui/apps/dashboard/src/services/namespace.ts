@@ -1,4 +1,11 @@
-import { IResponse, karmadaClient, ObjectMeta, TypeMeta } from './base';
+import {
+  convertDataSelectQuery,
+  DataSelectQuery,
+  IResponse,
+  karmadaClient,
+  ObjectMeta,
+  TypeMeta,
+} from './base';
 
 export interface Namespace {
   objectMeta: ObjectMeta;
@@ -7,7 +14,7 @@ export interface Namespace {
   skipAutoPropagation: boolean;
 }
 
-export async function GetNamespaces() {
+export async function GetNamespaces(query: DataSelectQuery) {
   const resp = await karmadaClient.get<
     IResponse<{
       errors: string[];
@@ -16,7 +23,9 @@ export async function GetNamespaces() {
       };
       namespaces: Namespace[];
     }>
-  >('/namespace');
+  >('/namespace', {
+    params: convertDataSelectQuery(query),
+  });
   return resp.data;
 }
 

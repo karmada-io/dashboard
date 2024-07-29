@@ -14,18 +14,28 @@ import { GetNamespaces } from '@/services/namespace.ts';
 import type { Namespace } from '@/services/namespace.ts';
 import { Icons } from '@/components/icons';
 import dayjs from 'dayjs';
-import { useToggle } from '@uidotdev/usehooks';
+import { useToggle, useWindowSize } from '@uidotdev/usehooks';
 import NewNamespaceModal from './new-namespace-modal.tsx';
 import { DeleteResource } from '@/services/unstructured';
+import { useState } from 'react';
+import { DataSelectQuery } from '@/services/base.ts';
+import TagList from '@/components/tag-list';
 
 const NamespacePage = () => {
+  const [searchFilter, setSearchFilter] = useState('');
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['GetNamespaces'],
+    queryKey: ['GetNamespaces', searchFilter],
     queryFn: async () => {
-      const clusters = await GetNamespaces();
+      const query: DataSelectQuery = {};
+      if (searchFilter) {
+        query.filterBy = ['name', searchFilter];
+      }
+      const clusters = await GetNamespaces(query);
       return clusters.data || {};
     },
   });
+  const size = useWindowSize();
+  console.log('size.width', size?.width);
   const columns: TableColumnProps<Namespace>[] = [
     {
       title: i18nInstance.t('06ff2e9eba7ae422587c6536e337395f'),
@@ -43,14 +53,17 @@ const NamespacePage = () => {
         if (!r?.objectMeta?.labels) {
           return '-';
         }
+        const params = Object.keys(r.objectMeta.labels).map((key) => {
+          return {
+            key: `${r.objectMeta.name}-${key}`,
+            value: `${key}:${r.objectMeta.labels[key]}`,
+          };
+        });
         return (
-          <div>
-            {Object.keys(r.objectMeta.labels).map((key) => (
-              <Tag key={`${r.objectMeta.name}-${key}`}>
-                {key}:{r.objectMeta.labels[key]}
-              </Tag>
-            ))}
-          </div>
+          <TagList
+            tags={params}
+            maxLen={size && size.width! > 1800 ? undefined : 1}
+          />
         );
       },
     },
@@ -123,12 +136,17 @@ const NamespacePage = () => {
 
   const [showModal, toggleShowModal] = useToggle(false);
   const [messageApi, messageContextHolder] = message.useMessage();
+
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
         <Input.Search
           placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
           className={'w-[400px]'}
+          onPressEnter={(e) => {
+            const input = e.currentTarget.value;
+            setSearchFilter(input);
+          }}
         />
         <Button
           type={'primary'}

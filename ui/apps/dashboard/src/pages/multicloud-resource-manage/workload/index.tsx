@@ -5,6 +5,7 @@ import {
   Input,
   message,
   Popconfirm,
+  Segmented,
   Select,
   Space,
   Table,
@@ -13,8 +14,8 @@ import {
 } from 'antd';
 import { Icons } from '@/components/icons';
 import { GetNamespaces } from '@/services/namespace';
-import { GetWorkloads } from '@/services/workload';
 import type { DeploymentWorkload } from '@/services/workload';
+import { GetWorkloads } from '@/services/workload';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { DeleteResource, GetResource } from '@/services/unstructured.ts';
@@ -22,19 +23,31 @@ import NewWorkloadEditorModal from './new-workload-editor-modal.tsx';
 import WorkloadDetailDrawer, {
   WorkloadDetailDrawerProps,
 } from './workload-detail-drawer.tsx';
-import { useToggle } from '@uidotdev/usehooks';
+import { useToggle, useWindowSize } from '@uidotdev/usehooks';
 import { stringify } from 'yaml';
+import TagList from '@/components/tag-list';
+import { WorkloadKind } from '@/services/base.ts';
 
 /*
 propagationpolicy.karmada.io/name: "nginx-propagation"
 propagationpolicy.karmada.io/namespace: "default"
 */
+
 const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
 const WorkloadPage = () => {
-  const { data: nsData } = useQuery({
+  const [filter, setFilter] = useState<{
+    kind: WorkloadKind;
+    selectedWorkSpace: string;
+    searchText: string;
+  }>({
+    kind: WorkloadKind.Deployment,
+    selectedWorkSpace: '',
+    searchText: '',
+  });
+  const { data: nsData, isLoading: isNsDataLoading } = useQuery({
     queryKey: ['GetNamespaces'],
     queryFn: async () => {
-      const clusters = await GetNamespaces();
+      const clusters = await GetNamespaces({});
       return clusters.data || {};
     },
   });
@@ -48,9 +61,13 @@ const WorkloadPage = () => {
     });
   }, [nsData]);
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['GetWorkloads'],
+    queryKey: ['GetWorkloads', JSON.stringify(filter)],
     queryFn: async () => {
-      const clusters = await GetWorkloads({});
+      const clusters = await GetWorkloads({
+        kind: filter.kind,
+        namespace: filter.selectedWorkSpace,
+        keyword: filter.searchText,
+      });
       return clusters.data || {};
     },
   });
@@ -58,7 +75,7 @@ const WorkloadPage = () => {
     Omit<WorkloadDetailDrawerProps, 'onClose'>
   >({
     open: false,
-    kind: '',
+    kind: WorkloadKind.Unknown,
     namespace: '',
     name: '',
   });
@@ -76,6 +93,7 @@ const WorkloadPage = () => {
       content: '',
     });
   }, []);
+  const size = useWindowSize();
   const columns: TableColumnProps<DeploymentWorkload>[] = [
     {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
@@ -102,14 +120,17 @@ const WorkloadPage = () => {
         if (!r?.objectMeta?.labels) {
           return '-';
         }
+        const params = Object.keys(r.objectMeta.labels).map((key) => {
+          return {
+            key: `${r.objectMeta.name}-${key}`,
+            value: `${key}:${r.objectMeta.labels[key]}`,
+          };
+        });
         return (
-          <div className="flex flex-wrap">
-            {Object.keys(r.objectMeta.labels).map((key) => (
-              <Tag className={'mb-2'} key={`${r.objectMeta.name}-${key}`}>
-                {key}:{r.objectMeta.labels[key]}
-              </Tag>
-            ))}
-          </div>
+          <TagList
+            tags={params}
+            maxLen={size && size.width! > 1800 ? undefined : 1}
+          />
         );
       },
     },
@@ -144,7 +165,7 @@ const WorkloadPage = () => {
               onClick={() => {
                 setDrawerData({
                   open: true,
-                  kind: r.typeMeta.kind,
+                  kind: r.typeMeta.kind as WorkloadKind,
                   name: r.objectMeta.name,
                   namespace: r.objectMeta.namespace,
                 });
@@ -199,20 +220,43 @@ const WorkloadPage = () => {
   ];
 
   const [messageApi, messageContextHolder] = message.useMessage();
+
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
-        <div className={'flex flex-row justify-center space-x-4'}>
-          <h3 className={'leading-[32px]'}>
-            {i18nInstance.t('280c56077360c204e536eb770495bc5f')}
-          </h3>
-          <Select options={nsOptions} className={'w-[200px]'} />
-          <Input.Search
-            placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
-            className={'w-[300px]'}
+        <div>
+          <Segmented
+            value={filter.kind}
+            style={{ marginBottom: 8 }}
+            onChange={(value) => {
+              // reset filter when switch workload kind
+              const k = value as WorkloadKind;
+              if (k !== filter.kind) {
+                setFilter({
+                  ...filter,
+                  kind: value as WorkloadKind,
+                  selectedWorkSpace: '',
+                  searchText: '',
+                });
+              } else {
+                setFilter({
+                  ...filter,
+                  kind: value as WorkloadKind,
+                });
+              }
+            }}
+            options={[
+              {
+                label: 'Deployment',
+                value: 'deployment',
+              },
+              {
+                label: 'Statefulset',
+                value: 'statefulset',
+              },
+            ]}
           />
         </div>
-
         <Button
           type={'primary'}
           icon={<Icons.add width={16} height={16} />}
@@ -224,11 +268,41 @@ const WorkloadPage = () => {
           {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0')}
         </Button>
       </div>
+      <div className={'flex flex-row space-x-4 mb-4'}>
+        <h3 className={'leading-[32px]'}>
+          {i18nInstance.t('280c56077360c204e536eb770495bc5f')}
+        </h3>
+        <Select
+          options={nsOptions}
+          className={'min-w-[200px]'}
+          value={filter.selectedWorkSpace}
+          loading={isNsDataLoading}
+          showSearch
+          allowClear
+          onChange={(v) => {
+            setFilter({
+              ...filter,
+              selectedWorkSpace: v,
+            });
+          }}
+        />
+        <Input.Search
+          placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
+          className={'w-[300px]'}
+          onPressEnter={(e) => {
+            const input = e.currentTarget.value;
+            setFilter({
+              ...filter,
+              searchText: input,
+            });
+          }}
+        />
+      </div>
       <Table
         rowKey={(r: DeploymentWorkload) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data?.deployments || []}
+        dataSource={data ? data.deployments || data.statefulSets : []}
       />
 
       <NewWorkloadEditorModal
@@ -263,7 +337,7 @@ const WorkloadPage = () => {
         onClose={() => {
           setDrawerData({
             open: false,
-            kind: '',
+            kind: WorkloadKind.Unknown,
             namespace: '',
             name: '',
           });
