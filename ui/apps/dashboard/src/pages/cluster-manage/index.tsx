@@ -182,26 +182,27 @@ const ClusterManagePage = () => {
               {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
             </Button>
             <Popconfirm
-              placement="topRight"
-              title={`确认要删除${r.objectMeta.name}集群么?`}
-              onConfirm={async () => {
-                const ret = await DeleteCluster(r.objectMeta.name);
-                if (ret.code === 200) {
-                  await messageApi.success(`集群${r.objectMeta.name}删除成功`);
-                  await refetch();
-                } else {
-                  await messageApi.error(
-                    i18nInstance.t('9e7856e9c5938b9200dbdc174e97cf8a'),
-                  );
-                }
-              }}
-              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
-              cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
-            >
-              <Button size={'small'} type="link" danger>
-                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
-              </Button>
-            </Popconfirm>
+                placement="topRight"
+                title={`${i18nInstance.t('28f9bfb0c1f349d39a3f0e9c5040fbb8')} ${r.objectMeta.name} ${i18nInstance.t('3c8b3e5d432a454dbf9e5b737d7e7b62')}?`}
+                onConfirm={async () => {
+                  const ret = await DeleteCluster(r.objectMeta.name);
+                  if (ret.code === 200) {
+                    await messageApi.success(`${i18nInstance.t('3c8b3e5d432a454dbf9e5b737d7e7b62')} ${r.objectMeta.name} ${i18nInstance.t('6f57ad46ebf24ff4b5cfe6b919b7f89e')}`);
+                    await refetch();
+                  } else {
+                    await messageApi.error(
+                      i18nInstance.t('d4f1b92568af4b75a9d8c1b0c22b2b57')
+                    );
+                  }
+                }}
+                okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
+                cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+              >
+                <Button size={'small'} type="link" danger>
+                  {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
+                </Button>
+              </Popconfirm>
+
           </Space.Compact>
         );
       },
