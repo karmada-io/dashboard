@@ -34,7 +34,7 @@ const WorkloadPage = () => {
   const { data: nsData } = useQuery({
     queryKey: ['GetNamespaces'],
     queryFn: async () => {
-      const clusters = await GetNamespaces();
+      const clusters = await GetNamespaces({});
       return clusters.data || {};
     },
   });
