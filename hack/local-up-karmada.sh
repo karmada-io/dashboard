@@ -245,12 +245,12 @@ for cluster in "${MEMBER_CLUSTERS[@]}"; do
 
   # wait all of clusters member1, member2 and member3 status is ready
   INFO "Wait cluster ${cluster} join/register status ready"
-  util::misc::wait_cluster_ready "${KARMADA_KUBECONFIG_PATH}" "${KARMADA_APISERVER}" "${CLUSTER1}"
+  util::misc::wait_cluster_ready "${KARMADA_KUBECONFIG_PATH}" "${KARMADA_APISERVER}" "${cluster}"
 done
 
 # merge temporary kubeconfig of member clusters by kubectl
 # variable define in scripts will not make effect to parent shell thread
-KUBECONFIG=$(find "${KUBECONFIG_DIR}" -maxdepth 1 -type f | grep "${MEMBER_CLUSTER_KUBECONFIG_PREFIX}" | tr '\n' ':')
+export KUBECONFIG=$(find "${KUBECONFIG_DIR}" -maxdepth 1 -type f | grep "${MEMBER_CLUSTER_KUBECONFIG_PREFIX}" | tr '\n' ':')
 kubectl config view --flatten > "${MEMBER_CLUSTER_KUBECONFIG_PATH}"
 for tmp_config_file in $(find "${KUBECONFIG_DIR}" -maxdepth 1 -type f | grep "${MEMBER_CLUSTER_KUBECONFIG_PREFIX}"); do
   DEBUG "Remove ${tmp_config_file}"
