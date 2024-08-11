@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 import {
@@ -10,8 +11,28 @@ import { useMemo } from 'react';
 import _ from 'lodash';
 import { getSidebarWidth } from '@/utils/i18n.tsx';
 
+const useWindowSize = () => {
+  const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
+  useEffect(() => {
+    const handleResize = () => {
+      setSize([window.innerWidth, window.innerHeight]);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return size;
+};
+
 const Sidebar = () => {
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [width] = useWindowSize();
+  const isSmallScreen = width <= 768;
+
+  useEffect(() => {
+    setCollapsed(isSmallScreen);
+  }, [isSmallScreen]);
+
   const onClick: MenuProps['onClick'] = (e) => {
     const url = flattenRoutes[e.key];
     if (!url) return;
@@ -25,10 +46,13 @@ const Sidebar = () => {
       .map((m) => (m.handle as IRouteObjectHandle).sidebarKey);
   }, [matches]);
   return (
-    <div className={'w-full h-full overflow-y-auto'}>
+    <div
+      className={`w-full h-full overflow-y-auto ${collapsed ? 'collapsed-sidebar' : ''}`}
+      style={{ transition: 'width 0.3s' }}
+    >
       <Menu
         onClick={onClick}
-        style={{ width: getSidebarWidth() }}
+        style={{ width: collapsed ? '80px' : getSidebarWidth() }}
         selectedKeys={selectKeys}
         defaultOpenKeys={
           selectKeys.length > 0
@@ -37,6 +61,7 @@ const Sidebar = () => {
         }
         mode="inline"
         items={menuItems}
+        inlineCollapsed={collapsed}
       />
     </div>
   );
