@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 import {
@@ -7,32 +6,17 @@ import {
   flattenRoutes,
 } from '@/routes/route.tsx';
 import { useMatches, useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { FC,useMemo } from 'react';
 import _ from 'lodash';
 import { getSidebarWidth } from '@/utils/i18n.tsx';
+import { cn } from '@/utils/cn.ts';
 
-const useWindowSize = () => {
-  const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
-  useEffect(() => {
-    const handleResize = () => {
-      setSize([window.innerWidth, window.innerHeight]);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  return size;
-};
+interface SidebarProps {
+  collapsed: boolean;
+}
 
-const Sidebar = () => {
+const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
-  const [width] = useWindowSize();
-  const isSmallScreen = width <= 768;
-
-  useEffect(() => {
-    setCollapsed(isSmallScreen);
-  }, [isSmallScreen]);
-
   const onClick: MenuProps['onClick'] = (e) => {
     const url = flattenRoutes[e.key];
     if (!url) return;
@@ -47,7 +31,9 @@ const Sidebar = () => {
   }, [matches]);
   return (
     <div
-      className={`w-full h-full overflow-y-auto ${collapsed ? 'collapsed-sidebar' : ''}`}
+      className={cn('w-full', 'h-full', 'overflow-y-auto', {
+        'collapsed-sidebar': collapsed,
+      })}
       style={{ transition: 'width 0.3s' }}
     >
       <Menu
