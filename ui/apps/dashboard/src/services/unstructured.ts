@@ -36,3 +36,13 @@ function generateUrlForUnstructuredParams(params: UnstructuredParams) {
     return `/_raw/${kind}/name/${name}`;
   }
 }
+
+export async function CreateResource(
+  params: UnstructuredParams & {
+    content: Record<string, any>;
+  },
+) {
+  const url = generateUrlForUnstructuredParams(params);
+  const resp = await karmadaClient.post<IResponse<any>>(url, params.content);
+  return resp.data;
+}
