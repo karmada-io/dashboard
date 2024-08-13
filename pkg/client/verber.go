@@ -160,6 +160,14 @@ func (v *resourceVerber) Get(kind string, namespace string, name string) (runtim
 	return v.client.Resource(gvr).Namespace(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
+// Create creates the resource of the given kind in the given namespace with the given name.
+func (v *resourceVerber) Create(object *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	namespace := object.GetNamespace()
+	gvr := v.groupVersionResourceFromUnstructured(object)
+
+	return v.client.Resource(gvr).Namespace(namespace).Create(context.TODO(), object, metav1.CreateOptions{})
+}
+
 func VerberClient(request *http.Request) (ResourceVerber, error) {
 	// todo currently ignore rest.config from http.Request
 	restConfig, _, err := GetKarmadaConfig()

@@ -41,8 +41,8 @@ func handleDeleteResource(c *gin.Context) {
 			_, getErr := verber.Get(kind, namespace, name)
 			return getErr
 		})
-	if err != nil {
-		klog.ErrorS(err, "Wait for verber delete resourcefailed")
+	if !errors.IsNotFound(err) {
+		klog.ErrorS(err, "Wait for verber delete resource failed")
 		common.Fail(c, err)
 		return
 	}
@@ -97,14 +97,45 @@ func handlePutResource(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+func handleCreateResource(c *gin.Context) {
+	// todo double-check existence of target resources, if exist return directly.
+	verber, err := client.VerberClient(c.Request)
+	if err != nil {
+		klog.ErrorS(err, "Failed to init VerberClient")
+		common.Fail(c, err)
+		return
+	}
+
+	raw := &unstructured.Unstructured{}
+	bytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		klog.ErrorS(err, "Failed to read request body")
+		common.Fail(c, err)
+		return
+	}
+	err = raw.UnmarshalJSON(bytes)
+	if err != nil {
+		klog.ErrorS(err, "Failed to unmarshal request body")
+		common.Fail(c, err)
+	}
+	if _, err = verber.Create(raw); err != nil {
+		klog.ErrorS(err, "Failed to create resource")
+		common.Fail(c, err)
+		return
+	}
+	common.Success(c, "ok")
+}
+
 func init() {
 	r := router.V1()
 	r.DELETE("/_raw/:kind/namespace/:namespace/name/:name", handleDeleteResource)
 	r.GET("/_raw/:kind/namespace/:namespace/name/:name", handleGetResource)
 	r.PUT("/_raw/:kind/namespace/:namespace/name/:name", handlePutResource)
+	r.POST("/_raw/:kind/namespace/:namespace/name/:name", handleCreateResource)
 
 	// Verber (non-namespaced)
 	r.DELETE("/_raw/:kind/name/:name", handleDeleteResource)
 	r.GET("/_raw/:kind/name/:name", handleGetResource)
 	r.PUT("/_raw/:kind/name/:name", handlePutResource)
+	r.POST("/_raw/:kind/name/:name", handleCreateResource)
 }
