@@ -61,3 +61,9 @@ export enum WorkloadKind {
   Deployment = 'deployment',
   Statefulset = 'statefulset',
 }
+
+export enum ConfigKind {
+  Unknown = '',
+  Secret = 'secret',
+  ConfigMap = 'configmap',
+}
