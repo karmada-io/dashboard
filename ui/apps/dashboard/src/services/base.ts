@@ -56,6 +56,15 @@ export interface RollingUpdateStrategy {
   maxUnavailable: string;
 }
 
+export const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
+// safely extract propagationpolicy
+export const extractPropagationPolicy = (r: { objectMeta: ObjectMeta }) => {
+  if (!r?.objectMeta?.annotations?.[propagationpolicyKey]) {
+    return '';
+  }
+  return r?.objectMeta?.annotations?.[propagationpolicyKey];
+};
+
 export enum ConfigKind {
   Unknown = '',
   Secret = 'secret',
