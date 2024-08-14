@@ -6,11 +6,16 @@ import {
   flattenRoutes,
 } from '@/routes/route.tsx';
 import { useMatches, useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { FC,useMemo } from 'react';
 import _ from 'lodash';
 import { getSidebarWidth } from '@/utils/i18n.tsx';
+import { cn } from '@/utils/cn.ts';
 
-const Sidebar = () => {
+interface SidebarProps {
+  collapsed: boolean;
+}
+
+const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
   const onClick: MenuProps['onClick'] = (e) => {
     const url = flattenRoutes[e.key];
@@ -25,10 +30,12 @@ const Sidebar = () => {
       .map((m) => (m.handle as IRouteObjectHandle).sidebarKey);
   }, [matches]);
   return (
-    <div className={'w-full h-full overflow-y-auto'}>
+    <div
+      className={cn('w-full', 'h-full', 'overflow-y-auto')}
+    >
       <Menu
         onClick={onClick}
-        style={{ width: getSidebarWidth() }}
+        style={{ width: collapsed ? '80px' : getSidebarWidth() }}
         selectedKeys={selectKeys}
         defaultOpenKeys={
           selectKeys.length > 0
@@ -37,6 +44,7 @@ const Sidebar = () => {
         }
         mode="inline"
         items={menuItems}
+        inlineCollapsed={collapsed}
       />
     </div>
   );
