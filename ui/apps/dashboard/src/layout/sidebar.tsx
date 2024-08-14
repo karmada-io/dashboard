@@ -31,10 +31,7 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
   }, [matches]);
   return (
     <div
-      className={cn('w-full', 'h-full', 'overflow-y-auto', {
-        'collapsed-sidebar': collapsed,
-      })}
-      style={{ transition: 'width 0.3s' }}
+      className={cn('w-full', 'h-full', 'overflow-y-auto')}
     >
       <Menu
         onClick={onClick}
