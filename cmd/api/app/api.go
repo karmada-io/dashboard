@@ -21,6 +21,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/statefulset"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/unstructured"
 )
 
