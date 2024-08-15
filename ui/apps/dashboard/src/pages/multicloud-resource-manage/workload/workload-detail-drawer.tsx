@@ -17,10 +17,11 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import styles from './index.module.less';
+import { WorkloadKind } from '@/services/base.ts';
 
 export interface WorkloadDetailDrawerProps {
   open: boolean;
-  kind: string;
+  kind: WorkloadKind;
   namespace: string;
   name: string;
   onClose: () => void;
@@ -32,22 +33,24 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
     return !!(kind && name && namespace);
   }, [kind, name, namespace]);
   const { data: detailData, isLoading: isDetailDataLoading } = useQuery({
-    queryKey: ['GetWorkloadDetail', kind, name, name],
+    queryKey: ['GetWorkloadDetail', kind, name, namespace],
     queryFn: async () => {
       const workloadDetailRet = await GetWorkloadDetail({
         namespace,
         name,
+        kind,
       });
       return workloadDetailRet.data || {};
     },
     enabled: enableFetch,
   });
   const { data: eventsData } = useQuery({
-    queryKey: ['GetWorkloadEvents', kind, name, name],
+    queryKey: ['GetWorkloadEvents', kind, name, namespace],
     queryFn: async () => {
       const workloadEventsRet = await GetWorkloadEvents({
         namespace,
         name,
+        kind,
       });
       return workloadEventsRet.data || {};
     },
