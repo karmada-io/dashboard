@@ -53,6 +53,9 @@ var NoFilter = &FilterQuery{
 	FilterByList: []FilterBy{},
 }
 
+// NoDataSelect is an option for no data select (same data will be returned).
+var NoDataSelect = NewDataSelectQuery(NoPagination, NoSort, NoFilter)
+
 // NewDataSelectQuery creates DataSelectQuery object from simpler data select queries.
 func NewDataSelectQuery(paginationQuery *PaginationQuery, sortQuery *SortQuery, filterQuery *FilterQuery) *DataSelectQuery {
 	return &DataSelectQuery{
