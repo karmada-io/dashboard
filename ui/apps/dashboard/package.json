@@ -42,7 +42,8 @@
     "react-i18next": "^14.1.0",
     "react-router-dom": "^6.22.3",
     "tailwind-merge": "^2.2.2",
-    "yaml": "^2.4.2"
+    "yaml": "^2.4.2",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@karmada/eslint-config-ts-react": "workspace:*",
