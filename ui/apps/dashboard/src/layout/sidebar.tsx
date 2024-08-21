@@ -44,7 +44,6 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
         }
         mode="inline"
         items={menuItems}
-        inlineCollapsed={collapsed}
       />
     </div>
   );
