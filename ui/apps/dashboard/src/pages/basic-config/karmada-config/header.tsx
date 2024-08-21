@@ -1,30 +1,32 @@
 import { useState, useEffect } from 'react';
-import { Menu, Avatar, Row, Col, Typography, Tabs, Button, Modal, notification, List, Popconfirm, Dropdown } from 'antd';
+import { Avatar, Row, Col, Typography, Tabs, Button, Modal, notification, List, Popconfirm, Dropdown } from 'antd';
 import { ReloadOutlined, DeleteOutlined, FileTextOutlined, EyeOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { KarmadaHeaderProps ,restartDeployment, checkDeploymentStatus, reinstallDeployment, GetPodYAML } from '@/services/config';
+import { KarmadaHeaderProps ,restartDeployment, checkDeploymentStatus, reinstallDeployment, GetPodYAML } from '@/services/karmada-config';
 import ComponentEditorDrawer from './component-editor-drawer';
 
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 
 const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, podNames }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [modalStates, setModalStates] = useState({
+    isModalVisible: false,
+    loading: false,
+    isPodListVisible: false,
+    isYamlModalVisible: false,
+    selectedPod: '',
+    editorMode: 'detail' as 'edit' | 'detail',
+    yamlContent: '',
+  });
+
   const [pods, setPods] = useState<string[]>(podNames);
-  const [isPodListVisible, setIsPodListVisible] = useState(false);
-  const [isYamlModalVisible, setIsYamlModalVisible] = useState(false);
-  const [selectedPod, setSelectedPod] = useState('');
-  const [editorMode, setEditorMode] = useState<'edit' | 'detail'>('detail');
-  const [yamlContent, setYamlContent] = useState('');
 
   useEffect(() => {
     setPods(podNames);
   }, [podNames]);
 
-  const showRestartModal = () => setIsModalVisible(true);
+  const showRestartModal = () => setModalStates(prev => ({ ...prev, isModalVisible: true }));
 
   const handleRestartDeployment = async () => {
-    setLoading(true);
+    setModalStates(prev => ({ ...prev, loading: true }));
     try {
       const response = await restartDeployment(appName);
       notification.success({ 
@@ -34,8 +36,7 @@ const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, pod
       notification.error({ 
         message: 'Error', description: 'Failed to restart deployment' });
     } finally {
-      setLoading(false);
-      setIsModalVisible(false);
+      setModalStates(prev => ({ ...prev, loading: false, isModalVisible: false }));
     }
   };
 
@@ -47,16 +48,14 @@ const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, pod
         message: 'Deployment Status', description: response.status });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      notification.error({ message: 'Error', description: errorMessage 
-
-      });
+      notification.error({ message: 'Error', description: errorMessage });
     }
   };
 
-  const handleReinstall = () => setIsPodListVisible(true);
+  const handleReinstall = () => setModalStates(prev => ({ ...prev, isPodListVisible: true }));
 
   const handlePodDelete = async (podName: string) => {
-    setLoading(true);
+    setModalStates(prev => ({ ...prev, loading: true }));
     try {
       await reinstallDeployment(podName);
       notification.success({
@@ -67,48 +66,49 @@ const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, pod
         message: 'Error', description: `Failed to reinstall pod ${podName}.` 
       });
     } finally {
-      setLoading(false);
+      setModalStates(prev => ({ ...prev, loading: false }));
     }
   };
 
   const handleDeleteAll = async () => {
-    setLoading(true);
+    setModalStates(prev => ({ ...prev, loading: true }));
     try {
       for (const pod of pods) {
         await reinstallDeployment(pod);
       }
-      notification.success({ message: 'Success', description: 'All pods reinstalled successfully.' 
-      });
+      notification.success({ message: 'Success', description: 'All pods reinstalled successfully.' });
       setPods([]);
     } catch {
       notification.error({ message: 'Error', description: 'Failed to reinstall all pods.' });
     } finally {
-      setLoading(false);
+      setModalStates(prev => ({ ...prev, loading: false }));
     }
   };
 
   const handlePodAction = async (podName: string, mode: 'edit' | 'detail') => {
-    setSelectedPod(podName);
-    setEditorMode(mode);
+    setModalStates(prev => ({ ...prev, selectedPod: podName, editorMode: mode }));
     try {
       const response = await GetPodYAML(podName);
-      setYamlContent(response);
-      setIsYamlModalVisible(true);
+      setModalStates(prev => ({ ...prev, yamlContent: response, isYamlModalVisible: true }));
     } catch {
       notification.error({ message: 'Error', description: 'Failed to fetch pod YAML' });
     }
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="checkStatus">
+  const menuItems = [
+    {
+      key: 'checkStatus',
+      label: (
         <a onClick={handleCheckStatus} style={{ cursor: 'pointer' }}>Check Status</a>
-      </Menu.Item>
-      <Menu.Item key="reinstall">
+      ),
+    },
+    {
+      key: 'reinstall',
+      label: (
         <a onClick={handleReinstall} style={{ cursor: 'pointer' }}>Reinstall</a>
-      </Menu.Item>
-    </Menu>
-  );
+      ),
+    },
+  ];
 
   return (
     <Row gutter={16} align="middle" style={{ backgroundColor: '#f5f5f5', padding: '2px', borderRadius: '8px' }}>
@@ -121,39 +121,39 @@ const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, pod
       </Col>
       <Col flex="auto" />
       <Button icon={<ReloadOutlined />} onClick={showRestartModal}></Button>
-      <Dropdown overlay={menu}>
+      <Dropdown menu={{ items: menuItems }}>
         <Button>
           <EllipsisOutlined />
         </Button>
       </Dropdown>
-      <Button icon={<FileTextOutlined />} onClick={() => setIsYamlModalVisible(true)}></Button>
+      <Button icon={<FileTextOutlined />} onClick={() => setModalStates(prev => ({ ...prev, isYamlModalVisible: true }))}></Button>
 
       <Col span={24}>
-        <Tabs defaultActiveKey="1" onChange={onTabChange}>
-          <TabPane tab="Details" key="1" />
-          <TabPane tab="Logs" key="2" />
-        </Tabs>
+        <Tabs defaultActiveKey="1" onChange={onTabChange} items={[
+          { label: "Details", key: "1" },
+          { label: "Logs", key: "2" }
+        ]} />
       </Col>
 
       <Popconfirm
         title="Do you want to restart the deployment?"
-        visible={isModalVisible}
+        open={modalStates.isModalVisible}
         onConfirm={handleRestartDeployment}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => setModalStates(prev => ({ ...prev, isModalVisible: false }))}
         okText="Yes"
         cancelText="No"
-        okButtonProps={{ loading }}
-        cancelButtonProps={{ loading }}
+        okButtonProps={{ loading: modalStates.loading }}
+        cancelButtonProps={{ loading: modalStates.loading }}
       />
 
       <Modal
         title="Select Pods to Reinstall"
-        visible={isPodListVisible}
+        open={modalStates.isPodListVisible}
         onOk={handleDeleteAll}
-        onCancel={() => setIsPodListVisible(false)}
+        onCancel={() => setModalStates(prev => ({ ...prev, isPodListVisible: false }))}
         okText="Reinstall All"
         cancelText="Cancel"
-        confirmLoading={loading}
+        confirmLoading={modalStates.loading}
       >
         <List
           bordered
@@ -179,8 +179,8 @@ const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, pod
 
       <Modal
         title="View/Edit YAML"
-        visible={isYamlModalVisible}
-        onCancel={() => setIsYamlModalVisible(false)}
+        open={modalStates.isYamlModalVisible}
+        onCancel={() => setModalStates(prev => ({ ...prev, isYamlModalVisible: false }))}
         footer={null}
         width={500}
       >
@@ -198,17 +198,16 @@ const KarmadaHeader: React.FC<KarmadaHeaderProps> = ({ onTabChange, appName, pod
             </List.Item>
           )}
         />
-        {selectedPod && (
+        {modalStates.selectedPod && (
           <ComponentEditorDrawer
             initialOpen={true}
-            mode={editorMode}
-            podName={selectedPod}
+            mode={modalStates.editorMode}
+            podName={modalStates.selectedPod}
             namespace="karmada-system"
             onClose={() => {
-              setIsYamlModalVisible(false);
-              setSelectedPod('');
+              setModalStates(prev => ({ ...prev, isYamlModalVisible: false, selectedPod: '' }));
             }}
-            yamlContent={yamlContent}
+            yamlContent={modalStates.yamlContent}
           />
         )}
       </Modal>

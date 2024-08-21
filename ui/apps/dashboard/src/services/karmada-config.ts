@@ -94,3 +94,17 @@ export async function UpdatePodYAML(podName: string , params: {
     };
   }
 }
+export interface PodState {
+  pods: string[];
+  selectedPodDetails?: {
+    uid: string;
+    creationTimestamp: string;
+    generateName: string;
+    labels: Record<string, string>;
+    name: string;
+  } | null;
+  podLogs: Record<string, string>;
+  activeTab: string;
+  podCount: number;
+  podNames: string[];
+}

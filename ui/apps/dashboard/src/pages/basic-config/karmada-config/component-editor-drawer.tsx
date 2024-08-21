@@ -3,7 +3,7 @@ import { FC } from 'react';
 import Editor from '@monaco-editor/react';
 import { Button, Drawer, Space, notification } from 'antd';
 import i18nInstance from '@/utils/i18n';
-import { ComponentEditorDrawerProps, UpdatePodYAML, GetPodYAML } from '@/services/config';
+import { ComponentEditorDrawerProps, UpdatePodYAML, GetPodYAML } from '@/services/karmada-config';
 
 function getTitle(
   mode: ComponentEditorDrawerProps['mode'],

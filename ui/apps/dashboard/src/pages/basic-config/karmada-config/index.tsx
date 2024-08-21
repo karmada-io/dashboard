@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Layout, Menu, Row, Col, Card } from 'antd';
-import { GetRunningPods, GetPodDetails, GetPodLogs } from '@/services/config';
+import { GetRunningPods, GetPodDetails, GetPodLogs, PodState } from '@/services/karmada-config';
 import KarmadaHeader from './header';
 import TerminalLogs from './TerminalLogs';
 import dayjs from 'dayjs';
@@ -12,106 +12,71 @@ const Label = ({ text }: { text: string }) => <strong>{text}:</strong>;
 
 const Children = ({ content }: { content: string }) => <p>{content}</p>;
 
+
 const KarmadaConfigPage = () => {
-  const [pods, setPods] = useState<string[]>([]);
-  const [selectedPodDetails, setSelectedPodDetails] = useState<any | null>(null);
-  const [podLogs, setPodLogs] = useState<{ [key: string]: string }>({});
-  const [activeTab, setActiveTab] = useState('1');
-  const [podCount, setPodCount] = useState<number>(0);
-  const [podNames, setPodNames] = useState<string[]>([]);
+  const [state, setState] = useState<PodState>({
+    pods: [],
+    selectedPodDetails: null,
+    podLogs: {},
+    activeTab: '1',
+    podCount: 0,
+    podNames: []
+  });
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         const data = await GetRunningPods();
-        setPods(data.appLabels);
+        setState(prev => ({
+          ...prev,
+          pods: data.appLabels,
+          podNames: data.appLabels.length > 0 ? data.appLabels : []
+        }));
         if (data.appLabels.length > 0) {
           handlePodClick(data.appLabels[0]);
         }
       } catch (error) {
         console.error('Error fetching running pods:', error);
       }
-    }
-
+    };
     fetchData();
   }, []);
 
   const handlePodClick = async (podName: string) => {
     try {
       const data = await GetPodDetails(podName);
-      setSelectedPodDetails(data.pods[0]);
-      setPodCount(data.pods.length);
-      setPodNames(data.pods.map(pod => pod.name));
       const logsPromises = data.pods.map(async (pod: { name: string }) => {
         const logData = await GetPodLogs(pod.name);
         return { name: pod.name, log: logData.logs };
       });
 
       const logsArray = await Promise.all(logsPromises);
-      const logs = logsArray.reduce((acc, { name, log }) => {
+      const logs = logsArray.reduce((acc: Record<string, string>, { name, log }) => {
         acc[name] = log;
         return acc;
-      }, {} as { [key: string]: string });
+      }, {});
 
-      setPodLogs(logs);
+      setState(prev => ({
+        ...prev,
+        selectedPodDetails: data.pods[0],
+        podCount: data.pods.length,
+        podNames: data.pods.map(pod => pod.name),
+        podLogs: logs
+      }));
     } catch (error) {
       console.error(`Error fetching details for pod ${podName}:`, error);
     }
   };
 
   const handleTabChange = (key: string) => {
-    setActiveTab(key);
+    setState(prev => ({ ...prev, activeTab: key }));
   };
 
-  const metadataItems = (
-    <Card title="Metadata" style={{ marginBottom: '16px' }}>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Label text="UID" />
-          <Children content={selectedPodDetails?.uid || '-'} />
-        </Col>
-        <Col span={12}>
-          <Label text="Creation Timestamp" />
-          <Children
-            content={
-              selectedPodDetails?.creationTimestamp
-                ? dayjs(selectedPodDetails.creationTimestamp).format('YYYY-MM-DD HH:mm:ss')
-                : '-'
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Label text="Generate Name" />
-          <Children content={selectedPodDetails?.generateName || '-'} />
-        </Col>
-        <Col span={12}>
-          <Label text="Labels" />
-          <Children content={`app: ${selectedPodDetails?.labels?.app || '-'}`} />
-        </Col>
-      </Row>
-    </Card>
-  );
-
-  const podStatusItems = (
-    <Card title="Pod Status" style={{ marginBottom: '16px' }}>
-      <Row gutter={16}>
-        <Col span={8}>
-          <Label text="Updated" />
-          <Children content={podCount.toString()} />
-        </Col>
-        <Col span={8}>
-          <Label text="Total" />
-          <Children content={podCount.toString()} />
-        </Col>
-        <Col span={8}>
-          <Label text="Available" />
-          <Children content={podCount.toString()} />
-        </Col>
-      </Row>
-    </Card>
-  );
+  const menuItems = state.pods.map((pod, index) => ({
+    key: index.toString(),
+    label: pod,
+    onClick: () => handlePodClick(pod),
+  }));
 
   return (
     <Panel>
@@ -128,13 +93,8 @@ const KarmadaConfigPage = () => {
               overflowY: 'auto',
               borderRight: 0,
             }}
-          >
-            {pods.map((pod, index) => (
-              <Menu.Item key={index} onClick={() => handlePodClick(pod)}>
-                {pod}
-              </Menu.Item>
-            ))}
-          </Menu>
+            items={menuItems}
+          />
         </Sider>
         <Layout style={{ padding: '0 24px 24px' }}>
           <Content
@@ -147,16 +107,48 @@ const KarmadaConfigPage = () => {
           >
             <KarmadaHeader
               onTabChange={handleTabChange}
-              appName={selectedPodDetails?.labels?.app || 'Loading App Name ...'}
-              podNames={podNames}
+              appName={state.selectedPodDetails?.labels?.app || 'Loading App Name ...'}
+              podNames={state.podNames}
             />
-            {activeTab === '1' && selectedPodDetails && (
+            {state.activeTab === '1' && state.selectedPodDetails && (
               <>
-                {metadataItems}
-                {podStatusItems}
+                <Card title="Metadata" style={{ marginBottom: '16px' }}>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Label text="UID" />
+                      <Children content={state.selectedPodDetails?.uid || '-'} />
+                    </Col>
+                    <Col span={12}>
+                      <Label text="Creation Timestamp" />
+                      <Children
+                        content={
+                          state.selectedPodDetails?.creationTimestamp
+                            ? dayjs(state.selectedPodDetails.creationTimestamp).format('YYYY-MM-DD HH:mm:ss')
+                            : '-'
+                        }
+                      />
+                    </Col>
+                  </Row>
+                </Card>
+                <Card title="Pod Status" style={{ marginBottom: '16px' }}>
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      <Label text="Updated" />
+                      <Children content={state.podCount.toString()} />
+                    </Col>
+                    <Col span={8}>
+                      <Label text="Total" />
+                      <Children content={state.podCount.toString()} />
+                    </Col>
+                    <Col span={8}>
+                      <Label text="Available" />
+                      <Children content={state.podCount.toString()} />
+                    </Col>
+                  </Row>
+                </Card>
               </>
             )}
-            {activeTab === '2' && <TerminalLogs logs={podLogs} />}
+            {state.activeTab === '2' && <TerminalLogs logs={state.podLogs} />}
           </Content>
         </Layout>
       </Layout>

@@ -1,8 +1,6 @@
 package config
 
 import (
- 
-// "fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
@@ -83,7 +81,6 @@ func handlegetpodinfo(c *gin.Context) {
 
 func hadlleputpodinfo(c *gin.Context) {
     podName := c.Param("Name")
-	// fmt.Printf("Attempting to update Pod in namespace: %s, with name: %s\n", namespace, podName)
     var requestBody struct {
         YamlContent string `json:"yamlContent"`
     }
