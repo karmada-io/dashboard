@@ -27,6 +27,7 @@
     "tsx": "^4.15.6"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "dayjs": "^1.11.11"
   }
 }
