@@ -8,13 +8,13 @@ import ErrorBoundary from '@/components/error';
 import Overview from '@/pages/overview';
 import {
   MultiCloudConfig,
-  MultiCloudworkload,
-  MultiCloudService,
   MultiCloudNamespace,
+  MultiCloudService,
+  MultiCloudworkload,
 } from '@/pages/multicloud-resource-manage';
 import {
-  MultiCloudPropagationPolicy,
   MultiCloudOverridePolicy,
+  MultiCloudPropagationPolicy,
 } from '@/pages/multicloud-policy-manage';
 import {
   Helm,
@@ -129,7 +129,7 @@ export function getRoutes() {
               path: 'propagation-policy',
               element: <MultiCloudPropagationPolicy />,
               handle: {
-                sidebarKey: 'PROPAGTION-POLICY',
+                sidebarKey: 'PROPAGATION-POLICY',
                 sidebarName: i18nInstance.t('a95abe7b8eeb55427547e764bf39f1c4'),
               },
             },
@@ -285,7 +285,7 @@ function concatPathSegment(paths: string[] = []) {
   return paths.map((p) => (p.startsWith('/') ? p : `/${p}`)).join('');
 }
 
-export function tranverseRoutes(route: RouteObject, paths: string[] = []) {
+export function traverseRoutes(route: RouteObject, paths: string[] = []) {
   if (_.isUndefined(route) || _.isUndefined(route.handle)) return;
   const { path = '' } = route;
   const { sidebarKey } = route.handle;
@@ -293,18 +293,39 @@ export function tranverseRoutes(route: RouteObject, paths: string[] = []) {
   if (!route.children) {
     flattenRoutes[sidebarKey] = concatPathSegment(newPaths);
   } else {
-    route.children.forEach((child) => tranverseRoutes(child, newPaths));
+    route.children.forEach((child) => traverseRoutes(child, newPaths));
   }
 }
 
+export function filterMenuItems(
+  menuItems: MenuItem[],
+  menuInfo: Record<string, boolean>,
+): MenuItem[] {
+  return menuItems
+    .filter((menuItem) => {
+      if (!menuItem) return;
+      const menuKey = menuItem.key as string;
+      if (menuKey && !menuInfo[menuKey]) {
+        return;
+      }
+      if (menuItem.children && menuItem.children.length > 0) {
+        menuItem.children = filterMenuItems(menuItem.children, menuInfo);
+      }
+      return menuItem;
+    })
+    .filter(Boolean);
+}
+
 // type MenuPropsItems = MenuProps['items']
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = Required<MenuProps>['items'][number] & {
+  children?: MenuItem[];
+};
 
 function getItem(
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
-  children?: MenuItem[],
+  children?: (MenuItem | null)[],
   type?: 'group',
 ): MenuItem {
   return {
@@ -318,11 +339,11 @@ function getItem(
 
 function convertRouteToMenuItem(
   route: RouteObject,
-  keypaths: string[] = [],
+  keyPaths: string[] = [],
 ): MenuItem | null {
   if (_.isUndefined(route.handle)) return null;
   const { sidebarName, sidebarKey, icon } = route.handle;
-  const newKeyPaths = [...keypaths, sidebarKey];
+  const newKeyPaths = [...keyPaths, sidebarKey];
   if (!route.children) {
     return getItem(sidebarName, sidebarKey, icon);
   } else {
@@ -344,10 +365,10 @@ export function initRoute() {
   if (!rs[0].children) return;
 
   menuItems = rs[0].children
-    .map((route) => convertRouteToMenuItem(route))
+    .map((route) => convertRouteToMenuItem(route) as MenuItem)
     .filter((menuItem) => !_.isNull(menuItem));
 
-  rs[0].children.map((route) => tranverseRoutes(route));
+  rs[0].children.map((route) => traverseRoutes(route));
 }
 
 initRoute();
