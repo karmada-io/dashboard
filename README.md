@@ -43,6 +43,10 @@ Create Service Account:
 ```bash
 kubectl apply -f  https://raw.githubusercontent.com/karmada-io/dashboard/main/deploy/karmada-dashboard-role.yaml
 ```
+Create Secret for ServiceAccount [need in k8s v1.24+]
+```bash
+kubectl apply -f  https://raw.githubusercontent.com/karmada-io/dashboard/main/deploy/karmada-dashboard-secret.yaml
+```
 
 #### 4.Get Bearer Token
 
