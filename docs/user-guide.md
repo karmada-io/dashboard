@@ -38,6 +38,7 @@ kubectl config use-context karmada-host
 kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
 kubectl apply -f artifacts/dashboard/karmada-dashboard-api.yaml
 kubectl apply -f artifacts/dashboard/karmada-dashboard-web.yaml
+kubectl apply -f artifacts/dashboard/karmada-dashboard-configmap.yaml
 ```
 
 
