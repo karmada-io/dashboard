@@ -3,7 +3,7 @@ node_modules/
 
 # Dist
 .dist/
-
+**/*/dist
 # Yarn
 .yarn/*
 !.yarn/patches
@@ -11,4 +11,4 @@ node_modules/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
+apps/demos
