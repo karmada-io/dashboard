@@ -15,6 +15,7 @@ type Options struct {
 	I18nDir             string
 	EnableApiProxy      bool
 	ApiProxyEndpoint    string
+	DashboardConfigPath string
 }
 
 func NewOptions() *Options {
@@ -34,4 +35,5 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.I18nDir, "i18n-dir", "./i18n", "directory to serve i18n files")
 	fs.BoolVar(&o.EnableApiProxy, "enable-api-proxy", true, "whether enable proxy to karmada-dashboard-api, if set true, all requests with /api prefix will be proxyed to karmada-dashboard-api.karmada-system.svc.cluster.local")
 	fs.StringVar(&o.ApiProxyEndpoint, "api-proxy-endpoint", "http://karmada-dashboard-api.karmada-system.svc.cluster.local:8000", "karmada-dashboard-api endpoint")
+	fs.StringVar(&o.DashboardConfigPath, "dashboard-config-path", "./config/dashboard-config.yaml", "path to dashboard config file")
 }
