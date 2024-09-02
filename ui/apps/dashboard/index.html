@@ -5,6 +5,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <script>
+      // assume that __path_prefix__ in the form of '/xxx/aaa'
+      // start with slash and not end with slash
+      window.__path_prefix__ = '/karmada'
+      window.__dynamic_base__ = window.__path_prefix__ + '/static'
+    </script>
   </head>
   <body>
     <div id="root"></div>
