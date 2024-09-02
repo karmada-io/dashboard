@@ -20,6 +20,7 @@ This is an out-of-the-box automated i18n tool designed for the Karmada dashboard
 1. Automatically configures i18n key-value pairs in the form of {key:value}.
 2. Automatically translates all i18n key-value pairs in a directory and adds them to the existing i18n repository.
 
+
 <!--
 这是一个为Karmada dashboard设计的开箱即用的自动化i18n工具，基于以中文环境开发的主视角，它实现了以下功能：
 1. 自动配置i18n键值对，并且为{key:value}形式。
@@ -28,9 +29,9 @@ This is an out-of-the-box automated i18n tool designed for the Karmada dashboard
 
 ## Motivation
 
-The global digital landscape demands applications that cater seamlessly to diverse linguistic audiences. Recognizing this need, we embarked on creating an automated tool designed specifically for the Karmada dashboard, which simplifies the process of internationalizing applications by automatically detecting and converting Chinese text within the code into internationalized function calls. This tool not only enhances the accessibility and usability of applications across different language-speaking regions but also streamlines the development process by integrating internationalization early in the software development lifecycle. 
+The current Karmada-dashboard requires a set of automated i18n tools to meet the development process primarily from a Chinese perspective. When users input the directory of files to be translated, this i18n tool can automatically scan and differentiate all files within that directory, and then process each one for internationalization. The modules for identifying Chinese characters, internationalization, and translation can be modularized and integrated into other tools that may be developed in the future.
 <!--
-全球数字环境要求应用程序能够无缝地迎合不同语言的受众。认识到这一需求，我们着手创建一个专门为karma仪表板设计的自动化工具，通过自动检测并将代码中的中文文本转换为国际化的函数调用，简化了国际化应用程序的过程。该工具不仅增强了跨不同语言区域的应用程序的可访问性和可用性，而且还通过在软件开发生命周期的早期集成国际化来简化开发过程。通过自动生成和更新用于国际化的键值对。
+目前的karmada-dashboard需要一套自动化的i18n自动工具，来满足以中文为主视角开发过程。当用户输入需要翻译的文件目录，该i18n工具可以自动地对该目录下的所有文件进行扫描和区分，然后逐个对其进行i18n化处理。其中，识别中文字符的模块，i18n化的模块，翻译的模块可以被拆分，融入其他未来可能开发的工具中。
 -->
 
 ### Goals
@@ -59,7 +60,7 @@ Developers need to manually add the styles of Chinese characters types that are 
 
 4. Translation Execution: Develop and integrate a translation program that utilizes the updated zh-CN.json file to generate corresponding translations in other languages, such as English (en-US) and French. This functionality will allow for rapid and accurate production of multilingual content.
 
-![EN-process](./images/EN-i18nOPPS-process.png)
+![EN-process](./images/i18n-tool-process.jpg)
 
 <!--
 1. 自动节点识别:增强工具以自动识别和处理源代码中的各种节点类型，包括纯字符串节点、模板文字节点、JSX文本节点和JSX属性节点。此功能将确保对可能需要国际化的所有潜在文本元素进行全面扫描和修改。
@@ -70,8 +71,6 @@ Developers need to manually add the styles of Chinese characters types that are 
 
 4. 翻译执行:开发和整合使用更新后的zh-CN的翻译程序。json文件生成对应的其他语言的翻译，如英语(en-US)和法语。该功能将允许快速和准确地制作多语言内容。
 -->
-中文版本：
-![CN-process](./images/CN-i18nOPPS-process.png)
 ### User Stories (Optional)
 
 <!--
@@ -82,13 +81,16 @@ bogged down.
 -->
 
 #### Story 1
-For instance, I named my tool CNfinder. When developers execute ```CNfinder -d <directory_of_files_needing_i18n>``` the tool automatically searches and performs the i18n replacements.
+When front-end developers of the Karmada-dashboard use it, they can input files that need to be internationalized through a command line interface linked by the commander tool. The tool automatically performs internationalization processing on the files. When using the -d command, it processes all files in a directory; when using the -f command, it processes a single file. Using the -x command after -d allows for the exclusion of files that do not require internationalization. If dissatisfied with the results of the internationalization, or in the event of an error, the -b command can be used to revert to the previous version.At the same time, users need to enter -l to bind to locales/CN.json; otherwise, the program will warn that no output path has been specified and will refuse to execute subsequent processes.
 
 <!--
-例如，我给我的工具取名为CNfinder, 在开发者以中文为主语言进行前端开发后，执行 ```CNfinder -d <需要进行i18n的文件目录>``` 后，该工具就能自动检索，并且进行i18n的替换
+当karmada-dashboard的前端页面开发者使用时，它可以将需要进行i18n化的文件，通过commander软链接后，在命令行对需要进行i18n化的文件进行输入。工具将自动执行i18n化处理文件。当他使用-d 命令，则可以处理整个目录下的文件，当他使用-f 命令，则可以处理单个文件。 当他在-d 后使用-x 命令，则可以将不需要进行i18n化的文件剔除出来。当他对本次i18n化的结果不满意，或者出现错误时，可以使用-b 命令可以退回到上一个版本。与此同时，用户需要输入-l 来进行对locales/CN.json的绑定，否则程序将警告没有对输出路径进行指定，继而拒绝执行后续程序。
 -->
 #### Story 2
-
+When software developers use the system, they can improve the code for each module. The executable code for each module is stored in the 'src' directory. Developers simply need to open each file to directly modify and enhance it.When they want to develop new tools in the future and need to use these modules, they can directly reference them, avoiding redundant production.
+<!--
+当程序开发者使用时，它可以对每个模块的代码进行改进。在scr目录下存放了每个模块的执行代码。开发者只需点开每个文件即可直接对其进行修改和增强。当他们在未来想开发的新的工具，需要用到这些模块时，也可以直接进行引用，避免了重复生产。
+-->
 ### Notes/Constraints/Caveats (Optional)
 
 <!--
@@ -169,10 +171,10 @@ Call updateZhCNFile to update the internationalization JSON file, appending the 
 
 ### Test Plan
 
-Rely on vitest for unit testing, details will be given later.
+During the development process, unit testing is performed using Vitest.
 
 <!--
-主要依靠vitest进行单元测试，细节将会在之后给出。
+在开发的过程中，通过vitest进行单元测试。
 -->
 
 ## Alternatives
