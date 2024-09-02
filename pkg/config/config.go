@@ -86,6 +86,7 @@ func GetDashboardConfig() DashboardConfig {
 		DockerRegistries: dashboardConfig.DockerRegistries,
 		ChartRegistries:  dashboardConfig.ChartRegistries,
 		MenuConfigs:      dashboardConfig.MenuConfigs,
+		PathPrefix:       dashboardConfig.PathPrefix,
 	}
 }
 
@@ -109,4 +110,24 @@ func UpdateDashboardConfig(k8sClient kubernetes.Interface, newDashboardConfig Da
 		return err
 	}
 	return nil
+}
+
+func InitDashboardConfigFromMountFile(mountPath string) error {
+	_, err := os.Stat(mountPath)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("%s not exist", mountPath)
+	}
+	content, err := os.ReadFile(mountPath)
+	if err != nil {
+		return err
+	}
+
+	var tmpConfig DashboardConfig
+	if err = yaml.Unmarshal(content, &tmpConfig); err != nil {
+		klog.Errorf("Failed to unmarshal from content %v", err)
+		return err
+	} else {
+		dashboardConfig = tmpConfig
+		return nil
+	}
 }
