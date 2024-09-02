@@ -109,6 +109,7 @@ func serve(opts *options.Options) {
 				buff, readAllErr := io.ReadAll(f)
 				if readAllErr == nil {
 					indexHtml = string(buff)
+					indexHtml = strings.ReplaceAll(indexHtml, "{{PathPrefix}}", pathPrefix)
 				}
 			}
 			c.Header("Content-Type", "text/html; charset=utf-8")
