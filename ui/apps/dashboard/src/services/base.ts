@@ -1,6 +1,16 @@
 import axios from 'axios';
+import _ from 'lodash';
 
-const baseURL: string = '/api/v1';
+let pathPrefix = window.__path_prefix__ || '';
+if (!pathPrefix.startsWith('/')) {
+  pathPrefix = '/' + pathPrefix;
+}
+if (!pathPrefix.endsWith('/')) {
+  pathPrefix = pathPrefix + '/';
+}
+export const routerBase = pathPrefix;
+const baseURL: string = _.join([pathPrefix, 'api/v1'], '');
+
 export const karmadaClient = axios.create({
   baseURL,
 });
@@ -76,5 +86,3 @@ export const extractPropagationPolicy = (r: { objectMeta: ObjectMeta }) => {
   }
   return r?.objectMeta?.annotations?.[propagationpolicyKey];
 };
-
-

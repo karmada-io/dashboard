@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/web/app/options"
+	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
 	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
@@ -17,9 +18,10 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 )
 
-// NewApiCommand creates a *cobra.Command object with default parameters
+// NewWebCommand creates a *cobra.Command object with default parameters
 func NewWebCommand(ctx context.Context) *cobra.Command {
 	opts := options.NewOptions()
 	cmd := &cobra.Command{
@@ -60,7 +62,7 @@ func NewWebCommand(ctx context.Context) *cobra.Command {
 
 func run(ctx context.Context, opts *options.Options) error {
 	klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
-
+	config.InitDashboardConfigFromMountFile(opts.DashboardConfigPath)
 	serve(opts)
 	select {
 	case <-ctx.Done():
@@ -72,12 +74,15 @@ func run(ctx context.Context, opts *options.Options) error {
 func serve(opts *options.Options) {
 	insecureAddress := fmt.Sprintf("%s:%d", opts.InsecureBindAddress, opts.InsecurePort)
 	klog.V(1).InfoS("Listening and serving on", "address", insecureAddress)
+	pathPrefix := config.GetDashboardConfig().PathPrefix
+	klog.V(1).Infof("PathPrefix is:%s", pathPrefix)
 	go func() {
 		r := router.Router()
-		r.StaticFS("/static", http.Dir(opts.StaticDir))
+		g := r.Group(pathPrefix)
+		g.StaticFS("/static", http.Dir(opts.StaticDir))
 		if opts.EnableApiProxy {
 			//	https://karmada-apiserver.karmada-system.svc.cluster.local:5443
-			r.Any("/api/*path", func(c *gin.Context) {
+			g.Any("/api/*path", func(c *gin.Context) {
 				remote, _ := url.Parse(opts.ApiProxyEndpoint)
 				proxy := httputil.NewSingleHostReverseProxy(remote)
 				proxy.Director = func(req *http.Request) {
@@ -85,6 +90,7 @@ func serve(opts *options.Options) {
 					req.Host = remote.Host
 					req.URL.Scheme = remote.Scheme
 					req.URL.Host = remote.Host
+					req.URL.Path = strings.TrimPrefix(req.URL.Path, pathPrefix)
 				}
 				proxy.ServeHTTP(c.Writer, c.Request)
 			})
@@ -92,7 +98,7 @@ func serve(opts *options.Options) {
 		// TODO:
 		// currently we only mock the return i18n json, this feature will be implemented by ospp2024
 		// https://summer-ospp.ac.cn/org/prodetail/245c40338?lang=zh&list=pro
-		r.GET("/i18n/*path", func(c *gin.Context) {
+		g.GET("/i18n/*path", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{})
 		})
 		r.NoRoute(func(c *gin.Context) {
@@ -103,6 +109,7 @@ func serve(opts *options.Options) {
 				buff, readAllErr := io.ReadAll(f)
 				if readAllErr == nil {
 					indexHtml = string(buff)
+					indexHtml = strings.ReplaceAll(indexHtml, "{{PathPrefix}}", pathPrefix)
 				}
 			}
 			c.Header("Content-Type", "text/html; charset=utf-8")
