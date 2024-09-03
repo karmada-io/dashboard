@@ -320,10 +320,6 @@ func generateClusterInControllerPlane(opts karmadautil.ClusterRegisterOption) (*
 		clusterObj.Spec.Provider = opts.ClusterProvider
 	}
 
-	if opts.ClusterZone != "" {
-		clusterObj.Spec.Zone = opts.ClusterZone
-	}
-
 	if len(opts.ClusterZones) > 0 {
 		clusterObj.Spec.Zones = opts.ClusterZones
 	}
