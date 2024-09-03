@@ -196,6 +196,32 @@ type DaemonSetListChannel struct {
 	Error chan error
 }
 
+// GetDaemonSetListChannel returns a pair of channels to a DaemonSet list and errors that both must be read
+// numReads times.
+func GetDaemonSetListChannel(client client.Interface, nsQuery *NamespaceQuery, numReads int) DaemonSetListChannel {
+	channel := DaemonSetListChannel{
+		List:  make(chan *apps.DaemonSetList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.AppsV1().DaemonSets(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
+		var filteredItems []apps.DaemonSet
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // JobListChannel is a list and error channels to Jobs.
 type JobListChannel struct {
 	List  chan *batch.JobList
@@ -212,6 +238,33 @@ type CronJobListChannel struct {
 type ServiceListChannel struct {
 	List  chan *v1.ServiceList
 	Error chan error
+}
+
+// GetServiceListChannel returns a pair of channels to a Service list and errors that both
+// must be read numReads times.
+func GetServiceListChannel(client client.Interface, nsQuery *NamespaceQuery,
+	numReads int) ServiceListChannel {
+
+	channel := ServiceListChannel{
+		List:  make(chan *v1.ServiceList, numReads),
+		Error: make(chan error, numReads),
+	}
+	go func() {
+		list, err := client.CoreV1().Services(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
+		var filteredItems []v1.Service
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
 }
 
 // EndpointListChannel is a list and error channels to Endpoints.
