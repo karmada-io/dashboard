@@ -64,6 +64,7 @@ export async function GetWorkloads(params: {
       status: WorkloadStatus;
       deployments?: Workload[];
       statefulSets?: Workload[];
+      daemonSets?: Workload[];
     }>
   >(url, {
     params: convertDataSelectQuery(requestData),
