@@ -70,6 +70,9 @@ export enum WorkloadKind {
   Unknown = '',
   Deployment = 'deployment',
   Statefulset = 'statefulset',
+  Daemonset = 'daemonset',
+  Cronjob = 'cronjob',
+  Job = 'job',
 }
 
 export enum ConfigKind {
