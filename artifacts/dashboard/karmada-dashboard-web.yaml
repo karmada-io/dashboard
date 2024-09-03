@@ -27,9 +27,13 @@ spec:
             - --static-dir=/static
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
+            - --dashboard-config-path=/config/dashboard-config.yaml
           name: karmada-dashboard-web
           image: karmada/karmada-dashboard-web:main
           imagePullPolicy: IfNotPresent
+          env:
+            - name: GIN_MODE
+              value: release
           livenessProbe:
             failureThreshold: 8
             httpGet:
@@ -58,12 +62,19 @@ spec:
             - name: kubeconfig
               subPath: kubeconfig
               mountPath: /etc/kubeconfig
+            - mountPath: /config/dashboard-config.yaml
+              name: dashboard-config
+              subPath: prod.yaml
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
         - name: kubeconfig
           secret:
             secretName: kubeconfig
+        - name: dashboard-config
+          configMap:
+            name:  karmada-dashboard-configmap
+
 ---
 apiVersion: v1
 kind: Service
