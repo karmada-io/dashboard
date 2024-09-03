@@ -248,11 +248,15 @@ const WorkloadPage = () => {
             options={[
               {
                 label: 'Deployment',
-                value: 'deployment',
+                value: WorkloadKind.Deployment,
               },
               {
                 label: 'Statefulset',
-                value: 'statefulset',
+                value: WorkloadKind.Statefulset,
+              },
+              {
+                label: 'Daemonset',
+                value: WorkloadKind.Daemonset,
               },
             ]}
           />
@@ -302,7 +306,9 @@ const WorkloadPage = () => {
         rowKey={(r: DeploymentWorkload) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data ? data.deployments || data.statefulSets : []}
+        dataSource={
+          data ? data.deployments || data.statefulSets || data.daemonSets : []
+        }
       />
 
       <NewWorkloadEditorModal
