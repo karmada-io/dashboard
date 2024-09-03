@@ -54,7 +54,7 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
           className="flex flex-row items-center"
           onClick={onNewConfig}
         >
-          新增配置
+          {filter.kind === ConfigKind.ConfigMap ? '新增配置' : '新增秘钥'}
         </Button>
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
