@@ -9,6 +9,7 @@ import { useStore } from './store.ts';
 import { message } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
+import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
 
 const ConfigPage = () => {
   const { nsOptions, isNsDataLoading } = useNamespace({});
@@ -67,6 +68,37 @@ const ConfigPage = () => {
               }
               await queryClient.invalidateQueries({
                 queryKey: ['GetConfigMaps'],
+                exact: false,
+              });
+            } catch (e) {
+              console.log('error', e);
+            }
+          }}
+        />
+      )}
+      {filter.kind === ConfigKind.Secret && (
+        <SecretTable
+          labelTagNum={tagNum}
+          searchText={filter.searchText}
+          selectedWorkSpace={filter.selectedWorkspace}
+          onViewSecret={(r) => {
+            viewConfig(stringify(r));
+          }}
+          onEditSecret={(r) => {
+            editConfig(stringify(r));
+          }}
+          onDeleteSecretContent={async (r) => {
+            try {
+              const ret = await DeleteResource({
+                kind: r.typeMeta.kind,
+                name: r.objectMeta.name,
+                namespace: r.objectMeta.namespace,
+              });
+              if (ret.code !== 200) {
+                await messageApi.error('删除秘钥失败');
+              }
+              await queryClient.invalidateQueries({
+                queryKey: ['GetSecrets'],
                 exact: false,
               });
             } catch (e) {
