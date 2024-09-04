@@ -62,9 +62,9 @@ spec:
             - name: kubeconfig
               subPath: kubeconfig
               mountPath: /etc/kubeconfig
-            - mountPath: /config/dashboard-config.yaml
-              name: dashboard-config
+            - name: dashboard-config
               subPath: prod.yaml
+              mountPath: /config/dashboard-config.yaml
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
