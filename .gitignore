@@ -27,3 +27,4 @@ _output
 charts/*/charts
 cmd/ops
 .turbo
+.dockerconfigjson

@@ -1,0 +1,59 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../dashboard
+  - ./ingress.yaml
+
+configMapGenerator:
+  - name: karmada-dashboard-configmap
+    namespace: karmada-system
+    behavior: replace
+    files:
+      - prod.yaml=dashboard-config.yaml
+
+#  If you want to create secret for private registry, uncomment it
+#secretGenerator:
+#  - name: regcred
+#    namespace: karmada-system
+#    files:
+#      - .dockerconfigjson
+#    type: kubernetes.io/dockerconfigjson
+
+# Uncomment the patch rules to make change to ingress
+#patches:
+#  By default, the ingress-mode will export karmada-dashboard-web with no-domain specified and served with location '/'
+#  If you want to specify domain or change the location path, you can uncomment the following patch code
+#  - target:
+#      kind: Ingress
+#      name: ingress-karmada-dashboard
+#      namespace: karmada-system
+#    patch: |-
+#      # If you want to specify domain, you can uncomment the first patch rules
+#      - op: add
+#        path: /spec/rules/0/host
+#        value: "www.example.com"
+#      # If you want to change the location path from '/' to customized path, you can uncomment the following patch rules
+#      # Noticed: the path value should be consisted with 'path_prefix' field in the './dashboard-config.yaml'
+#      - op: replace
+#        path: /spec/rules/0/http/paths/0/path
+#        value: "/karmada"
+#  # Uncomment the next two patch rules to add imagePullSecrets to deployment
+#  - target:
+#      kind: Deployment
+#      name: karmada-dashboard-web
+#      namespace: karmada-system
+#    patch: |-
+#      - op: add
+#        path: /spec/template/spec/imagePullSecrets
+#        value: [{ name: regcred }]
+#  - target:
+#        kind: Deployment
+#        name: karmada-dashboard-api
+#        namespace: karmada-system
+#    patch: |-
+#      - op: add
+#        path: /spec/template/spec/imagePullSecrets
+#        value: [{ name: regcred }]
+        
+        
