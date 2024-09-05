@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-karmada-dashboard
+  namespace: karmada-system
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              serviceName: karmada-dashboard-web
+              servicePort: 8000
+            path: /
+            pathType: ImplementationSpecific

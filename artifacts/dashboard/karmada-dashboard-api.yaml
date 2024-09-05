@@ -34,6 +34,9 @@ spec:
           name: karmada-dashboard-api
           image: karmada/karmada-dashboard-api:main
           imagePullPolicy: IfNotPresent
+          env:
+            - name: GIN_MODE
+              value: release
           livenessProbe:
             failureThreshold: 8
             httpGet:
