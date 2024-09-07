@@ -62,13 +62,21 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6InZLdkRNclVZSFB6SUVXczBIRm8zMDBxOHFOanQxbWU4WUk1VVVp
 ![image](docs/images/readme-login-cn.png)
 等待授权流程完成后，就可以任意的使用karmada dashboard提供的服务。对于新手来说，可以参考Karmada的基本用法章节完成karmada-dashboard的快速入门。
 
----
+## 例会
+
+Dashbaord 开发例会:
+* Wednesday at 14:30 UTC+8 (中文)(双周会). [Convert to your timezone](https://www.thetimezoneconverter.com/?t=14%3A30&tz=GMT%2B8&).
+* 暂无英文例会，如有任何待讨论事项可参加 [Karmada 社区例会](https://github.com/karmada-io/karmada?tab=readme-ov-file#meeting).
+
+相关会议资源:
+- [会议日程及纪要](https://docs.google.com/document/d/1dX3skCE-QRBWzABq3O9cG7yhIDUWLYWmg7kGq8UHU6s/edit)
+- [会议日历](https://calendar.google.com/calendar/embed?src=a71aae8a75e3558a90683596c71382b8195bf7c84cb50e6e75d1a3e64e08480b%40group.calendar.google.com&ctz=Asia%2FShanghai) | [Subscribe](https://calendar.google.com/calendar/u/1?cid=YTcxYWFlOGE3NWUzNTU4YTkwNjgzNTk2YzcxMzgyYjgxOTViZjdjODRjYjUwZTZlNzVkMWEzZTY0ZTA4NDgwYkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t)
+- [会议链接](https://zoom.us/j/97070047574?pwd=lXha0Sqngw4mwtmArP1sjsLMMXk34z.1)
+
 ## 💻贡献
 Karmada-dashboard目前仍在追赶Karmada的功能特性，目前我们实现了基础的功能。 如果您想为Karmada-dashboard的开发做出贡献，可以参考[开发文档](https://github.com/karmada-io/dashboard/blob/main/DEVELOPMENT.md)，我们乐意看到更多的贡献者加入。
 
 随时向Karmada-dashboard的仓库提交issue或PR。
-
-**TBD google doc and online meeting calendar**
 
 ## License
 
