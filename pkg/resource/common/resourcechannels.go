@@ -228,6 +228,32 @@ type JobListChannel struct {
 	Error chan error
 }
 
+// GetJobListChannel returns a pair of channels to a Job list and errors that both must be read numReads times.
+func GetJobListChannel(client client.Interface,
+	nsQuery *NamespaceQuery, numReads int) JobListChannel {
+	channel := JobListChannel{
+		List:  make(chan *batch.JobList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.BatchV1().Jobs(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
+		var filteredItems []batch.Job
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // CronJobListChannel is a list and error channels to Cron Jobs.
 type CronJobListChannel struct {
 	List  chan *batch.CronJobList
