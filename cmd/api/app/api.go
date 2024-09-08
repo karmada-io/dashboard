@@ -19,6 +19,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/config"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/configmap"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cronjob"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/daemonset"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/job"
