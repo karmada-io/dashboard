@@ -21,6 +21,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/configmap"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/daemonset"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/job"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
