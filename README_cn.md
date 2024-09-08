@@ -30,7 +30,7 @@ kubectl config use-context karmada-host
 ```bash
 kubectl apply -k artifacts/overlays/nodeport-mode
 ```
-待安装部署过程完成后，打开浏览器访问http://your-karmada-host:32000即可开始使用karmada-dashboard。
+待安装部署过程完成后，打开浏览器访问 http://your-karmada-host:32000 即可开始使用karmada-dashboard。
 在使用之前，还需要生成jwt token才能访问dashboard。
 
 3.创建Service-Account资源
