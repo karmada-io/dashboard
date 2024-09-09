@@ -7,7 +7,8 @@ REGISTRY_USER_NAME  	?= ""
 REGISTRY_PASSWORD   	?= ""
 REGISTRY_SERVER_ADDRESS ?= ""
 
-TARGETS := karmada-dashboard-api
+TARGETS := karmada-dashboard-api \
+		   karmada-dashboard-web \
 
 
 # Build binary.
@@ -24,6 +25,8 @@ TARGETS := karmada-dashboard-api
 $(TARGETS):
 	BUILD_PLATFORMS=$(GOOS)/$(GOARCH) hack/build.sh $@
 
+.PHONY: all
+all: $(TARGETS)
 
 # Build image.
 #
@@ -52,3 +55,4 @@ image-karmada-dashboard-web:
 	BUILD_PLATFORMS=linux/$(GOARCH) hack/build.sh karmada-dashboard-web
 	cp -R ui/apps/dashboard/dist _output/bin/linux/$(GOARCH)/dist
 	DOCKER_FILE="build-web.Dockerfile" VERSION=$(VERSION) REGISTRY=$(REGISTRY) BUILD_PLATFORMS=linux/$(GOARCH) hack/docker.sh karmada-dashboard-web
+
