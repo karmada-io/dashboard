@@ -28,9 +28,9 @@ kubectl config use-context karmada-host
 2.部署Karmada-dashboard, 这里我们选择通过nodePort来暴露karmada-dashboard相关的服务, 用nodePort的好处在于可以避免依赖ingress等资源，无依赖。
 
 ```bash
-kubectl apply -k overlays/nodeport-mode
+kubectl apply -k artifacts/overlays/nodeport-mode
 ```
-待安装部署过程完成后，打开浏览器访问http://your-karmada-host:32000即可开始使用karmada-dashboard。
+待安装部署过程完成后，打开浏览器访问 http://your-karmada-host:32000 即可开始使用karmada-dashboard。
 在使用之前，还需要生成jwt token才能访问dashboard。
 
 3.创建Service-Account资源
