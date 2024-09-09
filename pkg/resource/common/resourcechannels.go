@@ -324,6 +324,26 @@ type EndpointListChannel struct {
 	Error chan error
 }
 
+// GetEndpointListChannelWithOptions is GetEndpointListChannel plus list options.
+func GetEndpointListChannelWithOptions(client client.Interface,
+	nsQuery *NamespaceQuery, opt metaV1.ListOptions, numReads int) EndpointListChannel {
+	channel := EndpointListChannel{
+		List:  make(chan *v1.EndpointsList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.CoreV1().Endpoints(nsQuery.ToRequestParam()).List(context.TODO(), opt)
+
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // IngressListChannel is a list and error channels to Ingresss.
 type IngressListChannel struct {
 	List  chan *networkingv1.IngressList
