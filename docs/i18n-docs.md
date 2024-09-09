@@ -100,7 +100,7 @@ i18n工具会修改原始文件，可能导致不可逆的更改。开发人员�
 
 ## Design Details
 The overall i18n automation tool comprises two main modules: the translation module and the command-line module. The translation module is responsible for interfacing with mainstream translation APIs, and its interface-oriented programming approach ensures good extensibility. If a better translation implementation is invented in the future, it can be integrated by simply supporting the corresponding translation interface. The command-line module serves as the entry point for the entire i18n tool, handling the main workflow of the i18n functionality, which is showed as follows:
-![process details](./images/i18n-tool-overview.jpg)
+![process details](./images/i18n-tool-overview.png)
 <!--
 整体i18n自动化工具包含两个主要的模块：翻译模块以及命令行模块，翻译模块负责对接主流翻译API，面相接口的编程方式保证了良好的拓展性，如果未来有更好的翻译实现，只需要支持对应的翻译接口即可接入；命令行模块是整个i18n工具的入口，负责完成i18n功能的主流程，整体如下所示：
 -->
@@ -137,7 +137,7 @@ The program, which is developed based on Node.js's commander module, primarily h
 -->
 
 1. Scanning Process: The scanning process is responsible for receiving external raw files and returning a processed AST (Abstract Syntax Tree). The internal process is illustrated in the diagram below:
-![process details](./images/i18n-tool-scan.jpg)
+![process details](./images/i18n-tool-scan.png)
 <!--
 扫描流程：扫描模块负责接收外部传入的原始文件，返回处理好的AST(Abstract Syntax Tree)树，内部流程如图：
 -->
@@ -146,7 +146,7 @@ Convert the input files into an AST, traverse the AST to find nodes which contai
 将输入的文件转换成AST树，遍历AST树找到包含中文字符的AST节点，计算中文字符对应的码点保存在i18nMap中，并将AST节点作统一转换后保存在CNpath中。完成一趟扫描后，继续遍历CNpath，将对应的AST节点中的中文字符转成i18n的函数调用的形式，生成新的AST树返回出去。
 -->
 2. Code generating process: This process receives the modified AST from the scanning module and converts this modified AST back into the original code. The internal process is as follows:
-![process details](./images/i18n-tool-codeG.jpg)
+![process details](./images/i18n-tool-codeG.png)
 <!--
 代码生成流程：接收扫描模块返回的修改后的AST树，将修改后的AST树转换成原始代码，内部流程如图:
 -->
@@ -156,7 +156,7 @@ If the original code does not include an import statement for the i18n instance,
 -->
 
 3. UpdateLocales process: This part receives the i18nMap which returned from the scanning module and updates the locale files by various target languages. The internal process is as follows: 
-![process details](./images/i18n-tool-upLoc.jpg)
+![process details](./images/i18n-tool-upLoc.png)
 <!--
 更新locale文件流程： 接收扫描模块返回的i18nMap ，更新多种目标语言的locales文件，内部流程如图：
 -->
