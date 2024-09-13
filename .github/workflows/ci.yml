@@ -34,7 +34,7 @@ jobs:
           echo "Start build"
           pnpm --version
           cd ui
-          pnpm install -w
+          pnpm install --filter @karmada/dashboard
           pnpm run dashboard:build
   build-bin:
     name: build-bin
