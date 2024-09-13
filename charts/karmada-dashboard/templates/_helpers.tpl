@@ -73,19 +73,6 @@ Return the proper karmada search image name
 {{ include "common.images.image" (dict "imageRoot" .Values.api.image "global" .Values.global) }}
 {{- end -}}
 
-{{- define "karmada-dashboard.api.kubeconfig.volume" -}}
-{{ $name :=  include "karmada-dashboard.name" . }}
-{{- if eq .Values.installMode "host" -}}
-- name: kubeconfig-secret
-  secret:
-    secretName: {{ $name }}-kubeconfig
-{{- else -}}
-- name: kubeconfig-secret
-  secret:
-    secretName: {{ .Values.api.kubeconfig }}
-{{- end -}}
-{{- end -}}
-
 
 {{/*
 Return the proper karmada search image name
