@@ -3,10 +3,10 @@ const babelTraverse = require('@babel/traverse').default;
 const babelGenerator = require('@babel/generator').default;
 const crypto = require('crypto');
 
-// 生成唯一键值的方法，使用 MD5 哈希算法
+// Method to generate unique keys using the MD5 hash algorithm
 const generateKey = (text) => crypto.createHash('md5').update(text).digest('hex');
 
-// 处理 AST 树，识别中文并生成 i18n 键值对
+// Process the AST tree, detect Chinese characters, and generate i18n key-value pairs
 const processAST = (tsxCode, debugMode) => {
     const log = (...args) => {
         if (debugMode) {
@@ -19,11 +19,11 @@ const processAST = (tsxCode, debugMode) => {
         plugins: ['jsx', 'typescript'],
     });
 
-    let CNpath = []; 
-    let i18nMap = {}; 
-    let i18nImported = false; 
+    let CNpath = [];  // Store paths of Chinese text
+    let i18nMap = {}; // Store key-value pairs for i18n
+    let i18nImported = false; // Flag to check if i18nInstance is imported
 
-    // 遍历 AST，查找并处理目标节点
+    // Traverse the AST and find the target nodes
     babelTraverse(ast, {
         ImportDeclaration(path) {
             const sourceValue = path.node.source.value;
@@ -36,47 +36,47 @@ const processAST = (tsxCode, debugMode) => {
         },
         StringLiteral(path) {
             const value = path.node.value;
-            if (/[\u4e00-\u9fa5]/.test(value)) {
+            if (/[\u4e00-\u9fa5]/.test(value)) { // Check if the string contains Chinese characters
                 const key = generateKey(value);
                 if (!i18nMap[key]) {  
                     i18nMap[key] = value;
                     CNpath.push({ path, key, value, type: 'StringLiteral' });
-                    log(`识别到的中文字符: ${value}`);
+                    log(`Detected Chinese text: ${value}`);
                 }
             }
         },
         TemplateLiteral(path) {
             path.node.quasis.forEach((quasi) => {
                 const value = quasi.value.raw;
-                if (/[\u4e00-\u9fa5]/.test(value)) {
+                if (/[\u4e00-\u9fa5]/.test(value)) { // Check if the template contains Chinese characters
                     const key = generateKey(value);
                     if (!i18nMap[key]) {
                         i18nMap[key] = value;
                         CNpath.push({ path: quasi, key, value, type: 'TemplateLiteral' });
-                        log(`识别到的中文字符: ${value}`);
+                        log(`Detected Chinese text: ${value}`);
                     }
                 }
             });
         },
         JSXText(path) {
             const value = path.node.value.trim();
-            if (/[\u4e00-\u9fa5]/.test(value)) {
+            if (/[\u4e00-\u9fa5]/.test(value)) { // Check if JSXText contains Chinese characters
                 const key = generateKey(value);
                 if (!i18nMap[key]) {
                     i18nMap[key] = value;
                     CNpath.push({ path, key, value, type: 'JSXText' });
-                    log(`识别到的中文字符: ${value}`);
+                    log(`Detected Chinese text: ${value}`);
                 }
             }
         },
         JSXAttribute(path) {
             const value = path.node.value && path.node.value.value;
-            if (typeof value === 'string' && /[\u4e00-\u9fa5]/.test(value)) {
+            if (typeof value === 'string' && /[\u4e00-\u9fa5]/.test(value)) { // Check if JSXAttribute contains Chinese text
                 const key = generateKey(value);
                 if (!i18nMap[key]) {
                     i18nMap[key] = value;
                     CNpath.push({ path, key, value, type: 'JSXAttribute' });
-                    log(`识别到的中文字符: ${value}`);
+                    log(`Detected Chinese text: ${value}`);
                 }
             }
         }
@@ -85,7 +85,7 @@ const processAST = (tsxCode, debugMode) => {
     return { ast, CNpath, i18nMap, i18nImported };
 };
 
-// 生成代码，添加 i18nInstance.t 调用
+// Generate code and add i18nInstance.t calls
 const generateCode = (ast, i18nImported, CNpath) => {
     CNpath.forEach(({ path, key, value, type }) => {
         if (type === 'StringLiteral') {

@@ -8,20 +8,20 @@ async function findFiles(directory, excludePaths, callback, debugMode) {
     };
 
     const pattern = `${directory}/**/*.{tsx,ts,js}`; 
-    log(`使用的匹配模式: ${pattern}`);
+    log(`Using match pattern: ${pattern}`);
     
     try {
         const files = await fg(pattern, {
-            ignore: excludePaths,  
-            absolute: true        
+            ignore: excludePaths,  // Exclude paths that are not to be processed
+            absolute: true         // Return absolute paths of the matched files
         });
 
-        log(`匹配到的文件数: ${files.length}`);
-        log(`所有文件: ${files.join(', ')}`);
+        log(`Number of matched files: ${files.length}`);
+        log(`All matched files: ${files.join(', ')}`);
 
-        callback(files);
+        callback(files);  // Pass the matched files to the callback function
     } catch (err) {
-        console.error('查找文件时发生错误:', err);
+        console.error('Error occurred while searching for files:', err);
     }
 }
 
