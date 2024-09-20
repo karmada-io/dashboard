@@ -27,6 +27,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      serviceAccountName: karmada-dashboard
       {{- include "karmada-dashboard.imagePullSecrets" . | nindent 6 }}
       securityContext:
         {{- toYaml .Values.api.podSecurityContext | nindent 8 }}
@@ -68,13 +69,15 @@ spec:
           command:
             - karmada-dashboard-api
             - --karmada-kubeconfig=/etc/kubeconfig
-            - --karmada-context=karmada
+            - --karmada-context={{ .Values.api.kubeconfigContext }}
             - --kubeconfig=/etc/kubeconfig
-            - --context=karmada
+            - --context={{ .Values.api.kubeconfigContext }}
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
       volumes:
-      {{- include "karmada-dashboard.api.kubeconfig.volume" . | nindent 8 }}
+        - name: kubeconfig-secret
+          secret:
+            secretName: {{ .Values.api.kubeconfigName }}
       {{- with .Values.api.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
