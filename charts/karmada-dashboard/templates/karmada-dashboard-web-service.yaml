@@ -12,5 +12,8 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if and (eq .Values.web.service.type "NodePort") (not (empty .Values.web.service.nodePort)) }}
+      nodePort: {{ .Values.web.service.nodePort }}
+      {{- end }}
   selector:
     {{- include "karmada-dashboard.web.labels" . | nindent 4 }}
