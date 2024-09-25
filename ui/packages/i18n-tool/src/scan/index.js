@@ -46,8 +46,17 @@ async function scan(cmdOptions) {
             targetFiles,
         );
     }
+    let needUpdateLocale = true
+    if (cmdOptions.file || cmdOptions.directory) {
+        needUpdateLocale = false
+    }
+
     const cnLocalePath = buildLocalFilename(options.localesDir, options.originLang)
-    const existingData = JSON.parse(fs.readFileSync(cnLocalePath, 'utf8'));
+    let existingData = {}
+    if (needUpdateLocale) {
+        existingData = JSON.parse(fs.readFileSync(cnLocalePath, 'utf8'));
+    }
+
 
     const prettierConfig = await prettier.resolveConfig(path.join(process.cwd(), '.prettierrc'));
 
@@ -70,25 +79,28 @@ async function scan(cmdOptions) {
             }
         }
     }
-    fs.writeFileSync(cnLocalePath, JSON.stringify({
-        ...existingData,
-        ...updatedData,
-    }))
-
-
-    for (const targetLang of options.targetLangs) {
-        const targetLocalePath = buildLocalFilename(options.localesDir, targetLang)
-        const targetLangLocale =  await translate(updatedData, {
-            appid: options.translate.appid,
-            key: options.translate.key,
-            type: options.translate.type,
-            model: options.translate.model,
-            from: options.originLang,
-            to: targetLang
-        })
-        updateLocale(targetLocalePath, targetLangLocale)
+    if (needUpdateLocale) {
+        fs.writeFileSync(cnLocalePath, JSON.stringify({
+            ...existingData,
+            ...updatedData,
+        }))
     }
+
+    if (needUpdateLocale) {
+        for (const targetLang of options.targetLangs) {
+            const targetLocalePath = buildLocalFilename(options.localesDir, targetLang)
+            const targetLangLocale = await translate(updatedData, {
+                appid: options.translate.appid,
+                key: options.translate.key,
+                type: options.translate.type,
+                model: options.translate.model,
+                from: options.originLang,
+                to: targetLang
+            })
+            updateLocale(targetLocalePath, targetLangLocale)
+        }
+    }
+
 }
 
 module.exports = scan
-
