@@ -91,3 +91,4 @@ async function scan(cmdOptions) {
 }
 
 module.exports = scan
+
