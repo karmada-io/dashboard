@@ -19,19 +19,13 @@ global:
 ## See https://yaml.org/spec/1.2/spec.html#id2765878 and
 ## https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#yaml-anchors-and-aliases-sharing-variable-values
 ## for more details about yaml anchors and aliases.
-karmadaDashboardImageVersion: &karmadaDashboardImageVersion latest
+karmadaDashboardImageVersion: &karmadaDashboardImageVersion main
 
 ## Specify the imagePullPolicy of karmada-dashboard images
 ## Defaults to 'IfNotPresent', you can set to 'Always' in cases of special needs
 karmadaDashboardImagePullPolicy: &karmadaDashboardImagePullPolicy IfNotPresent
 
 podDisruptionBudget: &podDisruptionBudget { }
-
-## @param installMode "host" and "agent" are provided
-## "host" means install karmada in the control-cluster
-## "agent" means install agent client in the member cluster
-## "component" means install selected components in the control-cluster
-installMode: "host"
 
 ingress:
   enabled: false
@@ -99,8 +93,10 @@ api:
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 50%
-  ## @param apikubeconfig kubeconfig of the api
-  kubeconfig: karmada-kubeconfig
+  ## @param api.kubeconfigName secret name of the Karmada kubeconfig
+  kubeconfigName: karmada-kubeconfig
+  ## @param api.kubeconfigContext context name used in the Karmada kubeconfig
+  kubeconfigContext: karmada-apiserver
   ## @param api.podDisruptionBudget
   podDisruptionBudget: *podDisruptionBudget
   podSecurityContext: { }
@@ -180,3 +176,4 @@ web:
   service:
     type: ClusterIP
     port: 8000
+    # nodePort: 32000
