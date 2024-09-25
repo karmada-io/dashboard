@@ -89,11 +89,14 @@ const processAST = (tsxCode, debugMode) => {
 // Generate code and add i18nInstance.t calls
 const generateCode = (ast, i18nImported, CNPath) => {
     CNPath.forEach(({ path, key, value, type }) => {
+        if(isI18nInvoke(path)) {
+            return
+        }
         if (type === 'StringLiteral') {
             path.replaceWith(
                 babelParser.parseExpression(`i18nInstance.t("${key}", "${value}")`)
             );
-        } else if (type === 'TemplateLiteral') {
+        } else if (type === 'TemplateLiteral' ) {
             path.value.raw = `\${i18nInstance.t("${key}", "${value}")}`;
         } else if (type === 'JSXText') {
             const jsxText = `i18nInstance.t("${key}", "${value}")`
@@ -109,5 +112,19 @@ const generateCode = (ast, i18nImported, CNPath) => {
     }
     return transformedCode;
 };
+
+/**
+ * check the ast node to detect whether the ast node is already in form of i18n
+ * @param path
+ * @returns {boolean}
+ */
+function isI18nInvoke(path) {
+    if (!path || !path.parent ||
+        !path.parent.callee ||
+        !path.parent.callee.property || !path.parent.callee.object) return false;
+    const property = path.parent.callee.property.name
+    const object = path.parent.callee.object.name
+    return object === "i18nInstance" && property === "t"
+}
 
 module.exports = { processAST, generateCode };
