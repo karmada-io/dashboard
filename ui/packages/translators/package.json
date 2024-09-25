@@ -1,0 +1,28 @@
+{
+  "name": "@karmada/translators",
+  "version": "1.0.0",
+  "description": "",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "prepublish": "tsup --config ./tsup.config.ts",
+    "build": "tsup --config ./tsup.config.ts",
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "vite": "^5.2.0",
+    "vitest": "^2.0.5"
+  },
+  "dependencies": {
+    "got": "^14.4.2",
+    "openai": "^4.63.0"
+  }
+}
