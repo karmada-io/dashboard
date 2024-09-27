@@ -20,7 +20,8 @@ program
     // If not specified, will look for the config in the same directory as i18n-tool
     .option(
         '-c, --config <path>',
-        'specify the configuration file path, default is ./i18n.config.js'
+        'specify the configuration file path, default is ./i18n.config.cjs',
+        './i18n.config.cjs'
     )
 
 program

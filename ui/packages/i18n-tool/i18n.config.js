@@ -28,7 +28,7 @@ module.exports = {
     i18nMethod: 't',
     // [i18n translate provider]
     translate: {
-        type: 'baidu',
+        type: '',
         appid: '',
         model: '',
         key: '',
