@@ -183,11 +183,11 @@ const ClusterManagePage = () => {
             </Button>
             <Popconfirm
               placement="topRight"
-              title={`确认要删除${r.objectMeta.name}集群么?`}
+              title={`${i18nInstance.t('28f9bfb0c1f349d39a3f0e9c5040fbb8')} ${r.objectMeta.name} ${i18nInstance.t('3c8b3e5d432a454dbf9e5b737d7e7b62')}?`}
               onConfirm={async () => {
                 const ret = await DeleteCluster(r.objectMeta.name);
                 if (ret.code === 200) {
-                  await messageApi.success(`集群${r.objectMeta.name}删除成功`);
+                  await messageApi.success(`${i18nInstance.t('3c8b3e5d432a454dbf9e5b737d7e7b62')} ${r.objectMeta.name} ${i18nInstance.t('6f57ad46ebf24ff4b5cfe6b919b7f89e')}`);
                   await refetch();
                 } else {
                   await messageApi.error(
