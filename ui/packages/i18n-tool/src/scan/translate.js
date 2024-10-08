@@ -47,13 +47,15 @@ function initTranslator(translateOpts) {
 
 }
 
-function updateLocale(localePath, newEntries) {
-     const existingData = JSON.parse(fs.readFileSync(localePath, 'utf8'));
-     const mergedData = {
-         ...existingData,
-         ...newEntries,
-     };
-     fs.writeFileSync(localePath, JSON.stringify(mergedData, null, 2), 'utf8');
+function updateLocale(localePath, newEntries, glossaries) {
+    const _glossaries = glossaries || {}
+    const existingData = JSON.parse(fs.readFileSync(localePath, 'utf8'));
+    const mergedData = {
+        ...existingData,
+        ...newEntries,
+        ..._glossaries
+    };
+    fs.writeFileSync(localePath, JSON.stringify(mergedData, null, 2), 'utf8');
 }
 
 module.exports = {
