@@ -101,40 +101,7 @@ async function scan(cmdOptions) {
         }
     }
     debug('groupedGlossaryData is %O', groupedGlossaryData);
-    /*
-    const updatedDataWithoutGlossaryByLang = options.targetLangs
-        .map(targetLang => {
-            const updatedDataWithoutGlossary = Object.keys(updatedData)
-                .reduce((p, c) => {
-                    const key = c
-                    if (key in glossaryData && glossaryData[key][targetLang]) {
-                        return p
-                    }
-                    p[key] = updatedData[key]
-                    return p
-                }, {})
-            return {
-                lang: targetLang,
-                updatedDataWithoutGlossary
-            }
-        })
-        .reduce((p, c) => {
-            const {lang, updatedDataWithoutGlossary} = c;
-            return {
-                ...p,
-                [lang]: updatedDataWithoutGlossary
-            }
-        }, {})
-
-    debug('updatedDataWithoutGlossaryByLang is %O', updatedDataWithoutGlossaryByLang)
-    debug('updatedData is %O', updatedData)
-    */
     if (needUpdateLocale) {
-        // const tmpData = groupedGlossaryData['zh-CN'] || updatedData
-        // fs.writeFileSync(cnLocalePath, JSON.stringify({
-        //     ...existingData,
-        //     ...tmpData,
-        // }))
         updateLocale(cnLocalePath, updatedData, groupedGlossaryData['zh-CN'])
     }
 
