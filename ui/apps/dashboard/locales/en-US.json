@@ -1,7 +1,7 @@
 {
   "a7bac2239fcdcb3a067903d8077c4a07": "Chinese",
-  "86385379cf9cfbc2c554944f1c054a45": "overview",
-  "21a4e07b08a4efbbfe2b9d88c208836a": "Multi cloud resource management",
+  "86385379cf9cfbc2c554944f1c054a45": "Overview",
+  "21a4e07b08a4efbbfe2b9d88c208836a": "MultiCloud Resource Management",
   "a4b28a416f0b6f3c215c51e79e517298": "Namespace",
   "c3bc562e9ffcae6029db730fe218515c": "Workload",
   "4653569c7943335f62caa11e38d48aa0": "Service Management",
@@ -151,5 +151,5 @@
   "f2224910b0d022374967254002eb756f": "Successfully edited scheduling strategy",
   "5863fd1d291adf46d804f5801a79d0e1": "Editing scheduling strategy failed",
   "79d5c80e3be24682145aa9246df18b40": "Is it a cluster?",
-  "85fe5099f6807dada65d274810933389": "colony"
+  "85fe5099f6807dada65d274810933389": "Cluster"
 }
