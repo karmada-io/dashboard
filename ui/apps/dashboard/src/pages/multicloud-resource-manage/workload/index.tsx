@@ -194,7 +194,7 @@ const WorkloadPage = () => {
 
             <Popconfirm
               placement="topRight"
-              title={`确认要删除${r.objectMeta.name}工作负载么`}
+              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('627ce40030fcda39210cca054bb77775', '工作负载么')}`}
               onConfirm={async () => {
                 // todo after delete, need to wait until resource deleted
                 const ret = await DeleteResource({
@@ -218,16 +218,16 @@ const WorkloadPage = () => {
       },
     },
   ];
-
   const [messageApi, messageContextHolder] = message.useMessage();
-
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
         <div>
           <Segmented
             value={filter.kind}
-            style={{ marginBottom: 8 }}
+            style={{
+              marginBottom: 8,
+            }}
             onChange={(value) => {
               // reset filter when switch workload kind
               const k = value as WorkloadKind;
@@ -321,12 +321,16 @@ const WorkloadPage = () => {
               ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0')
               : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191');
           if (ret.code === 200) {
-            await messageApi.success(`工作负载${msg}成功`);
+            await messageApi.success(
+              `${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}${msg}${i18nInstance.t('330363dfc524cff2488f2ebde0500896', '成功')}`,
+            );
             toggleShowModal(false);
             resetEditorState();
             await refetch();
           } else {
-            await messageApi.error(`工作负载${msg}失败`);
+            await messageApi.error(
+              `工作负载${msg}${i18nInstance.t('acd5cb847a4aff235c9a01ddeb6f9770', '失败')}`,
+            );
           }
         }}
         onCancel={() => {
@@ -354,5 +358,4 @@ const WorkloadPage = () => {
     </Panel>
   );
 };
-
 export default WorkloadPage;

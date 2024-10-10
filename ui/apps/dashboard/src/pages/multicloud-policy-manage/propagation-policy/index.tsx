@@ -24,9 +24,7 @@ import PropagationPolicyEditorDrawer, {
 } from './propagation-policy-editor-drawer';
 import { stringify } from 'yaml';
 import { GetResource } from '@/services/unstructured.ts';
-
 export type PolicyScope = 'namespace-scope' | 'cluster-scope';
-
 const PropagationPolicyManage = () => {
   const [policyScope, setPolicyScope] =
     useState<PolicyScope>('namespace-scope');
@@ -152,7 +150,7 @@ const PropagationPolicyManage = () => {
             </Button>
             <Popconfirm
               placement="topRight"
-              title={`确认要删除${r.objectMeta.name}调度策略么`}
+              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('aa141bcb65729912b79cb27995a8989b', '调度策略么')}`}
               onConfirm={async () => {
                 const ret = await DeletePropagationPolicy({
                   isClusterScope: policyScope === 'cluster-scope',
@@ -182,9 +180,7 @@ const PropagationPolicyManage = () => {
       },
     },
   ];
-
   const [messageApi, messageContextHolder] = message.useMessage();
-
   function resetEditorDrawerData() {
     setEditorDrawerData({
       open: false,
@@ -194,12 +190,13 @@ const PropagationPolicyManage = () => {
       propagationContent: '',
     });
   }
-
   return (
     <Panel>
       <Segmented
         value={policyScope}
-        style={{ marginBottom: 8 }}
+        style={{
+          marginBottom: 8,
+        }}
         onChange={(value) => setPolicyScope(value as PolicyScope)}
         options={[
           {
@@ -258,20 +255,28 @@ const PropagationPolicyManage = () => {
         }}
         onCreate={async (ret) => {
           if (ret.code === 200) {
-            await messageApi.success(`新增调度策略成功`);
+            await messageApi.success(
+              `${i18nInstance.t('8233550b23ab7acc2a9c3b2623c371dd', '新增调度策略成功')}`,
+            );
             resetEditorDrawerData();
             await refetch();
           } else {
-            await messageApi.error(`新增调度策略失败`);
+            await messageApi.error(
+              `${i18nInstance.t('40eae6f51d50abb0f0132d7638682093', '新增调度策略失败')}`,
+            );
           }
         }}
         onUpdate={async (ret) => {
           if (ret.code === 200) {
-            await messageApi.success(`编辑调度策略成功`);
+            await messageApi.success(
+              `${i18nInstance.t('f2224910b0d022374967254002eb756f', '编辑调度策略成功')}`,
+            );
             resetEditorDrawerData();
             await refetch();
           } else {
-            await messageApi.error(`编辑调度策略失败`);
+            await messageApi.error(
+              `${i18nInstance.t('5863fd1d291adf46d804f5801a79d0e1', '编辑调度策略失败')}`,
+            );
           }
         }}
       />
@@ -280,5 +285,4 @@ const PropagationPolicyManage = () => {
     </Panel>
   );
 };
-
 export default PropagationPolicyManage;

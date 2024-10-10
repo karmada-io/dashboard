@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import { Button, Popconfirm, Space, Table, TableColumnProps, Tag } from 'antd';
 import TagList from '@/components/tag-list';
 import { FC } from 'react';
@@ -5,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { GetResource } from '@/services/unstructured.ts';
 import { Config, GetConfigMaps } from '@/services/config.ts';
 import { extractPropagationPolicy } from '@/services/base.ts';
-
 interface ConfigMapTableProps {
   labelTagNum?: number;
   selectedWorkSpace: string;
@@ -14,7 +14,6 @@ interface ConfigMapTableProps {
   onEditConfigMapContent: (r: any) => void;
   onDeleteConfigMapContent: (r: Config) => void;
 }
-
 const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
   const {
     labelTagNum,
@@ -26,7 +25,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
   } = props;
   const columns: TableColumnProps<Config>[] = [
     {
-      title: '命名空间',
+      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -34,7 +33,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       },
     },
     {
-      title: '配置名称',
+      title: i18nInstance.t('4fcad1c9ba0732214679e13bd69d998b', '配置名称'),
       key: 'configmapName',
       width: 300,
       render: (_, r) => {
@@ -42,7 +41,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       },
     },
     {
-      title: '标签信息',
+      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd', '标签信息'),
       key: 'labelName',
       align: 'left',
       width: '30%',
@@ -60,7 +59,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       },
     },
     {
-      title: '分发策略',
+      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619', '分发策略'),
       key: 'propagationPolicies',
       render: (_, r) => {
         const pp = extractPropagationPolicy(r);
@@ -68,7 +67,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       },
     },
     {
-      title: '覆盖策略',
+      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f', '覆盖策略'),
       key: 'overridePolicies',
       width: 150,
       render: () => {
@@ -76,7 +75,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       },
     },
     {
-      title: '操作',
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
       key: 'op',
       width: 200,
       render: (_, r) => {
@@ -94,7 +93,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
                 onViewConfigMapContent(ret?.data);
               }}
             >
-              查看
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
             </Button>
             <Button
               size={'small'}
@@ -108,20 +107,26 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
                 onEditConfigMapContent(ret?.data);
               }}
             >
-              编辑
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
 
             <Popconfirm
               placement="topRight"
-              title={`确认要删除${r.objectMeta.name}配置么`}
+              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('944bfddeffc83e54cc6920f281d9b9f3', '配置么')}`}
               onConfirm={() => {
                 onDeleteConfigMapContent(r);
               }}
-              okText={'确认'}
-              cancelText={'取消'}
+              okText={i18nInstance.t(
+                'e83a256e4f5bb4ff8b3d804b5473217a',
+                '确认',
+              )}
+              cancelText={i18nInstance.t(
+                '625fb26b4b3340f7872b411f401e754c',
+                '取消',
+              )}
             >
               <Button size={'small'} type="link" danger>
-                删除
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
               </Button>
             </Popconfirm>
           </Space.Compact>
@@ -150,5 +155,4 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
     />
   );
 };
-
 export default ConfigMapTable;

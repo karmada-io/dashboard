@@ -17,7 +17,6 @@ export interface PropagationPolicyEditorDrawerProps {
   onUpdate: (ret: IResponse<string>) => void;
   onCreate: (ret: IResponse<string>) => void;
 }
-
 function getTitle(
   mode: PropagationPolicyEditorDrawerProps['mode'],
   name: string = '',
@@ -26,14 +25,13 @@ function getTitle(
     case 'create':
       return i18nInstance.t('5ac6560da4f54522d590c5f8e939691b');
     case 'edit':
-      return `编辑${name}调度策略`;
+      return `${i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}${name}${i18nInstance.t('a95abe7b8eeb55427547e764bf39f1c4', '调度策略')}`;
     case 'detail':
-      return `${name}策略详情`;
+      return `${name}${i18nInstance.t('f05bc327e4066ca97af893e52e2c62b3', '策略详情')}`;
     default:
       return '';
   }
 }
-
 const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
   props,
 ) => {
@@ -51,20 +49,18 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
   useEffect(() => {
     setContent(propagationContent || '');
   }, [propagationContent]);
-
-  function handleEditorChange(
-    value: string | undefined,
-  ) {
+  function handleEditorChange(value: string | undefined) {
     setContent(value || '');
   }
-
   return (
     <Drawer
       open={open}
       title={getTitle(mode, name)}
       width={800}
       styles={{
-        body: { padding: 0 },
+        body: {
+          padding: 0,
+        },
       }}
       onClose={onClose}
       footer={

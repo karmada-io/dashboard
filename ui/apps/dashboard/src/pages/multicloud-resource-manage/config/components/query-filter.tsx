@@ -1,17 +1,19 @@
+import i18nInstance from '@/utils/i18n';
 import { Button, Input, Segmented, Select } from 'antd';
 import { Icons } from '@/components/icons';
 import { FC } from 'react';
 import { FilterState } from '../types';
 import { ConfigKind } from '@/services/base.ts';
-
 interface QueryFilterProps {
   filter: FilterState;
   setFilter: (d: Partial<FilterState>) => void;
   onNewConfig: () => void;
-  nsOptions: { title: string; value: string }[];
+  nsOptions: {
+    title: string;
+    value: string;
+  }[];
   isNsDataLoading: boolean;
 }
-
 const QueryFilter: FC<QueryFilterProps> = (props) => {
   const { filter, setFilter, onNewConfig, nsOptions, isNsDataLoading } = props;
   return (
@@ -20,7 +22,9 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
         <div>
           <Segmented
             value={filter.kind}
-            style={{ marginBottom: 8 }}
+            style={{
+              marginBottom: 8,
+            }}
             onChange={(value) => {
               // reset filter when switch workload kind
               const k = value as ConfigKind;
@@ -54,11 +58,15 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
           className="flex flex-row items-center"
           onClick={onNewConfig}
         >
-          {filter.kind === ConfigKind.ConfigMap ? '新增配置' : '新增秘钥'}
+          {filter.kind === ConfigKind.ConfigMap
+            ? i18nInstance.t('80e2ca37eabd710ead8581de48a54fed', '新增配置')
+            : i18nInstance.t('12f9985489b76f8cd0775f5757b293d4', '新增秘钥')}
         </Button>
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
-        <h3 className={'leading-[32px]'}>命名空间</h3>
+        <h3 className={'leading-[32px]'}>
+          {i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}
+        </h3>
         <Select
           options={nsOptions}
           className={'min-w-[200px]'}
@@ -74,7 +82,10 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
           }}
         />
         <Input.Search
-          placeholder={'按名称搜索'}
+          placeholder={i18nInstance.t(
+            '6fb6674001277533ddf8fa605a981009',
+            '按名称搜索',
+          )}
           className={'w-[300px]'}
           value={filter.searchText}
           onChange={(e) => {
@@ -96,5 +107,4 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
     </>
   );
 };
-
 export default QueryFilter;
