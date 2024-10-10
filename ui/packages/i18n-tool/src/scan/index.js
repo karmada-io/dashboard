@@ -5,6 +5,7 @@ const {getDebug, parseFiles, buildLocalFilename} = require('../utils')
 const {getDefaultOptions, parseI18nConfig} = require('../options')
 const {processAST, generateCode} = require('./ast')
 const {translate, updateLocale} = require('./translate')
+const {initGlossaries} = require('./glossary');
 const debug = getDebug('scan');
 
 async function scan(cmdOptions) {
@@ -52,11 +53,6 @@ async function scan(cmdOptions) {
     }
 
     const cnLocalePath = buildLocalFilename(options.localesDir, options.originLang)
-    let existingData = {}
-    if (needUpdateLocale) {
-        existingData = JSON.parse(fs.readFileSync(cnLocalePath, 'utf8'));
-    }
-
 
     const prettierConfig = await prettier.resolveConfig(path.join(process.cwd(), '.prettierrc'));
 
@@ -79,11 +75,34 @@ async function scan(cmdOptions) {
             }
         }
     }
+
+    // intercept updatedData
+    // for scenario of glossary, the i18n-tool should use translation in glossary first
+    const glossaryFilePath = path.join(options.localesDir, `glossaries.csv`)
+    debug("glossaryFilePath is %s", glossaryFilePath)
+    const glossaryData = initGlossaries(glossaryFilePath)
+    debug('glossaryData is %O', glossaryData);
+    /*
+    {
+        "zh-CN": {
+            updatedData but remove zh-CN column glossaries
+        },
+        "en-US": {
+            updatedData but remove en-US column glossaries
+        }
+    }
+    */
+    const groupedGlossaryData = {}
+    for (const key of Object.keys(glossaryData)) {
+        const tmp = glossaryData[key];
+        for (const lang of Object.keys(tmp)) {
+            groupedGlossaryData[lang] = groupedGlossaryData[lang] || {}
+            groupedGlossaryData[lang][key] = tmp[lang]
+        }
+    }
+    debug('groupedGlossaryData is %O', groupedGlossaryData);
     if (needUpdateLocale) {
-        fs.writeFileSync(cnLocalePath, JSON.stringify({
-            ...existingData,
-            ...updatedData,
-        }))
+        updateLocale(cnLocalePath, updatedData, groupedGlossaryData['zh-CN'])
     }
 
     if (needUpdateLocale) {
@@ -97,7 +116,7 @@ async function scan(cmdOptions) {
                 from: options.originLang,
                 to: targetLang
             })
-            updateLocale(targetLocalePath, targetLangLocale)
+            updateLocale(targetLocalePath, targetLangLocale, groupedGlossaryData[targetLang])
         }
     }
 
