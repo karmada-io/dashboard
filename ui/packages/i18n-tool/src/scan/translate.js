@@ -1,9 +1,11 @@
 const fs = require("node:fs");
 const translators = require('@karmada/translators')
+const {getDebug} = require("../utils");
 const {BaiduTranslator, DeepLTranslator, OpenAITranslator} = translators;
-
+const debug = getDebug('translate');
 
 async function translate(i18nMap, translateOpts) {
+    debug("translateOpts: %O", translateOpts)
     const translator = initTranslator(translateOpts);
 
     const i18nMapKeys = Object.keys(i18nMap);
