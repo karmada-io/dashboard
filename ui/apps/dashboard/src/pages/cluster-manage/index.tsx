@@ -23,7 +23,6 @@ import {
 import { Icons } from '@/components/icons';
 import NewClusterModal from './new-cluster-modal';
 import { useState } from 'react';
-
 function getPercentColor(v: number): string {
   // 0~60 #52C41A
   // 60~80 #FAAD14
@@ -36,7 +35,6 @@ function getPercentColor(v: number): string {
     return '#F5222D';
   }
 }
-
 const ClusterManagePage = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
   const { data, isLoading, refetch } = useQuery({
@@ -82,14 +80,30 @@ const ClusterManagePage = () => {
           return (
             <Badge
               color={'green'}
-              text={<span style={{ color: '#52c41a' }}>ready</span>}
+              text={
+                <span
+                  style={{
+                    color: '#52c41a',
+                  }}
+                >
+                  ready
+                </span>
+              }
             />
           );
         } else {
           return (
             <Badge
               color={'red'}
-              text={<span style={{ color: '#f5222d' }}>not ready</span>}
+              text={
+                <span
+                  style={{
+                    color: '#f5222d',
+                  }}
+                >
+                  not ready
+                </span>
+              }
             />
           );
         }
@@ -183,11 +197,13 @@ const ClusterManagePage = () => {
             </Button>
             <Popconfirm
               placement="topRight"
-              title={`确认要删除${r.objectMeta.name}集群么?`}
+              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('79d5c80e3be24682145aa9246df18b40', '集群么?')}`}
               onConfirm={async () => {
                 const ret = await DeleteCluster(r.objectMeta.name);
                 if (ret.code === 200) {
-                  await messageApi.success(`集群${r.objectMeta.name}删除成功`);
+                  await messageApi.success(
+                    `${i18nInstance.t('85fe5099f6807dada65d274810933389', '集群')}${r.objectMeta.name}${i18nInstance.t('0007d170de017dafc266aa03926d7f00', '删除成功')}`,
+                  );
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -207,7 +223,6 @@ const ClusterManagePage = () => {
       },
     },
   ];
-
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
@@ -282,5 +297,4 @@ const ClusterManagePage = () => {
     </Panel>
   );
 };
-
 export default ClusterManagePage;
