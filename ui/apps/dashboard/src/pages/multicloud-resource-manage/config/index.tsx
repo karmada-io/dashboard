@@ -1,3 +1,4 @@
+import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { ConfigKind } from '@/services/base.ts';
 import QueryFilter from './components/query-filter';
@@ -10,7 +11,6 @@ import { message } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
-
 const ConfigPage = () => {
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
@@ -64,7 +64,12 @@ const ConfigPage = () => {
                 namespace: r.objectMeta.namespace,
               });
               if (ret.code !== 200) {
-                await messageApi.error('删除配置失败');
+                await messageApi.error(
+                  i18nInstance.t(
+                    'f8484c9d3de78566f9e255360977f12c',
+                    '删除配置失败',
+                  ),
+                );
               }
               await queryClient.invalidateQueries({
                 queryKey: ['GetConfigMaps'],
@@ -95,7 +100,12 @@ const ConfigPage = () => {
                 namespace: r.objectMeta.namespace,
               });
               if (ret.code !== 200) {
-                await messageApi.error('删除秘钥失败');
+                await messageApi.error(
+                  i18nInstance.t(
+                    '1de397f628eb5943bdb6861ad667ff0a',
+                    '删除秘钥失败',
+                  ),
+                );
               }
               await queryClient.invalidateQueries({
                 queryKey: ['GetSecrets'],
@@ -118,10 +128,14 @@ const ConfigPage = () => {
             hideEditor();
             return;
           }
-
-          const msg = editor.mode === 'edit' ? '修改' : '新增';
+          const msg =
+            editor.mode === 'edit'
+              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0', '修改')
+              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增');
           if (ret.code === 200) {
-            await messageApi.success(`${msg}配置成功`);
+            await messageApi.success(
+              `${msg}${i18nInstance.t('a6d38572262cb1b1238d449b4098f002', '配置成功')}`,
+            );
             hideEditor();
             if (editor.mode === 'create') {
               await queryClient.invalidateQueries({
@@ -130,7 +144,9 @@ const ConfigPage = () => {
               });
             }
           } else {
-            await messageApi.error(`${msg}配置失败`);
+            await messageApi.error(
+              `${msg}${i18nInstance.t('03d3b00687bbab3e9a7e1bd3aeeaa0a4', '配置失败')}`,
+            );
           }
         }}
         onCancel={hideEditor}
@@ -139,5 +155,4 @@ const ConfigPage = () => {
     </Panel>
   );
 };
-
 export default ConfigPage;
