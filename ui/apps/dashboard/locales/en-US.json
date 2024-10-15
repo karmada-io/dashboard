@@ -125,7 +125,7 @@
   "3b0b5df2e18ef97b7f948c60906a7821": "Cluster access failure",
   "01812e386ab69ce4391769918e32d6d1": "Cluster update failed",
   "aba41769112ffcc08cb563e29f460770": "Select the kubeconfig file",
-  "03743b3522b7d69da1cdc44d7418ce4d": "I'm a bit tired, give it a try to refresh",
+  "03743b3522b7d69da1cdc44d7418ce4d": "An error occurred, please refresh and try again",
   "fc763fd5ddf637fe4ba1ac59e10b8d3a": "Confirm to delete",
   "627ce40030fcda39210cca054bb77775": "Is it a workload",
   "330363dfc524cff2488f2ebde0500896": "success",
