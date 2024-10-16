@@ -258,6 +258,14 @@ const WorkloadPage = () => {
                 label: 'Daemonset',
                 value: WorkloadKind.Daemonset,
               },
+              {
+                label: 'Cronjob',
+                value: WorkloadKind.Cronjob,
+              },
+              {
+                label: 'Job',
+                value: WorkloadKind.Job,
+              },
             ]}
           />
         </div>
@@ -315,6 +323,7 @@ const WorkloadPage = () => {
         mode={editorState.mode}
         workloadContent={editorState.content}
         open={showModal}
+        kind={filter.kind}
         onOk={async (ret) => {
           const msg =
             editorState.mode === 'edit'
