@@ -151,5 +151,7 @@
   "f2224910b0d022374967254002eb756f": "Successfully edited scheduling strategy",
   "5863fd1d291adf46d804f5801a79d0e1": "Editing scheduling strategy failed",
   "79d5c80e3be24682145aa9246df18b40": "Is it a cluster?",
-  "85fe5099f6807dada65d274810933389": "Cluster"
+  "85fe5099f6807dada65d274810933389": "Cluster",
+  "c7961c290ec86485d8692f3c09b4075b": "New services added",
+  "8f3747c057d893862fbe4b7980e9b451": "Service Name"
 }
