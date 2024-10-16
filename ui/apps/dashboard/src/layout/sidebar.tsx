@@ -9,7 +9,7 @@ import {
 import { useMatches, useNavigate } from 'react-router-dom';
 import { FC, useMemo } from 'react';
 import _ from 'lodash';
-import { getSidebarWidth } from '@/utils/i18n.tsx';
+import { getSidebarWidth } from '@/utils/i18n';
 import { cn } from '@/utils/cn.ts';
 import { useQuery } from '@tanstack/react-query';
 import { GetDashboardConfig, menuConfig } from '@/services/dashboard-config.ts';
