@@ -9,6 +9,7 @@ type ResourceKind string
 const (
 	ResourceKindCluster                  = "cluster"
 	ResourceKindPropagationPolicy        = "propagationpolicy"
+	ResourceKindClusterPropagationPolicy = "clusterpropagationpolicy"
 	ResourceKindConfigMap                = "configmap"
 	ResourceKindDaemonSet                = "daemonset"
 	ResourceKindDeployment               = "deployment"
