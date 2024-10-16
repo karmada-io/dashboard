@@ -162,6 +162,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
         className={styles['schedule-container']}
       >
         <Table
+          rowKey={(e) => e.objectMeta.uid}
           columns={columns}
           pagination={false}
           dataSource={eventsData?.events || []}

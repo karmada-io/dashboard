@@ -1,26 +1,28 @@
 import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
-import { Modal } from 'antd';
+import { Form, Modal, Select } from 'antd';
 import Editor from '@monaco-editor/react';
-import { parse, stringify } from 'yaml';
+import { parse } from 'yaml';
 import _ from 'lodash';
-import { PutResource } from '@/services/unstructured';
-import { CreateDeployment } from '@/services/workload';
-import { IResponse } from '@/services/base.ts';
+import { CreateResource, PutResource } from '@/services/unstructured';
+import { IResponse, WorkloadKind } from '@/services/base.ts';
 export interface NewWorkloadEditorModalProps {
   mode: 'create' | 'edit';
   open: boolean;
+  kind: WorkloadKind;
   workloadContent?: string;
   onOk: (ret: IResponse<any>) => Promise<void>;
   onCancel: () => Promise<void> | void;
 }
+
 const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
-  const { mode, open, workloadContent = '', onOk, onCancel } = props;
+  const { mode, open, workloadContent = '', onOk, onCancel, kind } = props;
   const [content, setContent] = useState<string>(workloadContent);
   useEffect(() => {
     console.log('workloadContent', workloadContent);
     setContent(workloadContent);
   }, [workloadContent]);
+
   function handleEditorChange(value: string | undefined) {
     setContent(value || '');
   }
@@ -40,15 +42,15 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
           const namespace = _.get(yamlObject, 'metadata.namespace');
           const name = _.get(yamlObject, 'metadata.name');
           if (mode === 'create') {
-            if (kind.toLowerCase() === 'deployment') {
-              const ret = await CreateDeployment({
-                namespace,
-                name,
-                content: stringify(yamlObject),
-              });
-              await onOk(ret);
-              setContent('');
-            }
+            const ret = await CreateResource({
+              kind,
+              name,
+              namespace,
+              content: yamlObject,
+            });
+            console.log('ret', ret);
+            await onOk(ret);
+            setContent('');
           } else {
             const ret = await PutResource({
               kind,
@@ -68,14 +70,46 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
         setContent('');
       }}
     >
+      <Form.Item label={'工作负载类型'}>
+        <Select
+          value={kind}
+          disabled
+          options={[
+            {
+              label: 'Deployment',
+              value: WorkloadKind.Deployment,
+            },
+            {
+              label: 'Statefulset',
+              value: WorkloadKind.Statefulset,
+            },
+            {
+              label: 'Daemonset',
+              value: WorkloadKind.Daemonset,
+            },
+            {
+              label: 'Cronjob',
+              value: WorkloadKind.Cronjob,
+            },
+            {
+              label: 'Job',
+              value: WorkloadKind.Job,
+            },
+          ]}
+          style={{
+            width: 200,
+          }}
+        />
+      </Form.Item>
       <Editor
         height="600px"
         defaultLanguage="yaml"
         value={content}
-        theme="vs-dark"
+        theme="vs"
         options={{
-          theme: 'vs-dark',
+          theme: 'vs',
           lineNumbers: 'on',
+          fontSize: 15,
           minimap: {
             enabled: false,
           },
