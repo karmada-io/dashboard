@@ -75,6 +75,12 @@ export enum WorkloadKind {
   Job = 'job',
 }
 
+export enum ServiceKind {
+  Unknown = '',
+  Ingress = 'ingress',
+  Service = 'service',
+}
+
 export enum ConfigKind {
   Unknown = '',
   Secret = 'secret',
