@@ -3,22 +3,26 @@ package client
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strings"
+
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
-	"os"
 )
 
 var (
-	kubernetesRestConfig               *rest.Config
-	kubernetesApiConfig                *clientcmdapi.Config
-	inClusterClient                    kubeclient.Interface
-	karmadaRestConfig                  *rest.Config
-	karmadaApiConfig                   *clientcmdapi.Config
-	inClusterKarmadaClient             karmadaclientset.Interface
-	inClusterClientForKarmadaApiServer kubeclient.Interface
+	kubernetesRestConfig                  *rest.Config
+	kubernetesApiConfig                   *clientcmdapi.Config
+	inClusterClient                       kubeclient.Interface
+	karmadaRestConfig                     *rest.Config
+	karmadaApiConfig                      *clientcmdapi.Config
+	inClusterKarmadaClient                karmadaclientset.Interface
+	inClusterClientForKarmadaApiServer    kubeclient.Interface
+	inClusterClientForKarmadactlApiServer kubeclient.Interface
+	clusterHost                           string
 )
 
 type configBuilder struct {
@@ -185,6 +189,8 @@ func InitKarmadaConfig(options ...Option) {
 		os.Exit(1)
 	}
 	karmadaApiConfig = apiConfig
+
+	clusterHost = karmadaRestConfig.Host
 }
 
 func InClusterKarmadaClient() karmadaclientset.Interface {
@@ -231,6 +237,29 @@ func InClusterClientForKarmadaApiServer() kubeclient.Interface {
 	}
 	inClusterClientForKarmadaApiServer = c
 	return inClusterClientForKarmadaApiServer
+}
+
+func InClusterClientForKarmadactlApiServer(clustername string) kubeclient.Interface {
+	if !isKarmadaInitialized() {
+		return nil
+	}
+	karmadaCtlRestConfig, _, err := GetKarmadaConfig()
+	if strings.Contains(karmadaCtlRestConfig.Host, clustername) {
+		return inClusterClientForKarmadactlApiServer
+	} else {
+		karmadaCtlRestConfig.Host = clusterHost + "/apis/cluster.karmada.io/v1alpha1/clusters/" + clustername + "/proxy"
+	}
+	if err != nil {
+		klog.ErrorS(err, "Could not get karmadactl restConfig")
+		return nil
+	}
+	c, err := kubeclient.NewForConfig(karmadaCtlRestConfig)
+	if err != nil {
+		klog.ErrorS(err, "Could not init kubernetes in-cluster client for karmadactl apiserver")
+		return nil
+	}
+	inClusterClientForKarmadactlApiServer = c
+	return inClusterClientForKarmadactlApiServer
 }
 
 func ConvertRestConfigToAPIConfig(restConfig *rest.Config) *clientcmdapi.Config {
