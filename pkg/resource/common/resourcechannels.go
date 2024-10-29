@@ -441,6 +441,26 @@ type NodeListChannel struct {
 	Error chan error
 }
 
+// GetNodeListChannel returns a pair of channels to a Node list and errors that both must be read
+// numReads times.
+func GetNodeListChannel(client client.Interface, numReads int) NodeListChannel {
+
+	channel := NodeListChannel{
+		List:  make(chan *v1.NodeList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		list, err := client.CoreV1().Nodes().List(context.TODO(), helpers.ListEverything)
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
+}
+
 // NamespaceListChannel is a list and error channels to Namespaces.
 type NamespaceListChannel struct {
 	List  chan *v1.NamespaceList
