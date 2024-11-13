@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv, Plugin } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
@@ -19,7 +19,6 @@ const replacePathPrefixPlugin = (): Plugin => {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
   return {
     base: process.env.NODE_ENV === 'development' ? '' : '/static',
     build: {
@@ -36,7 +35,7 @@ export default defineConfig(({ mode }) => {
       // Put the Sentry vite plugin after all other plugins
       sentryVitePlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
-        org: 'spotty-23',
+        org: 'karmada-community',
         project: 'karmada-dashboard',
       }),
     ],

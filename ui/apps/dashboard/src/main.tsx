@@ -14,7 +14,7 @@ import { initRoute } from '@/routes/route.tsx';
 import * as Sentry from '@sentry/react';
 
 Sentry.init({
-  dsn: 'https://5edc679922b621e4ea52b1f66f24f48d@o4507968956268544.ingest.us.sentry.io/4507968984711168',
+  dsn: 'https://11deae085432e4e68dc5dccf6d79162b@o4508215039623168.ingest.us.sentry.io/4508215089496064',
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
