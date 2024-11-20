@@ -25,6 +25,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/ingress"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/job"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/node"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"

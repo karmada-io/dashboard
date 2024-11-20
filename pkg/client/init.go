@@ -3,13 +3,17 @@ package client
 import (
 	"errors"
 	"fmt"
+	"os"
+	"sync"
+
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
-	"os"
 )
+
+const proxyURL = "/apis/cluster.karmada.io/v1alpha1/clusters/%s/proxy/"
 
 var (
 	kubernetesRestConfig               *rest.Config
@@ -17,8 +21,11 @@ var (
 	inClusterClient                    kubeclient.Interface
 	karmadaRestConfig                  *rest.Config
 	karmadaApiConfig                   *clientcmdapi.Config
+	karmadaMemberConfig                *rest.Config
 	inClusterKarmadaClient             karmadaclientset.Interface
 	inClusterClientForKarmadaApiServer kubeclient.Interface
+	inClusterClientForMemberApiServer  kubeclient.Interface
+	memberClients                      sync.Map
 )
 
 type configBuilder struct {
@@ -185,6 +192,13 @@ func InitKarmadaConfig(options ...Option) {
 		os.Exit(1)
 	}
 	karmadaApiConfig = apiConfig
+
+	memberConfig, err := builder.buildRestConfig()
+	if err != nil {
+		klog.Errorf("Could not init member config: %s", err)
+		os.Exit(1)
+	}
+	karmadaMemberConfig = memberConfig
 }
 
 func InClusterKarmadaClient() karmadaclientset.Interface {
@@ -212,6 +226,13 @@ func GetKarmadaConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	return karmadaRestConfig, karmadaApiConfig, nil
 }
 
+func GetMemberConfig() (*rest.Config, error) {
+	if !isKarmadaInitialized() {
+		return nil, fmt.Errorf("client package not initialized")
+	}
+	return karmadaMemberConfig, nil
+}
+
 func InClusterClientForKarmadaApiServer() kubeclient.Interface {
 	if !isKarmadaInitialized() {
 		return nil
@@ -231,6 +252,43 @@ func InClusterClientForKarmadaApiServer() kubeclient.Interface {
 	}
 	inClusterClientForKarmadaApiServer = c
 	return inClusterClientForKarmadaApiServer
+}
+
+func InClusterClientForMemberCluster(clusterName string) kubeclient.Interface {
+	if !isKarmadaInitialized() {
+		return nil
+	}
+
+	// Load and return Interface for member apiserver if already exist
+	if value, ok := memberClients.Load(clusterName); ok {
+		if inClusterClientForMemberApiServer, ok = value.(kubeclient.Interface); ok {
+			return inClusterClientForMemberApiServer
+		} else {
+			klog.Error("Could not get client for member apiserver")
+			return nil
+		}
+	}
+
+	// Client for new member apiserver
+	restConfig, _, err := GetKarmadaConfig()
+	if err != nil {
+		klog.ErrorS(err, "Could not get karmada restConfig")
+		return nil
+	}
+	memberConfig, err := GetMemberConfig()
+	if err != nil {
+		klog.ErrorS(err, "Could not get member restConfig")
+		return nil
+	}
+	memberConfig.Host = restConfig.Host + fmt.Sprintf(proxyURL, clusterName)
+	c, err := kubeclient.NewForConfig(memberConfig)
+	if err != nil {
+		klog.ErrorS(err, "Could not init kubernetes in-cluster client for member apiserver")
+		return nil
+	}
+	inClusterClientForMemberApiServer = c
+	memberClients.Store(clusterName, inClusterClientForMemberApiServer)
+	return inClusterClientForMemberApiServer
 }
 
 func ConvertRestConfigToAPIConfig(restConfig *rest.Config) *clientcmdapi.Config {
