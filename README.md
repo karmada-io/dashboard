@@ -21,6 +21,8 @@ In the following steps, we assumed that you follow this tutorial to set up a min
 
 1.Switch user-context to karmada-host
 
+> karmada-host means that you are deploying Karmada with the kubeconfig for the Karmada host cluster.
+
 ```bash
 export KUBECONFIG="$HOME/.kube/karmada.config"
 kubectl config use-context karmada-host
@@ -37,20 +39,20 @@ You still need the jwt token to login to the dashboard.
 
 3.Create Service Account
 
-switch user-context to karmada-apiserver:
+switch user-context to karmada-apiserver, it is important to note the configuration switching of kubeconfig:
 ```bash
-kubectl config use-context karmada-apiserver
+kubectl config use-context karmada-apiserver --kubeconfig=/etc/karmada/karmada-apiserver.config
 ```
 Create Service Account:
 ```bash
-kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
+kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml --kubeconfig=/etc/karmada/karmada-apiserver.config
 ```
 
 4.Get jwt token
 
 Execute the following code to get the jwt token:
 ```bash
-kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}"
+kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}" --kubeconfig=/etc/karmada/karmada-apiserver.config
 ```
 
 it should print results like this:
@@ -61,7 +63,7 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6InZLdkRNclVZSFB6SUVXczBIRm8zMDBxOHFOanQxbWU4WUk1VVVp
 ### Login Dashboard
 Now open Karmada-dashboard with url [http://your-karmada-host:32000 ]()
 
-copy the token you just generated and paste it into the Enter token field on the login page. 
+copy the token you just generated and paste it into the Enter token field on the login page.
 ![image](docs/images/readme-login-en.png)
 Once the process of authentication passed, you can use karmada dashboard freely. You can follow the Usage of karmada-dashboard to have a quick experience of  karmada dashboard.
 
@@ -77,7 +79,7 @@ Resources:
 - [Meeting Link](https://zoom.us/j/97070047574?pwd=lXha0Sqngw4mwtmArP1sjsLMMXk34z.1)
 
 ## 💻Contributing
-Karmada dashboard is still catching up with the features of Karmada, we have only implemented the basic functionalities currently. 
+Karmada dashboard is still catching up with the features of Karmada, we have only implemented the basic functionalities currently.
 If you want to contribute to the development of the Karmada dashboard, you can refer to the document of development, we are happy to see more contributors join us.
 Please feel free to submit issues or pull requests to our repository.
 
