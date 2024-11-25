@@ -28,3 +28,7 @@ charts/*/charts
 cmd/ops
 .turbo
 .dockerconfigjson
+
+#local db files
+*.db
+*.db-journal
