@@ -30,6 +30,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overridepolicy"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/metrics"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/secret"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/service"
