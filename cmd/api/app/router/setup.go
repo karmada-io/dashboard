@@ -8,6 +8,7 @@ import (
 var (
 	router *gin.Engine
 	v1     *gin.RouterGroup
+	member *gin.RouterGroup
 )
 
 func init() {
@@ -18,6 +19,7 @@ func init() {
 	router = gin.Default()
 	_ = router.SetTrustedProxies(nil)
 	v1 = router.Group("/api/v1")
+	member = v1.Group("/member/:clustername")
 
 	router.GET("/livez", func(c *gin.Context) {
 		c.String(200, "livez")
@@ -33,4 +35,8 @@ func V1() *gin.RouterGroup {
 
 func Router() *gin.Engine {
 	return router
+}
+
+func MemberV1() *gin.RouterGroup {
+	return member
 }

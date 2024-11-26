@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+
 	"github.com/gin-gonic/gin"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
@@ -28,6 +29,6 @@ func handleGetClusterNode(c *gin.Context) {
 }
 
 func init() {
-	r := router.V1()
-	r.GET("/member/:clustername/node", handleGetClusterNode)
+	r := router.MemberV1()
+	r.GET("/node", handleGetClusterNode)
 }
