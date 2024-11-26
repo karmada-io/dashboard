@@ -14,6 +14,7 @@ import (
 	"k8s.io/klog/v2"
 	"net/http"
 	"os"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
 
 // NewMetricsScraperCommand creates a *cobra.Command object with default parameters
@@ -77,3 +78,23 @@ func serve(opts *options.Options) {
 		klog.Fatal(router.Router().Run(insecureAddress))
 	}()
 }
+
+func init() {
+	go scrape.InitDatabase()
+	// Initialize the router with modified endpoints
+	r := router.V1()
+	r.GET("/metrics", scrape.GetMetrics)
+	r.GET("/metrics/:app_name", scrape.GetMetrics)
+	r.GET("/metrics/:app_name/:pod_name", scrape.QueryMetrics)
+}
+
+// http://localhost:8000/api/v1/metrics/karmada-scheduler  //from terminal
+
+// http://localhost:8000/api/v1/metrics/karmada-scheduler?type=metricsdetails  //from sqlite details bar
+
+// http://localhost:8000/api/v1/metrics/karmada-scheduler/karmada-scheduler-7bd4659f9f-hh44f?type=details&mname=workqueue_queue_duration_seconds
+
+// http://localhost:8000/api/v1/metrics?type=sync_off // to skip all metrics
+
+// http://localhost:8000/api/v1/metrics/karmada-scheduler?type=sync_off // to skip specific metrics
+
