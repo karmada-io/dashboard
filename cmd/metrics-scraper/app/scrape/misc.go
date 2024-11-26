@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"log"
+	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 // Mname retrieves distinct metric names from the database.
@@ -126,5 +129,93 @@ func MetricsDetails(appName string) (map[string]map[string]interface{}, error) {
 	}
 
 	return result, nil
+}
+ 
+
+func QueryMetrics(c *gin.Context) {
+	appName := c.Param("app_name")
+	podName := c.Param("pod_name")
+	queryType := c.Query("type")  // Use a query parameter to determine the action
+	metricName := c.Query("mname")  // Optional: only needed for details
+
+	sanitizedAppName := strings.ReplaceAll(appName, "-", "_")
+	sanitizedPodName := strings.ReplaceAll(podName, "-", "_")
+
+	db, err := GetDB(sanitizedAppName)
+	if err != nil {
+		log.Printf("Error getting database connection: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open database"})
+		return
+	}
+	defer db.Close()
+
+	switch queryType {
+	case "mname":
+		metricNames, err := Mname(db, sanitizedPodName)
+		if err != nil {
+			log.Printf("Error retrieving metric names: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve metric names"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"metricNames": metricNames})
+
+	case "details":
+		if metricName == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
+			return
+		}
+		details, err := Details(db, sanitizedPodName, metricName)
+		if err != nil {
+			log.Printf("Error retrieving metric details: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve metric details"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"details": details})
+
+	case "metricsdetails":
+		result, err := MetricsDetails(sanitizedAppName)
+		if err != nil {
+			log.Printf("Error retrieving metrics details: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve metrics details"})
+			return
+		}
+		c.JSON(http.StatusOK, result)
+		return
+	}
+}
+
+func GetMetrics(c *gin.Context) {
+	appName := c.Param("app_name")
+	queryType := c.Query("type")
+
+	if queryType == "sync_on" || queryType == "sync_off" {
+		syncValue := 0
+		if queryType == "sync_on" {
+			syncValue = 1
+		}
+		HandleSyncOperation(c, appName, syncValue, queryType)
+		return
+	}
+
+	if queryType == "metricsdetails" {
+		QueryMetrics(c)
+		return
+	}
+
+	if queryType == "sync_status" {
+		CheckAppStatus(c)
+		return
+	}
+
+	allMetrics, errors, err := FetchMetrics(c.Request.Context(), appName, requests)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"errors": errors, "error": err.Error()})
+		return
+	}
+	if len(allMetrics) > 0 {
+		c.JSON(http.StatusOK, allMetrics)
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No metrics data found", "errors": errors})
+	}
 }
  

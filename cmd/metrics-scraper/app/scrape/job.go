@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
+	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

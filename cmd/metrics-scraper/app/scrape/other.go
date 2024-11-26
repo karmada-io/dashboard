@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/glebarez/sqlite"
-	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
+	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 	"github.com/prometheus/common/expfmt"
 	"log"
 	"strings"
