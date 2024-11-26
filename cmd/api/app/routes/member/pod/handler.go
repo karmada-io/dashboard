@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// return a pods list
 func handleGetMemberPod(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	_, err := karmadaClient.ClusterV1alpha1().Clusters().Get(context.TODO(), c.Param("clustername"), metav1.GetOptions{})
@@ -29,6 +30,7 @@ func handleGetMemberPod(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// return a pod detail
 func handleGetMemberPodDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	_, err := karmadaClient.ClusterV1alpha1().Clusters().Get(context.TODO(), c.Param("clustername"), metav1.GetOptions{})
