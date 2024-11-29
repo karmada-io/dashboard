@@ -7,6 +7,7 @@ import (
 	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -14,16 +15,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-)
-
-const (
-	namespace                 = "karmada-system"
-	karmadaAgent              = "karmada-agent"
-	karmadaScheduler          = "karmada-scheduler"
-	karmadaSchedulerEstimator = "karmada-scheduler-estimator"
-	karmadaControllerManager  = "karmada-controller-manager"
-	schedulerPort             = "10351"
-	controllerManagerPort     = "8080"
 )
 
 // Define a struct for save requests
@@ -55,7 +46,7 @@ func FetchMetrics(ctx context.Context, appName string, requests chan SaveRequest
 				}
 				var jsonMetrics *v1.ParsedData
 				var err error
-				if appName == karmadaAgent {
+				if appName == v1.KarmadaAgent {
 					jsonMetrics, err = getKarmadaAgentMetrics(ctx, pod.Name, clusterName, requests)
 					if err != nil {
 						mu.Lock()
@@ -64,12 +55,12 @@ func FetchMetrics(ctx context.Context, appName string, requests chan SaveRequest
 						return
 					}
 				} else {
-					port := schedulerPort
-					if appName == karmadaControllerManager {
-						port = controllerManagerPort
+					port := v1.SchedulerPort
+					if appName == v1.KarmadaControllerManager {
+						port = v1.ControllerManagerPort
 					}
 					metricsOutput, err := kubeClient.CoreV1().RESTClient().Get().
-						Namespace(namespace).
+						Namespace(v1.Namespace).
 						Resource("pods").
 						SubResource("proxy").
 						Name(fmt.Sprintf("%s:%s", pod.Name, port)).
@@ -115,7 +106,7 @@ func getKarmadaPods(ctx context.Context, appName string) (map[string][]v1.PodInf
 	podsMap := make(map[string][]v1.PodInfo)
 	var errors []string
 
-	if appName == karmadaAgent {
+	if appName == v1.KarmadaAgent {
 		karmadaClient := client.InClusterKarmadaClient()
 		clusters, err := karmadaClient.ClusterV1alpha1().Clusters().List(ctx, metav1.ListOptions{})
 		if err != nil {
@@ -134,7 +125,7 @@ func getKarmadaPods(ctx context.Context, appName string) (map[string][]v1.PodInf
 			}
 		}
 	} else {
-		pods, err := kubeClient.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
+		pods, err := kubeClient.CoreV1().Pods(v1.Namespace).List(ctx, metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("app=%s", appName),
 		})
 		if err != nil {
@@ -260,7 +251,7 @@ func getKarmadaAgentMetrics(ctx context.Context, podName string, clusterName str
 	// Send save request to the database worker
 	select {
 	case requests <- SaveRequest{
-		appName: karmadaAgent,
+		appName: v1.KarmadaAgent,
 		podName: podName,
 		data:    parsedData,
 		result:  nil, // Not waiting for result
