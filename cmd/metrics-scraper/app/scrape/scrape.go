@@ -6,14 +6,11 @@ import(
 	"log"
 	"sync"
 	"context"
-	 
- 
+	  
 	"fmt"
 	"net/http"
- 
-
-	"github.com/gin-gonic/gin"
-	 
+ 	"github.com/gin-gonic/gin"
+	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"	 
 )
 
 var (
@@ -71,12 +68,12 @@ func CheckAppStatus(c *gin.Context) {
 
 	// Get status for all registered apps
 	for _, app := range []string{
-		karmadaScheduler,
-		karmadaControllerManager,
-		karmadaAgent,
-		karmadaSchedulerEstimator + "-member1",
-		karmadaSchedulerEstimator + "-member2",
-		karmadaSchedulerEstimator + "-member3",
+		v1.KarmadaScheduler,
+		v1.KarmadaControllerManager,
+		v1.KarmadaAgent,
+		v1.KarmadaSchedulerEstimator + "-member1",
+		v1.KarmadaSchedulerEstimator + "-member2",
+		v1.KarmadaSchedulerEstimator + "-member3",
 	} {
 		syncValue, exists := syncMap.Load(app)
 		if !exists {
@@ -182,12 +179,12 @@ func InitDatabase(){
     appCancelFuncs = make(map[string]context.CancelFunc)
     
     appNames := []string{
-        karmadaScheduler,
-        karmadaControllerManager,
-        karmadaAgent,
-        karmadaSchedulerEstimator + "-member1",
-        karmadaSchedulerEstimator + "-member2",
-        karmadaSchedulerEstimator + "-member3",
+        v1.KarmadaScheduler,
+        v1.KarmadaControllerManager,
+        v1.KarmadaAgent,
+        v1.KarmadaSchedulerEstimator + "-member1",
+        v1.KarmadaSchedulerEstimator + "-member2",
+        v1.KarmadaSchedulerEstimator + "-member3",
     }
 
     // Create database connection
@@ -234,45 +231,3 @@ func InitDatabase(){
     }
 }
 
-
-// func InitDatabase() {
-// 	// db := db.GetDB()
-// 	// Initialize contexts and cancel functions
-// 	appContexts = make(map[string]context.Context)
-// 	appCancelFuncs = make(map[string]context.CancelFunc)
-
-// 	appNames := []string{
-// 		karmadaScheduler,
-// 		karmadaControllerManager,
-// 		karmadaAgent,
-// 		//karmadaSchedulerEstimator + "-member1",
-// 		//karmadaSchedulerEstimator + "-member2",
-// 		//karmadaSchedulerEstimator + "-member3",
-// 	}
-
-// 	// Create the app_sync table
-// 	_, err := db.Exec(`
-//         CREATE TABLE IF NOT EXISTS app_sync (
-//             app_name TEXT PRIMARY KEY,
-//             sync_trigger INTEGER DEFAULT 1
-//         )
-//     `)
-// 	if err != nil {
-// 		log.Fatalf("Error creating app_sync table: %v", err)
-// 	}
-
-// 	for _, appName := range appNames {
-// 		ctx, cancel := context.WithCancel(context.Background())
-// 		contextMutex.Lock()
-// 		appContexts[appName] = ctx
-// 		appCancelFuncs[appName] = cancel
-// 		contextMutex.Unlock()
-// 		_, err = db.Exec("INSERT OR IGNORE INTO app_sync (app_name) VALUES (?)", appName)
-// 		if err != nil {
-// 			log.Printf("Error inserting app name into app_sync table: %v", err)
-// 			continue
-// 		}
-
-// 		syncMap.Store(appName, 1)
-// 	}
-// }

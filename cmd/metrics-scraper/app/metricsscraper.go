@@ -3,18 +3,19 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
-	"github.com/karmada-io/dashboard/cmd/web/app/options"
+	"github.com/karmada-io/dashboard/cmd/api/app/options"
+	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
 	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
-	"net/http"
 	"os"
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/routes/metrics"
+
 )
 
 // NewMetricsScraperCommand creates a *cobra.Command object with default parameters
@@ -53,8 +54,26 @@ func NewMetricsScraperCommand(ctx context.Context) *cobra.Command {
 }
 
 func run(ctx context.Context, opts *options.Options) error {
-	klog.InfoS("Starting Karmada Dashboard Metrics-scraper", "version", environment.Version)
+	klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
+
+	client.InitKarmadaConfig(
+		client.WithUserAgent(environment.UserAgent()),
+		client.WithKubeconfig(opts.KarmadaKubeConfig),
+		client.WithKubeContext(opts.KarmadaContext),
+		client.WithInsecureTLSSkipVerify(opts.SkipKarmadaApiserverTLSVerify),
+	)
+
+	client.InitKubeConfig(
+		client.WithUserAgent(environment.UserAgent()),
+		client.WithKubeconfig(opts.KubeConfig),
+		client.WithKubeContext(opts.KubeContext),
+		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
+	)
+	ensureAPIServerConnectionOrDie()
 	serve(opts)
+	go scrape.InitDatabase()
+	
+	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	select {
 	case <-ctx.Done():
 		os.Exit(0)
@@ -65,30 +84,39 @@ func run(ctx context.Context, opts *options.Options) error {
 func serve(opts *options.Options) {
 	insecureAddress := fmt.Sprintf("%s:%d", opts.InsecureBindAddress, opts.InsecurePort)
 	klog.V(1).InfoS("Listening and serving on", "address", insecureAddress)
-	pathPrefix := config.GetDashboardConfig().PathPrefix
-	klog.V(1).Infof("PathPrefix is:%s", pathPrefix)
 	go func() {
-		r := router.Router()
-		g := r.Group(pathPrefix)
-		g.StaticFS("/static", http.Dir(opts.StaticDir))
-		r.NoRoute(func(c *gin.Context) {
-			c.Header("Content-Type", "text/html; charset=utf-8")
-			c.Data(http.StatusOK, "text/html; charset=utf-8", []byte("indexHtml"))
-		})
 		klog.Fatal(router.Router().Run(insecureAddress))
 	}()
 }
 
-func init() {
-	go scrape.InitDatabase()
-	// Initialize the router with modified endpoints
-	r := router.V1()
-	r.GET("/metrics", scrape.GetMetrics)
-	r.GET("/metrics/:app_name", scrape.GetMetrics)
-	r.GET("/metrics/:app_name/:pod_name", scrape.QueryMetrics)
+
+func ensureAPIServerConnectionOrDie() {
+	versionInfo, err := client.InClusterClient().Discovery().ServerVersion()
+	if err != nil {
+		klog.Fatalf("Error while initializing connection to Kubernetes apiserver. "+
+			"This most likely means that the cluster is misconfigured. Reason: %s\n", err)
+		os.Exit(1)
+	}
+	klog.InfoS("Successful initial request to the Kubernetes apiserver", "version", versionInfo.String())
+
+	karmadaVersionInfo, err := client.InClusterKarmadaClient().Discovery().ServerVersion()
+	if err != nil {
+		klog.Fatalf("Error while initializing connection to Karmada apiserver. "+
+			"This most likely means that the cluster is misconfigured. Reason: %s\n", err)
+		os.Exit(1)
+	}
+	klog.InfoS("Successful initial request to the Karmada apiserver", "version", karmadaVersionInfo.String())
 }
 
-// http://localhost:8000/api/v1/metrics/karmada-scheduler  //from terminal
+func init() {
+ 
+	r := router.V1()
+	 
+	r.GET("/metrics", metrics.GetMetrics)
+	r.GET("/metrics/:app_name", metrics.GetMetrics)
+	r.GET("/metrics/:app_name/:pod_name", metrics.QueryMetrics)
+
+}
 
 // http://localhost:8000/api/v1/metrics/karmada-scheduler?type=metricsdetails  //from sqlite details bar
 

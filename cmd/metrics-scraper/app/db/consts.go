@@ -1,11 +1,11 @@
 package db
 
-// const (
-// 	namespace                 = "karmada-system"
-// 	karmadaAgent              = "karmada-agent"
-// 	karmadaScheduler          = "karmada-scheduler"
-// 	karmadaSchedulerEstimator = "karmada-scheduler-estimator"
-// 	karmadaControllerManager  = "karmada-controller-manager"
-// 	schedulerPort             = "10351"
-// 	controllerManagerPort     = "8080"
-// )
+const (
+	Namespace                 = "karmada-system"
+	KarmadaAgent             = "karmada-agent"
+	KarmadaScheduler         = "karmada-scheduler"
+	KarmadaSchedulerEstimator = "karmada-scheduler-estimator"
+	KarmadaControllerManager  = "karmada-controller-manager"
+	SchedulerPort            = "10351"
+	ControllerManagerPort    = "8080"
+)
