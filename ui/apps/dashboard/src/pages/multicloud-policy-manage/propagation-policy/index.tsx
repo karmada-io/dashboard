@@ -1,5 +1,5 @@
 import i18nInstance from '@/utils/i18n';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Panel from '@/components/panel';
 import {
   Input,
@@ -11,12 +11,15 @@ import {
   Table,
   message,
   Popconfirm,
+  Select,
 } from 'antd';
 import { Icons } from '@/components/icons';
 import { useQuery } from '@tanstack/react-query';
 import {
   GetPropagationPolicies,
   DeletePropagationPolicy,
+  GetClusterPropagationPolicies,
+  ClusterPropagationPolicy,
 } from '@/services/propagationpolicy.ts';
 import type { PropagationPolicy } from '@/services/propagationpolicy.ts';
 import PropagationPolicyEditorDrawer, {
@@ -24,21 +27,59 @@ import PropagationPolicyEditorDrawer, {
 } from './propagation-policy-editor-drawer';
 import { stringify } from 'yaml';
 import { GetResource } from '@/services/unstructured.ts';
+import { GetNamespaces } from '@/services/namespace.ts';
+import { useDebounce } from '@uidotdev/usehooks';
+
 export type PolicyScope = 'namespace-scope' | 'cluster-scope';
 const PropagationPolicyManage = () => {
-  const [policyScope, setPolicyScope] =
-    useState<PolicyScope>('namespace-scope');
+  const [filter, setFilter] = useState<{
+    policyScope: PolicyScope;
+    selectedNamespace: string;
+    searchText: string;
+  }>({
+    policyScope: 'namespace-scope',
+    selectedNamespace: '',
+    searchText: '',
+  });
+  const debouncedSearchText = useDebounce(filter.searchText, 300);
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['GetPropagationPolicies', policyScope],
+    queryKey: [
+      'GetPropagationPolicies',
+      filter.selectedNamespace,
+      filter.policyScope,
+      debouncedSearchText,
+    ],
     queryFn: async () => {
-      if (policyScope === 'cluster-scope')
-        return {
-          propagationpolicys: [],
-        };
-      const ret = await GetPropagationPolicies();
-      return ret.data || {};
+      if (filter.policyScope === 'cluster-scope') {
+        const ret = await GetClusterPropagationPolicies({
+          keyword: filter.searchText,
+        });
+        return ret?.data?.clusterPropagationPolicies || [];
+      } else {
+        const ret = await GetPropagationPolicies({
+          namespace: filter.selectedNamespace,
+          keyword: filter.searchText,
+        });
+        return ret?.data?.propagationpolicys || [];
+      }
     },
   });
+  const { data: nsData, isLoading: isNsDataLoading } = useQuery({
+    queryKey: ['GetNamespaces'],
+    queryFn: async () => {
+      const clusters = await GetNamespaces({});
+      return clusters.data || {};
+    },
+  });
+  const nsOptions = useMemo(() => {
+    if (!nsData?.namespaces) return [];
+    return nsData.namespaces.map((item) => {
+      return {
+        title: item.objectMeta.name,
+        value: item.objectMeta.name,
+      };
+    });
+  }, [nsData]);
   const [editorDrawerData, setEditorDrawerData] = useState<
     Omit<
       PropagationPolicyEditorDrawerProps,
@@ -51,12 +92,12 @@ const PropagationPolicyManage = () => {
     namespace: '',
     propagationContent: '',
   });
-  const columns: TableColumnProps<PropagationPolicy>[] = [
-    {
+  const columns = [
+    filter.policyScope === 'namespace-scope' && {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
       key: 'namespaceName',
       width: 200,
-      render: (_, r) => {
+      render: (_v: string, r: PropagationPolicy) => {
         return r.objectMeta.namespace;
       },
     },
@@ -64,7 +105,7 @@ const PropagationPolicyManage = () => {
       title: i18nInstance.t('53cf41060c577315071a7c14bb612852'),
       key: 'policyName',
       width: 200,
-      render: (_, r) => {
+      render: (_v: string, r: PropagationPolicy) => {
         return r.objectMeta.name;
       },
     },
@@ -77,7 +118,7 @@ const PropagationPolicyManage = () => {
     {
       title: i18nInstance.t('ab7e397dd8c88360e441f1c1525a5758'),
       key: 'cluster',
-      render: (_, r) => {
+      render: (_v: string, r: PropagationPolicy) => {
         if (!r?.clusterAffinity?.clusterNames) {
           return '-';
         }
@@ -93,8 +134,8 @@ const PropagationPolicyManage = () => {
     {
       title: i18nInstance.t('8c0921045b741bc4e19d61426b99c938'),
       key: 'deployments',
-      render: (_, r) => {
-        return r.deployments.map((d) => (
+      render: (_v: string, r: PropagationPolicy) => {
+        return r?.deployments?.map((d) => (
           <Tag key={`${r.objectMeta.name}-${d}`}>{d}</Tag>
         ));
       },
@@ -103,7 +144,7 @@ const PropagationPolicyManage = () => {
       title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
       key: 'op',
       width: 200,
-      render: (_, r) => {
+      render: (_v: string, r: PropagationPolicy) => {
         return (
           <Space.Compact>
             <Button
@@ -153,7 +194,7 @@ const PropagationPolicyManage = () => {
               title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('aa141bcb65729912b79cb27995a8989b', '调度策略么')}`}
               onConfirm={async () => {
                 const ret = await DeletePropagationPolicy({
-                  isClusterScope: policyScope === 'cluster-scope',
+                  isClusterScope: filter.policyScope === 'cluster-scope',
                   namespace: r.objectMeta.namespace,
                   name: r.objectMeta.name,
                 });
@@ -179,8 +220,11 @@ const PropagationPolicyManage = () => {
         );
       },
     },
-  ];
+  ].filter(Boolean) as TableColumnProps<
+    PropagationPolicy | ClusterPropagationPolicy
+  >[];
   const [messageApi, messageContextHolder] = message.useMessage();
+
   function resetEditorDrawerData() {
     setEditorDrawerData({
       open: false,
@@ -190,14 +234,22 @@ const PropagationPolicyManage = () => {
       propagationContent: '',
     });
   }
+
   return (
     <Panel>
       <Segmented
-        value={policyScope}
+        value={filter.policyScope}
         style={{
           marginBottom: 8,
         }}
-        onChange={(value) => setPolicyScope(value as PolicyScope)}
+        onChange={(value) => {
+          setFilter({
+            ...filter,
+            searchText: '',
+            selectedNamespace: '',
+            policyScope: value as PolicyScope,
+          });
+        }}
         options={[
           {
             label: i18nInstance.t('bf15e71b2553d369585ace795d15ac3b'),
@@ -210,32 +262,64 @@ const PropagationPolicyManage = () => {
         ]}
       />
 
-      <div className={'flex flex-row justify-between mb-4'}>
-        <Input.Search
-          placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
-          className={'w-[400px]'}
-        />
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            setEditorDrawerData({
-              open: true,
-              mode: 'create',
-            });
-          }}
-        >
-          {policyScope === 'namespace-scope'
-            ? i18nInstance.t('5ac6560da4f54522d590c5f8e939691b')
-            : i18nInstance.t('929e0cda9f7fdc960dafe6ef742ab088')}
-        </Button>
+      <div className={'flex flex-row mb-4 justify-between'}>
+        <div className={'flex flex-row space-x-4'}>
+          {filter.policyScope === 'namespace-scope' && (
+            <>
+              <h3 className={'leading-[32px]'}>命名空间</h3>
+              <Select
+                options={nsOptions}
+                className={'min-w-[200px]'}
+                value={filter.selectedNamespace}
+                loading={isNsDataLoading}
+                showSearch
+                allowClear
+                placeholder={''}
+                onChange={(v) => {
+                  setFilter({
+                    ...filter,
+                    selectedNamespace: v,
+                  });
+                }}
+              />
+            </>
+          )}
+          <Input.Search
+            placeholder={'按名称检索，按下回车开始搜索'}
+            className={'w-[400px]'}
+            value={filter.searchText}
+            onChange={(e) => {
+              setFilter({
+                ...filter,
+                searchText: e.target.value,
+              });
+            }}
+          />
+        </div>
+        <div>
+          <Button
+            type={'primary'}
+            icon={<Icons.add width={16} height={16} />}
+            className="flex flex-row items-center"
+            onClick={() => {
+              setEditorDrawerData({
+                open: true,
+                mode: 'create',
+              });
+            }}
+          >
+            {filter.policyScope === 'namespace-scope'
+              ? i18nInstance.t('5ac6560da4f54522d590c5f8e939691b')
+              : i18nInstance.t('929e0cda9f7fdc960dafe6ef742ab088')}
+          </Button>
+        </div>
       </div>
+
       <Table
         rowKey={(r: PropagationPolicy) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data?.propagationpolicys || []}
+        dataSource={data || []}
       />
 
       <PropagationPolicyEditorDrawer

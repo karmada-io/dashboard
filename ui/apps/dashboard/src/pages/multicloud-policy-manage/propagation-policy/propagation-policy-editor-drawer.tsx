@@ -62,6 +62,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
           padding: 0,
         },
       }}
+      closeIcon={false}
       onClose={onClose}
       footer={
         <div className={'flex flex-row justify-end'}>
@@ -103,11 +104,11 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
       <Editor
         defaultLanguage="yaml"
         value={content}
-        theme="vs-dark"
-        // height={800}
+        theme="vs"
         options={{
-          theme: 'vs-dark',
+          theme: 'vs',
           lineNumbers: 'on',
+          fontSize: 15,
           readOnly: mode === 'detail',
           minimap: {
             enabled: false,
