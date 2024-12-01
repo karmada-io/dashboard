@@ -3,19 +3,19 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/karmada-io/dashboard/cmd/api/app/options"
-	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/config"
-	"github.com/karmada-io/dashboard/pkg/environment"
-	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	"os"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
+
+	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/config"
+	"github.com/karmada-io/dashboard/pkg/environment"
+	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/router"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/routes/metrics"
-
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/options"
 )
 
 // NewMetricsScraperCommand creates a *cobra.Command object with default parameters
@@ -109,13 +109,10 @@ func ensureAPIServerConnectionOrDie() {
 }
 
 func init() {
- 
-	r := router.V1()
-	 
+	r := router.V1() 
 	r.GET("/metrics", metrics.GetMetrics)
 	r.GET("/metrics/:app_name", metrics.GetMetrics)
 	r.GET("/metrics/:app_name/:pod_name", metrics.QueryMetrics)
-
 }
 
 // http://localhost:8000/api/v1/metrics/karmada-scheduler?type=metricsdetails  //from sqlite details bar
@@ -125,4 +122,3 @@ func init() {
 // http://localhost:8000/api/v1/metrics?type=sync_off // to skip all metrics
 
 // http://localhost:8000/api/v1/metrics/karmada-scheduler?type=sync_off // to skip specific metrics
-

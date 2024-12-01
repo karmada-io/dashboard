@@ -1,10 +1,10 @@
 package scrape
 
 import (
-	_ "github.com/glebarez/sqlite"
-	"database/sql"
 	"fmt"
 	"strings"
+	"database/sql"
+	_ "github.com/glebarez/sqlite"
 )
 
 // Mname retrieves distinct metric names from the database.
@@ -127,5 +127,3 @@ func MetricsDetails(appName string) (map[string]map[string]interface{}, error) {
 
 	return result, nil
 }
- 
- 

@@ -1,16 +1,16 @@
 package scrape
 
 import (
+	"log"
+	"strings"
+	"sync"
+	"time"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	_ "github.com/glebarez/sqlite"
 	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 	"github.com/prometheus/common/expfmt"
-	"log"
-	"strings"
-	"sync"
-	"time"
 )
 
 var dbMutex sync.Mutex
