@@ -10,12 +10,12 @@ import(
 	"fmt"
 	"net/http"
  	"github.com/gin-gonic/gin"
-	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"	 
+	db "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"	 
 )
 
 var (
     requests chan SaveRequest
-    db       *sql.DB
+    sqldb       *sql.DB
     syncMap  sync.Map
     // Add contexts and cancel functions for each app
     appContexts     map[string]context.Context
@@ -68,12 +68,12 @@ func CheckAppStatus(c *gin.Context) {
 
 	// Get status for all registered apps
 	for _, app := range []string{
-		v1.KarmadaScheduler,
-		v1.KarmadaControllerManager,
-		v1.KarmadaAgent,
-		v1.KarmadaSchedulerEstimator + "-member1",
-		v1.KarmadaSchedulerEstimator + "-member2",
-		v1.KarmadaSchedulerEstimator + "-member3",
+		db.KarmadaScheduler,
+		db.KarmadaControllerManager,
+		db.KarmadaAgent,
+		db.KarmadaSchedulerEstimator + "-member1",
+		db.KarmadaSchedulerEstimator + "-member2",
+		db.KarmadaSchedulerEstimator + "-member3",
 	} {
 		syncValue, exists := syncMap.Load(app)
 		if !exists {
@@ -94,7 +94,7 @@ func CheckAppStatus(c *gin.Context) {
 func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryType string) {
 	if appName == "" {
 		// Stop all apps
-		_, err := db.Exec("UPDATE app_sync SET sync_trigger = ?", syncValue)
+		_, err := sqldb.Exec("UPDATE app_sync SET sync_trigger = ?", syncValue)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to update sync_trigger for all apps: %v", err)})
 			return
@@ -140,7 +140,7 @@ func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryTyp
 			return
 		}
 
-		_, err := db.Exec("UPDATE app_sync SET sync_trigger = ? WHERE app_name = ?", syncValue, appName)
+		_, err := sqldb.Exec("UPDATE app_sync SET sync_trigger = ? WHERE app_name = ?", syncValue, appName)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to update sync_trigger: %v", err)})
 			return
@@ -179,23 +179,23 @@ func InitDatabase(){
     appCancelFuncs = make(map[string]context.CancelFunc)
     
     appNames := []string{
-        v1.KarmadaScheduler,
-        v1.KarmadaControllerManager,
-        v1.KarmadaAgent,
-        v1.KarmadaSchedulerEstimator + "-member1",
-        v1.KarmadaSchedulerEstimator + "-member2",
-        v1.KarmadaSchedulerEstimator + "-member3",
+        db.KarmadaScheduler,
+        db.KarmadaControllerManager,
+        db.KarmadaAgent,
+        db.KarmadaSchedulerEstimator + "-member1",
+        db.KarmadaSchedulerEstimator + "-member2",
+        db.KarmadaSchedulerEstimator + "-member3",
     }
 
     // Create database connection
     var err error
-    db, err = sql.Open("sqlite", "app_sync.db")
+    sqldb, err = sql.Open("sqlite", "app_sync.db")
     if err != nil {
         log.Fatalf("Error opening app_sync database: %v", err)
     }
 
     // Create the app_sync table
-    _, err = db.Exec(`
+    _, err = sqldb.Exec(`
         CREATE TABLE IF NOT EXISTS app_sync (
             app_name TEXT PRIMARY KEY,
             sync_trigger INTEGER DEFAULT 1
@@ -213,7 +213,7 @@ func InitDatabase(){
         appCancelFuncs[appName] = cancel
         contextMutex.Unlock()
 
-        _, err = db.Exec("INSERT OR IGNORE INTO app_sync (app_name) VALUES (?)", appName)
+        _, err = sqldb.Exec("INSERT OR IGNORE INTO app_sync (app_name) VALUES (?)", appName)
         if err != nil {
             log.Printf("Error inserting app name into app_sync table: %v", err)
             continue
@@ -230,4 +230,3 @@ func InitDatabase(){
         go startAppMetricsFetcher(app)
     }
 }
-
