@@ -10,6 +10,8 @@ const (
 	ResourceKindCluster                  = "cluster"
 	ResourceKindPropagationPolicy        = "propagationpolicy"
 	ResourceKindClusterPropagationPolicy = "clusterpropagationpolicy"
+	ResourceKindOverridePolicy           = "overridepolicy"
+	ResourceKindClusterOverridePolicy    = "clusteroverridepolicy"
 	ResourceKindConfigMap                = "configmap"
 	ResourceKindDaemonSet                = "daemonset"
 	ResourceKindDeployment               = "deployment"
