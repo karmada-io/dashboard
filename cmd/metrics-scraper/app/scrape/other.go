@@ -9,13 +9,13 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/glebarez/sqlite"
-	v1 "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 	"github.com/prometheus/common/expfmt"
 )
 
 var dbMutex sync.Mutex
 
-func saveToDBWithConnection(db *sql.DB, appName, podName string, data *v1.ParsedData) (err error) {
+func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.ParsedData) (err error) {
 	sanitizedPodName := strings.ReplaceAll(podName, "-", "_")
 	log.Printf("Saving data for app '%s', pod '%s' (sanitized: '%s')", appName, podName, sanitizedPodName)
 
@@ -174,21 +174,21 @@ func startDatabaseWorker(requests chan SaveRequest) {
 	}
 }
 
-func parseMetricsToJSON(metricsOutput string) (*v1.ParsedData, error) {
+func parseMetricsToJSON(metricsOutput string) (*db.ParsedData, error) {
 	var parser expfmt.TextParser
 	metricFamilies, err := parser.TextToMetricFamilies(strings.NewReader(metricsOutput))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing metrics: %w", err)
 	}
 
-	metrics := make(map[string]*v1.Metric)
+	metrics := make(map[string]*db.Metric)
 
 	for name, mf := range metricFamilies {
-		m := &v1.Metric{
+		m := &db.Metric{
 			Name:   name,
 			Help:   mf.GetHelp(),
 			Type:   mf.GetType().String(),
-			Values: []v1.MetricValue{},
+			Values: []db.MetricValue{},
 		}
 
 		for _, metric := range mf.Metric {
@@ -205,38 +205,38 @@ func parseMetricsToJSON(metricsOutput string) (*v1.ParsedData, error) {
 						bucketLabels[k] = v
 					}
 					bucketLabels["le"] = fmt.Sprintf("%f", bucket.GetUpperBound())
-					m.Values = append(m.Values, v1.MetricValue{
+					m.Values = append(m.Values, db.MetricValue{
 						Labels:  bucketLabels,
 						Value:   bucketValue,
 						Measure: "cumulative_count",
 					})
 				}
-				m.Values = append(m.Values, v1.MetricValue{
+				m.Values = append(m.Values, db.MetricValue{
 					Labels:  labels,
 					Value:   fmt.Sprintf("%f", metric.Histogram.GetSampleSum()),
 					Measure: "sum",
 				})
-				m.Values = append(m.Values, v1.MetricValue{
+				m.Values = append(m.Values, db.MetricValue{
 					Labels:  labels,
 					Value:   fmt.Sprintf("%d", metric.Histogram.GetSampleCount()),
 					Measure: "count",
 				})
 			} else if metric.Counter != nil {
 				value := fmt.Sprintf("%f", metric.Counter.GetValue())
-				m.Values = append(m.Values, v1.MetricValue{
+				m.Values = append(m.Values, db.MetricValue{
 					Labels:  labels,
 					Value:   value,
 					Measure: "total",
 				})
 			} else if metric.Gauge != nil {
 				value := fmt.Sprintf("%f", metric.Gauge.GetValue())
-				m.Values = append(m.Values, v1.MetricValue{
+				m.Values = append(m.Values, db.MetricValue{
 					Labels:  labels,
 					Value:   value,
 					Measure: "current_value",
 				})
 			} else {
-				m.Values = append(m.Values, v1.MetricValue{
+				m.Values = append(m.Values, db.MetricValue{
 					Labels:  labels,
 					Value:   "",
 					Measure: "unhandled_metric_type",
@@ -249,7 +249,7 @@ func parseMetricsToJSON(metricsOutput string) (*v1.ParsedData, error) {
 
 	currentTime := time.Now().Format(time.RFC3339)
 
-	parsedData := &v1.ParsedData{
+	parsedData := &db.ParsedData{
 		CurrentTime: currentTime,
 		Metrics:     metrics,
 	}

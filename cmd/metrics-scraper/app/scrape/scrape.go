@@ -9,8 +9,9 @@ import(
 	  
 	"fmt"
 	"net/http"
- 	"github.com/gin-gonic/gin"
-	db "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"	 
+
+	"github.com/gin-gonic/gin"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 )
 
 var (
