@@ -4,11 +4,6 @@ type PodInfo struct {
 	Name string `json:"name"`
 }
 
-type MetricInfo struct {
-	Help string `json:"help"`
-	Type string `json:"type"`
-}
-
 type Metric struct {
 	Name   string        `json:"name"`
 	Help   string        `json:"help"`
