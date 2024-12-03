@@ -17,6 +17,7 @@ import (
 	// Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusteroverridepolicy"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusterpropagationpolicy"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/config"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/configmap"
@@ -27,6 +28,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/job"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/node"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overridepolicy"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/secret"
