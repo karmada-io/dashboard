@@ -1,4 +1,11 @@
-import { IResponse, karmadaClient, ObjectMeta, TypeMeta } from './base';
+import {
+  convertDataSelectQuery,
+  DataSelectQuery,
+  IResponse,
+  karmadaClient,
+  ObjectMeta,
+  TypeMeta,
+} from './base';
 
 export interface PropagationPolicy {
   objectMeta: ObjectMeta;
@@ -12,7 +19,18 @@ export interface ClusterAffinity {
   clusterNames: string[];
 }
 
-export async function GetPropagationPolicies() {
+export async function GetPropagationPolicies(params: {
+  namespace?: string;
+  keyword?: string;
+}) {
+  const { namespace } = params;
+  const url = namespace
+    ? `/propagationpolicy/${namespace}`
+    : '/propagationpolicy';
+  const requestData = {} as DataSelectQuery;
+  if (params.keyword) {
+    requestData.filterBy = ['name', params.keyword];
+  }
   const resp = await karmadaClient.get<
     IResponse<{
       errors: string[];
@@ -21,7 +39,9 @@ export async function GetPropagationPolicies() {
       };
       propagationpolicys: PropagationPolicy[];
     }>
-  >('/propagationpolicy');
+  >(url, {
+    params: convertDataSelectQuery(requestData),
+  });
   return resp.data;
 }
 
@@ -72,5 +92,33 @@ export async function DeletePropagationPolicy(params: {
       data: params,
     },
   );
+  return resp.data;
+}
+
+export interface ClusterPropagationPolicy {
+  objectMeta: ObjectMeta;
+  typeMeta: TypeMeta;
+  schedulerName: string;
+  clusterAffinity: ClusterAffinity;
+  deployments: string[];
+}
+export async function GetClusterPropagationPolicies(params: {
+  keyword?: string;
+}) {
+  const requestData = {} as DataSelectQuery;
+  if (params.keyword) {
+    requestData.filterBy = ['name', params.keyword];
+  }
+  const resp = await karmadaClient.get<
+    IResponse<{
+      errors: string[];
+      listMeta: {
+        totalItems: number;
+      };
+      clusterPropagationPolicies: ClusterPropagationPolicy[];
+    }>
+  >('/clusterpropagationpolicy', {
+    params: convertDataSelectQuery(requestData),
+  });
   return resp.data;
 }
