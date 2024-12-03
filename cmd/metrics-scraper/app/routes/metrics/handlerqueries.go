@@ -4,11 +4,16 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"fmt"
+	"time"
+	"database/sql"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
- 
 	"github.com/gin-gonic/gin"
 )
-
+type MetricInfo struct {
+	Help string `json:"help"`
+	Type string `json:"type"`
+}
 
 func QueryMetrics(c *gin.Context) {
 	appName := c.Param("app_name")
@@ -25,38 +30,195 @@ func QueryMetrics(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open database"})
 		return
 	}
-	defer db.Close()
+
+	// Add transaction for consistent reads
+	tx, err := db.Begin()
+	if err != nil {
+		log.Printf("Error starting transaction: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start transaction"})
+		return
+	}
+	defer tx.Rollback()
 
 	switch queryType {
 	case "mname":
-		metricNames, err := scrape.Mname(db, sanitizedPodName)
+		rows, err := tx.Query(fmt.Sprintf("SELECT DISTINCT name FROM %s", sanitizedPodName))
 		if err != nil {
-			log.Printf("Error retrieving metric names: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve metric names"})
+			log.Printf("Error querying metric names: %v, SQL Error: %v", err, err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query metric names"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"metricNames": metricNames})
+		defer rows.Close()
+
+		var metricNames []string
+		for rows.Next() {
+			var metricName string
+			if err := rows.Scan(&metricName); err != nil {
+				log.Printf("Error scanning metric name: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan metric name"})
+				return
+			}
+			metricNames = append(metricNames, metricName)
+		}
+
+		c.JSON(http.StatusOK, gin.H{ "metricNames": metricNames})
 
 	case "details":
-		if metricName == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
-			return
-		}
-		details, err := scrape.Details(db, sanitizedPodName, metricName)
+        if metricName == "" {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
+            return
+        }
+		query := fmt.Sprintf(`
+            SELECT 
+                m.currentTime, 
+                m.name, 
+                v.value, 
+                v.measure, 
+                v.id
+            FROM %s m
+            INNER JOIN %s_values v ON m.id = v.metric_id
+            WHERE m.name = ?
+        `, sanitizedPodName, sanitizedPodName)
+		rows, err := tx.Query(query, metricName)
 		if err != nil {
-			log.Printf("Error retrieving metric details: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve metric details"})
+			log.Printf("Error querying metric details: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query metric details"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"details": details})
+		defer rows.Close()
 
+		type MetricValue struct {
+			Value   string            `json:"value"`
+			Measure string            `json:"measure"`
+			Labels  map[string]string `json:"labels"`
+		}
+
+		type MetricDetails struct {
+			Name   string        `json:"name"`
+			Values []MetricValue `json:"values"`
+		}
+
+		detailsMap := make(map[string]MetricDetails)
+
+		for rows.Next() {
+			var currentTime time.Time
+			var name, value, measure string
+			var valueID int
+			if err := rows.Scan(&currentTime, &name, &value, &measure, &valueID); err != nil {
+				log.Printf("Error scanning metric details: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan metric details"})
+				return
+			}
+
+			labelsQuery := fmt.Sprintf("SELECT key, value FROM %s_labels WHERE value_id = ?", sanitizedPodName)
+			labelsRows, err := tx.Query(labelsQuery, valueID)
+			if err != nil {
+				log.Printf("Error querying labels: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query labels"})
+				return
+			}
+			defer labelsRows.Close()
+
+			labels := make(map[string]string)
+			for labelsRows.Next() {
+				var labelKey, labelValue string
+				if err := labelsRows.Scan(&labelKey, &labelValue); err != nil {
+					log.Printf("Error scanning labels: %v", err)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan labels"})
+					return
+				}
+				labels[labelKey] = labelValue
+			}
+
+			timeKey := currentTime.Format(time.RFC3339)
+
+			detail, exists := detailsMap[timeKey]
+			if !exists {
+				detail = MetricDetails{
+					Name:   name,
+					Values: []MetricValue{},
+				}
+			}
+
+			detail.Values = append(detail.Values, MetricValue{
+				Value:   value,
+				Measure: measure,
+				Labels:  labels,
+			})
+
+			detailsMap[timeKey] = detail  
+		}
+
+		c.JSON(http.StatusOK, gin.H{"details": detailsMap})
+	
 	case "metricsdetails":
-		result, err := scrape.MetricsDetails(sanitizedAppName)
+		// Handle metricsdetails query type
+		db, err := sql.Open("sqlite", strings.ReplaceAll(appName, "-", "_")+".db")
 		if err != nil {
-			log.Printf("Error retrieving metrics details: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve metrics details"})
+			log.Printf("Error opening database: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open database"})
 			return
 		}
+		defer db.Close()
+
+		// Get all relevant tables
+		rows, err := db.Query(`
+			SELECT name 
+			FROM sqlite_master 
+			WHERE type='table' 
+			AND name NOT LIKE '%_values' 
+			AND name NOT LIKE '%_labels' 
+			AND name NOT LIKE '%_time_load'
+			AND name != 'sqlite_sequence'
+		`)
+		if err != nil {
+			log.Printf("Error querying tables: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query tables"})
+			return
+		}
+		defer rows.Close()
+
+		result := make(map[string]map[string]MetricInfo)
+
+		// Process each table (pod)
+		for rows.Next() {
+			var tableName string
+			if err := rows.Scan(&tableName); err != nil {
+				log.Printf("Error scanning table name: %v", err)
+				continue
+			}
+
+			// Get metrics for this pod
+			metricRows, err := db.Query(fmt.Sprintf(`
+				SELECT DISTINCT name, help, type 
+				FROM %s 
+				GROUP BY name
+			`, tableName))
+			if err != nil {
+				log.Printf("Error querying metrics for table %s: %v", tableName, err)
+				continue
+			}
+			defer metricRows.Close()
+
+			podMetrics := make(map[string]MetricInfo)
+
+			// Process each metric
+			for metricRows.Next() {
+				var name, help, metricType string
+				if err := metricRows.Scan(&name, &help, &metricType); err != nil {
+					log.Printf("Error scanning metric info: %v", err)
+					continue
+				}
+
+				podMetrics[name] = MetricInfo{
+					Help: help,
+					Type: metricType,
+				}
+			}
+
+			result[tableName] = podMetrics
+		}
+
 		c.JSON(http.StatusOK, result)
 		return
 	}
