@@ -13,3 +13,6 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
+
+# Sentry Config File
+.env.sentry-build-plugin
