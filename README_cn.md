@@ -20,6 +20,8 @@ Karmada是一个多云多集群管理的项目，Karmada Dashboard 是一个通�
 
 1.在kubeconfig中把user-context切换到karmada-host
 
+> karmada-host, 部署karmada的host的kubeconfig
+
 ```bash
 export KUBECONFIG="$HOME/.kube/karmada.config"
 kubectl config use-context karmada-host
@@ -35,20 +37,21 @@ kubectl apply -k artifacts/overlays/nodeport-mode
 
 3.创建Service-Account资源
 
-在kubeconfig中把user-context切换到karmada-apiserver
+在kubeconfig中把user-context切换到karmada-apiserver, 这里需要注意kubeconfig的配置切换
+
 ```bash
-kubectl config use-context karmada-apiserver
+kubectl config use-context karmada-apiserver --kubeconfig=/etc/karmada/karmada-apiserver.config
 ```
 执行下面的命令创建一个service-account的资源
 ```bash
-kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
+kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml --kubeconfig=/etc/karmada/karmada-apiserver.config
 ```
 
 4.获取 jwt token：
 
 执行下面的命令生成jwt token:
 ```bash
-kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}"
+kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}" --kubeconfig=/etc/karmada/karmada-apiserver.config
 ```
 
 jwt token的形式如下所示：
