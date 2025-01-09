@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/glebarez/sqlite v1.11.0
 	github.com/gobuffalo/flect v1.0.2
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/karmada-io/karmada v1.12.1
 	github.com/prometheus/common v0.55.0
 	github.com/samber/lo v1.39.0
