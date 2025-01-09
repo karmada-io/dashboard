@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Dropdown, Tag } from 'antd';
 import { cn } from '@/utils/cn.ts';
 
-interface ITagListProps {
+export interface ITagListProps {
   tags: {
     key: string;
     value: string;
@@ -17,7 +17,11 @@ const TagList: FC<ITagListProps> = (props) => {
       {tags.length === 0 ? (
         '-'
       ) : tags.length <= maxLen ? (
-        tags.map((t) => <Tag key={t.key}>{t.value}</Tag>)
+        <div className="flex flex-row flex-wrap gap-y-[4px]">
+          {tags.map((t) => (
+            <Tag key={t.key}>{t.value}</Tag>
+          ))}
+        </div>
       ) : (
         <div
           className={cn('flex', 'flex-row', {
@@ -42,5 +46,5 @@ const TagList: FC<ITagListProps> = (props) => {
     </>
   );
 };
-
+export { convertLabelToTags } from './helper.ts';
 export default TagList;
