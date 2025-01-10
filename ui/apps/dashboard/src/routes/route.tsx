@@ -87,7 +87,10 @@ export function getRoutes() {
               element: <MultiCloudNamespace />,
               handle: {
                 sidebarKey: 'NAMESPACE',
-                sidebarName: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
+                sidebarName: i18nInstance.t(
+                  'a4b28a416f0b6f3c215c51e79e517298',
+                  '命名空间',
+                ),
               },
             },
             {
@@ -208,7 +211,10 @@ export function getRoutes() {
           path: '/advanced-config',
           handle: {
             sidebarKey: 'ADVANCED-CONFIG',
-            sidebarName: i18nInstance.t('1f318234cab713b51b5172d91770bc11'),
+            sidebarName: i18nInstance.t(
+              '1f318234cab713b51b5172d91770bc11',
+              '高级配置',
+            ),
             icon: <Icons.advancedConfig {...IconStyles} />,
             isPage: false,
           },

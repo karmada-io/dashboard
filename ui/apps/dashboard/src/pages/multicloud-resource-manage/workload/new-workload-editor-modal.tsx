@@ -19,7 +19,6 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
   const { mode, open, workloadContent = '', onOk, onCancel, kind } = props;
   const [content, setContent] = useState<string>(workloadContent);
   useEffect(() => {
-    console.log('workloadContent', workloadContent);
     setContent(workloadContent);
   }, [workloadContent]);
 
@@ -28,11 +27,15 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
   }
   return (
     <Modal
-      title={`${mode === 'create' ? i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191') : i18nInstance.t('95b351c86267f3aedf89520959bce689')}${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}`}
+      title={
+        mode === 'create'
+          ? i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0', '新增工作负载')
+          : i18nInstance.t('634a943c97e905149acb81cef5bda28e', '编辑工作负载')
+      }
       open={open}
       width={1000}
-      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
-      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
+      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
       destroyOnClose={true}
       onOk={async () => {
         // await onOk()
@@ -113,6 +116,7 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
           minimap: {
             enabled: false,
           },
+          wordWrap: 'on',
         }}
         onChange={handleEditorChange}
       />

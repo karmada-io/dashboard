@@ -201,10 +201,20 @@ const OverridePolicyManage = () => {
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
-                  await messageApi.success(i18nInstance.t('删除成功'));
+                  await messageApi.success(
+                    i18nInstance.t(
+                      '0007d170de017dafc266aa03926d7f00',
+                      '删除成功',
+                    ),
+                  );
                   await refetch();
                 } else {
-                  await messageApi.error(i18nInstance.t('删除失败'));
+                  await messageApi.error(
+                    i18nInstance.t(
+                      'acf0664a54dc58d9d0377bb56e162092',
+                      '删除失败',
+                    ),
+                  );
                 }
               }}
               okText={'确认'}

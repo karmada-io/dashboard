@@ -14,6 +14,7 @@ interface ServiceTableProps {
   selectedWorkSpace: string;
   searchText: string;
   onViewServiceContent: (r: any) => void;
+  onEditServiceContent: (r: any) => void;
   onDeleteServiceContent: (r: Service) => void;
 }
 const ServiceTable: FC<ServiceTableProps> = (props) => {
@@ -22,11 +23,12 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
     selectedWorkSpace,
     searchText,
     onViewServiceContent,
+    onEditServiceContent,
     onDeleteServiceContent,
   } = props;
   const columns: TableColumnProps<Service>[] = [
     {
-      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
+      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -35,14 +37,14 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
     },
     {
       title: i18nInstance.t('8f3747c057d893862fbe4b7980e9b451', '服务名称'),
-      key: 'servicename',
+      key: 'serviceName',
       width: 300,
       render: (_, r) => {
         return r.objectMeta.name;
       },
     },
     {
-      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd'),
+      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd', '标签信息'),
       key: 'labelName',
       align: 'left',
       width: '30%',
@@ -60,7 +62,7 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619'),
+      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619', '分发策略'),
       key: 'propagationPolicies',
       render: (_, r) => {
         const pp = extractPropagationPolicy(r);
@@ -68,7 +70,7 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f'),
+      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f', '覆盖策略'),
       key: 'overridePolicies',
       width: 150,
       render: () => {
@@ -76,7 +78,7 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
       key: 'op',
       width: 200,
       render: (_, r) => {
@@ -94,27 +96,37 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
                 onViewServiceContent(ret?.data);
               }}
             >
-              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
             </Button>
             <Button
               size={'small'}
               type="link"
               onClick={async () => {
-                onDeleteServiceContent(r);
+                const ret = await GetResource({
+                  kind: r.typeMeta.kind,
+                  name: r.objectMeta.name,
+                  namespace: r.objectMeta.namespace,
+                });
+                onEditServiceContent(ret?.data);
               }}
             >
-              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
 
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('627ce40030fcda39210cca054bb77775', '工作负载么')}`}
-              onConfirm={async () => {}}
-              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
+              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('7cd82aa99087de6a052b1aba33dbd3ed', '服务么')}`}
+              onConfirm={() => {
+                onDeleteServiceContent(r);
+              }}
+              okText={i18nInstance.t(
+                'e83a256e4f5bb4ff8b3d804b5473217a',
+                '确认',
+              )}
               cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
             >
               <Button size={'small'} type="link" danger>
-                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
               </Button>
             </Popconfirm>
           </Space.Compact>

@@ -112,7 +112,9 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
 
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('944bfddeffc83e54cc6920f281d9b9f3', '配置么')}`}
+              title={i18nInstance.t('af57bb34df71db6c4a115ed7665faf5d', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={() => {
                 onDeleteConfigMapContent(r);
               }}

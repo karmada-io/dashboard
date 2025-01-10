@@ -110,6 +110,7 @@ const NewConfigEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
           minimap: {
             enabled: false,
           },
+          wordWrap: 'on',
         }}
         onChange={handleEditorChange}
       />

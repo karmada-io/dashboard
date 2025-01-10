@@ -1,43 +1,43 @@
 import i18nInstance from '@/utils/i18n';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Panel from '@/components/panel';
 import {
-  Input,
   Button,
-  Segmented,
-  TableColumnProps,
-  Tag,
-  Space,
-  Table,
+  Input,
   message,
   Popconfirm,
+  Segmented,
   Select,
+  Space,
+  Table,
+  TableColumnProps,
+  Tag,
 } from 'antd';
 import { Icons } from '@/components/icons';
 import { useQuery } from '@tanstack/react-query';
+import type { PropagationPolicy } from '@/services/propagationpolicy.ts';
 import {
-  GetPropagationPolicies,
+  ClusterPropagationPolicy,
   DeletePropagationPolicy,
   GetClusterPropagationPolicies,
-  ClusterPropagationPolicy,
+  GetPropagationPolicies,
 } from '@/services/propagationpolicy.ts';
-import type { PropagationPolicy } from '@/services/propagationpolicy.ts';
 import PropagationPolicyEditorDrawer, {
   PropagationPolicyEditorDrawerProps,
 } from './propagation-policy-editor-drawer';
 import { stringify } from 'yaml';
 import { GetResource } from '@/services/unstructured.ts';
-import { GetNamespaces } from '@/services/namespace.ts';
 import { useDebounce } from '@uidotdev/usehooks';
+import { PolicyScope } from '@/services/base.ts';
+import useNamespace from '@/hooks/use-namespace.ts';
 
-export type PolicyScope = 'namespace-scope' | 'cluster-scope';
 const PropagationPolicyManage = () => {
   const [filter, setFilter] = useState<{
     policyScope: PolicyScope;
     selectedNamespace: string;
     searchText: string;
   }>({
-    policyScope: 'namespace-scope',
+    policyScope: PolicyScope.Namespace,
     selectedNamespace: '',
     searchText: '',
   });
@@ -50,7 +50,7 @@ const PropagationPolicyManage = () => {
       debouncedSearchText,
     ],
     queryFn: async () => {
-      if (filter.policyScope === 'cluster-scope') {
+      if (filter.policyScope === PolicyScope.Cluster) {
         const ret = await GetClusterPropagationPolicies({
           keyword: filter.searchText,
         });
@@ -64,22 +64,7 @@ const PropagationPolicyManage = () => {
       }
     },
   });
-  const { data: nsData, isLoading: isNsDataLoading } = useQuery({
-    queryKey: ['GetNamespaces'],
-    queryFn: async () => {
-      const clusters = await GetNamespaces({});
-      return clusters.data || {};
-    },
-  });
-  const nsOptions = useMemo(() => {
-    if (!nsData?.namespaces) return [];
-    return nsData.namespaces.map((item) => {
-      return {
-        title: item.objectMeta.name,
-        value: item.objectMeta.name,
-      };
-    });
-  }, [nsData]);
+  const { nsOptions, isNsDataLoading } = useNamespace({});
   const [editorDrawerData, setEditorDrawerData] = useState<
     Omit<
       PropagationPolicyEditorDrawerProps,
@@ -93,8 +78,8 @@ const PropagationPolicyManage = () => {
     propagationContent: '',
   });
   const columns = [
-    filter.policyScope === 'namespace-scope' && {
-      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298'),
+    filter.policyScope === PolicyScope.Namespace && {
+      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
       key: 'namespaceName',
       width: 200,
       render: (_v: string, r: PropagationPolicy) => {
@@ -102,7 +87,7 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('53cf41060c577315071a7c14bb612852'),
+      title: i18nInstance.t('53cf41060c577315071a7c14bb612852', '策略名称'),
       key: 'policyName',
       width: 200,
       render: (_v: string, r: PropagationPolicy) => {
@@ -110,13 +95,13 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('915f48c8fcbe25e3dc5875c471b0ce3e'),
+      title: i18nInstance.t('915f48c8fcbe25e3dc5875c471b0ce3e', '调度器名称'),
       key: 'schedulerName',
       dataIndex: 'schedulerName',
       width: 200,
     },
     {
-      title: i18nInstance.t('ab7e397dd8c88360e441f1c1525a5758'),
+      title: i18nInstance.t('ab7e397dd8c88360e441f1c1525a5758', '关联集群'),
       key: 'cluster',
       render: (_v: string, r: PropagationPolicy) => {
         if (!r?.clusterAffinity?.clusterNames) {
@@ -132,7 +117,7 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('8c0921045b741bc4e19d61426b99c938'),
+      title: i18nInstance.t('8c0921045b741bc4e19d61426b99c938', '关联资源'),
       key: 'deployments',
       render: (_v: string, r: PropagationPolicy) => {
         return r?.deployments?.map((d) => (
@@ -141,7 +126,7 @@ const PropagationPolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
       key: 'op',
       width: 200,
       render: (_v: string, r: PropagationPolicy) => {
@@ -154,7 +139,10 @@ const PropagationPolicyManage = () => {
                 const ret = await GetResource({
                   name: r.objectMeta.name,
                   namespace: r.objectMeta.namespace,
-                  kind: 'propagationpolicy',
+                  kind:
+                    filter.policyScope === PolicyScope.Namespace
+                      ? 'propagationpolicy'
+                      : 'clusterpropagationpolicy',
                 });
                 const content = stringify(ret.data);
                 setEditorDrawerData({
@@ -166,7 +154,7 @@ const PropagationPolicyManage = () => {
                 });
               }}
             >
-              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
             </Button>
             <Button
               size={'small'}
@@ -175,7 +163,10 @@ const PropagationPolicyManage = () => {
                 const ret = await GetResource({
                   name: r.objectMeta.name,
                   namespace: r.objectMeta.namespace,
-                  kind: 'propagationpolicy',
+                  kind:
+                    filter.policyScope === PolicyScope.Namespace
+                      ? 'propagationpolicy'
+                      : 'clusterpropagationpolicy',
                 });
                 const content = stringify(ret.data);
                 setEditorDrawerData({
@@ -187,33 +178,47 @@ const PropagationPolicyManage = () => {
                 });
               }}
             >
-              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('aa141bcb65729912b79cb27995a8989b', '调度策略么')}`}
+              title={i18nInstance.t('b13c676134d8ab066d62e9ea5bdf796c', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={async () => {
                 const ret = await DeletePropagationPolicy({
-                  isClusterScope: filter.policyScope === 'cluster-scope',
+                  isClusterScope: filter.policyScope === PolicyScope.Cluster,
                   namespace: r.objectMeta.namespace,
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
                   await messageApi.success(
-                    i18nInstance.t('0007d170de017dafc266aa03926d7f00'),
+                    i18nInstance.t(
+                      '0007d170de017dafc266aa03926d7f00',
+                      '删除成功',
+                    ),
                   );
                   await refetch();
                 } else {
                   await messageApi.error(
-                    i18nInstance.t('acf0664a54dc58d9d0377bb56e162092'),
+                    i18nInstance.t(
+                      'acf0664a54dc58d9d0377bb56e162092',
+                      '删除失败',
+                    ),
                   );
                 }
               }}
-              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
-              cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+              okText={i18nInstance.t(
+                'e83a256e4f5bb4ff8b3d804b5473217a',
+                '确认',
+              )}
+              cancelText={i18nInstance.t(
+                '625fb26b4b3340f7872b411f401e754c',
+                '取消',
+              )}
             >
               <Button size={'small'} type="link" danger>
-                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
               </Button>
             </Popconfirm>
           </Space.Compact>
@@ -252,19 +257,25 @@ const PropagationPolicyManage = () => {
         }}
         options={[
           {
-            label: i18nInstance.t('bf15e71b2553d369585ace795d15ac3b'),
-            value: 'namespace-scope',
+            label: i18nInstance.t(
+              'bf15e71b2553d369585ace795d15ac3b',
+              '命名空间级别',
+            ),
+            value: PolicyScope.Namespace,
           },
           {
-            label: i18nInstance.t('860f29d8fc7a68113902db52885111d4'),
-            value: 'cluster-scope',
+            label: i18nInstance.t(
+              '860f29d8fc7a68113902db52885111d4',
+              '集群级别',
+            ),
+            value: PolicyScope.Cluster,
           },
         ]}
       />
 
       <div className={'flex flex-row mb-4 justify-between'}>
         <div className={'flex flex-row space-x-4'}>
-          {filter.policyScope === 'namespace-scope' && (
+          {filter.policyScope === PolicyScope.Namespace && (
             <>
               <h3 className={'leading-[32px]'}>命名空间</h3>
               <Select
@@ -308,9 +319,15 @@ const PropagationPolicyManage = () => {
               });
             }}
           >
-            {filter.policyScope === 'namespace-scope'
-              ? i18nInstance.t('5ac6560da4f54522d590c5f8e939691b')
-              : i18nInstance.t('929e0cda9f7fdc960dafe6ef742ab088')}
+            {filter.policyScope === PolicyScope.Namespace
+              ? i18nInstance.t(
+                  '5ac6560da4f54522d590c5f8e939691b',
+                  '新增调度策略',
+                )
+              : i18nInstance.t(
+                  '929e0cda9f7fdc960dafe6ef742ab088',
+                  '新增集群调度策略',
+                )}
           </Button>
         </div>
       </div>

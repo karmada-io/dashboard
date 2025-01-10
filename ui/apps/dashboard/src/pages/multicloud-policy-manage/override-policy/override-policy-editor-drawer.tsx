@@ -113,6 +113,7 @@ const OverridePolicyEditorDrawer: FC<OverridePolicyEditorDrawerProps> = (
           minimap: {
             enabled: false,
           },
+          wordWrap: 'on',
         }}
         onChange={handleEditorChange}
       />
