@@ -26,7 +26,7 @@ spec:
         - command:
             - karmada-dashboard-api
             - --karmada-kubeconfig=/etc/kubeconfig
-            - --karmada-context=karmada
+            - --karmada-context=karmada-apiserver
             - --kubeconfig=/etc/kubeconfig
             - --context=karmada
             - --insecure-bind-address=0.0.0.0

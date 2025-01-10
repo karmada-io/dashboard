@@ -1,8 +1,6 @@
 # Karmada-dashboard
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/kubernetes/dashboard/blob/master/LICENSE)
 
-English version|[中文版](README_cn.md)
-
 Karmada Dashboard is a general-purpose, web-based control panel for Karmada which is a multi-cluster management project.
 ![image](docs/images/readme-dashboard-en.png)
 
@@ -17,25 +15,80 @@ If you don't already have the Karmada, you can launch one by following this [tut
 
 ---
 ### Install Karmada-dashboard
-In the following steps, we assumed that you follow this tutorial to set up a minimal environment with Karmada, for administrator who manage multi cluster with karmada, all the experience from minimal environment is reusable, there won't be a lot of differences.
+In the following steps, we are going to install Karmada Dashboard on the `host cluster` where running the Karmada
+control plane components. We assume that Karmada was installed in namespace `karmada-system` and Karmada config is 
+located at `$HOME/.kube/karmada.config`, if this differs from your environment, please modify the following commands 
+accordingly. 
 
-1.Switch user-context to karmada-host
+1. Switch user-context of your Karmada config to `karmada-host`.
 
 ```bash
 export KUBECONFIG="$HOME/.kube/karmada.config"
 kubectl config use-context karmada-host
 ```
 
-2.Deploy Karmada-dashboard, we choose to export karmada dashboard by nodePort, which will free of any dependencies.
+Now, you should be able to see Karmada control plane components by following command:
+```
+kubectl get deployments.apps -n karmada-system
+```
 
-```bash
+If everything works fine, you will get similar messages as following:
+```
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+karmada-aggregated-apiserver          2/2     2            2           3d
+karmada-apiserver                     1/1     1            1           3d
+karmada-controller-manager            1/1     1            1           3d
+karmada-kube-controller-manager       1/1     1            1           3d
+karmada-scheduler                     2/2     2            2           3d
+karmada-webhook                       2/2     2            2           3d
+```
+
+2. Deploy Karmada Dashboard
+
+Clone this repo to your machine:
+```
+git clone https://github.com/karmada-io/dashboard.git
+```
+
+Change to the dashboard directory:
+```
+cd dashboard
+```
+
+Create the secret based on your Karmada config, the Karmada Dashboard will use this config to talk to the Karmada API server.
+```
+kubectl create secret generic kubeconfig --from-file=kubeconfig=$HOME/.kube/karmada.config -n karmada-system
+```
+
+Deploy Karmada Dashboard:
+```
 kubectl apply -k artifacts/overlays/nodeport-mode
 ```
-When the process of installation finished, you can visit the karmada dashboard by http://your-karmada-host:32000
+
+This will deploy two components in `karmada-system` namespace:
+
+```
+kubectl get deployments.apps -n karmada-system                                                                                                                karmada-dev-linux-renhongcai: Fri Jan 10 16:08:38 2025
+
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+karmada-dashboard-api                 1/1     1            1           2m
+karmada-dashboard-web                 1/1     1            1           2m
+...
+```
+
+Then you will be able to access the Karmada Dashboard by `http://your-karmada-host:32000`.
+Note that, the Karmada Dashboard service type is `NodePort`, this exposes the dashboard on a specific port on each node
+of your `host cluster`, allowing you to access it via any node's IP address and that port.
+
+You also can use `kubectl port-forward` to forward a local port to the Dashboard's backend pod:
+```
+kubectl port-forward -n karmada-system services/karmada-dashboard-web --address 0.0.0.0 8000:8000
+```
+Then you can access it via `http://localhost:8000`.
 
 You still need the jwt token to login to the dashboard.
 
-3.Create Service Account
+3. Create Service Account
 
 switch user-context to karmada-apiserver:
 ```bash
@@ -46,7 +99,7 @@ Create Service Account:
 kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
 ```
 
-4.Get jwt token
+4. Get jwt token
 
 Execute the following code to get the jwt token:
 ```bash
