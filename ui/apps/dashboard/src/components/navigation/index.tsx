@@ -65,7 +65,7 @@ const Navigation: FC<INavigationProps> = (props) => {
                 placement="bottomLeft"
                 arrow
               >
-                {getLangIcon(getLang())}
+                <div>{getLangIcon(getLang())}</div>
               </Dropdown>
             </div>
             {/* user info */}
