@@ -29,7 +29,9 @@ const ServiceEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
       title={
         mode === 'create'
           ? i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')
-          : i18nInstance.t('cc51f34aa418cb3a596fd6470c677bfe', '编辑服务')
+          : mode === 'edit'
+            ? i18nInstance.t('cc51f34aa418cb3a596fd6470c677bfe', '编辑服务')
+            : i18nInstance.t('ad23e7bbdbe6ed03eebfc27eef7570fa', '查看服务')
       }
       open={open}
       width={1000}
@@ -72,7 +74,9 @@ const ServiceEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
         setContent('');
       }}
     >
-      <Form.Item label={'服务类型'}>
+      <Form.Item
+        label={i18nInstance.t('924f67de61fc9e07fff979306900dc6a', '服务类型')}
+      >
         <Select
           value={kind}
           disabled

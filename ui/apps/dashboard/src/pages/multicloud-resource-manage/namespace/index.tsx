@@ -82,10 +82,10 @@ const NamespacePage = () => {
       render: (_, r) => {
         return (
           <Space.Compact>
-            <Button size={'small'} type="link">
+            <Button size={'small'} type="link" disabled={true}>
               {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
             </Button>
-            <Button size={'small'} type="link">
+            <Button size={'small'} type="link" disabled={true}>
               {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
             <Button

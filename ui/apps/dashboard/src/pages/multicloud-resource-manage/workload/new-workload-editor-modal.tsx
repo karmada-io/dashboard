@@ -73,7 +73,12 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
         setContent('');
       }}
     >
-      <Form.Item label={'工作负载类型'}>
+      <Form.Item
+        label={i18nInstance.t(
+          '0a3e7cdadc44fb133265152268761abc',
+          '工作负载类型',
+        )}
+      >
         <Select
           value={kind}
           disabled

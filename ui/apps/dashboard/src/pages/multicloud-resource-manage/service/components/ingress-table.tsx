@@ -108,7 +108,9 @@ const IngressTable: FC<ServiceTableProps> = (props) => {
 
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('627ce40030fcda39210cca054bb77775', '工作负载么')}`}
+              title={i18nInstance.t('6163856192e115e6b914d6fb8c4fd82c', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={async () => {}}
               okText={i18nInstance.t(
                 'e83a256e4f5bb4ff8b3d804b5473217a',

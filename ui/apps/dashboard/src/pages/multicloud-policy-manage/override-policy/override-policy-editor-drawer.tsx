@@ -6,6 +6,7 @@ import { IResponse } from '@/services/base.ts';
 import { parse } from 'yaml';
 import _ from 'lodash';
 import { CreateOverridePolicy } from '@/services/overridepolicy.ts';
+import i18nInstance from '@/utils/i18n.tsx';
 export interface OverridePolicyEditorDrawerProps {
   open: boolean;
   mode: 'create' | 'edit' | 'detail';
@@ -23,11 +24,11 @@ function getTitle(
 ) {
   switch (mode) {
     case 'create':
-      return '新增调度策略';
+      return i18nInstance.t('7afddf70e5c82fab8fa935458b53174a', '新增覆盖策略');
     case 'edit':
-      return `编辑覆盖策略`;
+      return i18nInstance.t('236513393327bd6b098056314f8676ac', '编辑覆盖策略');
     case 'detail':
-      return `${name}策略详情`;
+      return i18nInstance.t('781a90424b3d02153bc979e0f90179aa', { name });
     default:
       return '';
   }

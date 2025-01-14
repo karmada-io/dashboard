@@ -277,7 +277,9 @@ const PropagationPolicyManage = () => {
         <div className={'flex flex-row space-x-4'}>
           {filter.policyScope === PolicyScope.Namespace && (
             <>
-              <h3 className={'leading-[32px]'}>命名空间</h3>
+              <h3 className={'leading-[32px]'}>
+                {i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}
+              </h3>
               <Select
                 options={nsOptions}
                 className={'min-w-[200px]'}
@@ -296,7 +298,10 @@ const PropagationPolicyManage = () => {
             </>
           )}
           <Input.Search
-            placeholder={'按名称检索，按下回车开始搜索'}
+            placeholder={i18nInstance.t(
+              '88270824e97355ca21f4101e5f1b73a0',
+              '按名称检索，按下回车开始搜索',
+            )}
             className={'w-[400px]'}
             value={filter.searchText}
             onChange={(e) => {

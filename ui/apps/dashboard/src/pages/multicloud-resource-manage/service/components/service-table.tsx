@@ -115,7 +115,9 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
 
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('7cd82aa99087de6a052b1aba33dbd3ed', '服务么')}`}
+              title={i18nInstance.t('6163856192e115e6b914d6fb8c4fd82c', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={() => {
                 onDeleteServiceContent(r);
               }}

@@ -164,7 +164,9 @@ const WorkloadPage = () => {
 
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('627ce40030fcda39210cca054bb77775', '工作负载么')}`}
+              title={i18nInstance.t('f0ade52acfa0bc5bd63e7cb29db84959', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={async () => {
                 // todo after delete, need to wait until resource deleted
                 const ret = await DeleteResource({
