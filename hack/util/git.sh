@@ -26,4 +26,3 @@ function util::git::version_ldflags() {
            -X github.com/karmada-io/dashboard/pkg/environment.buildDate=${BUILDDATE}"
   echo "$LDFLAGS"
 }
-
