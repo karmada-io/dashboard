@@ -54,7 +54,7 @@ const ClusterManagePage = () => {
   });
   const columns: TableColumnProps<Cluster>[] = [
     {
-      title: i18nInstance.t('c3f28b34bbdec501802fa403584267e6'),
+      title: i18nInstance.t('c3f28b34bbdec501802fa403584267e6', '集群名称'),
       key: 'clusterName',
       width: 150,
       render: (_, r) => {
@@ -63,14 +63,17 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('bd17297989ec345cbc03ae0b8a13dc0a'),
+      title: i18nInstance.t(
+        'bd17297989ec345cbc03ae0b8a13dc0a',
+        'kubernetes版本',
+      ),
       dataIndex: 'kubernetesVersion',
       key: 'kubernetesVersion',
       width: 150,
       align: 'center',
     },
     {
-      title: i18nInstance.t('ee00813361387a116d274c608ba8bb13'),
+      title: i18nInstance.t('ee00813361387a116d274c608ba8bb13', '集群状态'),
       dataIndex: 'ready',
       key: 'ready',
       align: 'center',
@@ -110,7 +113,7 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('f0789e79d48f135e5d870753f7a85d05'),
+      title: i18nInstance.t('f0789e79d48f135e5d870753f7a85d05', '模式'),
       dataIndex: 'syncMode',
       width: 150,
       align: 'center',
@@ -123,7 +126,7 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('b86224e030e5948f96b70a4c3600b33f'),
+      title: i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态'),
       dataIndex: 'nodeStatus',
       align: 'center',
       width: 150,
@@ -140,7 +143,7 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f'),
+      title: i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'cpu用量'),
       dataIndex: 'cpuFraction',
       width: '15%',
       render: (_, r) => {
@@ -156,7 +159,7 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07'),
+      title: i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'memory用量'),
       dataIndex: 'memoryFraction',
       width: '15%',
       render: (_, r) => {
@@ -172,14 +175,14 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc'),
+      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
       key: 'op',
       width: 200,
       render: (_, r) => {
         return (
           <Space.Compact>
             <Button size={'small'} type="link" disabled>
-              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f')}
+              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
             </Button>
             <Button
               size={'small'}
@@ -193,29 +196,42 @@ const ClusterManagePage = () => {
                 });
               }}
             >
-              {i18nInstance.t('95b351c86267f3aedf89520959bce689')}
+              {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('79d5c80e3be24682145aa9246df18b40', '集群么?')}`}
+              title={i18nInstance.t('30ee910e8ea18311b1b2efbea94333b8', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={async () => {
                 const ret = await DeleteCluster(r.objectMeta.name);
                 if (ret.code === 200) {
                   await messageApi.success(
-                    `${i18nInstance.t('85fe5099f6807dada65d274810933389', '集群')}${r.objectMeta.name}${i18nInstance.t('0007d170de017dafc266aa03926d7f00', '删除成功')}`,
+                    i18nInstance.t('fb09e53e96ff76a72894a816dd7c731c', {
+                      name: r.objectMeta.name,
+                    }),
                   );
                   await refetch();
                 } else {
                   await messageApi.error(
-                    i18nInstance.t('9e7856e9c5938b9200dbdc174e97cf8a'),
+                    i18nInstance.t(
+                      '9e7856e9c5938b9200dbdc174e97cf8a',
+                      '集群删除失败',
+                    ),
                   );
                 }
               }}
-              okText={i18nInstance.t('e83a256e4f5bb4ff8b3d804b5473217a')}
-              cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+              okText={i18nInstance.t(
+                'e83a256e4f5bb4ff8b3d804b5473217a',
+                '确认',
+              )}
+              cancelText={i18nInstance.t(
+                '625fb26b4b3340f7872b411f401e754c',
+                '取消',
+              )}
             >
               <Button size={'small'} type="link" danger>
-                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b')}
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
               </Button>
             </Popconfirm>
           </Space.Compact>
@@ -227,7 +243,10 @@ const ClusterManagePage = () => {
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
         <Input.Search
-          placeholder={i18nInstance.t('e8d235e76b8e310660e158dc4c2fd560')}
+          placeholder={i18nInstance.t(
+            'e8d235e76b8e310660e158dc4c2fd560',
+            '按集群名称搜索',
+          )}
           className={'w-[400px]'}
         />
         <Button
@@ -241,7 +260,7 @@ const ClusterManagePage = () => {
             });
           }}
         >
-          {i18nInstance.t('4cd980b26c5c76cdd4a5c5e44064d6da')}
+          {i18nInstance.t('4cd980b26c5c76cdd4a5c5e44064d6da', '新增集群')}
         </Button>
       </div>
       <Table
@@ -258,11 +277,17 @@ const ClusterManagePage = () => {
           if (ret.code === 200) {
             if (clusterModalData.mode === 'create') {
               await messageApi.success(
-                i18nInstance.t('dca2754f7a646ef40f495f75145428d0'),
+                i18nInstance.t(
+                  'dca2754f7a646ef40f495f75145428d0',
+                  '集群接入成功',
+                ),
               );
             } else if (clusterModalData.mode === 'edit') {
               await messageApi.success(
-                i18nInstance.t('474162cdce4e540d3a4d97c6de92cd68'),
+                i18nInstance.t(
+                  '474162cdce4e540d3a4d97c6de92cd68',
+                  '集群更新成功',
+                ),
               );
             }
             await refetch();
@@ -274,11 +299,17 @@ const ClusterManagePage = () => {
           } else {
             if (clusterModalData.mode === 'create') {
               await messageApi.error(
-                i18nInstance.t('3b0b5df2e18ef97b7f948c60906a7821'),
+                i18nInstance.t(
+                  '3b0b5df2e18ef97b7f948c60906a7821',
+                  '集群接入失败',
+                ),
               );
             } else if (clusterModalData.mode === 'edit') {
               await messageApi.error(
-                i18nInstance.t('01812e386ab69ce4391769918e32d6d1'),
+                i18nInstance.t(
+                  '01812e386ab69ce4391769918e32d6d1',
+                  '集群更新失败',
+                ),
               );
             }
           }

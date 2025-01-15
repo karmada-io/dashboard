@@ -39,7 +39,10 @@ const LoginPage = () => {
                   items={[
                     {
                       key: '1',
-                      label: i18nInstance.t('11fa53ed08b11d4753c29bbc8c8fee64'),
+                      label: i18nInstance.t(
+                        '11fa53ed08b11d4753c29bbc8c8fee64',
+                        '参考文档生成jwt token',
+                      ),
                       children: <code>!!todo</code>,
                     },
                   ]}
@@ -66,7 +69,10 @@ const LoginPage = () => {
                   const ret = await Login(authToken);
                   if (ret.code === 200) {
                     await messageApi.success(
-                      i18nInstance.t('11427a1edb98cf7efe26ca229d6f2626'),
+                      i18nInstance.t(
+                        '11427a1edb98cf7efe26ca229d6f2626',
+                        '登录成功，即将跳转',
+                      ),
                     );
                     setTimeout(() => {
                       setToken(authToken);
@@ -74,17 +80,23 @@ const LoginPage = () => {
                     }, 1000);
                   } else {
                     await messageApi.error(
-                      i18nInstance.t('a831066e2d289e126ff7cbf483c3bad1'),
+                      i18nInstance.t(
+                        'a831066e2d289e126ff7cbf483c3bad1',
+                        '登录失败，请重试',
+                      ),
                     );
                   }
                 } catch (e) {
                   await messageApi.error(
-                    i18nInstance.t('b6076a055fe6cc0473e0d313dc58a049'),
+                    i18nInstance.t(
+                      'b6076a055fe6cc0473e0d313dc58a049',
+                      '登录失败',
+                    ),
                   );
                 }
               }}
             >
-              {i18nInstance.t('402d19e50fff44c827a4f3b608bd5812')}
+              {i18nInstance.t('402d19e50fff44c827a4f3b608bd5812', '登录')}
             </Button>
           </div>
         </Card>

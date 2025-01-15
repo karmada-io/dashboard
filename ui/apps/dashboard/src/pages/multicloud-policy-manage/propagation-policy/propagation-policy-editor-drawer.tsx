@@ -23,9 +23,9 @@ function getTitle(
 ) {
   switch (mode) {
     case 'create':
-      return i18nInstance.t('5ac6560da4f54522d590c5f8e939691b');
+      return i18nInstance.t('5ac6560da4f54522d590c5f8e939691b', '新增调度策略');
     case 'edit':
-      return `${i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}${name}${i18nInstance.t('a95abe7b8eeb55427547e764bf39f1c4', '调度策略')}`;
+      return i18nInstance.t('0518f7eb54d49436d72ae539f422e68b', { name });
     case 'detail':
       return `${name}${i18nInstance.t('f05bc327e4066ca97af893e52e2c62b3', '策略详情')}`;
     default:
@@ -68,7 +68,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
         <div className={'flex flex-row justify-end'}>
           <Space>
             <Button onClick={onClose}>
-              {i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+              {i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
             </Button>
             <Button
               type="primary"
@@ -95,7 +95,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
                 }
               }}
             >
-              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
+              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
             </Button>
           </Space>
         </div>
@@ -113,6 +113,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
           minimap: {
             enabled: false,
           },
+          wordWrap: 'on',
         }}
         onChange={handleEditorChange}
       />

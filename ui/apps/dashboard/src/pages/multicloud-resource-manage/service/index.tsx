@@ -3,14 +3,13 @@ import Panel from '@/components/panel';
 import { Button, Input, Segmented, Select } from 'antd';
 import { ServiceKind } from '@/services/base';
 import { Icons } from '@/components/icons';
-import { useQuery } from '@tanstack/react-query';
-import { GetNamespaces } from '@/services/namespace';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useToggle, useWindowSize } from '@uidotdev/usehooks';
 import ServiceTable from './components/service-table';
 import ServiceEditorModal from './components/service-editor-modal';
 import { stringify } from 'yaml';
 import IngressTable from '@/pages/multicloud-resource-manage/service/components/ingress-table';
+import useNamespace from '@/hooks/use-namespace.ts';
 const ServicePage = () => {
   const [filter, setFilter] = useState<{
     selectedWorkSpace: string;
@@ -21,26 +20,11 @@ const ServicePage = () => {
     searchText: '',
     kind: ServiceKind.Service,
   });
-  const { data: nsData, isLoading: isNsDataLoading } = useQuery({
-    queryKey: ['GetNamespaces'],
-    queryFn: async () => {
-      const clusters = await GetNamespaces({});
-      return clusters.data || {};
-    },
-  });
-  const nsOptions = useMemo(() => {
-    if (!nsData?.namespaces) return [];
-    return nsData.namespaces.map((item) => {
-      return {
-        title: item.objectMeta.name,
-        value: item.objectMeta.name,
-      };
-    });
-  }, [nsData]);
+  const { nsOptions, isNsDataLoading } = useNamespace({});
   const size = useWindowSize();
   const labelTagNum = size && size.width! > 1800 ? undefined : 1;
   const [editorState, setEditorState] = useState<{
-    mode: 'create' | 'edit';
+    mode: 'create' | 'edit' | 'detail';
     content: string;
   }>({
     mode: 'create',
@@ -103,7 +87,7 @@ const ServicePage = () => {
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
         <h3 className={'leading-[32px]'}>
-          {i18nInstance.t('280c56077360c204e536eb770495bc5f')}
+          {i18nInstance.t('280c56077360c204e536eb770495bc5f', '命名空间')}
         </h3>
         <Select
           options={nsOptions}
@@ -120,7 +104,10 @@ const ServicePage = () => {
           }}
         />
         <Input.Search
-          placeholder={i18nInstance.t('cfaff3e369b9bd51504feb59bf0972a0')}
+          placeholder={i18nInstance.t(
+            'cfaff3e369b9bd51504feb59bf0972a0',
+            '按命名空间搜索',
+          )}
           className={'w-[300px]'}
           onPressEnter={(e) => {
             const input = e.currentTarget.value;
@@ -137,6 +124,13 @@ const ServicePage = () => {
           searchText={filter.searchText}
           selectedWorkSpace={filter.selectedWorkSpace}
           onViewServiceContent={(r) => {
+            setEditorState({
+              mode: 'detail',
+              content: stringify(r),
+            });
+            toggleShowModal(true);
+          }}
+          onEditServiceContent={(r) => {
             setEditorState({
               mode: 'edit',
               content: stringify(r),
@@ -173,6 +167,7 @@ const ServicePage = () => {
           resetEditorState();
           toggleShowModal(false);
         }}
+        kind={filter.kind}
       />
     </Panel>
   );
