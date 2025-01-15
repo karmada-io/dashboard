@@ -79,12 +79,12 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
       open={open}
       title={
         mode === 'create'
-          ? i18nInstance.t('4cd980b26c5c76cdd4a5c5e44064d6da')
-          : i18nInstance.t('8d3d771ab6d38cf457a832763a5203a0')
+          ? i18nInstance.t('4cd980b26c5c76cdd4a5c5e44064d6da', '新增集群')
+          : i18nInstance.t('8d3d771ab6d38cf457a832763a5203a0', '编辑集群')
       }
       width={800}
-      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721')}
-      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c')}
+      okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
+      cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
       destroyOnClose={true}
       confirmLoading={confirmLoading}
       onOk={async () => {
@@ -121,24 +121,30 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
         form={form}
         className={mode === 'create' ? 'min-h-[500px]' : 'min-h-[200px]'}
         validateMessages={{
-          required: i18nInstance.t('e0a23c19b8a0044c5defd167b441d643'),
+          required: i18nInstance.t(
+            'e0a23c19b8a0044c5defd167b441d643',
+            "'${name}' 是必选字段",
+          ),
         }}
       >
         <Form.Item
-          label={i18nInstance.t('c3f28b34bbdec501802fa403584267e6')}
+          label={i18nInstance.t('c3f28b34bbdec501802fa403584267e6', '集群名称')}
           name="clusterName"
           required
           rules={[{ required: true }]}
           {...formItemLayout}
         >
           <Input
-            placeholder={i18nInstance.t('debdfce08462b0261ed58925fe915450')}
+            placeholder={i18nInstance.t(
+              'debdfce08462b0261ed58925fe915450',
+              '请输入集群名称',
+            )}
             disabled={mode !== 'create'}
             className={'w-[200px]'}
           />
         </Form.Item>
         <Form.Item
-          label={i18nInstance.t('e8d733d77271dd37b33820f5eafeb2c2')}
+          label={i18nInstance.t('e8d733d77271dd37b33820f5eafeb2c2', '接入模式')}
           name="mode"
           required
           {...formItemLayout}
@@ -182,7 +188,9 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
               setShowAdvancedConfig(!showAdvancedConfig);
             }}
           >
-            <span>{i18nInstance.t('1f318234cab713b51b5172d91770bc11')}</span>
+            <span>
+              {i18nInstance.t('1f318234cab713b51b5172d91770bc11', '高级配置')}
+            </span>
             <Icons.up
               width={16}
               height={16}
@@ -212,7 +220,10 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                       : formItemLayoutWithOutLabel)}
                     label={
                       index === 0
-                        ? i18nInstance.t('b5a42b0552078d909538b09290dac33b')
+                        ? i18nInstance.t(
+                            'b5a42b0552078d909538b09290dac33b',
+                            '集群标签',
+                          )
                         : ''
                     }
                     required
@@ -226,6 +237,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                             required: true,
                             message: i18nInstance.t(
                               '645e18caca231e11428f48afbcc33f12',
+                              'label key必填',
                             ),
                           },
                         ]}
@@ -234,6 +246,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                         <Input
                           placeholder={i18nInstance.t(
                             '38fe9f04343da51a22f32b08fda176e2',
+                            '请输出label的key',
                           )}
                           className={'w-[150px]'}
                         />
@@ -245,6 +258,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                             required: true,
                             message: i18nInstance.t(
                               '95ef866ba7b4dccef30d67b9d0573f4c',
+                              'label value必填',
                             ),
                           },
                         ]}
@@ -253,6 +267,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                         <Input
                           placeholder={i18nInstance.t(
                             '8728e41e53f5447795926bfe80e547df',
+                            '请输出label的value',
                           )}
                           className={'w-[150px]'}
                         />
@@ -273,7 +288,10 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                     icon={<Icons.add />}
                     className="flex flex-row items-center justify-center h-[32px]"
                   >
-                    {i18nInstance.t('c1153b413b26be76aa95cce9ce3ce588')}
+                    {i18nInstance.t(
+                      'c1153b413b26be76aa95cce9ce3ce588',
+                      '新增集群标签',
+                    )}
                   </Button>
                 </Form.Item>
               </>
@@ -292,7 +310,10 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                           : formItemLayoutWithOutLabel)}
                         label={
                           index === 0
-                            ? i18nInstance.t('7e9edd6aac5f7394babb5825093d0b2f')
+                            ? i18nInstance.t(
+                                '7e9edd6aac5f7394babb5825093d0b2f',
+                                '集群污点',
+                              )
                             : ''
                         }
                         required
@@ -307,6 +328,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                             <Input
                               placeholder={i18nInstance.t(
                                 'af4d4438625e0bd7915a63a9cf48d6cb',
+                                '请输出taint的key',
                               )}
                               className={'w-[200px]'}
                             />
@@ -333,6 +355,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                             <Input
                               placeholder={i18nInstance.t(
                                 'dc74ee6676ae5689ef91a6a1f6ca4e17',
+                                '请输出taint的value',
                               )}
                               className={'w-[200px]'}
                             />
@@ -381,7 +404,10 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                       icon={<Icons.add />}
                       className="flex flex-row items-center justify-center h-[32px]"
                     >
-                      {i18nInstance.t('a8c0e7f3a8bbae7c553d25aab4f68978')}
+                      {i18nInstance.t(
+                        'a8c0e7f3a8bbae7c553d25aab4f68978',
+                        '新增集群污点',
+                      )}
                     </Button>
                   </Form.Item>
                 </>

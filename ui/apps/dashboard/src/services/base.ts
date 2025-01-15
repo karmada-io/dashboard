@@ -87,6 +87,17 @@ export enum ConfigKind {
   ConfigMap = 'configmap',
 }
 
+export enum PolicyScope {
+  Namespace = 'namespace-scope',
+  Cluster = 'cluster-scope',
+}
+
+export enum Mode {
+  Create = 'create',
+  Edit = 'edit',
+  Detail = 'detail',
+}
+
 export const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
 // safely extract propagationpolicy
 export const extractPropagationPolicy = (r: { objectMeta: ObjectMeta }) => {

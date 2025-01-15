@@ -117,7 +117,9 @@ const SecretTable: FC<SecretTableProps> = (props) => {
 
             <Popconfirm
               placement="topRight"
-              title={`${i18nInstance.t('fc763fd5ddf637fe4ba1ac59e10b8d3a', '确认要删除')}${r.objectMeta.name}${i18nInstance.t('d75cd1214625380b095ff63a891ce293', '秘钥么')}`}
+              title={i18nInstance.t('dd7454e05ce9088395dbeb92bf939fd4', {
+                name: r.objectMeta.name,
+              })}
               onConfirm={() => {
                 onDeleteSecretContent(r);
               }}
