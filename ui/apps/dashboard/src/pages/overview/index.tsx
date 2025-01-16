@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { capitalize, titleCase } from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { Badge, Descriptions, DescriptionsProps, Statistic, Spin } from 'antd';
 import { useQuery } from '@tanstack/react-query';
@@ -21,7 +21,9 @@ const Overview = () => {
     },
     {
       key: 'karmada-status',
-      label: i18nInstance.t('3fea7ca76cdece641436d7ab0d02ab1b', '状态'),
+      label: capitalize(
+        i18nInstance.t('3fea7ca76cdece641436d7ab0d02ab1b', '状态'),
+      ),
       children:
         data?.karmadaInfo.status === 'running' ? (
           <Badge
@@ -40,7 +42,9 @@ const Overview = () => {
     },
     {
       key: 'karmada-create-time',
-      label: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
+      label: capitalize(
+        i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
+      ),
       children:
         (data?.karmadaInfo.createTime &&
           dayjs(data?.karmadaInfo.createTime).format('YYYY-MM-DD HH:mm:ss')) ||
@@ -48,7 +52,9 @@ const Overview = () => {
     },
     {
       key: 'cluster-info',
-      label: i18nInstance.t('a0d6cb39b547d45a530a3308dce79c86', '工作集群信息'),
+      label: capitalize(
+        i18nInstance.t('a0d6cb39b547d45a530a3308dce79c86', '工作集群信息'),
+      ),
       children: (
         <>
           <div>
@@ -194,14 +200,18 @@ const Overview = () => {
       <Panel>
         <Descriptions
           className={'mt-8'}
-          title={i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息')}
+          title={titleCase(
+            i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息'),
+          )}
           bordered
           items={basicItems}
         />
 
         <Descriptions
           className={'mt-8'}
-          title={i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息')}
+          title={titleCase(
+            i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息'),
+          )}
           bordered
           items={resourceItems}
           labelStyle={{ width: '150px' }}
