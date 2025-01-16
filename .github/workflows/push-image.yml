@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-fronted:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
 
   build-and-push-web:
     if: ${{ github.repository == 'karmada-io/dashboard' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ "build-fronted" ]
     env:
       IMAGE_NAME: karmada/karmada-dashboard-web
@@ -88,7 +88,7 @@ jobs:
 
   build-and-push-api:
     if: ${{ github.repository == 'karmada-io/dashboard' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       IMAGE_NAME: karmada/karmada-dashboard-api
       BINARY_NAME: karmada-dashboard-api
