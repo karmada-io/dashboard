@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { titleCase } from '@/utils/i18n';
 import { useMemo, useState } from 'react';
 import Panel from '@/components/panel';
 import {
@@ -90,7 +90,9 @@ const OverridePolicyManage = () => {
   });
   const columns = [
     filter.policyScope === 'namespace-scope' && {
-      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
+      title: titleCase(
+        i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
+      ),
       key: 'namespaceName',
       width: 200,
       render: (_v: string, r: OverridePolicy | ClusterOverridePolicy) => {
@@ -98,7 +100,9 @@ const OverridePolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('53cf41060c577315071a7c14bb612852', '策略名称'),
+      title: titleCase(
+        i18nInstance.t('53cf41060c577315071a7c14bb612852', '策略名称'),
+      ),
       key: 'policyName',
       width: 200,
       render: (_v: string, r: OverridePolicy | ClusterOverridePolicy) => {
@@ -106,9 +110,8 @@ const OverridePolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t(
-        '8a59b316f11d99f01ebe9b1b466ba8de',
-        '差异化策略类型',
+      title: titleCase(
+        i18nInstance.t('8a59b316f11d99f01ebe9b1b466ba8de', '差异化策略类型'),
       ),
       key: 'ruleTypes',
       dataIndex: 'ruleTypes',
@@ -125,7 +128,9 @@ const OverridePolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('ab7e397dd8c88360e441f1c1525a5758', '关联集群'),
+      title: titleCase(
+        i18nInstance.t('ab7e397dd8c88360e441f1c1525a5758', '关联集群'),
+      ),
       key: 'cluster',
       render: (_v: string, r: OverridePolicy | ClusterOverridePolicy) => {
         const clusters = extractClusterNames(r);
@@ -140,7 +145,9 @@ const OverridePolicyManage = () => {
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      title: titleCase(
+        i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      ),
       key: 'op',
       width: 200,
       render: (_v: string, r: OverridePolicy | ClusterOverridePolicy) => {
@@ -263,16 +270,17 @@ const OverridePolicyManage = () => {
         }}
         options={[
           {
-            label: i18nInstance.t(
-              'bf15e71b2553d369585ace795d15ac3b',
-              '命名空间级别',
+            label: titleCase(
+              i18nInstance.t(
+                'bf15e71b2553d369585ace795d15ac3b',
+                '命名空间级别',
+              ),
             ),
             value: 'namespace-scope',
           },
           {
-            label: i18nInstance.t(
-              '860f29d8fc7a68113902db52885111d4',
-              '集群级别',
+            label: titleCase(
+              i18nInstance.t('860f29d8fc7a68113902db52885111d4', '集群级别'),
             ),
             value: 'cluster-scope',
           },

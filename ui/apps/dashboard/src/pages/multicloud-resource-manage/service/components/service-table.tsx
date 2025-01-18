@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { titleCase } from '@/utils/i18n';
 import { Button, Popconfirm, Space, Table, TableColumnProps, Tag } from 'antd';
 import {
   extractPropagationPolicy,
@@ -9,6 +9,7 @@ import TagList from '@/components/tag-list';
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { GetResource } from '@/services/unstructured.ts';
+import { useTranslation } from 'react-i18next';
 interface ServiceTableProps {
   labelTagNum?: number;
   selectedWorkSpace: string;
@@ -18,6 +19,7 @@ interface ServiceTableProps {
   onDeleteServiceContent: (r: Service) => void;
 }
 const ServiceTable: FC<ServiceTableProps> = (props) => {
+  const { i18n } = useTranslation();
   const {
     labelTagNum,
     selectedWorkSpace,
@@ -28,7 +30,9 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
   } = props;
   const columns: TableColumnProps<Service>[] = [
     {
-      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
+      title: titleCase(
+        i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
+      ),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -36,7 +40,9 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('8f3747c057d893862fbe4b7980e9b451', '服务名称'),
+      title: titleCase(
+        i18nInstance.t('8f3747c057d893862fbe4b7980e9b451', '服务名称'),
+      ),
       key: 'serviceName',
       width: 300,
       render: (_, r) => {
@@ -44,7 +50,9 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd', '标签信息'),
+      title: titleCase(
+        i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd', '标签信息'),
+      ),
       key: 'labelName',
       align: 'left',
       width: '30%',
@@ -62,7 +70,9 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619', '分发策略'),
+      title: titleCase(
+        i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619', '分发策略'),
+      ),
       key: 'propagationPolicies',
       render: (_, r) => {
         const pp = extractPropagationPolicy(r);
@@ -70,15 +80,19 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       },
     },
     {
-      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f', '覆盖策略'),
+      title: titleCase(
+        i18nInstance.t('eaf8a02d1b16fcf94302927094af921f', '覆盖策略'),
+      ),
       key: 'overridePolicies',
-      width: 150,
+      width: i18n.language === 'en-US' ? 200 : 150,
       render: () => {
         return '-';
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      title: titleCase(
+        i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      ),
       key: 'op',
       width: 200,
       render: (_, r) => {

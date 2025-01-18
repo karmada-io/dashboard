@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { titleCase } from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
@@ -54,7 +54,9 @@ const ClusterManagePage = () => {
   });
   const columns: TableColumnProps<Cluster>[] = [
     {
-      title: i18nInstance.t('c3f28b34bbdec501802fa403584267e6', '集群名称'),
+      title: titleCase(
+        i18nInstance.t('c3f28b34bbdec501802fa403584267e6', '集群名称'),
+      ),
       key: 'clusterName',
       width: 150,
       render: (_, r) => {
@@ -63,9 +65,8 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t(
-        'bd17297989ec345cbc03ae0b8a13dc0a',
-        'kubernetes版本',
+      title: titleCase(
+        i18nInstance.t('bd17297989ec345cbc03ae0b8a13dc0a', 'kubernetes版本'),
       ),
       dataIndex: 'kubernetesVersion',
       key: 'kubernetesVersion',
@@ -73,7 +74,9 @@ const ClusterManagePage = () => {
       align: 'center',
     },
     {
-      title: i18nInstance.t('ee00813361387a116d274c608ba8bb13', '集群状态'),
+      title: titleCase(
+        i18nInstance.t('ee00813361387a116d274c608ba8bb13', '集群状态'),
+      ),
       dataIndex: 'ready',
       key: 'ready',
       align: 'center',
@@ -113,7 +116,9 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('f0789e79d48f135e5d870753f7a85d05', '模式'),
+      title: titleCase(
+        i18nInstance.t('f0789e79d48f135e5d870753f7a85d05', '模式'),
+      ),
       dataIndex: 'syncMode',
       width: 150,
       align: 'center',
@@ -126,7 +131,9 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态'),
+      title: titleCase(
+        i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态'),
+      ),
       dataIndex: 'nodeStatus',
       align: 'center',
       width: 150,
@@ -143,7 +150,9 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'cpu用量'),
+      title: titleCase(
+        i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'cpu用量'),
+      ),
       dataIndex: 'cpuFraction',
       width: '15%',
       render: (_, r) => {
@@ -159,7 +168,9 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'memory用量'),
+      title: titleCase(
+        i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'memory用量'),
+      ),
       dataIndex: 'memoryFraction',
       width: '15%',
       render: (_, r) => {
@@ -175,7 +186,9 @@ const ClusterManagePage = () => {
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      title: titleCase(
+        i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      ),
       key: 'op',
       width: 200,
       render: (_, r) => {
