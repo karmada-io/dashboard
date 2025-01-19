@@ -32,3 +32,6 @@ cmd/ops
 #local db files
 *.db
 *.db-journal
+
+# local api pid
+.api.pid
