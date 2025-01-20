@@ -19,6 +19,7 @@ import styles from './index.module.less';
 import { WorkloadKind } from '@/services/base.ts';
 import { cn } from '@/utils/cn';
 import TagList, { convertLabelToTags } from '@/components/tag-list';
+import { calculateDuration } from '@/utils/time.ts';
 
 export interface WorkloadDetailDrawerProps {
   open: boolean;
@@ -140,7 +141,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
               '4a6341a8bcc68e0b7120dbc89014b6a2',
               '持续时间',
             )}
-            value="2h"
+            value={calculateDuration(detailData?.objectMeta?.creationTimestamp)}
           />
           <Statistic
             className={styles['no-value']}
