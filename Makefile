@@ -40,7 +40,7 @@ build: $(TARGETS)
 # Build specific binary
 .PHONY: $(TARGETS)
 $(TARGETS):
-	BUILD_PLATFORMS=$(GOOS)/$(GOARCH) hack/build.sh $@
+	hack/build.sh $@
 
 ###################
 # Docker Images   #
