@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { titleCase } from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { Badge, Descriptions, DescriptionsProps, Statistic, Spin } from 'antd';
 import { useQuery } from '@tanstack/react-query';
@@ -16,12 +16,16 @@ const Overview = () => {
   const basicItems: DescriptionsProps['items'] = [
     {
       key: 'karmada-version',
-      label: i18nInstance.t('66e8579fa53a0cdf402e882a3574a380', 'Karmada版本'),
+      label: titleCase(
+        i18nInstance.t('66e8579fa53a0cdf402e882a3574a380', 'Karmada版本'),
+      ),
       children: data?.karmadaInfo.version.gitVersion || '-',
     },
     {
       key: 'karmada-status',
-      label: i18nInstance.t('3fea7ca76cdece641436d7ab0d02ab1b', '状态'),
+      label: titleCase(
+        i18nInstance.t('3fea7ca76cdece641436d7ab0d02ab1b', '状态'),
+      ),
       children:
         data?.karmadaInfo.status === 'running' ? (
           <Badge
@@ -40,7 +44,9 @@ const Overview = () => {
     },
     {
       key: 'karmada-create-time',
-      label: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
+      label: titleCase(
+        i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
+      ),
       children:
         (data?.karmadaInfo.createTime &&
           dayjs(data?.karmadaInfo.createTime).format('YYYY-MM-DD HH:mm:ss')) ||
@@ -48,7 +54,12 @@ const Overview = () => {
     },
     {
       key: 'cluster-info',
-      label: i18nInstance.t('a0d6cb39b547d45a530a3308dce79c86', '工作集群信息'),
+      label: titleCase(
+        i18nInstance.t('a0d6cb39b547d45a530a3308dce79c86', '工作集群信息'),
+      ),
+      labelStyle: {
+        width: i18nInstance.language === 'en-US' ? '300px' : '150px',
+      },
       children: (
         <>
           <div>
@@ -123,68 +134,76 @@ const Overview = () => {
   const resourceItems: DescriptionsProps['items'] = [
     {
       key: 'policy-info',
-      label: i18nInstance.t('85c6051762df2fe8f93ebc1083b7f6a4', '策略信息'),
+      label: titleCase(
+        i18nInstance.t('85c6051762df2fe8f93ebc1083b7f6a4', '策略信息'),
+      ),
       children: (
         <div className="flex flex-row space-x-4">
           <Statistic
-            title={i18nInstance.t(
-              'a95abe7b8eeb55427547e764bf39f1c4',
-              '调度策略',
+            title={titleCase(
+              i18nInstance.t('a95abe7b8eeb55427547e764bf39f1c4', '调度策略'),
             )}
             value={data?.clusterResourceStatus.propagationPolicyNum}
           />
 
           <Statistic
-            title={i18nInstance.t(
-              '0a7e9443c41575378d2db1e288d3f1cb',
-              '差异化策略',
+            title={titleCase(
+              i18nInstance.t('0a7e9443c41575378d2db1e288d3f1cb', '差异化策略'),
             )}
             value={data?.clusterResourceStatus.overridePolicyNum}
           />
         </div>
       ),
-
       span: 3,
     },
     {
       key: 'multicloud-resources-info',
-      label: i18nInstance.t('612af712ef5ed7868a6b2f1d3d68530c', '多云资源信息'),
+      label: titleCase(
+        i18nInstance.t('612af712ef5ed7868a6b2f1d3d68530c', '多云资源信息'),
+      ),
       children: (
         <div className="flex flex-row space-x-4">
           <Statistic
-            title={i18nInstance.t(
-              '1200778cf86309309154ef88804fa22e',
-              '多云命名空间',
+            title={titleCase(
+              i18nInstance.t(
+                '1200778cf86309309154ef88804fa22e',
+                '多云命名空间',
+              ),
             )}
             value={data?.clusterResourceStatus.namespaceNum}
           />
 
           <Statistic
-            title={i18nInstance.t(
-              '3692cf6a2e079d34e7e5035aa98b1335',
-              '多云工作负载',
+            title={titleCase(
+              i18nInstance.t(
+                '3692cf6a2e079d34e7e5035aa98b1335',
+                '多云工作负载',
+              ),
             )}
             value={data?.clusterResourceStatus.workloadNum}
           />
 
           <Statistic
-            title={i18nInstance.t(
-              '2030a6e845ad6476fecbc1711c9f139d',
-              '多云服务与路由',
+            title={titleCase(
+              i18nInstance.t(
+                '2030a6e845ad6476fecbc1711c9f139d',
+                '多云服务与路由',
+              ),
             )}
             value={data?.clusterResourceStatus.serviceNum}
           />
 
           <Statistic
-            title={i18nInstance.t(
-              '0287028ec7eefa1333b56ee340d325a0',
-              '多云配置与秘钥',
+            title={titleCase(
+              i18nInstance.t(
+                '0287028ec7eefa1333b56ee340d325a0',
+                '多云配置与秘钥',
+              ),
             )}
             value={data?.clusterResourceStatus.configNum}
           />
         </div>
       ),
-
       span: 3,
     },
   ];
@@ -194,17 +213,23 @@ const Overview = () => {
       <Panel>
         <Descriptions
           className={'mt-8'}
-          title={i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息')}
+          title={titleCase(
+            i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息'),
+          )}
           bordered
           items={basicItems}
         />
 
         <Descriptions
           className={'mt-8'}
-          title={i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息')}
+          title={titleCase(
+            i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息'),
+          )}
           bordered
           items={resourceItems}
-          labelStyle={{ width: '150px' }}
+          labelStyle={{
+            width: i18nInstance.language === 'en-US' ? '300px' : '150px',
+          }}
         />
       </Panel>
     </Spin>

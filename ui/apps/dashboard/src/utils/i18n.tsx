@@ -58,4 +58,22 @@ export function getSidebarWidth(lang?: string) {
   return supportedLangConfig[lang]?.sidebarWidth || '';
 }
 
+export function capitalize(value: string) {
+  if (!value) return '';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+export function titleCase(value: string) {
+  if (!value) return '';
+  return value
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+export function lowerCase(value: string) {
+  if (!value) return '';
+  return value.toLowerCase();
+}
+
 export default i18nInstance;

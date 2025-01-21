@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { titleCase } from '@/utils/i18n';
 import { FC, useMemo } from 'react';
 import {
   Drawer,
@@ -59,27 +59,37 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
   });
   const columns: TableColumnProps<WorkloadEvent>[] = [
     {
-      title: i18nInstance.t('383a6d166f8f60e16e726ccc9c483631', '类别'),
+      title: titleCase(
+        i18nInstance.t('383a6d166f8f60e16e726ccc9c483631', '类别'),
+      ),
       key: 'type',
       dataIndex: 'type',
     },
     {
-      title: i18nInstance.t('26ca20b161c33362d88eb0ba0bc90751', '来源'),
+      title: titleCase(
+        i18nInstance.t('26ca20b161c33362d88eb0ba0bc90751', '来源'),
+      ),
       key: 'sourceComponent',
       dataIndex: 'sourceComponent',
     },
     {
-      title: i18nInstance.t('03663386e7d82f847634a6ee9111a32b', '最后检测时间'),
+      title: titleCase(
+        i18nInstance.t('03663386e7d82f847634a6ee9111a32b', '最后检测时间'),
+      ),
       key: 'lastSeen',
       dataIndex: 'lastSeen',
     },
     {
-      title: i18nInstance.t('41dfb0bf6167ca035b93caf3e06d6c95', '原因'),
+      title: titleCase(
+        i18nInstance.t('41dfb0bf6167ca035b93caf3e06d6c95', '原因'),
+      ),
       key: 'reason',
       dataIndex: 'reason',
     },
     {
-      title: i18nInstance.t('d8c7e04c8e2be23dd3b81a31db6e04f1', '信息'),
+      title: titleCase(
+        i18nInstance.t('d8c7e04c8e2be23dd3b81a31db6e04f1', '信息'),
+      ),
       key: 'message',
       dataIndex: 'message',
     },
@@ -87,7 +97,9 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
 
   return (
     <Drawer
-      title={i18nInstance.t('0af9d9af618327e912ac9f91bbe6a30f', '工作负载详情')}
+      title={titleCase(
+        i18nInstance.t('0af9d9af618327e912ac9f91bbe6a30f', '工作负载详情'),
+      )}
       placement="right"
       open={open}
       width={800}
@@ -95,13 +107,17 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
       onClose={onClose}
     >
       <Card
-        title={i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息')}
+        title={titleCase(
+          i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息'),
+        )}
         bordered
       >
         <div className="flex flex-row space-x-4 mb-4">
           <Statistic
             className={styles['no-value']}
-            title={i18nInstance.t('d7ec2d3fea4756bc1642e0f10c180cf5', '名称')}
+            title={titleCase(
+              i18nInstance.t('d7ec2d3fea4756bc1642e0f10c180cf5', '名称'),
+            )}
             prefix={
               <Typography.Text
                 ellipsis={{
@@ -114,17 +130,15 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
             }
           />
           <Statistic
-            title={i18nInstance.t(
-              'a4b28a416f0b6f3c215c51e79e517298',
-              '命名空间',
+            title={titleCase(
+              i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
             )}
             value={detailData?.objectMeta?.namespace || '-'}
           />
 
           <Statistic
-            title={i18nInstance.t(
-              'eca37cb0726c51702f70c486c1c38cf3',
-              '创建时间',
+            title={titleCase(
+              i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
             )}
             value={
               detailData?.objectMeta?.creationTimestamp
@@ -136,17 +150,15 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
           />
 
           <Statistic
-            title={i18nInstance.t(
-              '4a6341a8bcc68e0b7120dbc89014b6a2',
-              '持续时间',
+            title={titleCase(
+              i18nInstance.t('4a6341a8bcc68e0b7120dbc89014b6a2', '持续时间'),
             )}
             value="2h"
           />
           <Statistic
             className={styles['no-value']}
-            title={i18nInstance.t(
-              '70e6882e567e3dbc86df3ef2fb2f65e4',
-              '资源UID',
+            title={titleCase(
+              i18nInstance.t('70e6882e567e3dbc86df3ef2fb2f65e4', '资源UID'),
             )}
             prefix={
               <Typography.Text
@@ -189,7 +201,9 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
         </div>
       </Card>
       <Card
-        title={i18nInstance.t('be41a5333fef1e665214254aaf11f4fd', '调度信息')}
+        title={titleCase(
+          i18nInstance.t('be41a5333fef1e665214254aaf11f4fd', '调度信息'),
+        )}
         bordered
         className={cn(styles['schedule-container'], 'mt-[6px]')}
       >

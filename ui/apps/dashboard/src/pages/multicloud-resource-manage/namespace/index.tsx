@@ -1,4 +1,4 @@
-import i18nInstance from '@/utils/i18n';
+import i18nInstance, { titleCase } from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { useQuery } from '@tanstack/react-query';
 import { App, Button, Input, Space, Table, TableColumnProps, Tag } from 'antd';
@@ -29,7 +29,9 @@ const NamespacePage = () => {
   const size = useWindowSize();
   const columns: TableColumnProps<Namespace>[] = [
     {
-      title: i18nInstance.t('06ff2e9eba7ae422587c6536e337395f', '命名空间名称'),
+      title: titleCase(
+        i18nInstance.t('06ff2e9eba7ae422587c6536e337395f', '命名空间名称'),
+      ),
       key: 'namespaceName',
       width: 200,
       render: (_, r) => {
@@ -37,7 +39,9 @@ const NamespacePage = () => {
       },
     },
     {
-      title: i18nInstance.t('14d342362f66aa86e2aa1c1e11aa1204', '标签'),
+      title: titleCase(
+        i18nInstance.t('14d342362f66aa86e2aa1c1e11aa1204', '标签'),
+      ),
       key: 'label',
       align: 'left',
       render: (_, r) => (
@@ -48,9 +52,8 @@ const NamespacePage = () => {
       ),
     },
     {
-      title: i18nInstance.t(
-        '1d5fc011c19d35d08186afc4bad14be9',
-        '是否跳过自动调度',
+      title: titleCase(
+        i18nInstance.t('1d5fc011c19d35d08186afc4bad14be9', '是否跳过自动调度'),
       ),
       key: 'skipAutoPropagation',
       render: (_, r) => {
@@ -62,12 +65,16 @@ const NamespacePage = () => {
       },
     },
     {
-      title: i18nInstance.t('e4b51d5cd0e4f199e41c25be1c7591d3', '运行状态'),
+      title: titleCase(
+        i18nInstance.t('e4b51d5cd0e4f199e41c25be1c7591d3', '运行状态'),
+      ),
       key: 'phase',
       dataIndex: 'phase',
     },
     {
-      title: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
+      title: titleCase(
+        i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
+      ),
       key: 'creationTimestamp',
       render: (_, r) => {
         return dayjs(r.objectMeta.creationTimestamp).format(
@@ -76,7 +83,9 @@ const NamespacePage = () => {
       },
     },
     {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      title: titleCase(
+        i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
+      ),
       key: 'op',
       width: 200,
       render: (_, r) => {
