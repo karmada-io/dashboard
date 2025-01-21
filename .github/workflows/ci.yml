@@ -17,6 +17,18 @@ concurrency:
 permissions:
   contents: read  # for actions/checkout to fetch code
 jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: verify license
+        run: hack/verify-license.sh
   build-frontend:
     runs-on: ubuntu-22.04
     steps:
