@@ -18,11 +18,12 @@ package daemonset
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"log"
 
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sClient "k8s.io/client-go/kubernetes"
+
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // DaemonSetDetail represents detailed information about a Daemon Set.

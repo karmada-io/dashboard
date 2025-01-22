@@ -18,15 +18,17 @@ package overridepolicy
 
 import (
 	"context"
+	"log"
+
+	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
+	"k8s.io/client-go/kubernetes"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
-	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
-	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
-	"k8s.io/client-go/kubernetes"
-	"log"
 )
 
 // OverridePolicyList contains a list of propagation in the karmada control-plance.

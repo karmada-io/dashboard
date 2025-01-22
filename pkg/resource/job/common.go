@@ -17,10 +17,11 @@ limitations under the License.
 package job
 
 import (
-	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
 	batch "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
+
+	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // The code below allows to perform complex data section on []batch.Job

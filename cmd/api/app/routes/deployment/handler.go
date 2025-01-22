@@ -18,17 +18,19 @@ package deployment
 
 import (
 	"context"
+
 	"github.com/gin-gonic/gin"
+	appsv1 "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/yaml"
+
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/resource/deployment"
 	"github.com/karmada-io/dashboard/pkg/resource/event"
-	appsv1 "k8s.io/api/apps/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"sigs.k8s.io/yaml"
 )
 
 func handlerCreateDeployment(c *gin.Context) {

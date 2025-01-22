@@ -18,9 +18,11 @@ package main
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app"
-	"k8s.io/component-base/cli"
 	"os"
+
+	"k8s.io/component-base/cli"
+
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app"
 )
 
 func main() {

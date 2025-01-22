@@ -17,15 +17,18 @@ limitations under the License.
 package metrics
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
-	"fmt"
 	"time"
-	"database/sql"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
+
 	"github.com/gin-gonic/gin"
+
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
+
 type MetricInfo struct {
 	Help string `json:"help"`
 	Type string `json:"type"`
@@ -34,8 +37,8 @@ type MetricInfo struct {
 func QueryMetrics(c *gin.Context) {
 	appName := c.Param("app_name")
 	podName := c.Param("pod_name")
-	queryType := c.Query("type")  // Use a query parameter to determine the action
-	metricName := c.Query("mname")  // Optional: only needed for details
+	queryType := c.Query("type")   // Use a query parameter to determine the action
+	metricName := c.Query("mname") // Optional: only needed for details
 
 	sanitizedAppName := strings.ReplaceAll(appName, "-", "_")
 	sanitizedPodName := strings.ReplaceAll(podName, "-", "_")
@@ -77,13 +80,13 @@ func QueryMetrics(c *gin.Context) {
 			metricNames = append(metricNames, metricName)
 		}
 
-		c.JSON(http.StatusOK, gin.H{ "metricNames": metricNames})
+		c.JSON(http.StatusOK, gin.H{"metricNames": metricNames})
 
 	case "details":
-        if metricName == "" {
-            c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
-            return
-        }
+		if metricName == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
+			return
+		}
 		query := fmt.Sprintf(`
             SELECT 
                 m.currentTime, 
@@ -162,11 +165,11 @@ func QueryMetrics(c *gin.Context) {
 				Labels:  labels,
 			})
 
-			detailsMap[timeKey] = detail  
+			detailsMap[timeKey] = detail
 		}
 
 		c.JSON(http.StatusOK, gin.H{"details": detailsMap})
-	
+
 	case "metricsdetails":
 		// Handle metricsdetails query type
 		db, err := sql.Open("sqlite", strings.ReplaceAll(appName, "-", "_")+".db")

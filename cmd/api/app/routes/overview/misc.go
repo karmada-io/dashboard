@@ -20,19 +20,21 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
-	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/dashboard/pkg/resource/cluster"
+	"math/rand"
+	"strings"
+	"time"
+
 	"github.com/karmada-io/karmada/pkg/version"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/remotecommand"
-	"math/rand"
-	"strings"
-	"time"
+
+	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
+	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"github.com/karmada-io/dashboard/pkg/resource/cluster"
 )
 
 const (

@@ -18,13 +18,15 @@ package ingress
 
 import (
 	"context"
+
+	v1 "k8s.io/api/networking/v1"
+	client "k8s.io/client-go/kubernetes"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
-	v1 "k8s.io/api/networking/v1"
-	client "k8s.io/client-go/kubernetes"
 )
 
 // Ingress - a single ingress returned to the frontend.

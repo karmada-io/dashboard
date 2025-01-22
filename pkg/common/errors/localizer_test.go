@@ -15,8 +15,9 @@
 package errors_test
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"testing"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
 func TestLocalizeError(t *testing.T) {

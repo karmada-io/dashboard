@@ -17,11 +17,13 @@ limitations under the License.
 package common
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 func parsePaginationPathParameter(request *gin.Context) *dataselect.PaginationQuery {

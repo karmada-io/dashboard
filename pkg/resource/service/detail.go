@@ -18,12 +18,14 @@ package service
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
-	"github.com/karmada-io/dashboard/pkg/resource/endpoint"
+	"log"
+
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sClient "k8s.io/client-go/kubernetes"
-	"log"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
+	"github.com/karmada-io/dashboard/pkg/resource/endpoint"
 )
 
 // Service is a representation of a service.

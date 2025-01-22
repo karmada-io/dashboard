@@ -17,8 +17,9 @@ limitations under the License.
 package node
 
 import (
-	"github.com/karmada-io/dashboard/pkg/dataselect"
 	api "k8s.io/api/core/v1"
+
+	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
 type NodeCell api.Node

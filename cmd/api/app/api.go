@@ -19,38 +19,38 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/karmada-io/dashboard/cmd/api/app/options"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
-	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/config"
-	"github.com/karmada-io/dashboard/pkg/environment"
+	"os"
+
 	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
-	"os"
 
-	// Importing route packages forces route registration
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusteroverridepolicy"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusterpropagationpolicy"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/config"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/configmap"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cronjob"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/daemonset"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/ingress"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/job"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overridepolicy"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/secret"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/service"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/statefulset"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/unstructured"
+	"github.com/karmada-io/dashboard/cmd/api/app/options"
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"                     // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"                  // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusteroverridepolicy"    // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusterpropagationpolicy" // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/config"                   // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/configmap"                // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cronjob"                  // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/daemonset"                // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/deployment"               // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/ingress"                  // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/job"                      // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member"                   // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/namespace"                // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overridepolicy"           // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/overview"                 // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/propagationpolicy"        // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/secret"                   // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/service"                  // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/statefulset"              // Importing route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/unstructured"             // Importing route packages forces route registration
+	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/config"
+	"github.com/karmada-io/dashboard/pkg/environment"
 )
 
 // NewApiCommand creates a *cobra.Command object with default parameters

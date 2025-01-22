@@ -18,11 +18,13 @@ package namespace
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"log"
+
 	api "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"log"
+
+	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
 const (

@@ -18,12 +18,14 @@ package statefulset
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
+	"log"
+
 	apps "k8s.io/api/apps/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"log"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // StatefulSetDetail is a presentation layer view of Kubernetes Stateful Set resource. This means it is Stateful

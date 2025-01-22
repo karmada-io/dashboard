@@ -18,11 +18,13 @@ package statefulset
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
+
 	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // getRawStatefulSetPods return array of api pods targeting pet set with given name.

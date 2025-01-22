@@ -19,19 +19,21 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
-	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
-	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
-	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/resource/cluster"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
-	"time"
+
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
+	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
+	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/resource/cluster"
 )
 
 func handleGetClusterList(c *gin.Context) {

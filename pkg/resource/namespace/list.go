@@ -18,13 +18,15 @@ package namespace
 
 import (
 	"context"
+	"log"
+
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes"
-	"log"
 )
 
 // NamespaceList contains a list of namespaces in the cluster.
