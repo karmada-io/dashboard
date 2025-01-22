@@ -18,16 +18,17 @@ package secret
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
-	"github.com/karmada-io/dashboard/pkg/common/helpers"
-	"github.com/karmada-io/dashboard/pkg/common/types"
-	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"log"
 
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
+	"github.com/karmada-io/dashboard/pkg/common/helpers"
+	"github.com/karmada-io/dashboard/pkg/common/types"
+	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // SecretSpec is a common interface for the specification of different secrets.

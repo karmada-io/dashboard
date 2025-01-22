@@ -17,10 +17,12 @@ limitations under the License.
 package event
 
 import (
-	"github.com/karmada-io/dashboard/pkg/resource/common"
+	"strings"
+
 	api "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"strings"
+
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // FailedReasonPartials  is an array of partial strings to correctly filter warning events.

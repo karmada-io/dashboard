@@ -17,8 +17,9 @@ limitations under the License.
 package clusterpropagationpolicy
 
 import (
-	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
+
+	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
 type ClusterPropagationPolicyCell v1alpha1.ClusterPropagationPolicy

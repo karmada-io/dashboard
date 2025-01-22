@@ -15,8 +15,6 @@
 package endpoint
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/types"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"log"
 
 	v1 "k8s.io/api/core/v1"
@@ -24,6 +22,9 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	k8sClient "k8s.io/client-go/kubernetes"
+
+	"github.com/karmada-io/dashboard/pkg/common/types"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 type Endpoint struct {

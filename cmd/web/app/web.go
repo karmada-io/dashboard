@@ -19,22 +19,24 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
-	"github.com/karmada-io/dashboard/cmd/web/app/options"
-	"github.com/karmada-io/dashboard/pkg/config"
-	"github.com/karmada-io/dashboard/pkg/environment"
-	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
-	"github.com/spf13/cobra"
 	"io"
-	cliflag "k8s.io/component-base/cli/flag"
-	"k8s.io/klog/v2"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
+	"github.com/spf13/cobra"
+	cliflag "k8s.io/component-base/cli/flag"
+	"k8s.io/klog/v2"
+
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	"github.com/karmada-io/dashboard/cmd/web/app/options"
+	"github.com/karmada-io/dashboard/pkg/config"
+	"github.com/karmada-io/dashboard/pkg/environment"
 )
 
 // NewWebCommand creates a *cobra.Command object with default parameters

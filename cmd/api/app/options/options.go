@@ -17,8 +17,9 @@ limitations under the License.
 package options
 
 import (
-	"github.com/spf13/pflag"
 	"net"
+
+	"github.com/spf13/pflag"
 )
 
 // Options contains everything necessary to create and run api.

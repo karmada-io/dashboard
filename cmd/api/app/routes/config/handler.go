@@ -18,12 +18,13 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
+	"k8s.io/klog/v2"
+
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
-	"k8s.io/klog/v2"
 )
 
 func GetDashboardConfig(c *gin.Context) {

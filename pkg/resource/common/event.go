@@ -15,8 +15,9 @@
 package common
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/types"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
 // EventList is an events response structure.

@@ -18,6 +18,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/karmada-io/dashboard/pkg/environment"
 )
 

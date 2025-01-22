@@ -17,12 +17,13 @@ limitations under the License.
 package client
 
 import (
+	"net/http"
+	"strings"
+
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-	"net/http"
-	"strings"
 )
 
 const (

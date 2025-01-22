@@ -19,6 +19,8 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"time"
+
 	clusterv1alpha1 "github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	cmdutil "github.com/karmada-io/karmada/pkg/karmadactl/util"
@@ -32,7 +34,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
-	"time"
 )
 
 const (

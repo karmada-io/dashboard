@@ -19,14 +19,14 @@ package scrape
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
+	"net/http"
 	"sync"
 	"time"
 
-	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 )
 

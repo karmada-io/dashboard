@@ -19,6 +19,8 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/karmada-io/karmada/pkg/util/fedinformer"
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
@@ -27,7 +29,6 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
-	"os"
 )
 
 var dashboardConfig DashboardConfig

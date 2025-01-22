@@ -17,9 +17,10 @@ limitations under the License.
 package cronjob
 
 import (
+	batch "k8s.io/api/batch/v1"
+
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
-	batch "k8s.io/api/batch/v1"
 )
 
 // The code below allows to perform complex data section on []batch.CronJob

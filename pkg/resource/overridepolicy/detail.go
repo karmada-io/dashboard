@@ -18,10 +18,12 @@ package overridepolicy
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
+
 	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
 // OverridePolicyDetail is a presentation layer view of Karmada OverridePolicy resource. This means it is OverridePolicy plus

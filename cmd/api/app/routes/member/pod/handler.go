@@ -18,6 +18,7 @@ package pod
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"

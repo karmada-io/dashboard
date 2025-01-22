@@ -29,6 +29,8 @@ jobs:
           go-version-file: go.mod
       - name: verify license
         run: hack/verify-license.sh
+      - name: lint
+        run: hack/verify-staticcheck.sh
   build-frontend:
     runs-on: ubuntu-22.04
     steps:
