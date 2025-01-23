@@ -39,6 +39,7 @@ type MenuConfig struct {
 	Children   []MenuConfig `yaml:"children" json:"children,omitempty"`
 }
 
+// DashboardConfig represents the configuration structure for the Karmada dashboard.
 type DashboardConfig struct {
 	DockerRegistries []DockerRegistry `yaml:"docker_registries" json:"docker_registries"`
 	ChartRegistries  []ChartRegistry  `yaml:"chart_registries" json:"chart_registries"`

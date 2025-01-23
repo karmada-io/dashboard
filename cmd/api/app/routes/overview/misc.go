@@ -42,6 +42,7 @@ const (
 	app       = "karmada-controller-manager"
 )
 
+// GetControllerManagerVersionInfo returns the version info of karmada-controller-manager.
 func GetControllerManagerVersionInfo() (*version.Info, error) {
 	kubeClient := client.InClusterClient()
 	restConfig, _, err := client.GetKubeConfig()
@@ -92,6 +93,7 @@ func GetControllerManagerVersionInfo() (*version.Info, error) {
 	return parseVersion, nil
 }
 
+// ParseVersion parses the version string to version.Info.
 func ParseVersion(versionStr string) *version.Info {
 	versionInfo := &version.Info{}
 	leftBraceIdx := strings.IndexByte(versionStr, '{')
@@ -129,6 +131,7 @@ func ParseVersion(versionStr string) *version.Info {
 	return versionInfo
 }
 
+// GetControllerManagerInfo returns the version info of karmada-controller-manager.
 func GetControllerManagerInfo() (*v1.KarmadaInfo, error) {
 	versionInfo, err := GetControllerManagerVersionInfo()
 	if err != nil {
@@ -155,6 +158,7 @@ func GetControllerManagerInfo() (*v1.KarmadaInfo, error) {
 	return karmadaInfo, nil
 }
 
+// GetMemberClusterInfo returns the status of member clusters.
 func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStatus, error) {
 	karmadaClient := client.InClusterKarmadaClient()
 	result, err := cluster.GetClusterList(karmadaClient, ds)
@@ -187,6 +191,7 @@ func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStat
 	return memberClusterStatus, nil
 }
 
+// GetClusterResourceStatus returns the status of cluster resources.
 func GetClusterResourceStatus() (*v1.ClusterResourceStatus, error) {
 	clusterResourceStatus := &v1.ClusterResourceStatus{}
 	ctx := context.TODO()

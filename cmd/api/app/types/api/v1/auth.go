@@ -16,19 +16,23 @@ limitations under the License.
 
 package v1
 
+// LoginRequest is the request for login.
 type LoginRequest struct {
 	Token string `json:"token"`
 }
 
+// LoginResponse is the response for login.
 type LoginResponse struct {
 	Token string `json:"token"`
 }
 
+// User is the user info.
 type User struct {
 	Name          string `json:"name,omitempty"`
 	Authenticated bool   `json:"authenticated"`
 }
 
+// ServiceAccount is the service account info.
 type ServiceAccount struct {
 	Name string `json:"name"`
 	UID  string `json:"uid"`

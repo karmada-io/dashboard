@@ -16,9 +16,12 @@ limitations under the License.
 
 package v1
 
+// CreateDeploymentRequest defines the request structure for creating a deployment.
 type CreateDeploymentRequest struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
 	Content   string `json:"content"`
 }
+
+// CreateDeploymentResponse defines the response structure for creating a deployment.
 type CreateDeploymentResponse struct{}

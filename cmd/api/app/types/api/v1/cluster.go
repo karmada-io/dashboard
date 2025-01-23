@@ -21,6 +21,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+// PostClusterRequest is the request body for creating a cluster.
 type PostClusterRequest struct {
 	MemberClusterKubeConfig string                   `json:"memberClusterKubeconfig" binding:"required"`
 	SyncMode                v1alpha1.ClusterSyncMode `json:"syncMode" binding:"required"`
@@ -32,26 +33,37 @@ type PostClusterRequest struct {
 	ClusterZones            []string                 `json:"clusterZones"`
 }
 
+// PostClusterResponse is the response body for creating a cluster.
 type PostClusterResponse struct {
 }
 
+// LabelRequest is the request body for labeling a cluster.
 type LableRequest struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
+
+// TaintRequest is the request body for tainting a cluster.
 type TaintRequest struct {
 	Effect corev1.TaintEffect `json:"effect"`
 	Key    string             `json:"key"`
 	Value  string             `json:"value"`
 }
+
+// PutClusterRequest is the request body for updating a cluster.
 type PutClusterRequest struct {
 	Labels *[]LableRequest `json:"labels"`
 	Taints *[]TaintRequest `json:"taints"`
 }
+
+// PutClusterResponse is the response body for updating a cluster.
 type PutClusterResponse struct{}
 
+// DeleteClusterRequest is the request body for deleting a cluster.
 type DeleteClusterRequest struct {
 	MemberClusterName string `uri:"name" binding:"required"`
 }
+
+// DeleteClusterResponse is the response body for deleting a cluster.
 type DeleteClusterResponse struct {
 }

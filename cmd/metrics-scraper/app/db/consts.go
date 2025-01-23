@@ -17,11 +17,18 @@ limitations under the License.
 package db
 
 const (
-	Namespace                 = "karmada-system"
-	KarmadaAgent              = "karmada-agent"
-	KarmadaScheduler          = "karmada-scheduler"
+	// Namespace is the namespace of karmada.
+	Namespace = "karmada-system"
+	// KarmadaAgent is the name of karmada agent.
+	KarmadaAgent = "karmada-agent"
+	// KarmadaScheduler is the name of karmada scheduler.
+	KarmadaScheduler = "karmada-scheduler"
+	// KarmadaSchedulerEstimator is the name of karmada scheduler estimator.
 	KarmadaSchedulerEstimator = "karmada-scheduler-estimator"
-	KarmadaControllerManager  = "karmada-controller-manager"
-	SchedulerPort             = "10351"
-	ControllerManagerPort     = "8080"
+	// KarmadaControllerManager is the name of karmada controller manager.
+	KarmadaControllerManager = "karmada-controller-manager"
+	// SchedulerPort is the port of karmada scheduler.
+	SchedulerPort = "10351"
+	// ControllerManagerPort is the port of karmada controller manager.
+	ControllerManagerPort = "8080"
 )

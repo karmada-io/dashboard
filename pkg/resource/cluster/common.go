@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// ClusterCell is a cell representation of Cluster object.
 type ClusterCell v1alpha1.Cluster
 
+// GetProperty returns value of a given property.
 func (self ClusterCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

@@ -85,6 +85,7 @@ func LoadApiConfig(kubeconfig string, currentContext string) (*clientcmdapi.Conf
 	return apiConfig, nil
 }
 
+// LoadeRestConfigFromKubeConfig creates a rest.Config from a kubeconfig string.
 func LoadeRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
 	apiConfig, err := clientcmd.Load([]byte(kubeconfig))
 	if err != nil {
@@ -98,6 +99,7 @@ func LoadeRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
 	return restConfig, nil
 }
 
+// KubeClientSetFromKubeConfig creates a Kubernetes clientset from a kubeconfig string.
 func KubeClientSetFromKubeConfig(kubeconfig string) (*kubeclient.Clientset, error) {
 	restConfig, err := LoadeRestConfigFromKubeConfig(kubeconfig)
 	if err != nil {
@@ -107,6 +109,7 @@ func KubeClientSetFromKubeConfig(kubeconfig string) (*kubeclient.Clientset, erro
 	return kubeClient, nil
 }
 
+// GetKarmadaClientFromRequest creates a Karmada clientset from an HTTP request.
 func GetKarmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface, error) {
 	if !isKarmadaInitialized() {
 		return nil, fmt.Errorf("client package not initialized")

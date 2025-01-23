@@ -27,11 +27,13 @@ import (
 	"github.com/karmada-io/dashboard/pkg/config"
 )
 
+// GetDashboardConfig handles the request to retrieve the dashboard configuration.
 func GetDashboardConfig(c *gin.Context) {
 	dashboardConfig := config.GetDashboardConfig()
 	common.Success(c, dashboardConfig)
 }
 
+// SetDashboardConfig handles the request to update the dashboard configuration.
 func SetDashboardConfig(c *gin.Context) {
 	setDashboardConfigRequest := new(v1.SetDashboardConfigRequest)
 	if err := c.ShouldBind(setDashboardConfigRequest); err != nil {

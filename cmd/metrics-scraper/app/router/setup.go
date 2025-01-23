@@ -44,10 +44,12 @@ func init() {
 	})
 }
 
+// V1 returns the router group for /api/v1.
 func V1() *gin.RouterGroup {
 	return v1
 }
 
+// Router returns the main Gin engine instance.
 func Router() *gin.Engine {
 	return router
 }
