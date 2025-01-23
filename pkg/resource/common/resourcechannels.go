@@ -183,7 +183,6 @@ type DeploymentListChannel struct {
 // that both must be read numReads times.
 func GetDeploymentListChannel(client client.Interface,
 	nsQuery *NamespaceQuery, numReads int) DeploymentListChannel {
-
 	channel := DeploymentListChannel{
 		List:  make(chan *apps.DeploymentList, numReads),
 		Error: make(chan error, numReads),
@@ -313,7 +312,6 @@ type ServiceListChannel struct {
 // must be read numReads times.
 func GetServiceListChannel(client client.Interface, nsQuery *NamespaceQuery,
 	numReads int) ServiceListChannel {
-
 	channel := ServiceListChannel{
 		List:  make(chan *v1.ServiceList, numReads),
 		Error: make(chan error, numReads),
@@ -384,7 +382,6 @@ func GetPodListChannel(client client.Interface,
 // GetPodListChannelWithOptions is GetPodListChannel plus listing options.
 func GetPodListChannelWithOptions(client client.Interface, nsQuery *NamespaceQuery,
 	options metaV1.ListOptions, numReads int) PodListChannel {
-
 	channel := PodListChannel{
 		List:  make(chan *v1.PodList, numReads),
 		Error: make(chan error, numReads),
@@ -462,7 +459,6 @@ type NodeListChannel struct {
 // GetNodeListChannel returns a pair of channels to a Node list and errors that both must be read
 // numReads times.
 func GetNodeListChannel(client client.Interface, numReads int) NodeListChannel {
-
 	channel := NodeListChannel{
 		List:  make(chan *v1.NodeList, numReads),
 		Error: make(chan error, numReads),
@@ -528,7 +524,6 @@ type ConfigMapListChannel struct {
 // numReads times.
 func GetConfigMapListChannel(client client.Interface, nsQuery *NamespaceQuery,
 	numReads int) ConfigMapListChannel {
-
 	channel := ConfigMapListChannel{
 		List:  make(chan *v1.ConfigMapList, numReads),
 		Error: make(chan error, numReads),

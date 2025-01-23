@@ -39,7 +39,6 @@ type DaemonSetDetail struct {
 
 // GetDaemonSetDetail Returns detailed information about the given daemon set in the given namespace.
 func GetDaemonSetDetail(client k8sClient.Interface, namespace, name string) (*DaemonSetDetail, error) {
-
 	log.Printf("Getting details of %s daemon set in %s namespace", name, namespace)
 	daemonSet, err := client.AppsV1().DaemonSets(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {

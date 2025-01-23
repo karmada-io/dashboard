@@ -48,7 +48,6 @@ var emptyJobList = &job.JobList{
 // GetCronJobJobs returns list of jobs owned by cron job.
 func GetCronJobJobs(client client.Interface,
 	dsQuery *dataselect.DataSelectQuery, namespace, name string, active bool) (*job.JobList, error) {
-
 	cronJob, err := client.BatchV1().CronJobs(namespace).Get(context.TODO(), name, meta.GetOptions{})
 	if err != nil {
 		return emptyJobList, err
@@ -90,7 +89,6 @@ func GetCronJobJobs(client client.Interface,
 // TriggerCronJob manually triggers a cron job and creates a new job.
 func TriggerCronJob(client client.Interface,
 	namespace, name string) error {
-
 	cronJob, err := client.BatchV1().CronJobs(namespace).Get(context.TODO(), name, meta.GetOptions{})
 
 	if err != nil {

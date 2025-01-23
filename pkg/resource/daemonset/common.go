@@ -36,7 +36,6 @@ import (
 // label selector is targeting only 1 daemon set.
 func GetServicesForDSDeletion(client client.Interface, labelSelector labels.Selector,
 	namespace string) ([]v1.Service, error) {
-
 	daemonSet, err := client.AppsV1().DaemonSets(namespace).List(context.TODO(), metaV1.ListOptions{
 		LabelSelector: labelSelector.String(),
 		FieldSelector: fields.Everything().String(),
