@@ -122,7 +122,6 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 
 	// Insert metrics and values
 	for metricName, metricData := range data.Metrics {
-
 		result, err := tx.Exec(fmt.Sprintf(insertMainSQL, sanitizedPodName), metricName, metricData.Help, metricData.Type, data.CurrentTime)
 		if err != nil {
 			log.Printf("Error inserting data for metric %s: %v", metricName, err)
@@ -272,5 +271,4 @@ func parseMetricsToJSON(metricsOutput string) (*db.ParsedData, error) {
 		Metrics:     metrics,
 	}
 	return parsedData, nil
-
 }

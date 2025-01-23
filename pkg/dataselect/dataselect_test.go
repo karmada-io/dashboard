@@ -152,7 +152,6 @@ func TestSort(t *testing.T) {
 				testCase.Info, testCase.SortQuery, order, testCase.ExpectedOrder)
 		}
 	}
-
 }
 
 func TestPagination(t *testing.T) {
@@ -220,5 +219,4 @@ func TestPagination(t *testing.T) {
 				testCase.Info, testCase.PaginationQuery, order, testCase.ExpectedOrder)
 		}
 	}
-
 }

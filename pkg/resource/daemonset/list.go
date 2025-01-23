@@ -62,7 +62,6 @@ func GetDaemonSetList(client kubernetes.Interface, nsQuery *common.NamespaceQuer
 // GetDaemonSetListFromChannels returns a list of all Daemon Set in the cluster
 // reading required resource list once from the channels.
 func GetDaemonSetListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*DaemonSetList, error) {
-
 	daemonSets := <-channels.DaemonSetList.List
 	err := <-channels.DaemonSetList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -91,7 +90,6 @@ func GetDaemonSetListFromChannels(channels *common.ResourceChannels, dsQuery *da
 
 func toDaemonSetList(daemonSets []apps.DaemonSet, pods []v1.Pod, events []v1.Event, nonCriticalErrors []error,
 	dsQuery *dataselect.DataSelectQuery) *DaemonSetList {
-
 	daemonSetList := &DaemonSetList{
 		DaemonSets: make([]DaemonSet, 0),
 		ListMeta:   types.ListMeta{TotalItems: len(daemonSets)},

@@ -78,7 +78,6 @@ func GetDeploymentList(client client.Interface, nsQuery *common.NamespaceQuery, 
 // GetDeploymentListFromChannels returns a list of all Deployments in the cluster
 // reading required resource list once from the channels.
 func GetDeploymentListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*DeploymentList, error) {
-
 	deployments := <-channels.DeploymentList.List
 	err := <-channels.DeploymentList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -115,7 +114,6 @@ func GetDeploymentListFromChannels(channels *common.ResourceChannels, dsQuery *d
 
 func toDeploymentList(deployments []apps.Deployment, pods []v1.Pod, events []v1.Event, rs []apps.ReplicaSet,
 	nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *DeploymentList {
-
 	deploymentList := &DeploymentList{
 		Deployments: make([]Deployment, 0),
 		ListMeta:    types.ListMeta{TotalItems: len(deployments)},
