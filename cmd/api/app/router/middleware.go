@@ -27,6 +27,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 )
 
+// EnsureMemberClusterMiddleware ensures that the member cluster exists.
 func EnsureMemberClusterMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		karmadaClient := client.InClusterKarmadaClient()

@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// PropagationPolicyCell is a wrapper around PropagationPolicy type
 type PropagationPolicyCell v1alpha1.PropagationPolicy
 
+// GetProperty returns the given property of the PropagationPolicy.
 func (self PropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

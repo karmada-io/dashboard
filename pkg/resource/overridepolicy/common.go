@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// OverridePolicyCell represents an OverridePolicy that implements the DataCell interface.
 type OverridePolicyCell v1alpha1.OverridePolicy
 
+// GetProperty returns a comparable value for a specified property name.
 func (self OverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

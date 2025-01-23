@@ -16,8 +16,11 @@ limitations under the License.
 
 package v1
 
+// CreateNamesapceRequest is the request body for creating a namespace.
 type CreateNamesapceRequest struct {
 	Name                string `json:"name" required:"true"`
 	SkipAutoPropagation bool   `json:"skipAutoPropagation"`
 }
+
+// CreateNamesapceResponse is the response body for creating a namespace.
 type CreateNamesapceResponse struct{}

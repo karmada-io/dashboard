@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// ClusterAllocatedResources is the resource summary of a cluster.
 type ClusterAllocatedResources struct {
 	// CPUCapacity is specified node CPU capacity in milicores.
 	CPUCapacity int64   `json:"cpuCapacity"`
@@ -88,6 +89,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	}, nil
 }
 
+// ClusterDetail is the detailed information of a cluster.
 type ClusterDetail struct {
 	Cluster `json:",inline"`
 	Taints  []corev1.Taint `json:"taints,omitempty"`

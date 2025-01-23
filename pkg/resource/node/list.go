@@ -30,6 +30,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
+// Node represents a Kubernetes node with additional metadata.
 type Node struct {
 	ObjectMeta  types.ObjectMeta      `json:"objectMeta"`
 	TypeMeta    types.TypeMeta        `json:"typeMeta"`
@@ -98,6 +99,7 @@ func toNodeList(nodes []v1.Node, nonCriticalErrors []error, dsQuery *dataselect.
 	return result
 }
 
+// NewStatus returns a new status object.
 func NewStatus(status v1.NodeStatus) v1.NodeStatus {
 	return v1.NodeStatus{
 		Capacity:        status.Capacity,

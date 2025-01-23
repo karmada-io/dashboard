@@ -89,7 +89,7 @@ func handlePostCluster(c *gin.Context) {
 			common.Fail(c, err)
 			return
 		}
-		opts := &PullModeOption{
+		opts := &pullModeOption{
 			karmadaClient:          karmadaClient,
 			karmadaAgentCfg:        apiConfig,
 			memberClusterNamespace: clusterRequest.MemberClusterNamespace,
@@ -97,11 +97,11 @@ func handlePostCluster(c *gin.Context) {
 			memberClusterName:      clusterRequest.MemberClusterName,
 			memberClusterEndpoint:  clusterRequest.MemberClusterEndpoint,
 		}
-		if err = AccessClusterInPullMode(opts); err != nil {
-			klog.ErrorS(err, "AccessClusterInPullMode failed")
+		if err = accessClusterInPullMode(opts); err != nil {
+			klog.ErrorS(err, "accessClusterInPullMode failed")
 			common.Fail(c, err)
 		} else {
-			klog.Infof("AccessClusterInPullMode success")
+			klog.Infof("accessClusterInPullMode success")
 			common.Success(c, "ok")
 		}
 	} else if clusterRequest.SyncMode == v1alpha1.Push {
@@ -117,18 +117,18 @@ func handlePostCluster(c *gin.Context) {
 			common.Fail(c, err)
 			return
 		}
-		opts := &PushModeOption{
+		opts := &pushModeOption{
 			karmadaClient:           karmadaClient,
 			clusterName:             clusterRequest.MemberClusterName,
 			karmadaRestConfig:       restConfig,
 			memberClusterRestConfig: memberClusterRestConfig,
 		}
-		if err := AccessClusterInPushMode(opts); err != nil {
-			klog.ErrorS(err, "AccessClusterInPushMode failed")
+		if err := accessClusterInPushMode(opts); err != nil {
+			klog.ErrorS(err, "accessClusterInPushMode failed")
 			common.Fail(c, err)
 			return
 		}
-		klog.Infof("AccessClusterInPushMode success")
+		klog.Infof("accessClusterInPushMode success")
 		common.Success(c, "ok")
 	} else {
 		klog.Errorf("Unknown sync mode %s", clusterRequest.SyncMode)

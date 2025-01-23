@@ -33,10 +33,12 @@ var (
 	buildDate    = "unknown" // build date in ISO8601 format, output of $(date -u +'%Y-%m-%dT%H:%M:%SZ')
 )
 
+// IsDev returns true if the version is dev.
 func IsDev() bool {
 	return Version == dev
 }
 
+// UserAgent returns the user agent of this binary.
 func UserAgent() string {
 	return fmt.Sprintf("%s:%s", userAgent, Version)
 }

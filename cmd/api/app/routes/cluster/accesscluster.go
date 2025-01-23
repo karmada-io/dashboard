@@ -42,9 +42,11 @@ const (
 	// KarmadaAgentServiceAccountName is the name of karmada-agent serviceaccount
 	KarmadaAgentServiceAccountName = "karmada-agent-sa"
 	// KarmadaAgentName is the name of karmada-agent
-	KarmadaAgentName  = "karmada-agent"
+	KarmadaAgentName = "karmada-agent"
+	// KarmadaAgentImage is the image of karmada-agent
 	KarmadaAgentImage = "karmada/karmada-agent:latest"
-	ClusterNamespace  = "karmada-cluster"
+	// ClusterNamespace is the namespace of cluster
+	ClusterNamespace = "karmada-cluster"
 )
 
 var (
@@ -53,7 +55,7 @@ var (
 	timeout              = 5 * time.Minute
 )
 
-type PullModeOption struct {
+type pullModeOption struct {
 	karmadaClient          karmadaclientset.Interface
 	karmadaAgentCfg        *clientcmdapi.Config
 	memberClusterNamespace string
@@ -63,7 +65,7 @@ type PullModeOption struct {
 }
 
 // createSecretAndRBACInMemberCluster create required secrets and rbac in member cluster
-func (o PullModeOption) createSecretAndRBACInMemberCluster() error {
+func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	configBytes, err := clientcmd.Write(*o.karmadaAgentCfg)
 	if err != nil {
 		return fmt.Errorf("failure while serializing karmada-agent kubeConfig. %w", err)
@@ -149,7 +151,7 @@ func (o PullModeOption) createSecretAndRBACInMemberCluster() error {
 }
 
 // makeKarmadaAgentDeployment generate karmada-agent Deployment
-func (o PullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
+func (o pullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
 	karmadaAgent := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "apps/v1",
@@ -237,7 +239,7 @@ func (o PullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
 	return karmadaAgent
 }
 
-func AccessClusterInPullMode(opts *PullModeOption) error {
+func accessClusterInPullMode(opts *pullModeOption) error {
 	_, exist, err := karmadautil.GetClusterWithKarmadaClient(opts.karmadaClient, opts.memberClusterName)
 	if err != nil {
 		return err
@@ -269,14 +271,14 @@ func AccessClusterInPullMode(opts *PullModeOption) error {
 	return nil
 }
 
-type PushModeOption struct {
+type pushModeOption struct {
 	karmadaClient           karmadaclientset.Interface
 	clusterName             string
 	karmadaRestConfig       *rest.Config
 	memberClusterRestConfig *rest.Config
 }
 
-func AccessClusterInPushMode(opts *PushModeOption) error {
+func accessClusterInPushMode(opts *pushModeOption) error {
 	registerOption := karmadautil.ClusterRegisterOption{
 		ClusterNamespace:   ClusterNamespace,
 		ClusterName:        opts.clusterName,

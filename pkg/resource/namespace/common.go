@@ -60,8 +60,10 @@ func CreateNamespace(spec *NamespaceSpec, client kubernetes.Interface) error {
 
 // The code below allows to perform complex data section on []api.Namespace
 
+// NamespaceCell is a cell representation of Namespace object.
 type NamespaceCell api.Namespace
 
+// GetProperty returns specific property of NamespaceCell.
 func (self NamespaceCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

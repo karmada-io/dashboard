@@ -25,8 +25,10 @@ import (
 
 // The code below allows to perform complex data section on []batch.CronJob
 
+// CronJobCell is a type containing CronJob data
 type CronJobCell batch.CronJob
 
+// GetProperty returns specific property of CronJobCell
 func (self CronJobCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -41,6 +43,7 @@ func (self CronJobCell) GetProperty(name dataselect.PropertyName) dataselect.Com
 	}
 }
 
+// ToCells converts []batch.CronJob to []CronJobCell
 func ToCells(std []batch.CronJob) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -49,6 +52,7 @@ func ToCells(std []batch.CronJob) []dataselect.DataCell {
 	return cells
 }
 
+// FromCells converts []CronJobCell to []batch.CronJob
 func FromCells(cells []dataselect.DataCell) []batch.CronJob {
 	std := make([]batch.CronJob, len(cells))
 	for i := range std {
