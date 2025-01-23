@@ -15,8 +15,9 @@
 package endpoint
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/types"
 	v1 "k8s.io/api/core/v1"
+
+	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
 type EndpointList struct {

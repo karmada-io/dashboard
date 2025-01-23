@@ -18,14 +18,16 @@ package cluster
 
 import (
 	"context"
+	"log"
+
+	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
-	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"log"
 )
 
 type Cluster struct {

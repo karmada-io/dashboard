@@ -17,15 +17,17 @@ limitations under the License.
 package statefulset
 
 import (
+	"log"
+
+	apps "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"github.com/karmada-io/dashboard/pkg/resource/event"
-	apps "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes"
-	"log"
 )
 
 // StatefulSetList contains a list of Stateful Sets in the cluster.

@@ -17,11 +17,12 @@ limitations under the License.
 package deployment
 
 import (
+	apps "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"github.com/karmada-io/dashboard/pkg/resource/event"
-	apps "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
 )
 
 type DeploymentCell apps.Deployment

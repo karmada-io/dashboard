@@ -18,10 +18,12 @@ package metrics
 
 import (
 	"net/http"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
+
 	"github.com/gin-gonic/gin"
+
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
- 
+
 var requests = make(chan scrape.SaveRequest)
 
 func GetMetrics(c *gin.Context) {

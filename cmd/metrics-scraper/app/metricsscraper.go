@@ -19,19 +19,20 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
+
+	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
-	"os"
 
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/options"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/router"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/routes/metrics"
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
-	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/router"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/routes/metrics"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/options"
 )
 
 // NewMetricsScraperCommand creates a *cobra.Command object with default parameters
@@ -88,7 +89,7 @@ func run(ctx context.Context, opts *options.Options) error {
 	ensureAPIServerConnectionOrDie()
 	serve(opts)
 	go scrape.InitDatabase()
-	
+
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	select {
 	case <-ctx.Done():
@@ -104,7 +105,6 @@ func serve(opts *options.Options) {
 		klog.Fatal(router.Router().Run(insecureAddress))
 	}()
 }
-
 
 func ensureAPIServerConnectionOrDie() {
 	versionInfo, err := client.InClusterClient().Discovery().ServerVersion()
@@ -125,7 +125,7 @@ func ensureAPIServerConnectionOrDie() {
 }
 
 func init() {
-	r := router.V1() 
+	r := router.V1()
 	r.GET("/metrics", metrics.GetMetrics)
 	r.GET("/metrics/:app_name", metrics.GetMetrics)
 	r.GET("/metrics/:app_name/:pod_name", metrics.QueryMetrics)

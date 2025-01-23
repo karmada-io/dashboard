@@ -17,10 +17,11 @@ limitations under the License.
 package auth
 
 import (
+	"net/http"
+
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/common/errors"
-	"net/http"
 )
 
 func login(spec *v1.LoginRequest, request *http.Request) (*v1.LoginResponse, int, error) {

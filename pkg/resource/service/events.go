@@ -17,13 +17,14 @@ limitations under the License.
 package service
 
 import (
+	"log"
+
+	client "k8s.io/client-go/kubernetes"
+
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"github.com/karmada-io/dashboard/pkg/resource/event"
-	"log"
-
-	client "k8s.io/client-go/kubernetes"
 )
 
 // GetServiceEvents returns model events for a service with the given name in the given namespace.

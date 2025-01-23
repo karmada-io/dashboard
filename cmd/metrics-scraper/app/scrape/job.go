@@ -20,18 +20,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
-	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	kubeclient "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kubeclient "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
+	"github.com/karmada-io/dashboard/pkg/client"
 )
 
 // Define a struct for save requests

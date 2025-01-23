@@ -18,11 +18,13 @@ package router
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"net/http"
 )
 
 func EnsureMemberClusterMiddleware() gin.HandlerFunc {

@@ -15,13 +15,14 @@
 package configmap
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/types"
-	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"reflect"
 	"testing"
 
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/karmada-io/dashboard/pkg/common/types"
+	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
 func TestToConfigMapList(t *testing.T) {

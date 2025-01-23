@@ -20,13 +20,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/glebarez/sqlite"
-	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
-	"github.com/prometheus/common/expfmt"
 	"log"
 	"strings"
 	"sync"
 	"time"
+
+	_ "github.com/glebarez/sqlite"
+	"github.com/prometheus/common/expfmt"
+
+	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 )
 
 var dbMutex sync.Mutex

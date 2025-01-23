@@ -18,7 +18,7 @@ package common
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/common/helpers"
+
 	apps "k8s.io/api/apps/v1"
 	autoscaling "k8s.io/api/autoscaling/v1"
 	batch "k8s.io/api/batch/v1"
@@ -28,6 +28,8 @@ import (
 	storage "k8s.io/api/storage/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	client "k8s.io/client-go/kubernetes"
+
+	"github.com/karmada-io/dashboard/pkg/common/helpers"
 )
 
 // ResourceChannels struct holds channels to resource lists. Each list channel is paired with

@@ -17,8 +17,9 @@ limitations under the License.
 package cluster
 
 import (
-	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
+
+	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
 type ClusterCell v1alpha1.Cluster

@@ -17,8 +17,9 @@ limitations under the License.
 package ingress
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/types"
 	networkingv1 "k8s.io/api/networking/v1"
+
+	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
 func FilterIngressByService(ingresses []networkingv1.Ingress, serviceName string) []networkingv1.Ingress {

@@ -18,13 +18,15 @@ package deployment
 
 import (
 	"context"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
+	"log"
+
 	apps "k8s.io/api/apps/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	client "k8s.io/client-go/kubernetes"
-	"log"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // RollingUpdateStrategy is behavior of a rolling update. See RollingUpdateDeployment K8s object.

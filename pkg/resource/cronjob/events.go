@@ -17,10 +17,11 @@ limitations under the License.
 package cronjob
 
 import (
+	client "k8s.io/client-go/kubernetes"
+
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 	"github.com/karmada-io/dashboard/pkg/resource/event"
-	client "k8s.io/client-go/kubernetes"
 )
 
 // GetCronJobEvents gets events associated to cron job.

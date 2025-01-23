@@ -17,12 +17,13 @@ limitations under the License.
 package configmap
 
 import (
-	"github.com/karmada-io/dashboard/pkg/common/types"
 	"reflect"
 	"testing"
 
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
 func TestGetConfigMapDetail(t *testing.T) {

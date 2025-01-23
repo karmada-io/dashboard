@@ -18,6 +18,7 @@ package overview
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"

@@ -18,12 +18,14 @@ package clusteroverridepolicy
 
 import (
 	"context"
+
+	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
 	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
-	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 )
 
 // ClusterOverridePolicyList contains a list of overriders in the karmada control-plane.

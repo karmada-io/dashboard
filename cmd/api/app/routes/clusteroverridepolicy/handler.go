@@ -18,18 +18,20 @@ package propagationpolicy
 
 import (
 	"context"
+
 	"github.com/gin-gonic/gin"
+	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/util/retry"
+	"k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
+
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/resource/clusteroverridepolicy"
-	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/util/retry"
-	"k8s.io/klog/v2"
-	"sigs.k8s.io/yaml"
 )
 
 func handleGetClusterOverridePolicyList(c *gin.Context) {

@@ -19,18 +19,20 @@ package propagationpolicy
 import (
 	"context"
 	"fmt"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
-	"github.com/karmada-io/dashboard/pkg/common/helpers"
-	"github.com/karmada-io/dashboard/pkg/common/types"
-	"github.com/karmada-io/dashboard/pkg/dataselect"
-	"github.com/karmada-io/dashboard/pkg/resource/common"
+	"log"
+
 	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	"github.com/samber/lo"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"log"
+
+	"github.com/karmada-io/dashboard/pkg/common/errors"
+	"github.com/karmada-io/dashboard/pkg/common/helpers"
+	"github.com/karmada-io/dashboard/pkg/common/types"
+	"github.com/karmada-io/dashboard/pkg/dataselect"
+	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
 // PropagationPolicyList contains a list of propagation in the karmada control-plance.
