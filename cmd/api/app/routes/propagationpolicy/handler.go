@@ -161,7 +161,7 @@ func handleDeletePropagationPolicy(c *gin.Context) {
 			common.Fail(c, err)
 			return
 		}
-		err = retry.OnError(
+		_ = retry.OnError(
 			retry.DefaultRetry,
 			func(err error) bool {
 				return errors.IsNotFound(err)

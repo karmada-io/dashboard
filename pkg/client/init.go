@@ -129,7 +129,7 @@ func isKubeInitialized() bool {
 
 func InitKubeConfig(options ...Option) {
 	builder := newConfigBuilder(options...)
-	// prefer InClusterConfig, if something wrong, use explict kubeconfig path
+	// prefer InClusterConfig, if something wrong, use explicit kubeconfig path
 	restConfig, err := rest.InClusterConfig()
 	if err == nil {
 		klog.Infof("InitKubeConfig by InClusterConfig method")
@@ -141,7 +141,7 @@ func InitKubeConfig(options ...Option) {
 		kubernetesApiConfig = apiConfig
 	} else {
 		klog.Infof("InClusterConfig error: %+v", err)
-		klog.Infof("InitKubeConfig by explict kubeconfig path")
+		klog.Infof("InitKubeConfig by explicit kubeconfig path")
 		restConfig, err = builder.buildRestConfig()
 		if err != nil {
 			klog.Errorf("Could not init client config: %s", err)

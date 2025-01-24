@@ -80,7 +80,7 @@ func GetControllerManagerVersionInfo() (*version.Info, error) {
 		return nil, err
 	}
 	var stdout, stderr bytes.Buffer
-	err = executor.Stream(remotecommand.StreamOptions{
+	err = executor.StreamWithContext(context.TODO(), remotecommand.StreamOptions{
 		Stdout: &stdout,
 		Stderr: &stderr,
 		Tty:    false,
