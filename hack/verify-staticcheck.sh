@@ -32,7 +32,7 @@ else
   curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin ${GOLANGCI_LINT_VER}
 fi
 
-if golangci-lint run --enable-only goimports,gci,whitespace; then
+if golangci-lint run --enable-only goimports,gci,whitespace,misspell,staticcheck,govet; then
   echo 'Congratulations!  All Go source files have passed staticcheck.'
 else
   echo # print one empty line, separate from warning messages.

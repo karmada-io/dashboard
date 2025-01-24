@@ -22,7 +22,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 
@@ -30,7 +29,6 @@ import (
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/resource/clusteroverridepolicy"
 )
 
@@ -132,43 +130,6 @@ func handlePutClusterOverridePolicy(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
-	common.Success(c, "ok")
-}
-
-func handleDeleteClusterOverridePolicy(c *gin.Context) {
-	ctx := context.Context(c)
-	overridepolicyRequest := new(v1.DeleteOverridePolicyRequest)
-	if err := c.ShouldBind(&overridepolicyRequest); err != nil {
-		common.Fail(c, err)
-		return
-	}
-	var err error
-	karmadaClient := client.InClusterKarmadaClient()
-	if overridepolicyRequest.IsClusterScope {
-		err = karmadaClient.PolicyV1alpha1().ClusterOverridePolicies().Delete(ctx, overridepolicyRequest.Name, metav1.DeleteOptions{})
-		if err != nil {
-			klog.ErrorS(err, "Failed to delete ClusterOverridePolicy")
-			common.Fail(c, err)
-			return
-		}
-	} else {
-		err = karmadaClient.PolicyV1alpha1().OverridePolicies(overridepolicyRequest.Namespace).Delete(ctx, overridepolicyRequest.Name, metav1.DeleteOptions{})
-		if err != nil {
-			klog.ErrorS(err, "Failed to delete OverridePolicy")
-			common.Fail(c, err)
-			return
-		}
-		err = retry.OnError(
-			retry.DefaultRetry,
-			func(err error) bool {
-				return errors.IsNotFound(err)
-			},
-			func() error {
-				_, getErr := karmadaClient.PolicyV1alpha1().OverridePolicies(overridepolicyRequest.Namespace).Get(ctx, overridepolicyRequest.Name, metav1.GetOptions{})
-				return getErr
-			})
-	}
-
 	common.Success(c, "ok")
 }
 

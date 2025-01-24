@@ -205,7 +205,7 @@ func handleDeleteCluster(c *gin.Context) {
 	}
 
 	// make sure the given cluster object has been deleted
-	err = wait.Poll(1*time.Second, waitDuration, func() (done bool, err error) {
+	err = wait.PollUntilContextTimeout(ctx, 1*time.Second, waitDuration, true, func(ctx context.Context) (done bool, err error) {
 		_, err = karmadaClient.ClusterV1alpha1().Clusters().Get(ctx, clusterName, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return true, nil
