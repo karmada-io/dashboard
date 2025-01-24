@@ -79,7 +79,7 @@ func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}
 	}
 	onUpdate := func(oldObj, newObj interface{}) {
 		newConfigMap := newObj.(*v1.ConfigMap)
-		klog.V(2).Info("ConfigMap %s Updated\n", newConfigMap.Name)
+		klog.V(2).Infof("ConfigMap %s Updated", newConfigMap.Name)
 		var tmpConfig DashboardConfig
 		if err := yaml.Unmarshal([]byte(newConfigMap.Data[GetConfigKey()]), &tmpConfig); err != nil {
 			klog.Errorf("Failed to unmarshal ConfigMap %s: %v", newConfigMap.Name, err)

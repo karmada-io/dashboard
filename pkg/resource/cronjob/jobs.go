@@ -154,8 +154,6 @@ func filterJobsByState(active bool, jobs []batch.Job) (matchingJobs []batch.Job)
 			matchingJobs = append(matchingJobs, j)
 		} else if !active && j.Status.Active == 0 {
 			matchingJobs = append(matchingJobs, j)
-		} else {
-			//sup
 		}
 	}
 	return
