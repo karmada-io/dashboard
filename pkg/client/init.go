@@ -155,7 +155,6 @@ func InitKubeConfig(options ...Option) {
 		}
 		kubernetesApiConfig = apiConfig
 	}
-
 }
 
 func InClusterClient() kubeclient.Interface {

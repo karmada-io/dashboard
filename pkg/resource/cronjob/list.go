@@ -69,7 +69,6 @@ func GetCronJobList(client client.Interface, nsQuery *common.NamespaceQuery,
 // GetCronJobListFromChannels returns a list of all CronJobs in the cluster reading required resource
 // list once from the channels.
 func GetCronJobListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*CronJobList, error) {
-
 	cronJobs := <-channels.CronJobList.List
 	err := <-channels.CronJobList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -83,7 +82,6 @@ func GetCronJobListFromChannels(channels *common.ResourceChannels, dsQuery *data
 }
 
 func toCronJobList(cronJobs []batch.CronJob, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *CronJobList {
-
 	list := &CronJobList{
 		Items:    make([]CronJob, 0),
 		ListMeta: types.ListMeta{TotalItems: len(cronJobs)},

@@ -27,7 +27,6 @@ import (
 // GetCronJobEvents gets events associated to cron job.
 func GetCronJobEvents(client client.Interface, dsQuery *dataselect.DataSelectQuery, namespace, name string) (
 	*common.EventList, error) {
-
 	raw, err := event.GetEvents(client, namespace, name)
 	if err != nil {
 		return event.EmptyEventList, err

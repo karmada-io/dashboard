@@ -38,7 +38,6 @@ type CronJobDetail struct {
 
 // GetCronJobDetail gets Cron Job details.
 func GetCronJobDetail(client k8sClient.Interface, namespace, name string) (*CronJobDetail, error) {
-
 	rawObject, err := client.BatchV1().CronJobs(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
 		return nil, err

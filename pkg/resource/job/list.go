@@ -102,7 +102,6 @@ func GetJobList(client client.Interface, nsQuery *common.NamespaceQuery,
 
 // GetJobListFromChannels returns a list of all Jobs in the cluster reading required resource list once from the channels.
 func GetJobListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*JobList, error) {
-
 	jobs := <-channels.JobList.List
 	err := <-channels.JobList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -131,7 +130,6 @@ func GetJobListFromChannels(channels *common.ResourceChannels, dsQuery *datasele
 
 func ToJobList(jobs []batch.Job, pods []v1.Pod, events []v1.Event, nonCriticalErrors []error,
 	dsQuery *dataselect.DataSelectQuery) *JobList {
-
 	jobList := &JobList{
 		Jobs:     make([]Job, 0),
 		ListMeta: types.ListMeta{TotalItems: len(jobs)},

@@ -84,7 +84,6 @@ type DeploymentDetail struct {
 
 // GetDeploymentDetail returns model object of deployment and error, if any.
 func GetDeploymentDetail(client client.Interface, namespace string, deploymentName string) (*DeploymentDetail, error) {
-
 	log.Printf("Getting details of %s deployment in %s namespace", deploymentName, namespace)
 
 	deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metaV1.GetOptions{})
