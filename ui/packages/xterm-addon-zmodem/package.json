@@ -29,7 +29,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@karmada/xterm-addon-zmodem": "link:",
+    "@karmada/utils": "workspace:*",
     "file-saver": "^2.0.5",
     "trzsz": "^1.1.5",
     "zmodem.js": "^0.1.10"

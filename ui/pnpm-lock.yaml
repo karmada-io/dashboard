@@ -41,12 +41,12 @@ importers:
 
   apps/dashboard:
     dependencies:
-      '@karmada/dashboard':
-        specifier: 'link:'
-        version: 'link:'
       '@karmada/i18n-tool':
-        specifier: 'link:'
-        version: 'link:'
+        specifier: workspace:*
+        version: link:../../packages/i18n-tool
+      '@karmada/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -58,7 +58,7 @@ importers:
         version: 2.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       antd:
         specifier: ^5.21.3
-        version: 5.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 5.21.3(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -153,6 +153,9 @@ importers:
       vite:
         specifier: ^5.4.8
         version: 5.4.8(@types/node@20.12.11)(less@4.2.0)
+      vite-plugin-banner:
+        specifier: ^0.8.0
+        version: 0.8.0
       vite-plugin-dynamic-base:
         specifier: ^1.1.0
         version: 1.1.0(vite@5.4.8(@types/node@20.12.11)(less@4.2.0))
@@ -260,6 +263,9 @@ importers:
 
   packages/terminal:
     dependencies:
+      '@karmada/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@karmada/xterm-addon-overlay':
         specifier: workspace:*
         version: link:../xterm-addon-overlay
@@ -327,6 +333,9 @@ importers:
 
   packages/translators:
     dependencies:
+      '@karmada/utils':
+        specifier: workspace:*
+        version: link:../utils
       got:
         specifier: ^14.4.2
         version: 14.4.2
@@ -344,17 +353,22 @@ importers:
         specifier: ^2.0.5
         version: 2.1.2(@types/node@20.12.11)(less@4.2.0)
 
+  packages/utils: {}
+
   packages/xterm-addon-overlay:
     dependencies:
+      '@karmada/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@xterm/xterm':
         specifier: ^5.0.0
         version: 5.5.0
 
   packages/xterm-addon-zmodem:
     dependencies:
-      '@karmada/xterm-addon-zmodem':
-        specifier: 'link:'
-        version: 'link:'
+      '@karmada/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@xterm/xterm':
         specifier: ^5.0.0
         version: 5.5.0
@@ -3065,6 +3079,9 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  moment@2.30.1:
+    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
+
   monaco-editor@0.48.0:
     resolution: {integrity: sha512-goSDElNqFfw7iDHMg8WDATkfcyeLTNpBHQpO8incK6p5qZt5G/1j41X0xdGzpIkGojGXM+QiRQyLjnfDVvrpwA==}
 
@@ -4254,6 +4271,9 @@ packages:
     resolution: {integrity: sha512-HPcGNN5g/7I2OtPjLqgOtCRu/qhVvBxTUD3qzitmL0SrG1cWFzxzhMDWussxSbrRYWqnKf8P2jiNhPMSN+ymsQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
+
+  vite-plugin-banner@0.8.0:
+    resolution: {integrity: sha512-JpDWDYxtrsytuvUOJCgJcTkBb6XM8yPOidjRtB6F5SW1JSzDd/Y+PD/44wR6ovWKXhSUiyDRqPvx7mMf8+8ELg==}
 
   vite-plugin-dynamic-base@1.1.0:
     resolution: {integrity: sha512-/hIOTuzedlPRiUTCIY1cJx7UDDUF0brxWIifE7xG1czCJy0Aw6k3QPbHVjPCs30YuU+WAgrX4ACOySLIp2NHkw==}
@@ -5874,7 +5894,7 @@ snapshots:
 
   ansi-styles@6.2.1: {}
 
-  antd@5.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  antd@5.21.3(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@ant-design/colors': 7.1.0
       '@ant-design/cssinjs': 1.21.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5906,7 +5926,7 @@ snapshots:
       rc-motion: 2.9.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-notification: 5.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-pagination: 4.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      rc-picker: 4.6.15(dayjs@1.11.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-picker: 4.6.15(dayjs@1.11.11)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-progress: 4.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-rate: 2.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-resize-observer: 1.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -7431,6 +7451,9 @@ snapshots:
 
   minipass@7.1.2: {}
 
+  moment@2.30.1:
+    optional: true
+
   monaco-editor@0.48.0: {}
 
   monaco-languageserver-types@0.4.0:
@@ -7924,7 +7947,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  rc-picker@4.6.15(dayjs@1.11.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  rc-picker@4.6.15(dayjs@1.11.11)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.25.7
       '@rc-component/trigger': 2.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -7936,6 +7959,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       dayjs: 1.11.11
+      moment: 2.30.1
 
   rc-progress@4.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -8739,6 +8763,8 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vite-plugin-banner@0.8.0: {}
 
   vite-plugin-dynamic-base@1.1.0(vite@5.4.8(@types/node@20.12.11)(less@4.2.0)):
     dependencies:

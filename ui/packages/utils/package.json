@@ -1,6 +1,6 @@
 {
-  "name": "@karmada/xterm-addon-overlay",
-  "version": "1.0.1",
+  "name": "@karmada/utils",
+  "version": "1.0.0",
   "publishConfig": {
     "access": "public"
   },
@@ -21,17 +21,7 @@
       "prettier --write"
     ]
   },
-  "keywords": [
-    "terminal",
-    "xterm",
-    "xterm.js"
-  ],
+  "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@karmada/utils": "workspace:*"
-  },
-  "peerDependencies": {
-    "@xterm/xterm": "^5.0.0"
-  }
+  "license": "ISC"
 }
