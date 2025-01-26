@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// ClusterOverridePolicyCell wraps v1alpha1.ClusterOverridePolicy for data selection.
 type ClusterOverridePolicyCell v1alpha1.ClusterOverridePolicy
 
+// GetProperty returns a property of the cluster override policy cell.
 func (self ClusterOverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

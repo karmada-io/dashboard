@@ -29,11 +29,13 @@ import (
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
 
+// MetricInfo represents the information about a metric.
 type MetricInfo struct {
 	Help string `json:"help"`
 	Type string `json:"type"`
 }
 
+// QueryMetrics handles the querying of metrics.
 func QueryMetrics(c *gin.Context) {
 	appName := c.Param("app_name")
 	podName := c.Param("pod_name")

@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// NodeCell wraps api.Node for data selection.
 type NodeCell api.Node
 
+// GetProperty returns a property of the cell.
 func (self NodeCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

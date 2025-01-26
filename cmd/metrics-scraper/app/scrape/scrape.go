@@ -79,6 +79,7 @@ func startAppMetricsFetcher(appName string) {
 	}
 }
 
+// CheckAppStatus checks the status of all registered apps and returns a map of app names to their status.
 func CheckAppStatus(c *gin.Context) {
 	statusMap := make(map[string]bool)
 
@@ -107,6 +108,8 @@ func CheckAppStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, statusMap)
 }
 
+// HandleSyncOperation handles the sync operation for a specific app
+// if not specified, it handles the sync operation for all apps.
 func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryType string) {
 	if appName == "" {
 		// Stop all apps
@@ -188,6 +191,7 @@ func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryTyp
 	}
 }
 
+// InitDatabase initializes the database and starts the metrics fetchers.
 func InitDatabase() {
 	// Initialize contexts and cancel functions
 	appContexts = make(map[string]context.Context)

@@ -185,6 +185,7 @@ func (v *resourceVerber) Create(object *unstructured.Unstructured) (*unstructure
 	return v.client.Resource(gvr).Namespace(namespace).Create(context.TODO(), object, metav1.CreateOptions{})
 }
 
+// VerberClient returns a resourceVerber client.
 func VerberClient(request *http.Request) (ResourceVerber, error) {
 	// todo currently ignore rest.config from http.Request
 	restConfig, _, err := GetKarmadaConfig()

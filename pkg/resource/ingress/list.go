@@ -103,6 +103,7 @@ func toIngress(ingress *v1.Ingress) Ingress {
 	}
 }
 
+// ToIngressList converts a list of Ingresss to IngressList
 func ToIngressList(ingresses []v1.Ingress, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *IngressList {
 	newIngressList := &IngressList{
 		ListMeta: types.ListMeta{TotalItems: len(ingresses)},

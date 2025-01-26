@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// ClusterPropagationPolicyCell wraps v1alpha1.ClusterPropagationPolicy for data selection.
 type ClusterPropagationPolicyCell v1alpha1.ClusterPropagationPolicy
 
+// GetProperty returns a property of the cluster propagation policy cell.
 func (self ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

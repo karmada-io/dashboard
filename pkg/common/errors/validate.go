@@ -45,4 +45,5 @@ func IsForbidden(err error) bool {
 	return k8serrors.IsForbidden(err)
 }
 
+// IsNotFound checks if the given error is of type NotFound.
 func IsNotFound(err error) bool { return k8serrors.IsNotFound(err) }

@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
+// ClusterPropagationPolicyDetail contains clusterPropagationPolicy details.
 type ClusterPropagationPolicyDetail struct {
 	// Extends list item structure.
 	ClusterPropagationPolicy `json:",inline"`

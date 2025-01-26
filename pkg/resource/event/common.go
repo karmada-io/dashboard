@@ -154,8 +154,10 @@ func CreateEventList(events []v1.Event, dsQuery *dataselect.DataSelectQuery) com
 
 // The code below allows to perform complex data section on []api.Event
 
+// EventCell wraps v1.Event for data selection.
 type EventCell v1.Event
 
+// GetProperty returns a property of the cell.
 func (self EventCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

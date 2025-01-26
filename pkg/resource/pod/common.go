@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// PodCell wraps api.Pod for data selection.
 type PodCell api.Pod
 
+// GetProperty returns a property.
 func (self PodCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

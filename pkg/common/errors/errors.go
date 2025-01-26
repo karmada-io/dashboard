@@ -30,6 +30,7 @@ func NewUnauthorized(reason string) *k8serrors.StatusError {
 	return k8serrors.NewUnauthorized(reason)
 }
 
+// NewForbidden returns an error indicating the client is not authorized to perform the requested
 func NewForbidden(name string, err error) *k8serrors.StatusError {
 	return k8serrors.NewForbidden(schema.GroupResource{}, name, err)
 }
@@ -44,17 +45,6 @@ func NewTokenExpired(reason string) *k8serrors.StatusError {
 			Code:    http.StatusUnauthorized,
 			Reason:  metav1.StatusReasonExpired,
 			Message: reason,
-		},
-	}
-}
-
-func NewCSRFValidationFailed() *k8serrors.StatusError {
-	return &k8serrors.StatusError{
-		ErrStatus: metav1.Status{
-			Status:  metav1.StatusFailure,
-			Code:    http.StatusUnauthorized,
-			Reason:  metav1.StatusReasonInvalid,
-			Message: MsgCSRFValidationError,
 		},
 	}
 }

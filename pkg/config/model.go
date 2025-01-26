@@ -16,6 +16,7 @@ limitations under the License.
 
 package config
 
+// DockerRegistry represents a Docker registry configuration.
 type DockerRegistry struct {
 	Name     string `yaml:"name" json:"name"`
 	Url      string `yaml:"url" json:"url"`
@@ -24,6 +25,7 @@ type DockerRegistry struct {
 	AddTime  int64  `yaml:"add_time" json:"add_time"`
 }
 
+// ChartRegistry represents a Helm chart registry configuration.
 type ChartRegistry struct {
 	Name     string `yaml:"name" json:"name"`
 	Url      string `yaml:"url" json:"url"`
@@ -32,6 +34,7 @@ type ChartRegistry struct {
 	AddTime  int64  `yaml:"add_time" json:"add_time"`
 }
 
+// MenuConfig represents a menu configuration.
 type MenuConfig struct {
 	Path       string       `yaml:"path" json:"path"`
 	Enable     bool         `yaml:"enable" json:"enable"`
