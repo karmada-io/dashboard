@@ -27,8 +27,10 @@ import (
 
 // The code below allows to perform complex data section on []apps.StatefulSet
 
+// StatefulSetCell wraps apps.StatefulSet for data selection.
 type StatefulSetCell apps.StatefulSet
 
+// GetProperty returns a property.
 func (self StatefulSetCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

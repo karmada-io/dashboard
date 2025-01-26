@@ -26,6 +26,7 @@ import (
 // silenced and displayed to the user as a warning on the frontend side.
 var nonCriticalErrors = []int32{http.StatusForbidden}
 
+// HandleError processes the incoming error and returns the corresponding HTTP status code and error message based on the error type.
 func HandleError(err error) (int, error) {
 	if IsUnauthorized(err) {
 		return http.StatusUnauthorized, NewUnauthorized(MsgLoginUnauthorizedError)

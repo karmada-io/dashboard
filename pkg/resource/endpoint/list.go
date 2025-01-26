@@ -20,6 +20,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
+// EndpointList is a list of endpoints in the cluster.
 type EndpointList struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 	// List of endpoints

@@ -24,8 +24,10 @@ import (
 
 // The code below allows to perform complex data section on []extensions.Ingress
 
+// IngressCell wraps v1.Ingress for data selection.
 type IngressCell v1.Ingress
 
+// GetProperty returns a property.
 func (self IngressCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

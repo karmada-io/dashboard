@@ -33,8 +33,10 @@ import (
 )
 
 const (
+	// CronJobAPIVersion is the version of the api for the cronjob.
 	CronJobAPIVersion = "v1"
-	CronJobKindName   = "cronjob"
+	// CronJobKindName is the kind name of the api for the cronjob.
+	CronJobKindName = "cronjob"
 )
 
 var emptyJobList = &job.JobList{

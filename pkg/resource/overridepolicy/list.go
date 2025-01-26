@@ -42,6 +42,7 @@ type OverridePolicyList struct {
 	Errors []error `json:"errors"`
 }
 
+// OverridePolicy contains information about a single override.
 type OverridePolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
@@ -50,7 +51,7 @@ type OverridePolicy struct {
 	OverrideRules     []v1alpha1.RuleWithCluster  `json:"overrideRules"`
 }
 
-// GetOverridePolicyList returns a list of all propagations in the karmada control-plance.
+// GetOverridePolicyList returns a list of all override policies in the Karmada control-plane.
 func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*OverridePolicyList, error) {
 	log.Println("Getting list of overridepolicy")
 	overridePolicies, err := client.PolicyV1alpha1().OverridePolicies(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)

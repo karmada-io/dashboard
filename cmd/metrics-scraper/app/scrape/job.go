@@ -34,7 +34,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 )
 
-// Define a struct for save requests
+// SaveRequest Define a struct for save requests
 type SaveRequest struct {
 	appName string
 	podName string
@@ -42,6 +42,7 @@ type SaveRequest struct {
 	result  chan error
 }
 
+// FetchMetrics fetches metrics from all pods of the given app name
 func FetchMetrics(ctx context.Context, appName string, requests chan SaveRequest) (map[string]*db.ParsedData, []string, error) {
 	kubeClient := client.InClusterClient()
 	podsMap, errors := getKarmadaPods(ctx, appName) // Pass context here

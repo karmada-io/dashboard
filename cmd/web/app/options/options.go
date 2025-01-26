@@ -35,6 +35,7 @@ type Options struct {
 	DashboardConfigPath string
 }
 
+// NewOptions creates a new Options object with default parameters.
 func NewOptions() *Options {
 	return &Options{}
 }

@@ -82,6 +82,7 @@ func buildAuthInfo(request *http.Request) (*clientcmdapi.AuthInfo, error) {
 	return authInfo, nil
 }
 
+// HasAuthorizationHeader checks if the request has an authorization header.
 func HasAuthorizationHeader(req *http.Request) bool {
 	header := req.Header.Get(authorizationHeader)
 	if len(header) == 0 {
@@ -92,11 +93,13 @@ func HasAuthorizationHeader(req *http.Request) bool {
 	return strings.HasPrefix(header, authorizationTokenPrefix) && len(token) > 0
 }
 
+// GetBearerToken returns the bearer token from the authorization header.
 func GetBearerToken(req *http.Request) string {
 	header := req.Header.Get(authorizationHeader)
 	return extractBearerToken(header)
 }
 
+// SetAuthorizationHeader sets the authorization header for the given request.
 func SetAuthorizationHeader(req *http.Request, token string) {
 	req.Header.Set(authorizationHeader, authorizationTokenPrefix+token)
 }

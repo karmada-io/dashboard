@@ -22,8 +22,10 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// SecretCell wraps api.Secret for data selection.
 type SecretCell api.Secret
 
+// GetProperty returns a property of the secret cell.
 func (self SecretCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

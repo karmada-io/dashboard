@@ -22,6 +22,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
+// FilterIngressByService filters the given ingresses based on the service name.
 func FilterIngressByService(ingresses []networkingv1.Ingress, serviceName string) []networkingv1.Ingress {
 	var matchingIngresses []networkingv1.Ingress
 	for _, ingress := range ingresses {

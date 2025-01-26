@@ -24,8 +24,10 @@ import (
 
 // The code below allows to perform complex data section on []api.Service
 
+// ServiceCell wraps v1.Service for data selection.
 type ServiceCell v1.Service
 
+// GetProperty returns a property of the service cell.
 func (self ServiceCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

@@ -22,6 +22,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// BaseResponse is the base response
 type BaseResponse struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"message"`
@@ -38,6 +39,7 @@ func Fail(c *gin.Context, err error) {
 	Response(c, err, nil)
 }
 
+// Response generate response
 func Response(c *gin.Context, err error, data interface{}) {
 	code := 200          // biz status code
 	message := "success" // biz status message
