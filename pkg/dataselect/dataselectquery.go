@@ -18,38 +18,54 @@ package dataselect
 // Can be extended to include any kind of selection - for example filtering.
 // Currently included only Pagination and Sort options.
 type DataSelectQuery struct {
+	// PaginationQuery holds options for pagination of data select.
 	PaginationQuery *PaginationQuery
-	SortQuery       *SortQuery
-	FilterQuery     *FilterQuery
+	// SortQuery holds options for sort functionality of data select.
+	SortQuery *SortQuery
+	// FilterQuery holds options for filter functionality of data select.
+	FilterQuery *FilterQuery
 	//MetricQuery     *MetricQuery
 }
 
 // SortQuery holds options for sort functionality of data select.
 type SortQuery struct {
+	// SortByList is a list of sort criteria for data selection.
 	SortByList []SortBy
 }
 
 // SortBy holds the name of the property that should be sorted and whether order should be ascending or descending.
 type SortBy struct {
-	Property  PropertyName
+	// Property is the name of the field or attribute to sort by.
+	Property PropertyName
+	// Ascending determines the sort order
 	Ascending bool
 }
 
 // NoSort is as option for no sort.
 var NoSort = &SortQuery{
+	// SortByList is a list of sort criteria for data selection.
 	SortByList: []SortBy{},
 }
 
+// FilterQuery holds options for filter functionality of data select.
 type FilterQuery struct {
+	// FilterByList is a list of filter criteria for data selection.
 	FilterByList []FilterBy
 }
 
+// FilterBy defines a filter criterion for data selection.
+// It specifies a property to filter on and the value to compare against.
 type FilterBy struct {
+	// Property is the name of the field or attribute to filter by.
 	Property PropertyName
-	Value    ComparableValue
+
+	// Value is the comparable value to match against the specified property.
+	Value ComparableValue
 }
 
+// NoFilter is an option for no filter.
 var NoFilter = &FilterQuery{
+	// FilterByList is a list of filter criteria for data selection.
 	FilterByList: []FilterBy{},
 }
 

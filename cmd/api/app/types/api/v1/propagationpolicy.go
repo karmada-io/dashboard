@@ -16,6 +16,7 @@ limitations under the License.
 
 package v1
 
+// PostPropagationPolicyRequest defines the request structure for creating a propagation policy.
 // todo this is only a simple version of pp request, just for POC
 type PostPropagationPolicyRequest struct {
 	PropagationData string `json:"propagationData" binding:"required"`
@@ -23,9 +24,11 @@ type PostPropagationPolicyRequest struct {
 	Namespace       string `json:"namespace"`
 }
 
+// PostPropagationPolicyResponse defines the response structure for creating a propagation policy.
 type PostPropagationPolicyResponse struct {
 }
 
+// PutPropagationPolicyRequest defines the request structure for updating a propagation policy.
 type PutPropagationPolicyRequest struct {
 	PropagationData string `json:"propagationData" binding:"required"`
 	IsClusterScope  bool   `json:"isClusterScope"`
@@ -33,14 +36,17 @@ type PutPropagationPolicyRequest struct {
 	Name            string `json:"name" binding:"required"`
 }
 
+// PutPropagationPolicyResponse defines the response structure for updating a propagation policy.
 type PutPropagationPolicyResponse struct {
 }
 
+// DeletePropagationPolicyRequest defines the request structure for deleting a propagation policy.
 type DeletePropagationPolicyRequest struct {
 	IsClusterScope bool   `json:"isClusterScope"`
 	Namespace      string `json:"namespace"`
 	Name           string `json:"name" binding:"required"`
 }
 
+// DeletePropagationPolicyResponse defines the response structure for deleting a propagation policy.
 type DeletePropagationPolicyResponse struct {
 }

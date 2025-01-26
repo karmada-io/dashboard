@@ -16,15 +16,18 @@ limitations under the License.
 
 package v1
 
+// PostOverridePolicyRequest is the request body for creating an override policy.
 type PostOverridePolicyRequest struct {
 	OverrideData   string `json:"overrideData" binding:"required"`
 	IsClusterScope bool   `json:"isClusterScope"`
 	Namespace      string `json:"namespace"`
 }
 
+// PostOverridePolicyResponse is the response body for creating an override policy.
 type PostOverridePolicyResponse struct {
 }
 
+// PutOverridePolicyRequest is the request body for updating an override policy.
 type PutOverridePolicyRequest struct {
 	OverrideData   string `json:"overrideData" binding:"required"`
 	IsClusterScope bool   `json:"isClusterScope"`
@@ -32,14 +35,17 @@ type PutOverridePolicyRequest struct {
 	Name           string `json:"name" binding:"required"`
 }
 
+// PutOverridePolicyResponse is the response body for updating an override policy.
 type PutOverridePolicyResponse struct {
 }
 
+// DeleteOverridePolicyRequest is the request body for deleting an override policy.
 type DeleteOverridePolicyRequest struct {
 	IsClusterScope bool   `json:"isClusterScope"`
 	Namespace      string `json:"namespace"`
 	Name           string `json:"name" binding:"required"`
 }
 
+// DeleteOverridePolicyResponse is the response body for deleting an override policy.
 type DeleteOverridePolicyResponse struct {
 }

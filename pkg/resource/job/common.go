@@ -26,8 +26,10 @@ import (
 
 // The code below allows to perform complex data section on []batch.Job
 
+// JobCell represents a job cell that implements the DataCell interface.
 type JobCell batch.Job
 
+// GetProperty returns a comparable value for a specified property name.
 func (self JobCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -42,6 +44,7 @@ func (self JobCell) GetProperty(name dataselect.PropertyName) dataselect.Compara
 	}
 }
 
+// ToCells converts a slice of Jobs to a slice of DataCells.
 func ToCells(std []batch.Job) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -50,6 +53,7 @@ func ToCells(std []batch.Job) []dataselect.DataCell {
 	return cells
 }
 
+// FromCells converts a slice of DataCells to a slice of Jobs.
 func FromCells(cells []dataselect.DataCell) []batch.Job {
 	std := make([]batch.Job, len(cells))
 	for i := range std {

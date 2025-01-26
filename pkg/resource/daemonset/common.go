@@ -64,8 +64,10 @@ func GetServicesForDSDeletion(client client.Interface, labelSelector labels.Sele
 
 // The code below allows to perform complex data section on Daemon Set
 
+// DaemonSetCell is a type alias for the DaemonSet type from the apps/v1 API.
 type DaemonSetCell apps.DaemonSet
 
+// GetProperty returns a comparable value for a specified property name.
 func (self DaemonSetCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -80,6 +82,7 @@ func (self DaemonSetCell) GetProperty(name dataselect.PropertyName) dataselect.C
 	}
 }
 
+// ToCells converts a slice of DaemonSets to a slice of DataCells.
 func ToCells(std []apps.DaemonSet) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -88,6 +91,7 @@ func ToCells(std []apps.DaemonSet) []dataselect.DataCell {
 	return cells
 }
 
+// FromCells converts a slice of DataCells to a slice of DaemonSets.
 func FromCells(cells []dataselect.DataCell) []apps.DaemonSet {
 	std := make([]apps.DaemonSet, len(cells))
 	for i := range std {

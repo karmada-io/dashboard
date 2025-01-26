@@ -30,6 +30,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
+// Cluster the definition of a cluster.
 type Cluster struct {
 	ObjectMeta         types.ObjectMeta          `json:"objectMeta"`
 	TypeMeta           types.TypeMeta            `json:"typeMeta"`

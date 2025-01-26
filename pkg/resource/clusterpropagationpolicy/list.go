@@ -39,6 +39,7 @@ type ClusterPropagationPolicyList struct {
 	Errors []error `json:"errors"`
 }
 
+// ClusterPropagationPolicy represents a cluster propagation policy.
 type ClusterPropagationPolicy struct {
 	ObjectMeta        types.ObjectMeta            `json:"objectMeta"`
 	TypeMeta          types.TypeMeta              `json:"typeMeta"`

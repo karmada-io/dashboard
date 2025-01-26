@@ -51,26 +51,31 @@ type configBuilder struct {
 	userAgent      string
 }
 
+// Option is a function that configures a configBuilder.
 type Option func(*configBuilder)
 
+// WithUserAgent is an option to set the user agent.
 func WithUserAgent(agent string) Option {
 	return func(c *configBuilder) {
 		c.userAgent = agent
 	}
 }
 
+// WithKubeconfig is an option to set the kubeconfig path.
 func WithKubeconfig(path string) Option {
 	return func(c *configBuilder) {
 		c.kubeconfigPath = path
 	}
 }
 
+// WithKubeContext is an option to set the kubeconfig context.
 func WithKubeContext(kubecontext string) Option {
 	return func(c *configBuilder) {
 		c.kubeContext = kubecontext
 	}
 }
 
+// WithInsecureTLSSkipVerify is an option to set the insecure tls skip verify.
 func WithInsecureTLSSkipVerify(insecure bool) Option {
 	return func(c *configBuilder) {
 		c.insecure = insecure
@@ -127,6 +132,7 @@ func isKubeInitialized() bool {
 	return true
 }
 
+// InitKubeConfig initializes the kubernetes client config.
 func InitKubeConfig(options ...Option) {
 	builder := newConfigBuilder(options...)
 	// prefer InClusterConfig, if something wrong, use explicit kubeconfig path
@@ -157,6 +163,7 @@ func InitKubeConfig(options ...Option) {
 	}
 }
 
+// InClusterClient returns a kubernetes client.
 func InClusterClient() kubeclient.Interface {
 	if !isKubeInitialized() {
 		return nil
@@ -177,6 +184,7 @@ func InClusterClient() kubeclient.Interface {
 	return inClusterClient
 }
 
+// GetKubeConfig returns the kubernetes client config.
 func GetKubeConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	if !isKubeInitialized() {
 		return nil, nil, fmt.Errorf("client package not initialized")
@@ -192,6 +200,7 @@ func isKarmadaInitialized() bool {
 	return true
 }
 
+// InitKarmadaConfig initializes the karmada client config.
 func InitKarmadaConfig(options ...Option) {
 	builder := newConfigBuilder(options...)
 	restConfig, err := builder.buildRestConfig()
@@ -216,6 +225,7 @@ func InitKarmadaConfig(options ...Option) {
 	karmadaMemberConfig = memberConfig
 }
 
+// InClusterKarmadaClient returns a karmada client.
 func InClusterKarmadaClient() karmadaclientset.Interface {
 	if !isKarmadaInitialized() {
 		return nil
@@ -234,6 +244,7 @@ func InClusterKarmadaClient() karmadaclientset.Interface {
 	return inClusterKarmadaClient
 }
 
+// GetKarmadaConfig returns the karmada client config.
 func GetKarmadaConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	if !isKarmadaInitialized() {
 		return nil, nil, fmt.Errorf("client package not initialized")
@@ -241,6 +252,7 @@ func GetKarmadaConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	return karmadaRestConfig, karmadaApiConfig, nil
 }
 
+// GetMemberConfig returns the member client config.
 func GetMemberConfig() (*rest.Config, error) {
 	if !isKarmadaInitialized() {
 		return nil, fmt.Errorf("client package not initialized")
@@ -248,6 +260,7 @@ func GetMemberConfig() (*rest.Config, error) {
 	return karmadaMemberConfig, nil
 }
 
+// InClusterClientForKarmadaApiServer returns a kubernetes client for karmada apiserver.
 func InClusterClientForKarmadaApiServer() kubeclient.Interface {
 	if !isKarmadaInitialized() {
 		return nil
@@ -269,6 +282,7 @@ func InClusterClientForKarmadaApiServer() kubeclient.Interface {
 	return inClusterClientForKarmadaApiServer
 }
 
+// InClusterClientForMemberCluster returns a kubernetes client for member apiserver.
 func InClusterClientForMemberCluster(clusterName string) kubeclient.Interface {
 	if !isKarmadaInitialized() {
 		return nil
@@ -306,6 +320,7 @@ func InClusterClientForMemberCluster(clusterName string) kubeclient.Interface {
 	return inClusterClientForMemberApiServer
 }
 
+// ConvertRestConfigToAPIConfig converts a rest.Config to a clientcmdapi.Config.
 func ConvertRestConfigToAPIConfig(restConfig *rest.Config) *clientcmdapi.Config {
 	// 将 rest.Config 转换为 clientcmdapi.Config
 	clientcmdConfig := clientcmdapi.NewConfig()

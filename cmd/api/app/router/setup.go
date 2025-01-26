@@ -47,14 +47,17 @@ func init() {
 	})
 }
 
+// V1 returns the router group for /api/v1 which for resources in control plane endpoints.
 func V1() *gin.RouterGroup {
 	return v1
 }
 
+// Router returns the main Gin engine instance.
 func Router() *gin.Engine {
 	return router
 }
 
+// MemberV1 returns the router group for /api/v1/member/:clustername which for resources in specific member cluster.
 func MemberV1() *gin.RouterGroup {
 	return member
 }

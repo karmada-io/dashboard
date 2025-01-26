@@ -47,6 +47,7 @@ var (
 	}
 )
 
+// GetConfigKey returns the configuration key based on the environment name.
 func GetConfigKey() string {
 	envName := os.Getenv("ENV_NAME")
 	if envName == "" {
@@ -55,6 +56,7 @@ func GetConfigKey() string {
 	return fmt.Sprintf("%s.yaml", envName)
 }
 
+// InitDashboardConfig initializes the dashboard configuration using a Kubernetes client.
 func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}) {
 	factory := informers.NewSharedInformerFactory(k8sClient, 0)
 	resource, err := factory.ForResource(configmapGVR)
@@ -98,6 +100,7 @@ func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}
 	klog.Infof("ConfigMap informer started, waiting for ConfigMap events...")
 }
 
+// GetDashboardConfig returns a copy of the current dashboard configuration.
 func GetDashboardConfig() DashboardConfig {
 	return DashboardConfig{
 		DockerRegistries: dashboardConfig.DockerRegistries,
@@ -107,6 +110,7 @@ func GetDashboardConfig() DashboardConfig {
 	}
 }
 
+// UpdateDashboardConfig updates the dashboard configuration in the Kubernetes ConfigMap.
 func UpdateDashboardConfig(k8sClient kubernetes.Interface, newDashboardConfig DashboardConfig) error {
 	ctx := context.TODO()
 	oldConfigMap, err := k8sClient.CoreV1().ConfigMaps(configNamespace).Get(ctx, configName, metav1.GetOptions{})
@@ -129,6 +133,7 @@ func UpdateDashboardConfig(k8sClient kubernetes.Interface, newDashboardConfig Da
 	return nil
 }
 
+// InitDashboardConfigFromMountFile initializes the dashboard configuration from a mounted file.
 func InitDashboardConfigFromMountFile(mountPath string) error {
 	_, err := os.Stat(mountPath)
 	if os.IsNotExist(err) {
