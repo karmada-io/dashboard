@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
+// ClusterOverridePolicyDetail contains clusterPropagationPolicy details and non-critical errors.
 type ClusterOverridePolicyDetail struct {
 	// Extends list item structure.
 	ClusterOverridePolicy `json:",inline"`

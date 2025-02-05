@@ -18,6 +18,7 @@ package v1
 
 import "github.com/karmada-io/dashboard/pkg/config"
 
+// SetDashboardConfigRequest is the request for setting dashboard config
 type SetDashboardConfigRequest struct {
 	DockerRegistries []config.DockerRegistry `json:"docker_registries"`
 	ChartRegistries  []config.ChartRegistry  `json:"chart_registries"`

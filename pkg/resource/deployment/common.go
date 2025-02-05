@@ -25,6 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
+// DeploymentCell is a wrapper for the k8s deployment
 type DeploymentCell apps.Deployment
 
 // GetProperty is used to get property of the deployment

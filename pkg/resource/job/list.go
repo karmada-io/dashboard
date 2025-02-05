@@ -44,6 +44,7 @@ type JobList struct {
 	Errors []error `json:"errors"`
 }
 
+// JobStatusType is a valid value for JobStatus.Status.
 type JobStatusType string
 
 const (
@@ -55,6 +56,7 @@ const (
 	JobStatusFailed JobStatusType = "Failed"
 )
 
+// JobStatus contains inferred job status based on job conditions
 type JobStatus struct {
 	// Short, machine understandable job status code.
 	Status JobStatusType `json:"status"`
@@ -128,6 +130,7 @@ func GetJobListFromChannels(channels *common.ResourceChannels, dsQuery *datasele
 	return jobList, nil
 }
 
+// ToJobList returns a list of Jobs in the cluster by reading required resource list returned from the channel.
 func ToJobList(jobs []batch.Job, pods []v1.Pod, events []v1.Event, nonCriticalErrors []error,
 	dsQuery *dataselect.DataSelectQuery) *JobList {
 	jobList := &JobList{

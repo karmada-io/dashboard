@@ -39,6 +39,7 @@ type Options struct {
 	OpenAPIEnabled                bool
 }
 
+// NewOptions returns initialized Options.
 func NewOptions() *Options {
 	return &Options{}
 }

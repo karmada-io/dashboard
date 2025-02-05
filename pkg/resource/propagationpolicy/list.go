@@ -46,6 +46,7 @@ type PropagationPolicyList struct {
 	Errors []error `json:"errors"`
 }
 
+// PropagationPolicy contains information about a single propagation.
 type PropagationPolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`

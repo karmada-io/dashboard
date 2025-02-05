@@ -124,6 +124,7 @@ func toSecret(secret *v1.Secret) Secret {
 	}
 }
 
+// ToSecretList converts a list of Secrets to SecretList
 func ToSecretList(secrets []v1.Secret, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *SecretList {
 	newSecretList := &SecretList{
 		ListMeta: types.ListMeta{TotalItems: len(secrets)},

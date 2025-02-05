@@ -27,6 +27,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
+// Endpoint represents an endpoint in a Kubernetes cluster.
 type Endpoint struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`

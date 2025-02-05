@@ -29,6 +29,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
+// Pod contains information about a single Pod.
 type Pod struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
@@ -96,6 +97,7 @@ func toPodList(pods []v1.Pod, nonCriticalErrors []error, dsQuery *dataselect.Dat
 	return result
 }
 
+// NewStatus returns a new status.
 func NewStatus(status v1.PodStatus) v1.PodStatus {
 	return v1.PodStatus{
 		Conditions: status.Conditions,

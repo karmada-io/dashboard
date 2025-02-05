@@ -24,8 +24,10 @@ import (
 
 // The code below allows to perform complex data section on []api.ConfigMap
 
+// ConfigMapCell wraps api.ConfigMap for data selection.
 type ConfigMapCell api.ConfigMap
 
+// GetProperty returns a property.
 func (self ConfigMapCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:

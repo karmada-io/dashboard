@@ -24,7 +24,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type PodDeatil struct {
+// PodDetail is a pod detail
+type PodDetail struct {
 	ObjectMeta metaV1.ObjectMeta `json:"objectMeta"`
 	TypeMeta   metaV1.TypeMeta   `json:"typeMeta"`
 	Spec       v1.PodSpec        `json:"podSpec"`

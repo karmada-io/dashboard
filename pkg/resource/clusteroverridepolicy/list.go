@@ -39,6 +39,7 @@ type ClusterOverridePolicyList struct {
 	Errors []error `json:"errors"`
 }
 
+// ClusterOverridePolicy contains information about a single clusterOverridePolicy.
 type ClusterOverridePolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
