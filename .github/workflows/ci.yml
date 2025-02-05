@@ -48,8 +48,8 @@ jobs:
           echo "Start build"
           pnpm --version
           cd ui
-          pnpm install --filter @karmada/dashboard
-          pnpm run dashboard:build
+          pnpm install
+          pnpm turbo build
   build-bin:
     name: build-bin
     runs-on: ubuntu-22.04
