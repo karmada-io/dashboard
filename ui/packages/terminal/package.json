@@ -31,6 +31,7 @@
   "dependencies": {
     "@karmada/xterm-addon-overlay": "workspace:*",
     "@karmada/xterm-addon-zmodem": "workspace:*",
+    "@karmada/utils": "workspace:*",
     "@xterm/addon-canvas": "^0.7.0",
     "@xterm/addon-clipboard": "^0.1.0",
     "@xterm/addon-fit": "^0.10.0",

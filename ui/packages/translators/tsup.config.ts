@@ -15,7 +15,9 @@ limitations under the License.
 */
 
 import { defineConfig } from 'tsup';
+import {getLicense} from '@karmada/utils';
 
+const license = getLicense()
 export default defineConfig({
   entry: ['src/index.ts'],
   splitting: false,
@@ -23,4 +25,7 @@ export default defineConfig({
   clean: true,
   format: ['cjs', 'esm'],
   dts: false,
+  banner: {
+    js: license
+  }
 });

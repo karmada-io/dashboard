@@ -19,6 +19,8 @@ import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
 import { dynamicBase } from 'vite-plugin-dynamic-base';
+import banner from 'vite-plugin-banner';
+import { getLicense } from '@karmada/utils';
 
 const replacePathPrefixPlugin = (): Plugin => {
   return {
@@ -34,10 +36,13 @@ const replacePathPrefixPlugin = (): Plugin => {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const license = getLicense();
+
   const env = loadEnv(mode, process.cwd(), '');
   return {
     base: process.env.NODE_ENV === 'development' ? '' : '/static',
     plugins: [
+      banner(license) as Plugin,
       react(),
       svgr(),
       replacePathPrefixPlugin(),
