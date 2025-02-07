@@ -39,9 +39,6 @@ func handleDeleteResource(c *gin.Context) {
 	}
 	kind := c.Param("kind")
 	namespace := c.Param("namespace")
-	if namespace == "" {
-		namespace = "default"
-	}
 	name := c.Param("name")
 	deleteNow := c.Param("deleteNow") == "true"
 
