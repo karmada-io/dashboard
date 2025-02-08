@@ -223,7 +223,6 @@ func handleDeleteCluster(c *gin.Context) {
 		return
 	}
 	common.Success(c, "ok")
-	return
 }
 
 func parseEndpointFromKubeconfig(kubeconfigContents string) (string, error) {

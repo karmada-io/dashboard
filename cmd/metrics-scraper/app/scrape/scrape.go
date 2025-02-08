@@ -143,11 +143,9 @@ func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryTyp
 		}
 		contextMutex.Unlock()
 
-		message := "Sync trigger updated successfully for all apps"
+		message := "Sync turned off successfully for all apps"
 		if syncValue == 1 {
 			message = "Sync turned on successfully for all apps"
-		} else {
-			message = "Sync turned off successfully for all apps"
 		}
 		c.JSON(http.StatusOK, gin.H{"message": message})
 	} else {

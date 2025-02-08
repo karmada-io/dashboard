@@ -187,7 +187,7 @@ func (o pullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
 					//fmt.Sprintf("--controllers=%s", strings.Join(controllers, ",")),
 					//fmt.Sprintf("--proxy-server-address=%s", proxyServerAddress),
 					//fmt.Sprintf("--leader-elect-resource-namespace=%s", o.memberClusterNamespace),
-					fmt.Sprintf("--feature-gates=CustomizedClusterResourceModeling=true,MultiClusterService=true"),
+					"--feature-gates=CustomizedClusterResourceModeling=true,MultiClusterService=true",
 					"--cluster-status-update-frequency=10s",
 					"--bind-address=0.0.0.0",
 					"--secure-port=10357",

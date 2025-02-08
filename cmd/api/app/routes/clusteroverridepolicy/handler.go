@@ -91,48 +91,6 @@ func handlePostClusterOverridePolicy(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
-func handlePutClusterOverridePolicy(c *gin.Context) {
-	ctx := context.Context(c)
-	overridepolicyRequest := new(v1.PutOverridePolicyRequest)
-	if err := c.ShouldBind(&overridepolicyRequest); err != nil {
-		common.Fail(c, err)
-		return
-	}
-	var err error
-	karmadaClient := client.InClusterKarmadaClient()
-	// todo check pp exist
-	if overridepolicyRequest.IsClusterScope {
-		clusterOverridePolicy := v1alpha1.ClusterOverridePolicy{}
-		if err = yaml.Unmarshal([]byte(overridepolicyRequest.OverrideData), &clusterOverridePolicy); err != nil {
-			klog.ErrorS(err, "Failed to unmarshal ClusterOverridePolicy")
-			common.Fail(c, err)
-			return
-		}
-		_, err = karmadaClient.PolicyV1alpha1().ClusterOverridePolicies().Update(ctx, &clusterOverridePolicy, metav1.UpdateOptions{})
-	} else {
-		overridePolicy := v1alpha1.OverridePolicy{}
-		if err = yaml.Unmarshal([]byte(overridepolicyRequest.OverrideData), &overridePolicy); err != nil {
-			klog.ErrorS(err, "Failed to unmarshal OverridePolicy")
-			common.Fail(c, err)
-			return
-		}
-		var oldPropagationPolicy *v1alpha1.OverridePolicy
-		oldPropagationPolicy, err = karmadaClient.PolicyV1alpha1().OverridePolicies(overridepolicyRequest.Namespace).Get(ctx, overridepolicyRequest.Name, metav1.GetOptions{})
-		if err == nil {
-			// only spec can be updated
-			overridePolicy.TypeMeta = oldPropagationPolicy.TypeMeta
-			overridePolicy.ObjectMeta = oldPropagationPolicy.ObjectMeta
-			_, err = karmadaClient.PolicyV1alpha1().OverridePolicies(overridepolicyRequest.Namespace).Update(ctx, &overridePolicy, metav1.UpdateOptions{})
-		}
-	}
-	if err != nil {
-		klog.ErrorS(err, "Failed to update OverridePolicy")
-		common.Fail(c, err)
-		return
-	}
-	common.Success(c, "ok")
-}
-
 func init() {
 	r := router.V1()
 	r.GET("/clusteroverridepolicy", handleGetClusterOverridePolicyList)
