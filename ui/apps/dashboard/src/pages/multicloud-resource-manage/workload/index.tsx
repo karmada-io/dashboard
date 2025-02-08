@@ -312,7 +312,13 @@ const WorkloadPage = () => {
         columns={columns}
         loading={isLoading}
         dataSource={
-          data ? data.deployments || data.statefulSets || data.daemonSets : []
+          data
+            ? data.deployments ||
+              data.statefulSets ||
+              data.daemonSets ||
+              data.jobs ||
+              data.items
+            : []
         }
       />
 
