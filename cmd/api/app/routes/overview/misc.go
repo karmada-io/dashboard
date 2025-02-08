@@ -19,10 +19,10 @@ package overview
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"errors"
-	"math/rand"
+	"math/big"
 	"strings"
-	"time"
 
 	"github.com/karmada-io/karmada/pkg/version"
 	corev1 "k8s.io/api/core/v1"
@@ -59,9 +59,11 @@ func GetControllerManagerVersionInfo() (*version.Info, error) {
 	if len(podListResult.Items) == 0 {
 		return nil, errors.New("no valid pod for karmada-controller-manager")
 	}
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	n := r.Intn(len(podListResult.Items))
-	pod := podListResult.Items[n]
+	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(len(podListResult.Items))))
+	if err != nil {
+		return nil, err
+	}
+	pod := podListResult.Items[int(nBig.Int64())]
 
 	req := kubeClient.CoreV1().RESTClient().Post().
 		Resource("pods").
