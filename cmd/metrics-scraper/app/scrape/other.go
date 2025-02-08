@@ -47,14 +47,14 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			log.Printf("Recovered from panic: %v", p)
 			err = fmt.Errorf("panic occurred: %v", p)
 		} else if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			log.Printf("Transaction rolled back due to error: %v", err)
 		} else {
-			tx.Commit()
+			_ = tx.Commit()
 		}
 	}()
 

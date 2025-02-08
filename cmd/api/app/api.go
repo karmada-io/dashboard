@@ -111,10 +111,8 @@ func run(ctx context.Context, opts *options.Options) error {
 	ensureAPIServerConnectionOrDie()
 	serve(opts)
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
-	select {
-	case <-ctx.Done():
-		os.Exit(0)
-	}
+	<-ctx.Done()
+	os.Exit(0)
 	return nil
 }
 
