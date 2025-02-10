@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { Button, Input, Segmented, Select } from 'antd';
+import { App, Button, Input, Segmented, Select } from 'antd';
 import { ServiceKind } from '@/services/base';
 import { Icons } from '@/components/icons';
 import { useCallback, useState } from 'react';
@@ -53,6 +53,7 @@ const ServicePage = () => {
       content: '',
     });
   }, []);
+  const { message: messageApi } = App.useApp();
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
@@ -176,8 +177,24 @@ const ServicePage = () => {
         mode={editorState.mode}
         open={showModal}
         serviceContent={editorState.content}
-        onOk={(ret) => {
-          console.log(ret);
+        onOk={async (ret) => {
+          const msg =
+            editorState.mode === 'edit'
+              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0', '修改')
+              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增');
+          if (ret.code === 200) {
+            await messageApi.success(
+              `${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}${msg}${i18nInstance.t('330363dfc524cff2488f2ebde0500896', '成功')}`,
+            );
+            toggleShowModal(false);
+            resetEditorState();
+            // await refetch();
+            // invalidate react query
+          } else {
+            await messageApi.error(
+              `工作负载${msg}${i18nInstance.t('acd5cb847a4aff235c9a01ddeb6f9770', '失败')}`,
+            );
+          }
         }}
         onCancel={() => {
           resetEditorState();
