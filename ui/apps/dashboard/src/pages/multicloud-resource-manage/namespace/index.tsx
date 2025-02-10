@@ -114,7 +114,7 @@ const NamespacePage = () => {
                   name: r.objectMeta.name,
                 });
                 if (ret.code === 200) {
-                  await messageApi.error(
+                  await messageApi.success(
                     i18nInstance.t(
                       '919994bf077d49f68f016811ffb5600e',
                       '删除命名空间成功',
