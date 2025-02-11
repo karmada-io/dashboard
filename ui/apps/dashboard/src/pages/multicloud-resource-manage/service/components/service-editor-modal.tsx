@@ -18,10 +18,9 @@ import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import { Form, Modal, Select } from 'antd';
 import Editor from '@monaco-editor/react';
-import { parse, stringify } from 'yaml';
+import { parse } from 'yaml';
 import _ from 'lodash';
-import { PutResource } from '@/services/unstructured';
-import { CreateDeployment } from '@/services/workload';
+import { CreateResource, PutResource } from '@/services/unstructured';
 import { IResponse, ServiceKind } from '@/services/base.ts';
 export interface NewWorkloadEditorModalProps {
   mode: 'create' | 'edit' | 'detail';
@@ -59,18 +58,17 @@ const ServiceEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
         try {
           const yamlObject = parse(content) as Record<string, string>;
           const kind = _.get(yamlObject, 'kind');
-          const namespace = _.get(yamlObject, 'metadata.namespace');
+          const namespace = _.get(yamlObject, 'metadata.namespace', 'default');
           const name = _.get(yamlObject, 'metadata.name');
           if (mode === 'create') {
-            if (kind.toLowerCase() === 'deployment') {
-              const ret = await CreateDeployment({
-                namespace,
-                name,
-                content: stringify(yamlObject),
-              });
-              await onOk(ret);
-              setContent('');
-            }
+            const ret = await CreateResource({
+              kind,
+              name,
+              namespace: namespace,
+              content: yamlObject,
+            });
+            await onOk(ret);
+            setContent('');
           } else {
             const ret = await PutResource({
               kind,
