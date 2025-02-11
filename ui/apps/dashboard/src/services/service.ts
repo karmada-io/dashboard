@@ -103,7 +103,7 @@ export async function GetIngress(params: {
       listMeta: {
         totalItems: number;
       };
-      services: Ingress[];
+      items: Ingress[];
     }>
   >(url, {
     params: convertDataSelectQuery(requestData),

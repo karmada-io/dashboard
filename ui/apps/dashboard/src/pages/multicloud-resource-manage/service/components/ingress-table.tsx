@@ -163,7 +163,7 @@ const IngressTable: FC<ServiceTableProps> = (props) => {
       }
       columns={columns}
       loading={isLoading}
-      dataSource={data?.services || []}
+      dataSource={data?.items || []}
     />
   );
 };
