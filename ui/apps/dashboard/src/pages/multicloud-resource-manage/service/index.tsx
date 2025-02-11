@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { Button, Input, Segmented, Select } from 'antd';
+import { App, Button, Input, Segmented, Select } from 'antd';
 import { ServiceKind } from '@/services/base';
 import { Icons } from '@/components/icons';
 import { useCallback, useState } from 'react';
@@ -26,6 +26,8 @@ import ServiceEditorModal from './components/service-editor-modal';
 import { stringify } from 'yaml';
 import IngressTable from '@/pages/multicloud-resource-manage/service/components/ingress-table';
 import useNamespace from '@/hooks/use-namespace.ts';
+import { useQueryClient } from '@tanstack/react-query';
+import { DeleteResource } from '@/services/unstructured.ts';
 const ServicePage = () => {
   const [filter, setFilter] = useState<{
     selectedWorkSpace: string;
@@ -53,6 +55,8 @@ const ServicePage = () => {
       content: '',
     });
   }, []);
+  const { message: messageApi } = App.useApp();
+  const queryClient = useQueryClient();
   return (
     <Panel>
       <div className={'flex flex-row justify-between mb-4'}>
@@ -153,7 +157,29 @@ const ServicePage = () => {
             });
             toggleShowModal(true);
           }}
-          onDeleteServiceContent={() => {}}
+          onDeleteServiceContent={async (r) => {
+            try {
+              const ret = await DeleteResource({
+                kind: r.typeMeta.kind,
+                name: r.objectMeta.name,
+                namespace: r.objectMeta.namespace,
+              });
+              if (ret.code !== 200) {
+                await messageApi.error(
+                  i18nInstance.t(
+                    '1ed71b1211f5d2ba41e4a23331985c7c',
+                    '删除服务失败',
+                  ),
+                );
+              }
+              await queryClient.invalidateQueries({
+                queryKey: ['GetServices'],
+                exact: false,
+              });
+            } catch (e) {
+              console.log('error', e);
+            }
+          }}
         />
       )}
       {filter.kind === ServiceKind.Ingress && (
@@ -168,7 +194,29 @@ const ServicePage = () => {
             });
             toggleShowModal(true);
           }}
-          onDeleteIngressContent={() => {}}
+          onDeleteIngressContent={async (r) => {
+            try {
+              const ret = await DeleteResource({
+                kind: r.typeMeta.kind,
+                name: r.objectMeta.name,
+                namespace: r.objectMeta.namespace,
+              });
+              if (ret.code !== 200) {
+                await messageApi.error(
+                  i18nInstance.t(
+                    '1ed71b1211f5d2ba41e4a23331985c7c',
+                    '删除服务失败',
+                  ),
+                );
+              }
+              await queryClient.invalidateQueries({
+                queryKey: ['GetIngress'],
+                exact: false,
+              });
+            } catch (e) {
+              console.log('error', e);
+            }
+          }}
         />
       )}
 
@@ -176,8 +224,38 @@ const ServicePage = () => {
         mode={editorState.mode}
         open={showModal}
         serviceContent={editorState.content}
-        onOk={(ret) => {
-          console.log(ret);
+        onOk={async (ret) => {
+          if (ret.code === 200) {
+            await messageApi.success(
+              editorState.mode === 'edit'
+                ? i18nInstance.t('55aa6366c0d09a392d8acf54c4c4b837', '更新成功')
+                : i18nInstance.t(
+                    '04a691b377c91da599d5b4b62b0cb114',
+                    '创建成功',
+                  ),
+            );
+            toggleShowModal(false);
+            resetEditorState();
+            // invalidate react query
+            await queryClient.invalidateQueries({
+              queryKey: [
+                filter.kind === ServiceKind.Service
+                  ? 'GetServices'
+                  : 'GetIngress',
+                filter.selectedWorkSpace,
+                filter.searchText,
+              ],
+            });
+          } else {
+            await messageApi.error(
+              editorState.mode === 'edit'
+                ? i18nInstance.t('930442e2f423436f9db3d8e91f648e93', '更新失败')
+                : i18nInstance.t(
+                    'a889286a51f3adab3cfb6913f2b0ac2e',
+                    '创建失败',
+                  ),
+            );
+          }
         }}
         onCancel={() => {
           resetEditorState();
