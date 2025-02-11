@@ -127,7 +127,9 @@ const IngressTable: FC<ServiceTableProps> = (props) => {
               title={i18nInstance.t('6163856192e115e6b914d6fb8c4fd82c', {
                 name: r.objectMeta.name,
               })}
-              onConfirm={async () => {}}
+              onConfirm={() => {
+                onDeleteIngressContent(r);
+              }}
               okText={i18nInstance.t(
                 'e83a256e4f5bb4ff8b3d804b5473217a',
                 '确认',
@@ -147,7 +149,7 @@ const IngressTable: FC<ServiceTableProps> = (props) => {
     },
   ];
   const { data, isLoading } = useQuery({
-    queryKey: ['GetServices', selectedWorkSpace, searchText],
+    queryKey: ['GetIngress', selectedWorkSpace, searchText],
     queryFn: async () => {
       const services = await GetIngress({
         namespace: selectedWorkSpace,

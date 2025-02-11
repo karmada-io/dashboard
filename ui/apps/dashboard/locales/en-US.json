@@ -175,5 +175,10 @@
   "7afddf70e5c82fab8fa935458b53174a": "Add",
   "236513393327bd6b098056314f8676ac": "Edit Override Policy",
   "781a90424b3d02153bc979e0f90179aa": "{{name}} Detail",
-  "1af8d577b89a4caf0e4b30734bbf7143": "Do you want to delete {{name}} Override Policy?"
+  "1af8d577b89a4caf0e4b30734bbf7143": "Do you want to delete {{name}} Override Policy?",
+  "1ed71b1211f5d2ba41e4a23331985c7c": "Failed to delete service",
+  "04a691b377c91da599d5b4b62b0cb114": "create successfully",
+  "a889286a51f3adab3cfb6913f2b0ac2e": "create failed",
+  "55aa6366c0d09a392d8acf54c4c4b837": "update successfully",
+  "930442e2f423436f9db3d8e91f648e93": "update failed"
 }
