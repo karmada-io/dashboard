@@ -28,7 +28,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/endpoint"
 )
 
-// Service is a representation of a service.
+// ServiceDetail is a representation of a service.
 type ServiceDetail struct {
 	// Extends list item structure.
 	Service `json:",inline"`

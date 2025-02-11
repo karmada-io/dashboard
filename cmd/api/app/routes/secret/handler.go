@@ -26,7 +26,7 @@ import (
 )
 
 func handleGetSecrets(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	nsQuery := common.ParseNamespacePathParameter(c)
 	result, err := secret.GetSecretList(k8sClient, nsQuery, dataSelect)
@@ -38,7 +38,7 @@ func handleGetSecrets(c *gin.Context) {
 }
 
 func handleGetSecretDetail(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
 	name := c.Param("service")
 	result, err := secret.GetSecretDetail(k8sClient, namespace, name)

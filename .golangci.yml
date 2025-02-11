@@ -70,6 +70,7 @@ linters-settings:
       - name: dot-imports
       - name: errorf
       - name: exported
+        arguments: ["disableStutteringCheck"]  # TODO Temporarily disable stuttering check
       - name: var-declaration
       - name: blank-imports
       - name: indent-error-flow

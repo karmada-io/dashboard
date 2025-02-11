@@ -38,7 +38,7 @@ type PostClusterResponse struct {
 }
 
 // LabelRequest is the request body for labeling a cluster.
-type LableRequest struct {
+type LabelRequest struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
@@ -52,7 +52,7 @@ type TaintRequest struct {
 
 // PutClusterRequest is the request body for updating a cluster.
 type PutClusterRequest struct {
-	Labels *[]LableRequest `json:"labels"`
+	Labels *[]LabelRequest `json:"labels"`
 	Taints *[]TaintRequest `json:"taints"`
 }
 

@@ -33,15 +33,15 @@ type SortTestCase struct {
 
 type TestDataCell struct {
 	Name string
-	Id   int
+	ID   int
 }
 
-func (self TestDataCell) GetProperty(name PropertyName) ComparableValue {
+func (c TestDataCell) GetProperty(name PropertyName) ComparableValue {
 	switch name {
 	case NameProperty:
-		return StdComparableString(self.Name)
+		return StdComparableString(c.Name)
 	case CreationTimestampProperty:
-		return StdComparableInt(self.Id)
+		return StdComparableInt(c.ID)
 	default:
 		return nil
 	}
@@ -81,7 +81,7 @@ func getDataCellList() []DataCell {
 func getOrder(dataList []TestDataCell) []int {
 	idOrder := []int{}
 	for _, e := range dataList {
-		idOrder = append(idOrder, e.Id)
+		idOrder = append(idOrder, e.ID)
 	}
 	return idOrder
 }

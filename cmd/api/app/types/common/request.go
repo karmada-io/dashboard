@@ -58,7 +58,7 @@ func ParseDataSelectPathParameter(request *gin.Context) *dataselect.DataSelectQu
 	return dataselect.NewDataSelectQuery(paginationQuery, sortQuery, filterQuery)
 }
 
-// parseNamespacePathParameter parses namespace selector for list pages in path parameter.
+// ParseNamespacePathParameter parses namespace selector for list pages in path parameter.
 // The namespace selector is a comma separated list of namespaces that are trimmed.
 // No namespaces mean "view all user namespaces", i.e., everything except kube-system.
 func ParseNamespacePathParameter(request *gin.Context) *common.NamespaceQuery {

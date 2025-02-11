@@ -26,12 +26,12 @@ import (
 type ClusterPropagationPolicyCell v1alpha1.ClusterPropagationPolicy
 
 // GetProperty returns a property of the cluster propagation policy cell.
-func (self ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
-		return dataselect.StdComparableString(self.ObjectMeta.Name)
+		return dataselect.StdComparableString(c.ObjectMeta.Name)
 	case dataselect.CreationTimestampProperty:
-		return dataselect.StdComparableTime(self.ObjectMeta.CreationTimestamp.Time)
+		return dataselect.StdComparableTime(c.ObjectMeta.CreationTimestamp.Time)
 	default:
 		// if name is not supported then just return a constant dummy value, sort will have no effect.
 		return nil

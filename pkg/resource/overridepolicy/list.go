@@ -63,7 +63,7 @@ func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernet
 	return toOverridePolicyList(k8sClient, overridePolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toOverridePolicyList(k8sClient kubernetes.Interface, overridepolicies []v1alpha1.OverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *OverridePolicyList {
+func toOverridePolicyList(_ kubernetes.Interface, overridepolicies []v1alpha1.OverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *OverridePolicyList {
 	overridepolicyList := &OverridePolicyList{
 		OverridePolicys: make([]OverridePolicy, 0),
 		ListMeta:        types.ListMeta{TotalItems: len(overridepolicies)},

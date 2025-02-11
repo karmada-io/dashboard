@@ -186,7 +186,7 @@ func (v *resourceVerber) Create(object *unstructured.Unstructured) (*unstructure
 }
 
 // VerberClient returns a resourceVerber client.
-func VerberClient(request *http.Request) (ResourceVerber, error) {
+func VerberClient(_ *http.Request) (ResourceVerber, error) {
 	// todo currently ignore rest.config from http.Request
 	restConfig, _, err := GetKarmadaConfig()
 	if err != nil {

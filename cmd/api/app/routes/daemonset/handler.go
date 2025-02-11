@@ -29,7 +29,7 @@ import (
 func handleGetDaemonset(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	result, err := daemonset.GetDaemonSetList(k8sClient, namespace, dataSelect)
 	if err != nil {
 		common.Fail(c, err)
@@ -41,7 +41,7 @@ func handleGetDaemonset(c *gin.Context) {
 func handleGetDaemonsetDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	result, err := daemonset.GetDaemonSetDetail(k8sClient, namespace, name)
 	if err != nil {
 		common.Fail(c, err)
@@ -53,7 +53,7 @@ func handleGetDaemonsetDetail(c *gin.Context) {
 func handleGetDaemonsetEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	result, err := event.GetResourceEvents(k8sClient, dataSelect, namespace, name)
 	if err != nil {

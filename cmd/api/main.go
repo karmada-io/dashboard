@@ -27,7 +27,7 @@ import (
 
 func main() {
 	ctx := context.TODO()
-	cmd := app.NewApiCommand(ctx)
+	cmd := app.NewAPICommand(ctx)
 	code := cli.Run(cmd)
 	os.Exit(code)
 }
