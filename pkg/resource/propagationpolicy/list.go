@@ -86,7 +86,7 @@ func toPropagationPolicyList(k8sClient kubernetes.Interface, propagationpolicies
 		})
 		pp := toPropagationPolicy(&propagationpolicy)
 		if err == nil {
-			pp.Deployments = lo.Map(deployments.Items, func(item appsv1.Deployment, index int) string {
+			pp.Deployments = lo.Map(deployments.Items, func(item appsv1.Deployment, _ int) string {
 				return fmt.Sprintf("%s/%s", item.Namespace, item.Name)
 			})
 		}

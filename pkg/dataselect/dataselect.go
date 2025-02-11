@@ -18,7 +18,7 @@ import (
 	"sort"
 )
 
-// GenericDataCell describes the interface of the data cell that contains all the necessary methods needed to perform
+// DataCell describes the interface of the data cell that contains all the necessary methods needed to perform
 // complex data selection
 // GenericDataSelect takes a list of these interfaces and performs selection operation.
 // Therefore as long as the list is composed of GenericDataCells you can perform any data selection!
@@ -36,7 +36,7 @@ type ComparableValue interface {
 	Contains(ComparableValue) bool
 }
 
-// SelectableData contains all the required data to perform data selection.
+// DataSelector contains all the required data to perform data selection.
 // It implements sort.Interface so its sortable under sort.Sort
 // You can use its Select method to get selected GenericDataCell list.
 type DataSelector struct {
@@ -49,18 +49,18 @@ type DataSelector struct {
 // Implementation of sort.Interface so that we can use built-in sort function (sort.Sort) for sorting SelectableData
 
 // Len returns the length of data inside SelectableData.
-func (self DataSelector) Len() int { return len(self.GenericDataList) }
+func (s DataSelector) Len() int { return len(s.GenericDataList) }
 
 // Swap swaps 2 indices inside SelectableData.
-func (self DataSelector) Swap(i, j int) {
-	self.GenericDataList[i], self.GenericDataList[j] = self.GenericDataList[j], self.GenericDataList[i]
+func (s DataSelector) Swap(i, j int) {
+	s.GenericDataList[i], s.GenericDataList[j] = s.GenericDataList[j], s.GenericDataList[i]
 }
 
 // Less compares 2 indices inside SelectableData and returns true if first index is larger.
-func (self DataSelector) Less(i, j int) bool {
-	for _, sortBy := range self.DataSelectQuery.SortQuery.SortByList {
-		a := self.GenericDataList[i].GetProperty(sortBy.Property)
-		b := self.GenericDataList[j].GetProperty(sortBy.Property)
+func (s DataSelector) Less(i, j int) bool {
+	for _, sortBy := range s.DataSelectQuery.SortQuery.SortByList {
+		a := s.GenericDataList[i].GetProperty(sortBy.Property)
+		b := s.GenericDataList[j].GetProperty(sortBy.Property)
 		// ignore sort completely if property name not found
 		if a == nil || b == nil {
 			break
@@ -68,26 +68,25 @@ func (self DataSelector) Less(i, j int) bool {
 		cmp := a.Compare(b)
 		if cmp == 0 { // values are the same. Just continue to next sortBy
 			continue
-		} else { // values different
-			return (cmp == -1 && sortBy.Ascending) || (cmp == 1 && !sortBy.Ascending)
 		}
+		return (cmp == -1 && sortBy.Ascending) || (cmp == 1 && !sortBy.Ascending)
 	}
 	return false
 }
 
 // Sort sorts the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
-func (self *DataSelector) Sort() *DataSelector {
-	sort.Sort(*self)
-	return self
+func (s *DataSelector) Sort() *DataSelector {
+	sort.Sort(*s)
+	return s
 }
 
 // Filter the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
-func (self *DataSelector) Filter() *DataSelector {
+func (s *DataSelector) Filter() *DataSelector {
 	filteredList := []DataCell{}
 
-	for _, c := range self.GenericDataList {
+	for _, c := range s.GenericDataList {
 		matches := true
-		for _, filterBy := range self.DataSelectQuery.FilterQuery.FilterByList {
+		for _, filterBy := range s.DataSelectQuery.FilterQuery.FilterByList {
 			v := c.GetProperty(filterBy.Property)
 			if v == nil || !v.Contains(filterBy.Value) {
 				matches = false
@@ -99,28 +98,28 @@ func (self *DataSelector) Filter() *DataSelector {
 		}
 	}
 
-	self.GenericDataList = filteredList
-	return self
+	s.GenericDataList = filteredList
+	return s
 }
 
-// Paginates the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
-func (self *DataSelector) Paginate() *DataSelector {
-	pQuery := self.DataSelectQuery.PaginationQuery
-	dataList := self.GenericDataList
+// Paginate paginates the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
+func (s *DataSelector) Paginate() *DataSelector {
+	pQuery := s.DataSelectQuery.PaginationQuery
+	dataList := s.GenericDataList
 	startIndex, endIndex := pQuery.GetPaginationSettings(len(dataList))
 
 	// Return all items if provided settings do not meet requirements
 	if !pQuery.IsValidPagination() {
-		return self
+		return s
 	}
 	// Return no items if requested page does not exist
-	if !pQuery.IsPageAvailable(len(self.GenericDataList), startIndex) {
-		self.GenericDataList = []DataCell{}
-		return self
+	if !pQuery.IsPageAvailable(len(s.GenericDataList), startIndex) {
+		s.GenericDataList = []DataCell{}
+		return s
 	}
 
-	self.GenericDataList = dataList[startIndex:endIndex]
-	return self
+	s.GenericDataList = dataList[startIndex:endIndex]
+	return s
 }
 
 // GenericDataSelect takes a list of GenericDataCells and DataSelectQuery and returns selected data as instructed by dsQuery.

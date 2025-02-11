@@ -41,7 +41,7 @@ func NewMetricsScraperCommand(ctx context.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "karmada-dashboard-metrics-scraper",
 		Long: `The karmada-dashboard-metrics-scraper responsible for scraping and visualizing the metrics of karmada components. `,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := run(ctx, opts); err != nil {
 				return err
 			}

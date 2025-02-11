@@ -28,7 +28,7 @@ import (
 )
 
 func handleCreateNamespace(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	createNamespaceRequest := new(v1.CreateNamesapceRequest)
 	if err := c.ShouldBind(&createNamespaceRequest); err != nil {
 		common.Fail(c, err)
@@ -45,7 +45,7 @@ func handleCreateNamespace(c *gin.Context) {
 	common.Success(c, "ok")
 }
 func handleGetNamespaces(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	result, err := ns.GetNamespaceList(k8sClient, dataSelect)
 	if err != nil {
@@ -55,7 +55,7 @@ func handleGetNamespaces(c *gin.Context) {
 	common.Success(c, result)
 }
 func handleGetNamespaceDetail(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	name := c.Param("name")
 	result, err := ns.GetNamespaceDetail(k8sClient, name)
 	if err != nil {
@@ -65,7 +65,7 @@ func handleGetNamespaceDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 func handleGetNamespaceEvents(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	name := c.Param("name")
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	result, err := event.GetNamespaceEvents(k8sClient, dataSelect, name)

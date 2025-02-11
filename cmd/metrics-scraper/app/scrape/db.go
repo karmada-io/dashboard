@@ -28,7 +28,7 @@ var (
 	dbMapLock sync.RWMutex
 )
 
-// getDB returns an existing database connection or creates a new one
+// GetDB returns an existing database connection or creates a new one
 func GetDB(appName string) (*sql.DB, error) {
 	sanitizedAppName := strings.ReplaceAll(appName, "-", "_")
 

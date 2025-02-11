@@ -16,10 +16,9 @@ limitations under the License.
 
 package member
 
-// Importing member route packages forces route registration
 import (
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/deployment"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/namespace"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/node"
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/pod"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/deployment" // Importing member route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/namespace"  // Importing member route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/node"       // Importing member route packages forces route registration
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/pod"        // Importing member route packages forces route registration
 )

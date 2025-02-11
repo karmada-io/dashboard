@@ -26,7 +26,7 @@ import (
 )
 
 func handleGetConfigMap(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	nsQuery := common.ParseNamespacePathParameter(c)
 	result, err := configmap.GetConfigMapList(k8sClient, nsQuery, dataSelect)
@@ -38,7 +38,7 @@ func handleGetConfigMap(c *gin.Context) {
 }
 
 func handleGetConfigMapDetail(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
 	name := c.Param("name")
 	result, err := configmap.GetConfigMapDetail(k8sClient, namespace, name)

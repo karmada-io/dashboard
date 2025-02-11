@@ -55,7 +55,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	allocatableCPU := cluster.Status.ResourceSummary.Allocatable.Cpu()
 	allocatedCPU := cluster.Status.ResourceSummary.Allocated.Cpu()
 	var cpuCapacity int64 = allocatableCPU.Value()
-	var cpuFraction float64 = 0
+	var cpuFraction float64
 	if cpuCapacity > 0 {
 		cpuFraction = float64(allocatedCPU.ScaledValue(resource.Micro)) / float64(allocatableCPU.ScaledValue(resource.Micro)) * 100
 	}
@@ -65,7 +65,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	fmt.Println(allocatableMemory.String())
 	fmt.Println(allocatedMemory.Value())
 	var memoryCapacity int64 = allocatableMemory.Value()
-	var memoryFraction float64 = 0
+	var memoryFraction float64
 	if memoryCapacity > 0 {
 		memoryFraction = float64(allocatedMemory.ScaledValue(resource.Micro)) / float64(allocatableMemory.ScaledValue(resource.Micro)) * 100
 	}
@@ -74,7 +74,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	allocatedPod := cluster.Status.ResourceSummary.Allocated.Pods()
 
 	var podCapacity int64 = allocatablePod.Value()
-	var podFraction float64 = 0
+	var podFraction float64
 	if podCapacity > 0 {
 		podFraction = float64(allocatedPod.Value()) / float64(podCapacity) * 100
 	}
@@ -95,7 +95,7 @@ type ClusterDetail struct {
 	Taints  []corev1.Taint `json:"taints,omitempty"`
 }
 
-// GetNodeDetail gets node details.
+// GetClusterDetail gets details of cluster.
 func GetClusterDetail(client karmadaclientset.Interface, clusterName string) (*ClusterDetail, error) {
 	log.Printf("Getting details of %s cluster", clusterName)
 	cluster, err := client.ClusterV1alpha1().Clusters().Get(context.TODO(), clusterName, metav1.GetOptions{})

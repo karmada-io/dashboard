@@ -29,7 +29,7 @@ import (
 func handleGetJob(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	result, err := job.GetJobList(k8sClient, namespace, dataSelect)
 	if err != nil {
 		common.Fail(c, err)
@@ -41,7 +41,7 @@ func handleGetJob(c *gin.Context) {
 func handleGetJobDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	result, err := job.GetJobDetail(k8sClient, namespace, name)
 	if err != nil {
 		common.Fail(c, err)
@@ -53,7 +53,7 @@ func handleGetJobDetail(c *gin.Context) {
 func handleGetJobEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	result, err := event.GetResourceEvents(k8sClient, dataSelect, namespace, name)
 	if err != nil {

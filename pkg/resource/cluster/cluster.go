@@ -49,7 +49,7 @@ type ClusterList struct {
 	Errors []error `json:"errors"`
 }
 
-// GetNodeList returns a list of all Nodes in the cluster.
+// GetClusterList returns a list of all Nodes in the cluster.
 func GetClusterList(client karmadaclientset.Interface, dsQuery *dataselect.DataSelectQuery) (*ClusterList, error) {
 	clusters, err := client.ClusterV1alpha1().Clusters().List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -59,7 +59,7 @@ func GetClusterList(client karmadaclientset.Interface, dsQuery *dataselect.DataS
 	return toClusterList(client, clusters.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toClusterList(client karmadaclientset.Interface, clusters []v1alpha1.Cluster, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterList {
+func toClusterList(_ karmadaclientset.Interface, clusters []v1alpha1.Cluster, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterList {
 	clusterList := &ClusterList{
 		Clusters: make([]Cluster, 0),
 		ListMeta: types.ListMeta{TotalItems: len(clusters)},
