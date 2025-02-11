@@ -91,10 +91,8 @@ func run(ctx context.Context, opts *options.Options) error {
 	go scrape.InitDatabase()
 
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
-	select {
-	case <-ctx.Done():
-		os.Exit(0)
-	}
+	<-ctx.Done()
+	os.Exit(0)
 	return nil
 }
 

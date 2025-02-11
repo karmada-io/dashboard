@@ -20,6 +20,7 @@ import (
 
 	"github.com/emicklei/go-restful/v3"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/klog/v2"
 )
 
 // nonCriticalErrors is an array of error statuses, that are non-critical. That means, that this error can be
@@ -52,7 +53,10 @@ func HandleInternalError(response *restful.Response, err error) {
 	code, err := HandleError(err)
 
 	response.AddHeader("Content-Type", "text/plain")
-	response.WriteError(code, err)
+	err = response.WriteError(code, err)
+	if err != nil {
+		klog.Error(err)
+	}
 }
 
 // AppendError handles single error, that occurred during API GET call. If it is not critical, then it will be

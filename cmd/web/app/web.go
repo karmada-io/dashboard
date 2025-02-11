@@ -80,12 +80,13 @@ func NewWebCommand(ctx context.Context) *cobra.Command {
 
 func run(ctx context.Context, opts *options.Options) error {
 	klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
-	config.InitDashboardConfigFromMountFile(opts.DashboardConfigPath)
-	serve(opts)
-	select {
-	case <-ctx.Done():
-		os.Exit(0)
+	err := config.InitDashboardConfigFromMountFile(opts.DashboardConfigPath)
+	if err != nil {
+		return err
 	}
+	serve(opts)
+	<-ctx.Done()
+	os.Exit(0)
 	return nil
 }
 
