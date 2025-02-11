@@ -28,8 +28,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ClusterAllocatedResources is the resource summary of a cluster.
-type ClusterAllocatedResources struct {
+// AllocatedResources is the resource summary of a cluster.
+type AllocatedResources struct {
 	// CPUCapacity is specified node CPU capacity in milicores.
 	CPUCapacity int64   `json:"cpuCapacity"`
 	CPUFraction float64 `json:"cpuFraction"`
@@ -48,9 +48,9 @@ type ClusterAllocatedResources struct {
 	PodFraction float64 `json:"podFraction"`
 }
 
-func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedResources, error) {
+func getAllocatedResources(cluster *v1alpha1.Cluster) (AllocatedResources, error) {
 	if cluster.Status.ResourceSummary == nil {
-		return ClusterAllocatedResources{}, nil
+		return AllocatedResources{}, nil
 	}
 	allocatableCPU := cluster.Status.ResourceSummary.Allocatable.Cpu()
 	allocatedCPU := cluster.Status.ResourceSummary.Allocated.Cpu()
@@ -78,7 +78,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	if podCapacity > 0 {
 		podFraction = float64(allocatedPod.Value()) / float64(podCapacity) * 100
 	}
-	return ClusterAllocatedResources{
+	return AllocatedResources{
 		CPUCapacity:    allocatableCPU.Value(),
 		CPUFraction:    cpuFraction,
 		MemoryCapacity: allocatedMemory.Value(),
@@ -89,20 +89,20 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	}, nil
 }
 
-// ClusterDetail is the detailed information of a cluster.
-type ClusterDetail struct {
+// Detail is the detailed information of a cluster.
+type Detail struct {
 	Cluster `json:",inline"`
 	Taints  []corev1.Taint `json:"taints,omitempty"`
 }
 
 // GetClusterDetail gets details of cluster.
-func GetClusterDetail(client karmadaclientset.Interface, clusterName string) (*ClusterDetail, error) {
+func GetClusterDetail(client karmadaclientset.Interface, clusterName string) (*Detail, error) {
 	log.Printf("Getting details of %s cluster", clusterName)
 	cluster, err := client.ClusterV1alpha1().Clusters().Get(context.TODO(), clusterName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
-	return &ClusterDetail{
+	return &Detail{
 		Cluster: toCluster(cluster),
 		Taints:  cluster.Spec.Taints,
 	}, nil

@@ -28,8 +28,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// StatefulSetDetail is a presentation layer view of Kubernetes Stateful Set resource. This means it is Stateful
-type StatefulSetDetail struct {
+// Detail is a presentation layer view of Kubernetes Stateful Set resource. This means it is Stateful
+type Detail struct {
 	// Extends list item structure.
 	StatefulSet `json:",inline"`
 
@@ -39,7 +39,7 @@ type StatefulSetDetail struct {
 
 // GetStatefulSetDetail gets Stateful Set details.
 func GetStatefulSetDetail(client kubernetes.Interface, namespace,
-	name string) (*StatefulSetDetail, error) {
+	name string) (*Detail, error) {
 	log.Printf("Getting details of %s statefulset in %s namespace", name, namespace)
 
 	ss, err := client.AppsV1().StatefulSets(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
@@ -57,8 +57,8 @@ func GetStatefulSetDetail(client kubernetes.Interface, namespace,
 	return &ssDetail, nil
 }
 
-func getStatefulSetDetail(statefulSet *apps.StatefulSet, podInfo *common.PodInfo, nonCriticalErrors []error) StatefulSetDetail {
-	return StatefulSetDetail{
+func getStatefulSetDetail(statefulSet *apps.StatefulSet, podInfo *common.PodInfo, nonCriticalErrors []error) Detail {
+	return Detail{
 		StatefulSet: toStatefulSet(statefulSet, podInfo),
 		Errors:      nonCriticalErrors,
 	}

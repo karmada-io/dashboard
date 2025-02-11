@@ -39,7 +39,7 @@ const (
 	CronJobKindName = "cronjob"
 )
 
-var emptyJobList = &job.JobList{
+var emptyJobList = &job.List{
 	Jobs:   make([]job.Job, 0),
 	Errors: make([]error, 0),
 	ListMeta: types.ListMeta{
@@ -49,7 +49,7 @@ var emptyJobList = &job.JobList{
 
 // GetCronJobJobs returns list of jobs owned by cron job.
 func GetCronJobJobs(client client.Interface,
-	dsQuery *dataselect.DataSelectQuery, namespace, name string, active bool) (*job.JobList, error) {
+	dsQuery *dataselect.Query, namespace, name string, active bool) (*job.List, error) {
 	cronJob, err := client.BatchV1().CronJobs(namespace).Get(context.TODO(), name, meta.GetOptions{})
 	if err != nil {
 		return emptyJobList, err

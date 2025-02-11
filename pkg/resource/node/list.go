@@ -38,8 +38,8 @@ type Node struct {
 	Status      v1.NodeStatus         `json:"status"`
 }
 
-// NodeList contains a list of node.
-type NodeList struct {
+// List contains a list of node.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of Nodes
@@ -50,7 +50,7 @@ type NodeList struct {
 }
 
 // GetNodeList returns a list of all Nodes in all cluster.
-func GetNodeList(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuery) (*NodeList, error) {
+func GetNodeList(client kubernetes.Interface, dsQuery *dataselect.Query) (*List, error) {
 	log.Printf("Getting nodes")
 	channels := &common.ResourceChannels{
 		NodeList: common.GetNodeListChannel(client, 1),
@@ -60,7 +60,7 @@ func GetNodeList(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuer
 }
 
 // GetNodeListFromChannels returns a list of all Nodes in the cluster reading required resource list once from the channels.
-func GetNodeListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*NodeList, error) {
+func GetNodeListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	nodes := <-channels.NodeList.List
 	err := <-channels.NodeList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -81,8 +81,8 @@ func toNode(meta metav1.ObjectMeta, status v1.NodeStatus) Node {
 	}
 }
 
-func toNodeList(nodes []v1.Node, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *NodeList {
-	result := &NodeList{
+func toNodeList(nodes []v1.Node, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	result := &List{
 		Items:    make([]Node, 0),
 		ListMeta: types.ListMeta{TotalItems: len(nodes)},
 		Errors:   nonCriticalErrors,

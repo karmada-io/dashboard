@@ -52,8 +52,8 @@ type Service struct {
 	ClusterIP string `json:"clusterIP"`
 }
 
-// ServiceList contains a list of services in the cluster.
-type ServiceList struct {
+// List contains a list of services in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of services.
@@ -65,7 +65,7 @@ type ServiceList struct {
 
 // GetServiceList returns a list of all services in the cluster.
 func GetServiceList(client client.Interface, nsQuery *common.NamespaceQuery,
-	dsQuery *dataselect.DataSelectQuery) (*ServiceList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	log.Print("Getting list of all services in the cluster")
 
 	channels := &common.ResourceChannels{
@@ -77,7 +77,7 @@ func GetServiceList(client client.Interface, nsQuery *common.NamespaceQuery,
 
 // GetServiceListFromChannels returns a list of all services in the cluster.
 func GetServiceListFromChannels(channels *common.ResourceChannels,
-	dsQuery *dataselect.DataSelectQuery) (*ServiceList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	services := <-channels.ServiceList.List
 	err := <-channels.ServiceList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -101,8 +101,8 @@ func toService(service *v1.Service) Service {
 }
 
 // CreateServiceList returns paginated service list based on given service array and pagination query.
-func CreateServiceList(services []v1.Service, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ServiceList {
-	serviceList := &ServiceList{
+func CreateServiceList(services []v1.Service, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	serviceList := &List{
 		Services: make([]Service, 0),
 		ListMeta: types.ListMeta{TotalItems: len(services)},
 		Errors:   nonCriticalErrors,

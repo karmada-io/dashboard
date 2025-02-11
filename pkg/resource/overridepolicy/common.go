@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// OverridePolicyCell represents an OverridePolicy that implements the DataCell interface.
-type OverridePolicyCell v1alpha1.OverridePolicy
+// Cell represents an OverridePolicy that implements the DataCell interface.
+type Cell v1alpha1.OverridePolicy
 
 // GetProperty returns a comparable value for a specified property name.
-func (c OverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -44,7 +44,7 @@ func (c OverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect
 func toCells(std []v1alpha1.OverridePolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = OverridePolicyCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -52,7 +52,7 @@ func toCells(std []v1alpha1.OverridePolicy) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1alpha1.OverridePolicy {
 	std := make([]v1alpha1.OverridePolicy, len(cells))
 	for i := range std {
-		std[i] = v1alpha1.OverridePolicy(cells[i].(OverridePolicyCell))
+		std[i] = v1alpha1.OverridePolicy(cells[i].(Cell))
 	}
 	return std
 }

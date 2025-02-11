@@ -27,8 +27,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// JobDetail is a presentation layer view of Kubernetes Job resource.
-type JobDetail struct {
+// Detail is a presentation layer view of Kubernetes Job resource.
+type Detail struct {
 	// Extends list item structure.
 	Job `json:",inline"`
 
@@ -40,7 +40,7 @@ type JobDetail struct {
 }
 
 // GetJobDetail gets job details.
-func GetJobDetail(client k8sClient.Interface, namespace, name string) (*JobDetail, error) {
+func GetJobDetail(client k8sClient.Interface, namespace, name string) (*Detail, error) {
 	jobData, err := client.BatchV1().Jobs(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -56,8 +56,8 @@ func GetJobDetail(client k8sClient.Interface, namespace, name string) (*JobDetai
 	return &job, nil
 }
 
-func toJobDetail(job *batch.Job, podInfo common.PodInfo, nonCriticalErrors []error) JobDetail {
-	return JobDetail{
+func toJobDetail(job *batch.Job, podInfo common.PodInfo, nonCriticalErrors []error) Detail {
+	return Detail{
 		Job:         toJob(job, &podInfo),
 		Completions: job.Spec.Completions,
 		Errors:      nonCriticalErrors,

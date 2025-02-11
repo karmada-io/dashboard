@@ -28,13 +28,13 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/endpoint"
 )
 
-// ServiceDetail is a representation of a service.
-type ServiceDetail struct {
+// Detail is a representation of a service.
+type Detail struct {
 	// Extends list item structure.
 	Service `json:",inline"`
 
 	// List of Endpoint obj. that are endpoints of this Service.
-	EndpointList endpoint.EndpointList `json:"endpointList"`
+	EndpointList endpoint.List `json:"endpointList"`
 
 	// Show the value of the SessionAffinity of the Service.
 	SessionAffinity v1.ServiceAffinity `json:"sessionAffinity"`
@@ -44,7 +44,7 @@ type ServiceDetail struct {
 }
 
 // GetServiceDetail gets service details.
-func GetServiceDetail(client k8sClient.Interface, namespace, name string) (*ServiceDetail, error) {
+func GetServiceDetail(client k8sClient.Interface, namespace, name string) (*Detail, error) {
 	log.Printf("Getting details of %s service in %s namespace", name, namespace)
 	serviceData, err := client.CoreV1().Services(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
@@ -61,8 +61,8 @@ func GetServiceDetail(client k8sClient.Interface, namespace, name string) (*Serv
 	return &service, nil
 }
 
-func toServiceDetail(service *v1.Service, endpointList endpoint.EndpointList, nonCriticalErrors []error) ServiceDetail {
-	return ServiceDetail{
+func toServiceDetail(service *v1.Service, endpointList endpoint.List, nonCriticalErrors []error) Detail {
+	return Detail{
 		Service:         toService(service),
 		EndpointList:    endpointList,
 		SessionAffinity: service.Spec.SessionAffinity,

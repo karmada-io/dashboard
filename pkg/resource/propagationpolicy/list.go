@@ -35,8 +35,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// PropagationPolicyList contains a list of propagation in the karmada control-plance.
-type PropagationPolicyList struct {
+// List contains a list of propagation in the karmada control-plance.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of PropagationPolicys.
@@ -57,7 +57,7 @@ type PropagationPolicy struct {
 }
 
 // GetPropagationPolicyList returns a list of all propagations in the karmada control-plance.
-func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*PropagationPolicyList, error) {
+func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.Query) (*List, error) {
 	log.Println("Getting list of namespaces")
 	propagationpolicies, err := client.PolicyV1alpha1().PropagationPolicies(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -68,8 +68,8 @@ func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kuber
 	return toPropagationPolicyList(k8sClient, propagationpolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toPropagationPolicyList(k8sClient kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *PropagationPolicyList {
-	propagationpolicyList := &PropagationPolicyList{
+func toPropagationPolicyList(k8sClient kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	propagationpolicyList := &List{
 		PropagationPolicys: make([]PropagationPolicy, 0),
 		ListMeta:           types.ListMeta{TotalItems: len(propagationpolicies)},
 	}

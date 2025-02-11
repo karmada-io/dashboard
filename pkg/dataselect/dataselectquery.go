@@ -14,10 +14,10 @@
 
 package dataselect
 
-// DataSelectQuery is options for GenericDataSelect which takes []GenericDataCell and returns selected data.
+// Query is options for GenericDataSelect which takes []GenericDataCell and returns selected data.
 // Can be extended to include any kind of selection - for example filtering.
 // Currently included only Pagination and Sort options.
-type DataSelectQuery struct {
+type Query struct {
 	// PaginationQuery holds options for pagination of data select.
 	PaginationQuery *PaginationQuery
 	// SortQuery holds options for sort functionality of data select.
@@ -72,9 +72,9 @@ var NoFilter = &FilterQuery{
 // NoDataSelect is an option for no data select (same data will be returned).
 var NoDataSelect = NewDataSelectQuery(NoPagination, NoSort, NoFilter)
 
-// NewDataSelectQuery creates DataSelectQuery object from simpler data select queries.
-func NewDataSelectQuery(paginationQuery *PaginationQuery, sortQuery *SortQuery, filterQuery *FilterQuery) *DataSelectQuery {
-	return &DataSelectQuery{
+// NewDataSelectQuery creates Query object from simpler data select queries.
+func NewDataSelectQuery(paginationQuery *PaginationQuery, sortQuery *SortQuery, filterQuery *FilterQuery) *Query {
+	return &Query{
 		PaginationQuery: paginationQuery,
 		SortQuery:       sortQuery,
 		FilterQuery:     filterQuery,

@@ -30,8 +30,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
-// StatefulSetList contains a list of Stateful Sets in the cluster.
-type StatefulSetList struct {
+// List contains a list of Stateful Sets in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	Status       common.ResourceStatus `json:"status"`
@@ -52,7 +52,7 @@ type StatefulSet struct {
 
 // GetStatefulSetList returns a list of all Stateful Sets in the cluster.
 func GetStatefulSetList(client kubernetes.Interface, nsQuery *common.NamespaceQuery,
-	dsQuery *dataselect.DataSelectQuery) (*StatefulSetList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	log.Print("Getting list of all stateful sets in the cluster")
 
 	channels := &common.ResourceChannels{
@@ -66,7 +66,7 @@ func GetStatefulSetList(client kubernetes.Interface, nsQuery *common.NamespaceQu
 
 // GetStatefulSetListFromChannels returns a list of all Stateful Sets in the cluster reading
 // required resource list once from the channels.
-func GetStatefulSetListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*StatefulSetList, error) {
+func GetStatefulSetListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	statefulSets := <-channels.StatefulSetList.List
 	err := <-channels.StatefulSetList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -94,8 +94,8 @@ func GetStatefulSetListFromChannels(channels *common.ResourceChannels, dsQuery *
 }
 
 func toStatefulSetList(statefulSets []apps.StatefulSet, pods []v1.Pod, events []v1.Event, nonCriticalErrors []error,
-	dsQuery *dataselect.DataSelectQuery) *StatefulSetList {
-	statefulSetList := &StatefulSetList{
+	dsQuery *dataselect.Query) *List {
+	statefulSetList := &List{
 		StatefulSets: make([]StatefulSet, 0),
 		ListMeta:     types.ListMeta{TotalItems: len(statefulSets)},
 		Errors:       nonCriticalErrors,

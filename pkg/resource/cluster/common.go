@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// ClusterCell is a cell representation of Cluster object.
-type ClusterCell v1alpha1.Cluster
+// Cell is a cell representation of Cluster object.
+type Cell v1alpha1.Cluster
 
 // GetProperty returns value of a given property.
-func (c ClusterCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -43,7 +43,7 @@ func (c ClusterCell) GetProperty(name dataselect.PropertyName) dataselect.Compar
 func toCells(std []v1alpha1.Cluster) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = ClusterCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -51,7 +51,7 @@ func toCells(std []v1alpha1.Cluster) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1alpha1.Cluster {
 	std := make([]v1alpha1.Cluster, len(cells))
 	for i := range std {
-		std[i] = v1alpha1.Cluster(cells[i].(ClusterCell))
+		std[i] = v1alpha1.Cluster(cells[i].(Cell))
 	}
 	return std
 }

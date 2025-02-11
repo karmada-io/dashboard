@@ -24,11 +24,11 @@ import (
 
 // The code below allows to perform complex data section on []api.Service
 
-// ServiceCell wraps v1.Service for data selection.
-type ServiceCell v1.Service
+// Cell wraps v1.Service for data selection.
+type Cell v1.Service
 
 // GetProperty returns a property of the service cell.
-func (c ServiceCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -47,7 +47,7 @@ func (c ServiceCell) GetProperty(name dataselect.PropertyName) dataselect.Compar
 func toCells(std []v1.Service) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = ServiceCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -55,7 +55,7 @@ func toCells(std []v1.Service) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1.Service {
 	std := make([]v1.Service, len(cells))
 	for i := range std {
-		std[i] = v1.Service(cells[i].(ServiceCell))
+		std[i] = v1.Service(cells[i].(Cell))
 	}
 	return std
 }

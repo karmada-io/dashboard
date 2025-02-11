@@ -143,7 +143,7 @@ func TestSort(t *testing.T) {
 	for _, testCase := range testCases {
 		selectableData := DataSelector{
 			GenericDataList: getDataCellList(),
-			DataSelectQuery: &DataSelectQuery{SortQuery: testCase.SortQuery},
+			DataSelectQuery: &Query{SortQuery: testCase.SortQuery},
 		}
 		sortedData := fromCells(selectableData.Sort().GenericDataList)
 		order := getOrder(sortedData)
@@ -210,7 +210,7 @@ func TestPagination(t *testing.T) {
 	for _, testCase := range testCases {
 		selectableData := DataSelector{
 			GenericDataList: getDataCellList(),
-			DataSelectQuery: &DataSelectQuery{PaginationQuery: testCase.PaginationQuery},
+			DataSelectQuery: &Query{PaginationQuery: testCase.PaginationQuery},
 		}
 		paginatedData := fromCells(selectableData.Paginate().GenericDataList)
 		order := getOrder(paginatedData)

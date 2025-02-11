@@ -30,8 +30,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
-// JobList contains a list of Jobs in the cluster.
-type JobList struct {
+// List contains a list of Jobs in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Basic information about resources status on the list.
@@ -44,22 +44,22 @@ type JobList struct {
 	Errors []error `json:"errors"`
 }
 
-// JobStatusType is a valid value for JobStatus.Status.
-type JobStatusType string
+// StatusType is a valid value for Status.Status.
+type StatusType string
 
 const (
 	// JobStatusRunning means the job is still running.
-	JobStatusRunning JobStatusType = "Running"
+	JobStatusRunning StatusType = "Running"
 	// JobStatusComplete means the job has completed its execution.
-	JobStatusComplete JobStatusType = "Complete"
+	JobStatusComplete StatusType = "Complete"
 	// JobStatusFailed means the job has failed its execution.
-	JobStatusFailed JobStatusType = "Failed"
+	JobStatusFailed StatusType = "Failed"
 )
 
-// JobStatus contains inferred job status based on job conditions
-type JobStatus struct {
+// Status contains inferred job status based on job conditions
+type Status struct {
 	// Short, machine understandable job status code.
-	Status JobStatusType `json:"status"`
+	Status StatusType `json:"status"`
 	// A human-readable description of the status of related job.
 	Message string `json:"message"`
 	// Conditions describe the state of a job after it finishes.
@@ -85,12 +85,12 @@ type Job struct {
 	Parallelism *int32 `json:"parallelism"`
 
 	// JobStatus contains inferred job status based on job conditions
-	JobStatus JobStatus `json:"jobStatus"`
+	JobStatus Status `json:"jobStatus"`
 }
 
 // GetJobList returns a list of all Jobs in the cluster.
 func GetJobList(client client.Interface, nsQuery *common.NamespaceQuery,
-	dsQuery *dataselect.DataSelectQuery) (*JobList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	log.Print("Getting list of all jobs in the cluster")
 
 	channels := &common.ResourceChannels{
@@ -103,7 +103,7 @@ func GetJobList(client client.Interface, nsQuery *common.NamespaceQuery,
 }
 
 // GetJobListFromChannels returns a list of all Jobs in the cluster reading required resource list once from the channels.
-func GetJobListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*JobList, error) {
+func GetJobListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	jobs := <-channels.JobList.List
 	err := <-channels.JobList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -132,8 +132,8 @@ func GetJobListFromChannels(channels *common.ResourceChannels, dsQuery *datasele
 
 // ToJobList returns a list of Jobs in the cluster by reading required resource list returned from the channel.
 func ToJobList(jobs []batch.Job, pods []v1.Pod, events []v1.Event, nonCriticalErrors []error,
-	dsQuery *dataselect.DataSelectQuery) *JobList {
-	jobList := &JobList{
+	dsQuery *dataselect.Query) *List {
+	jobList := &List{
 		Jobs:     make([]Job, 0),
 		ListMeta: types.ListMeta{TotalItems: len(jobs)},
 		Errors:   nonCriticalErrors,
@@ -166,8 +166,8 @@ func toJob(job *batch.Job, podInfo *common.PodInfo) Job {
 	}
 }
 
-func getJobStatus(job *batch.Job) JobStatus {
-	jobStatus := JobStatus{Status: JobStatusRunning, Conditions: getJobConditions(job)}
+func getJobStatus(job *batch.Job) Status {
+	jobStatus := Status{Status: JobStatusRunning, Conditions: getJobConditions(job)}
 	for _, condition := range job.Status.Conditions {
 		if condition.Type == batch.JobComplete && condition.Status == v1.ConditionTrue {
 			jobStatus.Status = JobStatusComplete

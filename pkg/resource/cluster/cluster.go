@@ -32,17 +32,17 @@ import (
 
 // Cluster the definition of a cluster.
 type Cluster struct {
-	ObjectMeta         types.ObjectMeta          `json:"objectMeta"`
-	TypeMeta           types.TypeMeta            `json:"typeMeta"`
-	Ready              metav1.ConditionStatus    `json:"ready"`
-	KubernetesVersion  string                    `json:"kubernetesVersion,omitempty"`
-	SyncMode           v1alpha1.ClusterSyncMode  `json:"syncMode"`
-	NodeSummary        *v1alpha1.NodeSummary     `json:"nodeSummary,omitempty"`
-	AllocatedResources ClusterAllocatedResources `json:"allocatedResources"`
+	ObjectMeta         types.ObjectMeta         `json:"objectMeta"`
+	TypeMeta           types.TypeMeta           `json:"typeMeta"`
+	Ready              metav1.ConditionStatus   `json:"ready"`
+	KubernetesVersion  string                   `json:"kubernetesVersion,omitempty"`
+	SyncMode           v1alpha1.ClusterSyncMode `json:"syncMode"`
+	NodeSummary        *v1alpha1.NodeSummary    `json:"nodeSummary,omitempty"`
+	AllocatedResources AllocatedResources       `json:"allocatedResources"`
 }
 
-// ClusterList contains a list of clusters.
-type ClusterList struct {
+// List contains a list of clusters.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 	Clusters []Cluster      `json:"clusters"`
 	// List of non-critical errors, that occurred during resource retrieval.
@@ -50,7 +50,7 @@ type ClusterList struct {
 }
 
 // GetClusterList returns a list of all Nodes in the cluster.
-func GetClusterList(client karmadaclientset.Interface, dsQuery *dataselect.DataSelectQuery) (*ClusterList, error) {
+func GetClusterList(client karmadaclientset.Interface, dsQuery *dataselect.Query) (*List, error) {
 	clusters, err := client.ClusterV1alpha1().Clusters().List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
 	if criticalError != nil {
@@ -59,8 +59,8 @@ func GetClusterList(client karmadaclientset.Interface, dsQuery *dataselect.DataS
 	return toClusterList(client, clusters.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toClusterList(_ karmadaclientset.Interface, clusters []v1alpha1.Cluster, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterList {
-	clusterList := &ClusterList{
+func toClusterList(_ karmadaclientset.Interface, clusters []v1alpha1.Cluster, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	clusterList := &List{
 		Clusters: make([]Cluster, 0),
 		ListMeta: types.ListMeta{TotalItems: len(clusters)},
 		Errors:   nonCriticalErrors,
@@ -78,7 +78,7 @@ func toClusterList(_ karmadaclientset.Interface, clusters []v1alpha1.Cluster, no
 }
 
 func toCluster(cluster *v1alpha1.Cluster) Cluster {
-	allocatedResources, err := getclusterAllocatedResources(cluster)
+	allocatedResources, err := getAllocatedResources(cluster)
 	if err != nil {
 		log.Printf("Couldn't get allocated resources of %s cluster: %s\n", cluster.Name, err)
 	}

@@ -34,7 +34,7 @@ func handleCreateNamespace(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
-	spec := &ns.NamespaceSpec{
+	spec := &ns.Spec{
 		Name:                createNamespaceRequest.Name,
 		SkipAutoPropagation: createNamespaceRequest.SkipAutoPropagation,
 	}

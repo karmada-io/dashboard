@@ -20,16 +20,16 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/types"
 )
 
-// EndpointList is a list of endpoints in the cluster.
-type EndpointList struct {
+// List is a list of endpoints in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 	// List of endpoints
 	Endpoints []Endpoint `json:"endpoints"`
 }
 
 // toEndpointList converts array of api events to endpoint List structure
-func toEndpointList(endpoints []v1.Endpoints) *EndpointList {
-	endpointList := EndpointList{
+func toEndpointList(endpoints []v1.Endpoints) *List {
+	endpointList := List{
 		Endpoints: make([]Endpoint, 0),
 		ListMeta:  types.ListMeta{TotalItems: len(endpoints)},
 	}

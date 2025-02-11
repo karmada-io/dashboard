@@ -36,8 +36,8 @@ type Pod struct {
 	Status     v1.PodStatus     `json:"status"`
 }
 
-// PodList contains a list of pod.
-type PodList struct {
+// List contains a list of pod.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of Pods
@@ -48,7 +48,7 @@ type PodList struct {
 }
 
 // GetPodList returns a list of all Pods in all cluster.
-func GetPodList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*PodList, error) {
+func GetPodList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.Query) (*List, error) {
 	log.Printf("Getting pods")
 	channels := &common.ResourceChannels{
 		PodList: common.GetPodListChannel(client, nsQuery, 1),
@@ -58,7 +58,7 @@ func GetPodList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQ
 }
 
 // GetPodListFromChannels returns a list of all Pods in the cluster reading required resource list once from the channels.
-func GetPodListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*PodList, error) {
+func GetPodListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	pods := <-channels.PodList.List
 	err := <-channels.PodList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -79,8 +79,8 @@ func toPod(meta metav1.ObjectMeta, status v1.PodStatus) Pod {
 	}
 }
 
-func toPodList(pods []v1.Pod, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *PodList {
-	result := &PodList{
+func toPodList(pods []v1.Pod, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	result := &List{
 		Items:    make([]Pod, 0),
 		ListMeta: types.ListMeta{TotalItems: len(pods)},
 		Errors:   nonCriticalErrors,

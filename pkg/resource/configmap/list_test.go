@@ -28,14 +28,14 @@ import (
 func TestToConfigMapList(t *testing.T) {
 	cases := []struct {
 		configMaps []v1.ConfigMap
-		expected   *ConfigMapList
+		expected   *List
 	}{
-		{nil, &ConfigMapList{Items: []ConfigMap{}}},
+		{nil, &List{Items: []ConfigMap{}}},
 		{
 			[]v1.ConfigMap{
 				{Data: map[string]string{"app": "my-name"}, ObjectMeta: metaV1.ObjectMeta{Name: "foo"}},
 			},
-			&ConfigMapList{
+			&List{
 				ListMeta: types.ListMeta{TotalItems: 1},
 				Items: []ConfigMap{{
 					TypeMeta:   types.TypeMeta{Kind: "configmap"},

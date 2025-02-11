@@ -30,8 +30,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
-// DeploymentList contains a list of Deployments in the cluster.
-type DeploymentList struct {
+// List contains a list of Deployments in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Basic information about resources status on the list.
@@ -62,7 +62,7 @@ type Deployment struct {
 }
 
 // GetDeploymentList returns a list of all Deployments in the cluster.
-func GetDeploymentList(client client.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*DeploymentList, error) {
+func GetDeploymentList(client client.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.Query) (*List, error) {
 	log.Print("Getting list of all deployments in the cluster")
 
 	channels := &common.ResourceChannels{
@@ -77,7 +77,7 @@ func GetDeploymentList(client client.Interface, nsQuery *common.NamespaceQuery, 
 
 // GetDeploymentListFromChannels returns a list of all Deployments in the cluster
 // reading required resource list once from the channels.
-func GetDeploymentListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*DeploymentList, error) {
+func GetDeploymentListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	deployments := <-channels.DeploymentList.List
 	err := <-channels.DeploymentList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -113,8 +113,8 @@ func GetDeploymentListFromChannels(channels *common.ResourceChannels, dsQuery *d
 }
 
 func toDeploymentList(deployments []apps.Deployment, pods []v1.Pod, events []v1.Event, rs []apps.ReplicaSet,
-	nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *DeploymentList {
-	deploymentList := &DeploymentList{
+	nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	deploymentList := &List{
 		Deployments: make([]Deployment, 0),
 		ListMeta:    types.ListMeta{TotalItems: len(deployments)},
 		Errors:      nonCriticalErrors,

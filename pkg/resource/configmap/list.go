@@ -29,8 +29,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// ConfigMapList contains a list of Config Maps in the cluster.
-type ConfigMapList struct {
+// List contains a list of Config Maps in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of Config Maps
@@ -48,7 +48,7 @@ type ConfigMap struct {
 }
 
 // GetConfigMapList returns a list of all ConfigMaps in the cluster.
-func GetConfigMapList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*ConfigMapList, error) {
+func GetConfigMapList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.Query) (*List, error) {
 	log.Printf("Getting list config maps in the namespace %s", nsQuery.ToRequestParam())
 	channels := &common.ResourceChannels{
 		ConfigMapList: common.GetConfigMapListChannel(client, nsQuery, 1),
@@ -58,7 +58,7 @@ func GetConfigMapList(client kubernetes.Interface, nsQuery *common.NamespaceQuer
 }
 
 // GetConfigMapListFromChannels returns a list of all Config Maps in the cluster reading required resource list once from the channels.
-func GetConfigMapListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*ConfigMapList, error) {
+func GetConfigMapListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	configMaps := <-channels.ConfigMapList.List
 	err := <-channels.ConfigMapList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -78,8 +78,8 @@ func toConfigMap(meta metaV1.ObjectMeta) ConfigMap {
 	}
 }
 
-func toConfigMapList(configMaps []v1.ConfigMap, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ConfigMapList {
-	result := &ConfigMapList{
+func toConfigMapList(configMaps []v1.ConfigMap, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	result := &List{
 		Items:    make([]ConfigMap, 0),
 		ListMeta: types.ListMeta{TotalItems: len(configMaps)},
 		Errors:   nonCriticalErrors,

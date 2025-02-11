@@ -43,7 +43,7 @@ type DataSelector struct {
 	// GenericDataList hold generic data cells that are being selected.
 	GenericDataList []DataCell
 	// DataSelectQuery holds instructions for data select.
-	DataSelectQuery *DataSelectQuery
+	DataSelectQuery *Query
 }
 
 // Implementation of sort.Interface so that we can use built-in sort function (sort.Sort) for sorting SelectableData
@@ -74,13 +74,13 @@ func (s DataSelector) Less(i, j int) bool {
 	return false
 }
 
-// Sort sorts the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
+// Sort sorts the data inside as instructed by Query and returns itself to allow method chaining.
 func (s *DataSelector) Sort() *DataSelector {
 	sort.Sort(*s)
 	return s
 }
 
-// Filter the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
+// Filter the data inside as instructed by Query and returns itself to allow method chaining.
 func (s *DataSelector) Filter() *DataSelector {
 	filteredList := []DataCell{}
 
@@ -102,7 +102,7 @@ func (s *DataSelector) Filter() *DataSelector {
 	return s
 }
 
-// Paginate paginates the data inside as instructed by DataSelectQuery and returns itself to allow method chaining.
+// Paginate paginates the data inside as instructed by Query and returns itself to allow method chaining.
 func (s *DataSelector) Paginate() *DataSelector {
 	pQuery := s.DataSelectQuery.PaginationQuery
 	dataList := s.GenericDataList
@@ -122,8 +122,8 @@ func (s *DataSelector) Paginate() *DataSelector {
 	return s
 }
 
-// GenericDataSelect takes a list of GenericDataCells and DataSelectQuery and returns selected data as instructed by dsQuery.
-func GenericDataSelect(dataList []DataCell, dsQuery *DataSelectQuery) []DataCell {
+// GenericDataSelect takes a list of GenericDataCells and Query and returns selected data as instructed by dsQuery.
+func GenericDataSelect(dataList []DataCell, dsQuery *Query) []DataCell {
 	SelectableData := DataSelector{
 		GenericDataList: dataList,
 		DataSelectQuery: dsQuery,
@@ -131,8 +131,8 @@ func GenericDataSelect(dataList []DataCell, dsQuery *DataSelectQuery) []DataCell
 	return SelectableData.Sort().Paginate().GenericDataList
 }
 
-// GenericDataSelectWithFilter takes a list of GenericDataCells and DataSelectQuery and returns selected data as instructed by dsQuery.
-func GenericDataSelectWithFilter(dataList []DataCell, dsQuery *DataSelectQuery) ([]DataCell, int) {
+// GenericDataSelectWithFilter takes a list of GenericDataCells and Query and returns selected data as instructed by dsQuery.
+func GenericDataSelectWithFilter(dataList []DataCell, dsQuery *Query) ([]DataCell, int) {
 	SelectableData := DataSelector{
 		GenericDataList: dataList,
 		DataSelectQuery: dsQuery,

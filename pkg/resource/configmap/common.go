@@ -24,11 +24,11 @@ import (
 
 // The code below allows to perform complex data section on []api.ConfigMap
 
-// ConfigMapCell wraps api.ConfigMap for data selection.
-type ConfigMapCell api.ConfigMap
+// Cell wraps api.ConfigMap for data selection.
+type Cell api.ConfigMap
 
 // GetProperty returns a property.
-func (c ConfigMapCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -45,7 +45,7 @@ func (c ConfigMapCell) GetProperty(name dataselect.PropertyName) dataselect.Comp
 func toCells(std []api.ConfigMap) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = ConfigMapCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -53,7 +53,7 @@ func toCells(std []api.ConfigMap) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []api.ConfigMap {
 	std := make([]api.ConfigMap, len(cells))
 	for i := range std {
-		std[i] = api.ConfigMap(cells[i].(ConfigMapCell))
+		std[i] = api.ConfigMap(cells[i].(Cell))
 	}
 	return std
 }

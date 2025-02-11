@@ -27,11 +27,11 @@ import (
 
 // The code below allows to perform complex data section on []apps.StatefulSet
 
-// StatefulSetCell wraps apps.StatefulSet for data selection.
-type StatefulSetCell apps.StatefulSet
+// Cell wraps apps.StatefulSet for data selection.
+type Cell apps.StatefulSet
 
 // GetProperty returns a property.
-func (c StatefulSetCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -48,7 +48,7 @@ func (c StatefulSetCell) GetProperty(name dataselect.PropertyName) dataselect.Co
 func toCells(std []apps.StatefulSet) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = StatefulSetCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -56,7 +56,7 @@ func toCells(std []apps.StatefulSet) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []apps.StatefulSet {
 	std := make([]apps.StatefulSet, len(cells))
 	for i := range std {
-		std[i] = apps.StatefulSet(cells[i].(StatefulSetCell))
+		std[i] = apps.StatefulSet(cells[i].(Cell))
 	}
 	return std
 }

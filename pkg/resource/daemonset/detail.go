@@ -26,8 +26,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// DaemonSetDetail represents detailed information about a Daemon Set.
-type DaemonSetDetail struct {
+// Detail represents detailed information about a Daemon Set.
+type Detail struct {
 	// Extends list item structure.
 	DaemonSet `json:",inline"`
 
@@ -38,7 +38,7 @@ type DaemonSetDetail struct {
 }
 
 // GetDaemonSetDetail Returns detailed information about the given daemon set in the given namespace.
-func GetDaemonSetDetail(client k8sClient.Interface, namespace, name string) (*DaemonSetDetail, error) {
+func GetDaemonSetDetail(client k8sClient.Interface, namespace, name string) (*Detail, error) {
 	log.Printf("Getting details of %s daemon set in %s namespace", name, namespace)
 	daemonSet, err := client.AppsV1().DaemonSets(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
@@ -60,7 +60,7 @@ func GetDaemonSetDetail(client k8sClient.Interface, namespace, name string) (*Da
 		return nil, err
 	}
 
-	return &DaemonSetDetail{
+	return &Detail{
 		DaemonSet:     toDaemonSet(*daemonSet, podList.Items, eventList.Items),
 		LabelSelector: daemonSet.Spec.Selector,
 		Errors:        []error{},

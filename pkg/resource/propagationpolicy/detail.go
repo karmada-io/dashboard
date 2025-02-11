@@ -26,9 +26,9 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
-// PropagationPolicyDetail is a presentation layer view of Karmada PropagationPolicy resource. This means it is PropagationPolicy plus
+// Detail is a presentation layer view of Karmada PropagationPolicy resource. This means it is PropagationPolicy plus
 // additional augmented data we can get from other sources.
-type PropagationPolicyDetail struct {
+type Detail struct {
 	// Extends list item structure.
 	PropagationPolicy `json:",inline"`
 
@@ -37,7 +37,7 @@ type PropagationPolicyDetail struct {
 }
 
 // GetPropagationPolicyDetail gets propagationpolicy details.
-func GetPropagationPolicyDetail(client karmadaclientset.Interface, namespace, name string) (*PropagationPolicyDetail, error) {
+func GetPropagationPolicyDetail(client karmadaclientset.Interface, namespace, name string) (*Detail, error) {
 	propagationpolicyData, err := client.PolicyV1alpha1().PropagationPolicies(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -52,8 +52,8 @@ func GetPropagationPolicyDetail(client karmadaclientset.Interface, namespace, na
 	return &propagationpolicy, nil
 }
 
-func toPropagationPolicyDetail(propagationpolicy *v1alpha1.PropagationPolicy, nonCriticalErrors []error) PropagationPolicyDetail {
-	return PropagationPolicyDetail{
+func toPropagationPolicyDetail(propagationpolicy *v1alpha1.PropagationPolicy, nonCriticalErrors []error) Detail {
+	return Detail{
 		PropagationPolicy: toPropagationPolicy(propagationpolicy),
 		Errors:            nonCriticalErrors,
 	}

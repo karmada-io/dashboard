@@ -161,7 +161,7 @@ func GetControllerManagerInfo() (*v1.KarmadaInfo, error) {
 }
 
 // GetMemberClusterInfo returns the status of member clusters.
-func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStatus, error) {
+func GetMemberClusterInfo(ds *dataselect.Query) (*v1.MemberClusterStatus, error) {
 	karmadaClient := client.InClusterKarmadaClient()
 	result, err := cluster.GetClusterList(karmadaClient, ds)
 	if err != nil {

@@ -28,8 +28,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
-// DaemonSetList contains a list of Daemon Sets in the cluster.
-type DaemonSetList struct {
+// List contains a list of Daemon Sets in the cluster.
+type List struct {
 	ListMeta   types.ListMeta        `json:"listMeta"`
 	DaemonSets []DaemonSet           `json:"daemonSets"`
 	Status     common.ResourceStatus `json:"status"`
@@ -48,7 +48,7 @@ type DaemonSet struct {
 }
 
 // GetDaemonSetList returns a list of all Daemon Set in the cluster.
-func GetDaemonSetList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*DaemonSetList, error) {
+func GetDaemonSetList(client kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.Query) (*List, error) {
 	channels := &common.ResourceChannels{
 		DaemonSetList: common.GetDaemonSetListChannel(client, nsQuery, 1),
 		ServiceList:   common.GetServiceListChannel(client, nsQuery, 1),
@@ -61,7 +61,7 @@ func GetDaemonSetList(client kubernetes.Interface, nsQuery *common.NamespaceQuer
 
 // GetDaemonSetListFromChannels returns a list of all Daemon Set in the cluster
 // reading required resource list once from the channels.
-func GetDaemonSetListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*DaemonSetList, error) {
+func GetDaemonSetListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	daemonSets := <-channels.DaemonSetList.List
 	err := <-channels.DaemonSetList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -89,8 +89,8 @@ func GetDaemonSetListFromChannels(channels *common.ResourceChannels, dsQuery *da
 }
 
 func toDaemonSetList(daemonSets []apps.DaemonSet, pods []v1.Pod, events []v1.Event, nonCriticalErrors []error,
-	dsQuery *dataselect.DataSelectQuery) *DaemonSetList {
-	daemonSetList := &DaemonSetList{
+	dsQuery *dataselect.Query) *List {
+	daemonSetList := &List{
 		DaemonSets: make([]DaemonSet, 0),
 		ListMeta:   types.ListMeta{TotalItems: len(daemonSets)},
 		Errors:     nonCriticalErrors,

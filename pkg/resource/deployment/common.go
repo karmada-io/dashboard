@@ -25,11 +25,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
-// DeploymentCell is a wrapper for the k8s deployment
-type DeploymentCell apps.Deployment
+// Cell is a wrapper for the k8s deployment
+type Cell apps.Deployment
 
 // GetProperty is used to get property of the deployment
-func (c DeploymentCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -46,7 +46,7 @@ func (c DeploymentCell) GetProperty(name dataselect.PropertyName) dataselect.Com
 func toCells(std []apps.Deployment) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = DeploymentCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -54,7 +54,7 @@ func toCells(std []apps.Deployment) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []apps.Deployment {
 	std := make([]apps.Deployment, len(cells))
 	for i := range std {
-		std[i] = apps.Deployment(cells[i].(DeploymentCell))
+		std[i] = apps.Deployment(cells[i].(Cell))
 	}
 	return std
 }

@@ -51,8 +51,8 @@ type StatusInfo struct {
 	Unavailable int32 `json:"unavailable"`
 }
 
-// DeploymentDetail is a presentation layer view of Kubernetes Deployment resource.
-type DeploymentDetail struct {
+// Detail is a presentation layer view of Kubernetes Deployment resource.
+type Detail struct {
 	// Extends list item structure.
 	Deployment `json:",inline"`
 
@@ -83,7 +83,7 @@ type DeploymentDetail struct {
 }
 
 // GetDeploymentDetail returns model object of deployment and error, if any.
-func GetDeploymentDetail(client client.Interface, namespace string, deploymentName string) (*DeploymentDetail, error) {
+func GetDeploymentDetail(client client.Interface, namespace string, deploymentName string) (*Detail, error) {
 	log.Printf("Getting details of %s deployment in %s namespace", deploymentName, namespace)
 
 	deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metaV1.GetOptions{})
@@ -136,7 +136,7 @@ func GetDeploymentDetail(client client.Interface, namespace string, deploymentNa
 		}
 	}
 
-	return &DeploymentDetail{
+	return &Detail{
 		Deployment:            toDeployment(deployment, rawRs.Items, rawPods.Items, rawEvents.Items),
 		Selector:              deployment.Spec.Selector.MatchLabels,
 		StatusInfo:            GetStatusInfo(&deployment.Status),

@@ -29,8 +29,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// CronJobList contains a list of CronJobs in the cluster.
-type CronJobList struct {
+// List contains a list of CronJobs in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 	Items    []CronJob      `json:"items"`
 
@@ -56,7 +56,7 @@ type CronJob struct {
 
 // GetCronJobList returns a list of all CronJobs in the cluster.
 func GetCronJobList(client client.Interface, nsQuery *common.NamespaceQuery,
-	dsQuery *dataselect.DataSelectQuery) (*CronJobList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	log.Print("Getting list of all cron jobs in the cluster")
 
 	channels := &common.ResourceChannels{
@@ -68,7 +68,7 @@ func GetCronJobList(client client.Interface, nsQuery *common.NamespaceQuery,
 
 // GetCronJobListFromChannels returns a list of all CronJobs in the cluster reading required resource
 // list once from the channels.
-func GetCronJobListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.DataSelectQuery) (*CronJobList, error) {
+func GetCronJobListFromChannels(channels *common.ResourceChannels, dsQuery *dataselect.Query) (*List, error) {
 	cronJobs := <-channels.CronJobList.List
 	err := <-channels.CronJobList.Error
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -81,8 +81,8 @@ func GetCronJobListFromChannels(channels *common.ResourceChannels, dsQuery *data
 	return cronJobList, nil
 }
 
-func toCronJobList(cronJobs []batch.CronJob, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *CronJobList {
-	list := &CronJobList{
+func toCronJobList(cronJobs []batch.CronJob, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	list := &List{
 		Items:    make([]CronJob, 0),
 		ListMeta: types.ListMeta{TotalItems: len(cronJobs)},
 		Errors:   nonCriticalErrors,

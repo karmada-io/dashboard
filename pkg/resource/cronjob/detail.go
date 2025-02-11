@@ -24,8 +24,8 @@ import (
 	k8sClient "k8s.io/client-go/kubernetes"
 )
 
-// CronJobDetail contains Cron Job details.
-type CronJobDetail struct {
+// Detail contains Cron Job details.
+type Detail struct {
 	// Extends list item structure.
 	CronJob `json:",inline"`
 
@@ -37,7 +37,7 @@ type CronJobDetail struct {
 }
 
 // GetCronJobDetail gets Cron Job details.
-func GetCronJobDetail(client k8sClient.Interface, namespace, name string) (*CronJobDetail, error) {
+func GetCronJobDetail(client k8sClient.Interface, namespace, name string) (*Detail, error) {
 	rawObject, err := client.BatchV1().CronJobs(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -47,8 +47,8 @@ func GetCronJobDetail(client k8sClient.Interface, namespace, name string) (*Cron
 	return &cj, nil
 }
 
-func toCronJobDetail(cj *batch.CronJob) CronJobDetail {
-	return CronJobDetail{
+func toCronJobDetail(cj *batch.CronJob) Detail {
+	return Detail{
 		CronJob:                 toCronJob(cj),
 		ConcurrencyPolicy:       string(cj.Spec.ConcurrencyPolicy),
 		StartingDeadLineSeconds: cj.Spec.StartingDeadlineSeconds,
