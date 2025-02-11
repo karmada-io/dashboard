@@ -19,7 +19,7 @@ package config
 // DockerRegistry represents a Docker registry configuration.
 type DockerRegistry struct {
 	Name     string `yaml:"name" json:"name"`
-	Url      string `yaml:"url" json:"url"`
+	URL      string `yaml:"url" json:"url"`
 	User     string `yaml:"user" json:"user"`
 	Password string `yaml:"password" json:"password"`
 	AddTime  int64  `yaml:"add_time" json:"add_time"`
@@ -28,7 +28,7 @@ type DockerRegistry struct {
 // ChartRegistry represents a Helm chart registry configuration.
 type ChartRegistry struct {
 	Name     string `yaml:"name" json:"name"`
-	Url      string `yaml:"url" json:"url"`
+	URL      string `yaml:"url" json:"url"`
 	User     string `yaml:"user" json:"user"`
 	Password string `yaml:"password" json:"password"`
 	AddTime  int64  `yaml:"add_time" json:"add_time"`

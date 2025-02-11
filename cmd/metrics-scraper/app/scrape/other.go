@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	_ "github.com/glebarez/sqlite"
+	_ "github.com/glebarez/sqlite" // Import the SQLite driver
 	"github.com/prometheus/common/expfmt"
 
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"

@@ -224,7 +224,7 @@ func GetClusterResourceStatus() (*v1.ClusterResourceStatus, error) {
 
 	// handle cluster resources
 	// handler namespace num
-	kubeClient := client.InClusterClientForKarmadaApiServer()
+	kubeClient := client.InClusterClientForKarmadaAPIServer()
 	nsRet, err := kubeClient.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, err

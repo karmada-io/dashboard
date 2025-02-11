@@ -45,7 +45,7 @@ func NewWebCommand(ctx context.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "karmada-dashboard-web",
 		Long: `The karmada-dashboard-web serve static files and api proxy for karmada-dashboard web ui. `,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			// validate options
 			//if errs := opts.Validate(); len(errs) != 0 {
 			//	return errs.ToAggregate()
@@ -99,10 +99,10 @@ func serve(opts *options.Options) {
 		r := router.Router()
 		g := r.Group(pathPrefix)
 		g.StaticFS("/static", http.Dir(opts.StaticDir))
-		if opts.EnableApiProxy {
+		if opts.EnableAPIProxy {
 			//	https://karmada-apiserver.karmada-system.svc.cluster.local:5443
 			g.Any("/api/*path", func(c *gin.Context) {
-				remote, _ := url.Parse(opts.ApiProxyEndpoint)
+				remote, _ := url.Parse(opts.APIProxyEndpoint)
 				proxy := httputil.NewSingleHostReverseProxy(remote)
 				proxy.Director = func(req *http.Request) {
 					req.Header = c.Request.Header
@@ -121,18 +121,18 @@ func serve(opts *options.Options) {
 			c.JSON(http.StatusOK, gin.H{})
 		})
 		r.NoRoute(func(c *gin.Context) {
-			indexHtml := "no content"
+			indexHTML := "no content"
 			indexPath := path.Join(opts.StaticDir, "index.html")
 			f, err := os.Open(indexPath)
 			if err == nil {
 				buff, readAllErr := io.ReadAll(f)
 				if readAllErr == nil {
-					indexHtml = string(buff)
-					indexHtml = strings.ReplaceAll(indexHtml, "{{PathPrefix}}", pathPrefix)
+					indexHTML = string(buff)
+					indexHTML = strings.ReplaceAll(indexHTML, "{{PathPrefix}}", pathPrefix)
 				}
 			}
 			c.Header("Content-Type", "text/html; charset=utf-8")
-			c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(indexHtml))
+			c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(indexHTML))
 		})
 		klog.Fatal(router.Router().Run(insecureAddress))
 	}()

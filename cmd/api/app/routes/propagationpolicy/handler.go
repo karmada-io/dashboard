@@ -38,7 +38,7 @@ func handleGetPropagationPolicyList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	namespace := common.ParseNamespacePathParameter(c)
-	k8sClient := client.InClusterClientForKarmadaApiServer()
+	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	propagationList, err := propagationpolicy.GetPropagationPolicyList(karmadaClient, k8sClient, namespace, dataSelect)
 	if err != nil {
 		klog.ErrorS(err, "Failed to GetPropagationPolicyList")

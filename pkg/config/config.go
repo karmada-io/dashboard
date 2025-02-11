@@ -79,7 +79,7 @@ func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}
 			dashboardConfig = tmpConfig
 		}
 	}
-	onUpdate := func(oldObj, newObj interface{}) {
+	onUpdate := func(_, newObj interface{}) {
 		newConfigMap := newObj.(*v1.ConfigMap)
 		klog.V(2).Infof("ConfigMap %s Updated", newConfigMap.Name)
 		var tmpConfig DashboardConfig
@@ -148,8 +148,7 @@ func InitDashboardConfigFromMountFile(mountPath string) error {
 	if err = yaml.Unmarshal(content, &tmpConfig); err != nil {
 		klog.Errorf("Failed to unmarshal from content %v", err)
 		return err
-	} else {
-		dashboardConfig = tmpConfig
-		return nil
 	}
+	dashboardConfig = tmpConfig
+	return nil
 }

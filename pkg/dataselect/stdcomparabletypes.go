@@ -29,65 +29,65 @@ import (
 type StdComparableInt int
 
 // Compare compares two ints.
-func (self StdComparableInt) Compare(otherV ComparableValue) int {
+func (i StdComparableInt) Compare(otherV ComparableValue) int {
 	other := otherV.(StdComparableInt)
-	return intsCompare(int(self), int(other))
+	return intsCompare(int(i), int(other))
 }
 
 // Contains checks if other is contained in self.
-func (self StdComparableInt) Contains(otherV ComparableValue) bool {
-	return self.Compare(otherV) == 0
+func (i StdComparableInt) Contains(otherV ComparableValue) bool {
+	return i.Compare(otherV) == 0
 }
 
 // StdComparableString is a wrapper for string that implements ComparableValueInterface
 type StdComparableString string
 
 // Compare compares two strings.
-func (self StdComparableString) Compare(otherV ComparableValue) int {
+func (s StdComparableString) Compare(otherV ComparableValue) int {
 	other := otherV.(StdComparableString)
-	return strings.Compare(string(self), string(other))
+	return strings.Compare(string(s), string(other))
 }
 
 // Contains checks if other is contained in self.
-func (self StdComparableString) Contains(otherV ComparableValue) bool {
+func (s StdComparableString) Contains(otherV ComparableValue) bool {
 	other := otherV.(StdComparableString)
-	return strings.Contains(string(self), string(other))
+	return strings.Contains(string(s), string(other))
 }
 
 // StdComparableRFC3339Timestamp takes RFC3339 Timestamp strings and compares them as TIMES. In case of time parsing error compares values as strings.
 type StdComparableRFC3339Timestamp string
 
 // Compare compares two RFC3339 Timestamp strings. In case of time parsing error compares values as strings.
-func (self StdComparableRFC3339Timestamp) Compare(otherV ComparableValue) int {
+func (t StdComparableRFC3339Timestamp) Compare(otherV ComparableValue) int {
 	other := otherV.(StdComparableRFC3339Timestamp)
 	// try to compare as timestamp (earlier = smaller)
-	selfTime, err1 := time.Parse(time.RFC3339, string(self))
+	selfTime, err1 := time.Parse(time.RFC3339, string(t))
 	otherTime, err2 := time.Parse(time.RFC3339, string(other))
 
 	if err1 != nil || err2 != nil {
 		// in case of timestamp parsing failure just compare as strings
-		return strings.Compare(string(self), string(other))
+		return strings.Compare(string(t), string(other))
 	}
 	return ints64Compare(selfTime.Unix(), otherTime.Unix())
 }
 
 // Contains checks if other is contained in self.
-func (self StdComparableRFC3339Timestamp) Contains(otherV ComparableValue) bool {
-	return self.Compare(otherV) == 0
+func (t StdComparableRFC3339Timestamp) Contains(otherV ComparableValue) bool {
+	return t.Compare(otherV) == 0
 }
 
 // StdComparableTime takes time.Time and compares them as TIMES.
 type StdComparableTime time.Time
 
 // Compare compares two time.Time.
-func (self StdComparableTime) Compare(otherV ComparableValue) int {
+func (t StdComparableTime) Compare(otherV ComparableValue) int {
 	other := otherV.(StdComparableTime)
-	return ints64Compare(time.Time(self).Unix(), time.Time(other).Unix())
+	return ints64Compare(time.Time(t).Unix(), time.Time(other).Unix())
 }
 
 // Contains checks if other is contained in self.
-func (self StdComparableTime) Contains(otherV ComparableValue) bool {
-	return self.Compare(otherV) == 0
+func (t StdComparableTime) Contains(otherV ComparableValue) bool {
+	return t.Compare(otherV) == 0
 }
 
 // Int comparison functions. Similar to strings.Compare.

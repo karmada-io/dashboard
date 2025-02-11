@@ -53,13 +53,13 @@ import (
 	"github.com/karmada-io/dashboard/pkg/environment"
 )
 
-// NewApiCommand creates a *cobra.Command object with default parameters
-func NewApiCommand(ctx context.Context) *cobra.Command {
+// NewAPICommand creates a *cobra.Command object with default parameters
+func NewAPICommand(ctx context.Context) *cobra.Command {
 	opts := options.NewOptions()
 	cmd := &cobra.Command{
 		Use:  "karmada-dashboard-api",
 		Long: `The karmada-dashboard-api provide api for karmada-dashboard web ui. It need to access host cluster apiserver and karmada apiserver internally, it will access host cluster apiserver for creating some resource like configmap in host cluster, meanwhile it will access karmada apiserver for interactiving for purpose of managing karmada-specific resources, like cluster、override policy、propagation policy and so on.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			// validate options
 			//if errs := opts.Validate(); len(errs) != 0 {
 			//	return errs.ToAggregate()

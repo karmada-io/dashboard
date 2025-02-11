@@ -49,8 +49,8 @@ func LoadRestConfig(kubeconfig string, context string) (*rest.Config, error) {
 	).ClientConfig()
 }
 
-// LoadApiConfig creates a clientcmdapi.Config using the passed kubeconfig. If currentContext is empty, current context in kubeconfig will be used.
-func LoadApiConfig(kubeconfig string, currentContext string) (*clientcmdapi.Config, error) {
+// LoadAPIConfig creates a clientcmdapi.Config using the passed kubeconfig. If currentContext is empty, current context in kubeconfig will be used.
+func LoadAPIConfig(kubeconfig string, currentContext string) (*clientcmdapi.Config, error) {
 	config, err := clientcmd.LoadFromFile(kubeconfig)
 	if err != nil {
 		return nil, err

@@ -68,14 +68,14 @@ func GetServicesForDSDeletion(client client.Interface, labelSelector labels.Sele
 type DaemonSetCell apps.DaemonSet
 
 // GetProperty returns a comparable value for a specified property name.
-func (self DaemonSetCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c DaemonSetCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
-		return dataselect.StdComparableString(self.ObjectMeta.Name)
+		return dataselect.StdComparableString(c.ObjectMeta.Name)
 	case dataselect.CreationTimestampProperty:
-		return dataselect.StdComparableTime(self.ObjectMeta.CreationTimestamp.Time)
+		return dataselect.StdComparableTime(c.ObjectMeta.CreationTimestamp.Time)
 	case dataselect.NamespaceProperty:
-		return dataselect.StdComparableString(self.ObjectMeta.Namespace)
+		return dataselect.StdComparableString(c.ObjectMeta.Namespace)
 	default:
 		// if name is not supported then just return a constant dummy value, sort will have no effect.
 		return nil
