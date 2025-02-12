@@ -136,8 +136,8 @@ const PropagationPolicyManage = () => {
       title: i18nInstance.t('8c0921045b741bc4e19d61426b99c938', '关联资源'),
       key: 'deployments',
       render: (_v: string, r: PropagationPolicy) => {
-        return r?.deployments?.map((d) => (
-          <Tag key={`${r.objectMeta.name}-${d}`}>{d}</Tag>
+        return r?.relatedResources?.map((resource) => (
+          <Tag key={`${r.objectMeta.name}-${resource}`}>{resource}</Tag>
         ));
       },
     },

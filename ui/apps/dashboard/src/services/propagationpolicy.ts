@@ -28,7 +28,7 @@ export interface PropagationPolicy {
   typeMeta: TypeMeta;
   schedulerName: string;
   clusterAffinity: ClusterAffinity;
-  deployments: string[];
+  relatedResources: string[];
 }
 
 export interface ClusterAffinity {
@@ -116,7 +116,7 @@ export interface ClusterPropagationPolicy {
   typeMeta: TypeMeta;
   schedulerName: string;
   clusterAffinity: ClusterAffinity;
-  deployments: string[];
+  relatedResources: string[];
 }
 export async function GetClusterPropagationPolicies(params: {
   keyword?: string;
