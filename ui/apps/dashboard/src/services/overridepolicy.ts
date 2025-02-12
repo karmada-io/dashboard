@@ -142,6 +142,7 @@ export async function GetOverridePolicies(params: {
   if (params.keyword) {
     requestData.filterBy = ['name', params.keyword];
   }
+  const url = namespace ? `/overridepolicy/${namespace}` : '/overridepolicy';
   const resp = await karmadaClient.get<
     IResponse<{
       errors: string[];
@@ -150,7 +151,7 @@ export async function GetOverridePolicies(params: {
       };
       overridepolicys: OverridePolicy[];
     }>
-  >(`/overridepolicy/${namespace}`, {
+  >(url, {
     params: convertDataSelectQuery(requestData),
   });
   return resp.data;

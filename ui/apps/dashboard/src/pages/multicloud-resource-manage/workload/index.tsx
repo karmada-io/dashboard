@@ -308,7 +308,9 @@ const WorkloadPage = () => {
         />
       </div>
       <Table
-        rowKey={(r: DeploymentWorkload) => r.objectMeta.name || ''}
+        rowKey={(r: DeploymentWorkload) =>
+          `${r.objectMeta.namespace}-${r.objectMeta.name}` || ''
+        }
         columns={columns}
         loading={isLoading}
         dataSource={
