@@ -17,7 +17,16 @@ limitations under the License.
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { useQuery } from '@tanstack/react-query';
-import { App, Button, Input, Space, Table, TableColumnProps, Tag } from 'antd';
+import {
+  App,
+  Button,
+  Input,
+  Popconfirm,
+  Space,
+  Table,
+  TableColumnProps,
+  Tag,
+} from 'antd';
 import { GetNamespaces } from '@/services/namespace.ts';
 import type { Namespace } from '@/services/namespace.ts';
 import { Icons } from '@/components/icons';
@@ -104,11 +113,12 @@ const NamespacePage = () => {
             <Button size={'small'} type="link" disabled={true}>
               {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
-            <Button
-              size={'small'}
-              type="link"
-              danger
-              onClick={async () => {
+            <Popconfirm
+              placement="topRight"
+              title={i18nInstance.t('b410105ce63c464d55d0b139912476e1', {
+                name: r.objectMeta.name,
+              })}
+              onConfirm={async () => {
                 const ret = await DeleteResource({
                   kind: 'namespace',
                   name: r.objectMeta.name,
@@ -130,9 +140,19 @@ const NamespacePage = () => {
                   );
                 }
               }}
+              okText={i18nInstance.t(
+                'e83a256e4f5bb4ff8b3d804b5473217a',
+                '确认',
+              )}
+              cancelText={i18nInstance.t(
+                '625fb26b4b3340f7872b411f401e754c',
+                '取消',
+              )}
             >
-              {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
-            </Button>
+              <Button size={'small'} type="link" danger>
+                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
+              </Button>
+            </Popconfirm>
           </Space.Compact>
         );
       },
