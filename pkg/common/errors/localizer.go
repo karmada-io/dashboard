@@ -25,7 +25,7 @@ const (
 	MsgLoginUnauthorizedError          = "MSG_LOGIN_UNAUTHORIZED_ERROR"
 	MsgForbiddenError                  = "MSG_FORBIDDEN_ERROR"
 	MsgDashboardExclusiveResourceError = "MSG_DASHBOARD_EXCLUSIVE_RESOURCE_ERROR"
-	MsgTokenExpiredError               = "MSG_TOKEN_EXPIRED_ERROR"
+	MsgTokenExpiredError               = "MSG_TOKEN_EXPIRED_ERROR" //nolint:gosec // mistake `Token` as hardcoded credential
 	MsgCSRFValidationError             = "MSG_CSRF_VALIDATION_ERROR"
 )
 

@@ -87,8 +87,27 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 	}
 
 	// Get oldest time and delete old data
+	if err = cleanupOldData(tx, timeLoadTableName, sanitizedPodName); err != nil {
+		return err
+	}
+
+	// Insert metrics and values
+	if err = insertMetricsData(tx, data, sanitizedPodName); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		log.Printf("Error committing transaction: %v", err)
+		return err
+	}
+
+	log.Println("Data inserted successfully")
+	return nil
+}
+
+func cleanupOldData(tx *sql.Tx, timeLoadTableName, sanitizedPodName string) error {
 	var oldestTime string
-	err = tx.QueryRow(fmt.Sprintf(getOldestTimeSQL, timeLoadTableName)).Scan(&oldestTime)
+	err := tx.QueryRow(fmt.Sprintf(getOldestTimeSQL, timeLoadTableName)).Scan(&oldestTime)
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("Error getting oldest time entry: %v", err)
 		return err
@@ -119,8 +138,10 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 		rowsAffected, _ = result.RowsAffected()
 		log.Printf("Deleted %d associated values from %s_values", rowsAffected, sanitizedPodName)
 	}
+	return nil
+}
 
-	// Insert metrics and values
+func insertMetricsData(tx *sql.Tx, data *db.ParsedData, sanitizedPodName string) error {
 	for metricName, metricData := range data.Metrics {
 		result, err := tx.Exec(fmt.Sprintf(insertMainSQL, sanitizedPodName), metricName, metricData.Help, metricData.Type, data.CurrentTime)
 		if err != nil {
@@ -155,13 +176,6 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 			}
 		}
 	}
-
-	if err = tx.Commit(); err != nil {
-		log.Printf("Error committing transaction: %v", err)
-		return err
-	}
-
-	log.Println("Data inserted successfully")
 	return nil
 }
 
