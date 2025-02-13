@@ -220,7 +220,9 @@ const Overview = () => {
           title={i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息')}
           bordered
           items={resourceItems}
-          labelStyle={{ width: '150px' }}
+          labelStyle={{
+            width: i18nInstance.language === 'en-US' ? '200px' : '150px',
+          }}
         />
       </Panel>
     </Spin>
