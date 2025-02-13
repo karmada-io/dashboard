@@ -171,6 +171,7 @@
   "d4e6e1153ed42d2b2482f22ee04ac05a": "Add",
   "f0ade52acfa0bc5bd63e7cb29db84959": "Do you want to delete {{name}} Workload?",
   "6163856192e115e6b914d6fb8c4fd82c": "Do you want to delete {{name}} Service?",
+  "b410105ce63c464d55d0b139912476e1": "Do you want to delete {{name}} Namespace?",
   "ad23e7bbdbe6ed03eebfc27eef7570fa": "View Service",
   "7afddf70e5c82fab8fa935458b53174a": "Add",
   "236513393327bd6b098056314f8676ac": "Edit Override Policy",
