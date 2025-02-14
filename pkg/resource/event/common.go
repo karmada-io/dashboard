@@ -117,7 +117,7 @@ func ToEvent(event v1.Event) common.Event {
 }
 
 // GetResourceEvents gets events associated to specified resource.
-func GetResourceEvents(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuery, namespace, name string) (
+func GetResourceEvents(client kubernetes.Interface, dsQuery *dataselect.Query, namespace, name string) (
 	*common.EventList, error) {
 	resourceEvents, err := GetEvents(client, namespace, name)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -131,13 +131,13 @@ func GetResourceEvents(client kubernetes.Interface, dsQuery *dataselect.DataSele
 }
 
 // GetNamespaceEvents gets events associated to a namespace with given name.
-func GetNamespaceEvents(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuery, namespace string) (common.EventList, error) {
+func GetNamespaceEvents(client kubernetes.Interface, dsQuery *dataselect.Query, namespace string) (common.EventList, error) {
 	events, _ := client.CoreV1().Events(namespace).List(context.TODO(), helpers.ListEverything)
 	return CreateEventList(FillEventsType(events.Items), dsQuery), nil
 }
 
 // CreateEventList converts array of api events to common EventList structure
-func CreateEventList(events []v1.Event, dsQuery *dataselect.DataSelectQuery) common.EventList {
+func CreateEventList(events []v1.Event, dsQuery *dataselect.Query) common.EventList {
 	eventList := common.EventList{
 		Events:   make([]common.Event, 0),
 		ListMeta: types.ListMeta{TotalItems: len(events)},
@@ -154,11 +154,11 @@ func CreateEventList(events []v1.Event, dsQuery *dataselect.DataSelectQuery) com
 
 // The code below allows to perform complex data section on []api.Event
 
-// EventCell wraps v1.Event for data selection.
-type EventCell v1.Event
+// Cell wraps v1.Event for data selection.
+type Cell v1.Event
 
 // GetProperty returns a property of the cell.
-func (c EventCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -181,7 +181,7 @@ func (c EventCell) GetProperty(name dataselect.PropertyName) dataselect.Comparab
 func toCells(std []v1.Event) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = EventCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -189,7 +189,7 @@ func toCells(std []v1.Event) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1.Event {
 	std := make([]v1.Event, len(cells))
 	for i := range std {
-		std[i] = v1.Event(cells[i].(EventCell))
+		std[i] = v1.Event(cells[i].(Cell))
 	}
 	return std
 }

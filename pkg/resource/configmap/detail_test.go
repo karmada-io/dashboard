@@ -29,13 +29,13 @@ import (
 func TestGetConfigMapDetail(t *testing.T) {
 	cases := []struct {
 		configMaps *v1.ConfigMap
-		expected   *ConfigMapDetail
+		expected   *Detail
 	}{
 		{
 			&v1.ConfigMap{
 				Data: map[string]string{"app": "my-name"}, ObjectMeta: metaV1.ObjectMeta{Name: "foo"},
 			},
-			&ConfigMapDetail{
+			&Detail{
 				ConfigMap: ConfigMap{
 					TypeMeta:   types.TypeMeta{Kind: "configmap"},
 					ObjectMeta: types.ObjectMeta{Name: "foo"},

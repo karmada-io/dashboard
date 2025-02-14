@@ -25,9 +25,9 @@ import (
 	client "k8s.io/client-go/kubernetes"
 )
 
-// IngressDetail API resource provides mechanisms to inject containers with configuration data while keeping
+// Detail API resource provides mechanisms to inject containers with configuration data while keeping
 // containers agnostic of Kubernetes
-type IngressDetail struct {
+type Detail struct {
 	// Extends list item structure.
 	Ingress `json:",inline"`
 
@@ -42,7 +42,7 @@ type IngressDetail struct {
 }
 
 // GetIngressDetail returns detailed information about an ingress
-func GetIngressDetail(client client.Interface, namespace, name string) (*IngressDetail, error) {
+func GetIngressDetail(client client.Interface, namespace, name string) (*Detail, error) {
 	log.Printf("Getting details of %s ingress in %s namespace", name, namespace)
 
 	rawIngress, err := client.NetworkingV1().Ingresses(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
@@ -54,8 +54,8 @@ func GetIngressDetail(client client.Interface, namespace, name string) (*Ingress
 	return getIngressDetail(rawIngress), nil
 }
 
-func getIngressDetail(i *v1.Ingress) *IngressDetail {
-	return &IngressDetail{
+func getIngressDetail(i *v1.Ingress) *Detail {
+	return &Detail{
 		Ingress: toIngress(i),
 		Spec:    i.Spec,
 		Status:  i.Status,

@@ -46,8 +46,8 @@ type Endpoint struct {
 }
 
 // GetServiceEndpoints gets list of endpoints targeted by given label selector in given namespace.
-func GetServiceEndpoints(client k8sClient.Interface, namespace, name string) (*EndpointList, error) {
-	endpointList := &EndpointList{
+func GetServiceEndpoints(client k8sClient.Interface, namespace, name string) (*List, error) {
+	endpointList := &List{
 		Endpoints: make([]Endpoint, 0),
 		ListMeta:  types.ListMeta{TotalItems: 0},
 	}

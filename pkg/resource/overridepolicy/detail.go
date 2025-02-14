@@ -26,9 +26,9 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
-// OverridePolicyDetail is a presentation layer view of Karmada OverridePolicy resource. This means it is OverridePolicy plus
+// Detail is a presentation layer view of Karmada OverridePolicy resource. This means it is OverridePolicy plus
 // additional augmented data we can get from other sources.
-type OverridePolicyDetail struct {
+type Detail struct {
 	// Extends list item structure.
 	OverridePolicy `json:",inline"`
 
@@ -37,7 +37,7 @@ type OverridePolicyDetail struct {
 }
 
 // GetOverridePolicyDetail gets Overridepolicy details.
-func GetOverridePolicyDetail(client karmadaclientset.Interface, namespace, name string) (*OverridePolicyDetail, error) {
+func GetOverridePolicyDetail(client karmadaclientset.Interface, namespace, name string) (*Detail, error) {
 	OverridepolicyData, err := client.PolicyV1alpha1().OverridePolicies(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -52,8 +52,8 @@ func GetOverridePolicyDetail(client karmadaclientset.Interface, namespace, name 
 	return &Overridepolicy, nil
 }
 
-func toOverridePolicyDetail(Overridepolicy *v1alpha1.OverridePolicy, nonCriticalErrors []error) OverridePolicyDetail {
-	return OverridePolicyDetail{
+func toOverridePolicyDetail(Overridepolicy *v1alpha1.OverridePolicy, nonCriticalErrors []error) Detail {
+	return Detail{
 		OverridePolicy: toOverridePolicy(Overridepolicy),
 		Errors:         nonCriticalErrors,
 	}

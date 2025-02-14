@@ -28,8 +28,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// ClusterOverridePolicyList contains a list of overriders in the karmada control-plane.
-type ClusterOverridePolicyList struct {
+// List contains a list of overriders in the karmada control-plane.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of clusterOverridePolicies.
@@ -49,7 +49,7 @@ type ClusterOverridePolicy struct {
 }
 
 // GetClusterOverridePolicyList returns a list of all overiders in the karmada control-plance.
-func GetClusterOverridePolicyList(client karmadaclientset.Interface, dsQuery *dataselect.DataSelectQuery) (*ClusterOverridePolicyList, error) {
+func GetClusterOverridePolicyList(client karmadaclientset.Interface, dsQuery *dataselect.Query) (*List, error) {
 	clusterOverridePolicies, err := client.PolicyV1alpha1().ClusterOverridePolicies().List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
 	if criticalError != nil {
@@ -59,8 +59,8 @@ func GetClusterOverridePolicyList(client karmadaclientset.Interface, dsQuery *da
 	return toClusterOverridePolicyList(clusterOverridePolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toClusterOverridePolicyList(clusterOverridePolicies []v1alpha1.ClusterOverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterOverridePolicyList {
-	overridepolicyList := &ClusterOverridePolicyList{
+func toClusterOverridePolicyList(clusterOverridePolicies []v1alpha1.ClusterOverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	overridepolicyList := &List{
 		ClusterOverridePolicies: make([]ClusterOverridePolicy, 0),
 		ListMeta:                types.ListMeta{TotalItems: len(clusterOverridePolicies)},
 	}

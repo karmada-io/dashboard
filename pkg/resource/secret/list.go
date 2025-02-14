@@ -31,15 +31,15 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// SecretSpec is a common interface for the specification of different secrets.
-type SecretSpec interface {
+// Spec is a common interface for the specification of different secrets.
+type Spec interface {
 	GetName() string
 	GetType() v1.SecretType
 	GetNamespace() string
 	GetData() map[string][]byte
 }
 
-// ImagePullSecretSpec is a specification of an image pull secret implements SecretSpec
+// ImagePullSecretSpec is a specification of an image pull secret implements Spec
 type ImagePullSecretSpec struct {
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
@@ -75,8 +75,8 @@ type Secret struct {
 	Type       v1.SecretType    `json:"type"`
 }
 
-// SecretList is a response structure for a queried secrets list.
-type SecretList struct {
+// List is a response structure for a queried secrets list.
+type List struct {
 	types.ListMeta `json:"listMeta"`
 
 	// Unordered list of Secrets.
@@ -88,7 +88,7 @@ type SecretList struct {
 
 // GetSecretList returns all secrets in the given namespace.
 func GetSecretList(client kubernetes.Interface, namespace *common.NamespaceQuery,
-	dsQuery *dataselect.DataSelectQuery) (*SecretList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	log.Printf("Getting list of secrets in %s namespace\n", namespace)
 	secretList, err := client.CoreV1().Secrets(namespace.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
 
@@ -101,7 +101,7 @@ func GetSecretList(client kubernetes.Interface, namespace *common.NamespaceQuery
 }
 
 // CreateSecret creates a single secret using the cluster API client
-func CreateSecret(client kubernetes.Interface, spec SecretSpec) (*Secret, error) {
+func CreateSecret(client kubernetes.Interface, spec Spec) (*Secret, error) {
 	namespace := spec.GetNamespace()
 	secret := &v1.Secret{
 		ObjectMeta: metaV1.ObjectMeta{
@@ -124,9 +124,9 @@ func toSecret(secret *v1.Secret) Secret {
 	}
 }
 
-// ToSecretList converts a list of Secrets to SecretList
-func ToSecretList(secrets []v1.Secret, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *SecretList {
-	newSecretList := &SecretList{
+// ToSecretList converts a list of Secrets to List
+func ToSecretList(secrets []v1.Secret, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	newSecretList := &List{
 		ListMeta: types.ListMeta{TotalItems: len(secrets)},
 		Secrets:  make([]Secret, 0),
 		Errors:   nonCriticalErrors,

@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// PropagationPolicyCell is a wrapper around PropagationPolicy type
-type PropagationPolicyCell v1alpha1.PropagationPolicy
+// Cell is a wrapper around PropagationPolicy type
+type Cell v1alpha1.PropagationPolicy
 
 // GetProperty returns the given property of the PropagationPolicy.
-func (c PropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 
@@ -45,7 +45,7 @@ func (c PropagationPolicyCell) GetProperty(name dataselect.PropertyName) datasel
 func toCells(std []v1alpha1.PropagationPolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = PropagationPolicyCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -53,7 +53,7 @@ func toCells(std []v1alpha1.PropagationPolicy) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1alpha1.PropagationPolicy {
 	std := make([]v1alpha1.PropagationPolicy, len(cells))
 	for i := range std {
-		std[i] = v1alpha1.PropagationPolicy(cells[i].(PropagationPolicyCell))
+		std[i] = v1alpha1.PropagationPolicy(cells[i].(Cell))
 	}
 	return std
 }

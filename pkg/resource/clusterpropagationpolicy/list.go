@@ -28,8 +28,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// ClusterPropagationPolicyList contains a list of propagation in the karmada control-plane.
-type ClusterPropagationPolicyList struct {
+// List contains a list of propagation in the karmada control-plane.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of PropagationPolicies.
@@ -49,7 +49,7 @@ type ClusterPropagationPolicy struct {
 }
 
 // GetClusterPropagationPolicyList returns a list of all propagations in the karmada control-plance.
-func GetClusterPropagationPolicyList(client karmadaclientset.Interface, dsQuery *dataselect.DataSelectQuery) (*ClusterPropagationPolicyList, error) {
+func GetClusterPropagationPolicyList(client karmadaclientset.Interface, dsQuery *dataselect.Query) (*List, error) {
 	clusterPropagationPolicies, err := client.PolicyV1alpha1().ClusterPropagationPolicies().List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
 	if criticalError != nil {
@@ -59,8 +59,8 @@ func GetClusterPropagationPolicyList(client karmadaclientset.Interface, dsQuery 
 	return toClusterPropagationPolicyList(clusterPropagationPolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toClusterPropagationPolicyList(clusterPropagationPolicies []v1alpha1.ClusterPropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterPropagationPolicyList {
-	propagationpolicyList := &ClusterPropagationPolicyList{
+func toClusterPropagationPolicyList(clusterPropagationPolicies []v1alpha1.ClusterPropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	propagationpolicyList := &List{
 		ClusterPropagationPolicies: make([]ClusterPropagationPolicy, 0),
 		ListMeta:                   types.ListMeta{TotalItems: len(clusterPropagationPolicies)},
 	}

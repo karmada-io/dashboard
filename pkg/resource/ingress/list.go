@@ -39,8 +39,8 @@ type Ingress struct {
 	Hosts     []string          `json:"hosts"`
 }
 
-// IngressList - response structure for a queried ingress list.
-type IngressList struct {
+// List - response structure for a queried ingress list.
+type List struct {
 	types.ListMeta `json:"listMeta"`
 
 	// Unordered list of Ingresss.
@@ -52,7 +52,7 @@ type IngressList struct {
 
 // GetIngressList returns all ingresses in the given namespace.
 func GetIngressList(client client.Interface, namespace *common.NamespaceQuery,
-	dsQuery *dataselect.DataSelectQuery) (*IngressList, error) {
+	dsQuery *dataselect.Query) (*List, error) {
 	ingressList, err := client.NetworkingV1().Ingresses(namespace.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
 
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -103,9 +103,9 @@ func toIngress(ingress *v1.Ingress) Ingress {
 	}
 }
 
-// ToIngressList converts a list of Ingresss to IngressList
-func ToIngressList(ingresses []v1.Ingress, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *IngressList {
-	newIngressList := &IngressList{
+// ToIngressList converts a list of Ingresss to List
+func ToIngressList(ingresses []v1.Ingress, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	newIngressList := &List{
 		ListMeta: types.ListMeta{TotalItems: len(ingresses)},
 		Items:    make([]Ingress, 0),
 		Errors:   nonCriticalErrors,

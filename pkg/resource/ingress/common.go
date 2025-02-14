@@ -24,11 +24,11 @@ import (
 
 // The code below allows to perform complex data section on []extensions.Ingress
 
-// IngressCell wraps v1.Ingress for data selection.
-type IngressCell v1.Ingress
+// Cell wraps v1.Ingress for data selection.
+type Cell v1.Ingress
 
 // GetProperty returns a property.
-func (c IngressCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -45,7 +45,7 @@ func (c IngressCell) GetProperty(name dataselect.PropertyName) dataselect.Compar
 func toCells(std []v1.Ingress) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = IngressCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -53,7 +53,7 @@ func toCells(std []v1.Ingress) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1.Ingress {
 	std := make([]v1.Ingress, len(cells))
 	for i := range std {
-		std[i] = v1.Ingress(cells[i].(IngressCell))
+		std[i] = v1.Ingress(cells[i].(Cell))
 	}
 	return std
 }

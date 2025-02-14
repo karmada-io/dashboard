@@ -28,7 +28,7 @@ import (
 )
 
 // GetServiceEvents returns model events for a service with the given name in the given namespace.
-func GetServiceEvents(client client.Interface, dsQuery *dataselect.DataSelectQuery, namespace, name string) (
+func GetServiceEvents(client client.Interface, dsQuery *dataselect.Query, namespace, name string) (
 	*common.EventList, error) {
 	eventList := common.EventList{
 		Events:   make([]common.Event, 0),

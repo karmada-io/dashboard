@@ -31,8 +31,8 @@ const (
 	skipAutoPropagationLable = "namespace.karmada.io/skip-auto-propagation"
 )
 
-// NamespaceSpec is a specification of namespace to create.
-type NamespaceSpec struct {
+// Spec is a specification of namespace to create.
+type Spec struct {
 	// Name of the namespace.
 	Name string `json:"name"`
 	// Whether skip auto propagation
@@ -40,7 +40,7 @@ type NamespaceSpec struct {
 }
 
 // CreateNamespace creates namespace based on given specification.
-func CreateNamespace(spec *NamespaceSpec, client kubernetes.Interface) error {
+func CreateNamespace(spec *Spec, client kubernetes.Interface) error {
 	// todo add namespace.karmada.io/skip-auto-propagation: "true"  to avoid auto-propagation
 	// https://karmada.io/docs/userguide/bestpractices/namespace-management/#labeling-the-namespace
 	log.Printf("Creating namespace %s", spec.Name)
@@ -60,11 +60,11 @@ func CreateNamespace(spec *NamespaceSpec, client kubernetes.Interface) error {
 
 // The code below allows to perform complex data section on []api.Namespace
 
-// NamespaceCell is a cell representation of Namespace object.
-type NamespaceCell api.Namespace
+// Cell is a cell representation of Namespace object.
+type Cell api.Namespace
 
-// GetProperty returns specific property of NamespaceCell.
-func (c NamespaceCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+// GetProperty returns specific property of Cell.
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -81,7 +81,7 @@ func (c NamespaceCell) GetProperty(name dataselect.PropertyName) dataselect.Comp
 func toCells(std []api.Namespace) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = NamespaceCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -89,7 +89,7 @@ func toCells(std []api.Namespace) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []api.Namespace {
 	std := make([]api.Namespace, len(cells))
 	for i := range std {
-		std[i] = api.Namespace(cells[i].(NamespaceCell))
+		std[i] = api.Namespace(cells[i].(Cell))
 	}
 	return std
 }

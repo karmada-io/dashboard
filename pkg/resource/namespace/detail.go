@@ -25,9 +25,9 @@ import (
 	k8sClient "k8s.io/client-go/kubernetes"
 )
 
-// NamespaceDetail is a presentation layer view of Kubernetes Namespace resource. This means it is Namespace plus
+// Detail is a presentation layer view of Kubernetes Namespace resource. This means it is Namespace plus
 // additional augmented data we can get from other sources.
-type NamespaceDetail struct {
+type Detail struct {
 	// Extends list item structure.
 	Namespace `json:",inline"`
 
@@ -36,7 +36,7 @@ type NamespaceDetail struct {
 }
 
 // GetNamespaceDetail gets namespace details.
-func GetNamespaceDetail(client k8sClient.Interface, name string) (*NamespaceDetail, error) {
+func GetNamespaceDetail(client k8sClient.Interface, name string) (*Detail, error) {
 	log.Printf("Getting details of %s namespace\n", name)
 
 	namespace, err := client.CoreV1().Namespaces().Get(context.TODO(), name, metaV1.GetOptions{})
@@ -48,8 +48,8 @@ func GetNamespaceDetail(client k8sClient.Interface, name string) (*NamespaceDeta
 	return &namespaceDetails, nil
 }
 
-func toNamespaceDetail(namespace v1.Namespace) NamespaceDetail {
-	return NamespaceDetail{
+func toNamespaceDetail(namespace v1.Namespace) Detail {
+	return Detail{
 		Namespace: toNamespace(namespace),
 	}
 }

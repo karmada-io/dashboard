@@ -25,9 +25,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-// ConfigMapDetail API resource provides mechanisms to inject containers with configuration data while keeping
+// Detail API resource provides mechanisms to inject containers with configuration data while keeping
 // containers agnostic of Kubernetes
-type ConfigMapDetail struct {
+type Detail struct {
 	// Extends list item structure.
 	ConfigMap `json:",inline"`
 
@@ -37,7 +37,7 @@ type ConfigMapDetail struct {
 }
 
 // GetConfigMapDetail returns detailed information about a config map
-func GetConfigMapDetail(client kubernetes.Interface, namespace, name string) (*ConfigMapDetail, error) {
+func GetConfigMapDetail(client kubernetes.Interface, namespace, name string) (*Detail, error) {
 	log.Printf("Getting details of %s config map in %s namespace", name, namespace)
 
 	rawConfigMap, err := client.CoreV1().ConfigMaps(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
@@ -49,8 +49,8 @@ func GetConfigMapDetail(client kubernetes.Interface, namespace, name string) (*C
 	return getConfigMapDetail(rawConfigMap), nil
 }
 
-func getConfigMapDetail(rawConfigMap *v1.ConfigMap) *ConfigMapDetail {
-	return &ConfigMapDetail{
+func getConfigMapDetail(rawConfigMap *v1.ConfigMap) *Detail {
+	return &Detail{
 		ConfigMap: toConfigMap(rawConfigMap.ObjectMeta),
 		Data:      rawConfigMap.Data,
 	}

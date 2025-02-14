@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// NodeCell wraps api.Node for data selection.
-type NodeCell api.Node
+// Cell wraps api.Node for data selection.
+type Cell api.Node
 
 // GetProperty returns a property of the cell.
-func (c NodeCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -43,7 +43,7 @@ func (c NodeCell) GetProperty(name dataselect.PropertyName) dataselect.Comparabl
 func toCells(std []api.Node) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = NodeCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -51,7 +51,7 @@ func toCells(std []api.Node) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []api.Node {
 	std := make([]api.Node, len(cells))
 	for i := range std {
-		std[i] = api.Node(cells[i].(NodeCell))
+		std[i] = api.Node(cells[i].(Cell))
 	}
 	return std
 }

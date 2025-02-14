@@ -64,11 +64,11 @@ func GetServicesForDSDeletion(client client.Interface, labelSelector labels.Sele
 
 // The code below allows to perform complex data section on Daemon Set
 
-// DaemonSetCell is a type alias for the DaemonSet type from the apps/v1 API.
-type DaemonSetCell apps.DaemonSet
+// Cell is a type alias for the DaemonSet type from the apps/v1 API.
+type Cell apps.DaemonSet
 
 // GetProperty returns a comparable value for a specified property name.
-func (c DaemonSetCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -86,7 +86,7 @@ func (c DaemonSetCell) GetProperty(name dataselect.PropertyName) dataselect.Comp
 func ToCells(std []apps.DaemonSet) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = DaemonSetCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -95,7 +95,7 @@ func ToCells(std []apps.DaemonSet) []dataselect.DataCell {
 func FromCells(cells []dataselect.DataCell) []apps.DaemonSet {
 	std := make([]apps.DaemonSet, len(cells))
 	for i := range std {
-		std[i] = apps.DaemonSet(cells[i].(DaemonSetCell))
+		std[i] = apps.DaemonSet(cells[i].(Cell))
 	}
 	return std
 }

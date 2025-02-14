@@ -29,8 +29,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// NamespaceList contains a list of namespaces in the cluster.
-type NamespaceList struct {
+// List contains a list of namespaces in the cluster.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of Namespaces.
@@ -52,7 +52,7 @@ type Namespace struct {
 }
 
 // GetNamespaceList returns a list of all namespaces in the cluster.
-func GetNamespaceList(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuery) (*NamespaceList, error) {
+func GetNamespaceList(client kubernetes.Interface, dsQuery *dataselect.Query) (*List, error) {
 	log.Println("Getting list of namespaces")
 	namespaces, err := client.CoreV1().Namespaces().List(context.TODO(), helpers.ListEverything)
 
@@ -64,8 +64,8 @@ func GetNamespaceList(client kubernetes.Interface, dsQuery *dataselect.DataSelec
 	return toNamespaceList(namespaces.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toNamespaceList(namespaces []v1.Namespace, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *NamespaceList {
-	namespaceList := &NamespaceList{
+func toNamespaceList(namespaces []v1.Namespace, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	namespaceList := &List{
 		Namespaces: make([]Namespace, 0),
 		ListMeta:   types.ListMeta{TotalItems: len(namespaces)},
 	}

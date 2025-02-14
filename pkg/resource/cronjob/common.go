@@ -25,11 +25,11 @@ import (
 
 // The code below allows to perform complex data section on []batch.CronJob
 
-// CronJobCell is a type containing CronJob data
-type CronJobCell batch.CronJob
+// Cell is a type containing CronJob data
+type Cell batch.CronJob
 
-// GetProperty returns specific property of CronJobCell
-func (c CronJobCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+// GetProperty returns specific property of Cell
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -43,20 +43,20 @@ func (c CronJobCell) GetProperty(name dataselect.PropertyName) dataselect.Compar
 	}
 }
 
-// ToCells converts []batch.CronJob to []CronJobCell
+// ToCells converts []batch.CronJob to []Cell
 func ToCells(std []batch.CronJob) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = CronJobCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
 
-// FromCells converts []CronJobCell to []batch.CronJob
+// FromCells converts []Cell to []batch.CronJob
 func FromCells(cells []dataselect.DataCell) []batch.CronJob {
 	std := make([]batch.CronJob, len(cells))
 	for i := range std {
-		std[i] = batch.CronJob(cells[i].(CronJobCell))
+		std[i] = batch.CronJob(cells[i].(Cell))
 	}
 	return std
 }

@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// PodCell wraps api.Pod for data selection.
-type PodCell api.Pod
+// Cell wraps api.Pod for data selection.
+type Cell api.Pod
 
 // GetProperty returns a property.
-func (c PodCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -43,7 +43,7 @@ func (c PodCell) GetProperty(name dataselect.PropertyName) dataselect.Comparable
 func toCells(std []api.Pod) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = PodCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -51,7 +51,7 @@ func toCells(std []api.Pod) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []api.Pod {
 	std := make([]api.Pod, len(cells))
 	for i := range std {
-		std[i] = api.Pod(cells[i].(PodCell))
+		std[i] = api.Pod(cells[i].(Cell))
 	}
 	return std
 }

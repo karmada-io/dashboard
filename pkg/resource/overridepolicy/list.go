@@ -31,8 +31,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// OverridePolicyList contains a list of propagation in the karmada control-plance.
-type OverridePolicyList struct {
+// List contains a list of propagation in the karmada control-plance.
+type List struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
 	// Unordered list of OverridePolicys.
@@ -52,7 +52,7 @@ type OverridePolicy struct {
 }
 
 // GetOverridePolicyList returns a list of all override policies in the Karmada control-plane.
-func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*OverridePolicyList, error) {
+func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.Query) (*List, error) {
 	log.Println("Getting list of overridepolicy")
 	overridePolicies, err := client.PolicyV1alpha1().OverridePolicies(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -63,8 +63,8 @@ func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernet
 	return toOverridePolicyList(k8sClient, overridePolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toOverridePolicyList(_ kubernetes.Interface, overridepolicies []v1alpha1.OverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *OverridePolicyList {
-	overridepolicyList := &OverridePolicyList{
+func toOverridePolicyList(_ kubernetes.Interface, overridepolicies []v1alpha1.OverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.Query) *List {
+	overridepolicyList := &List{
 		OverridePolicys: make([]OverridePolicy, 0),
 		ListMeta:        types.ListMeta{TotalItems: len(overridepolicies)},
 	}

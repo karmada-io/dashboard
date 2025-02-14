@@ -26,8 +26,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
-// ClusterOverridePolicyDetail contains clusterPropagationPolicy details and non-critical errors.
-type ClusterOverridePolicyDetail struct {
+// Detail contains clusterPropagationPolicy details and non-critical errors.
+type Detail struct {
 	// Extends list item structure.
 	ClusterOverridePolicy `json:",inline"`
 
@@ -36,7 +36,7 @@ type ClusterOverridePolicyDetail struct {
 }
 
 // GetClusterOverridePolicyDetail gets clusterPropagationPolicy details.
-func GetClusterOverridePolicyDetail(client karmadaclientset.Interface, name string) (*ClusterOverridePolicyDetail, error) {
+func GetClusterOverridePolicyDetail(client karmadaclientset.Interface, name string) (*Detail, error) {
 	overridepolicyData, err := client.PolicyV1alpha1().ClusterOverridePolicies().Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -51,8 +51,8 @@ func GetClusterOverridePolicyDetail(client karmadaclientset.Interface, name stri
 	return &propagationpolicy, nil
 }
 
-func toOverridePolicyDetail(clusterOverridepolicy *v1alpha1.ClusterOverridePolicy, nonCriticalErrors []error) ClusterOverridePolicyDetail {
-	return ClusterOverridePolicyDetail{
+func toOverridePolicyDetail(clusterOverridepolicy *v1alpha1.ClusterOverridePolicy, nonCriticalErrors []error) Detail {
+	return Detail{
 		ClusterOverridePolicy: toClusterOverridePolicy(clusterOverridepolicy),
 		Errors:                nonCriticalErrors,
 	}

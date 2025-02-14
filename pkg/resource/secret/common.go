@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// SecretCell wraps api.Secret for data selection.
-type SecretCell api.Secret
+// Cell wraps api.Secret for data selection.
+type Cell api.Secret
 
 // GetProperty returns a property of the secret cell.
-func (c SecretCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -43,7 +43,7 @@ func (c SecretCell) GetProperty(name dataselect.PropertyName) dataselect.Compara
 func toCells(std []api.Secret) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = SecretCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -51,7 +51,7 @@ func toCells(std []api.Secret) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []api.Secret {
 	std := make([]api.Secret, len(cells))
 	for i := range std {
-		std[i] = api.Secret(cells[i].(SecretCell))
+		std[i] = api.Secret(cells[i].(Cell))
 	}
 	return std
 }

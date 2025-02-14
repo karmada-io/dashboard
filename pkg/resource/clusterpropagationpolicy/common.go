@@ -22,11 +22,11 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// ClusterPropagationPolicyCell wraps v1alpha1.ClusterPropagationPolicy for data selection.
-type ClusterPropagationPolicyCell v1alpha1.ClusterPropagationPolicy
+// Cell wraps v1alpha1.ClusterPropagationPolicy for data selection.
+type Cell v1alpha1.ClusterPropagationPolicy
 
 // GetProperty returns a property of the cluster propagation policy cell.
-func (c ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
+func (c Cell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(c.ObjectMeta.Name)
@@ -41,7 +41,7 @@ func (c ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) 
 func toCells(std []v1alpha1.ClusterPropagationPolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
-		cells[i] = ClusterPropagationPolicyCell(std[i])
+		cells[i] = Cell(std[i])
 	}
 	return cells
 }
@@ -49,7 +49,7 @@ func toCells(std []v1alpha1.ClusterPropagationPolicy) []dataselect.DataCell {
 func fromCells(cells []dataselect.DataCell) []v1alpha1.ClusterPropagationPolicy {
 	std := make([]v1alpha1.ClusterPropagationPolicy, len(cells))
 	for i := range std {
-		std[i] = v1alpha1.ClusterPropagationPolicy(cells[i].(ClusterPropagationPolicyCell))
+		std[i] = v1alpha1.ClusterPropagationPolicy(cells[i].(Cell))
 	}
 	return std
 }

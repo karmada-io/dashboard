@@ -50,8 +50,8 @@ func parseSortPathParameter(request *gin.Context) *dataselect.SortQuery {
 	return dataselect.NewSortQuery(strings.Split(request.Query("sortBy"), ","))
 }
 
-// ParseDataSelectPathParameter parses query parameters of the request and returns a DataSelectQuery object
-func ParseDataSelectPathParameter(request *gin.Context) *dataselect.DataSelectQuery {
+// ParseDataSelectPathParameter parses query parameters of the request and returns a Query object
+func ParseDataSelectPathParameter(request *gin.Context) *dataselect.Query {
 	paginationQuery := parsePaginationPathParameter(request)
 	sortQuery := parseSortPathParameter(request)
 	filterQuery := parseFilterPathParameter(request)
