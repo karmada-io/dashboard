@@ -20,14 +20,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
-	"github.com/samber/lo"
-	appsv1 "k8s.io/api/apps/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 	"github.com/karmada-io/dashboard/pkg/common/helpers"
 	"github.com/karmada-io/dashboard/pkg/common/types"
@@ -51,9 +50,9 @@ type PropagationPolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
 	// propagation specificed data
-	SchedulerName   string                    `json:"schedulerName"`
-	ClusterAffinity *v1alpha1.ClusterAffinity `json:"clusterAffinity"`
-	Deployments     []string                  `json:"deployments"`
+	SchedulerName    string                    `json:"schedulerName"`
+	ClusterAffinity  *v1alpha1.ClusterAffinity `json:"clusterAffinity"`
+	RelatedResources []string                  `json:"relatedResources"`
 }
 
 // GetPropagationPolicyList returns a list of all propagations in the karmada control-plance.
@@ -68,7 +67,7 @@ func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kuber
 	return toPropagationPolicyList(k8sClient, propagationpolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
-func toPropagationPolicyList(k8sClient kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *PropagationPolicyList {
+func toPropagationPolicyList(_ kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *PropagationPolicyList {
 	propagationpolicyList := &PropagationPolicyList{
 		PropagationPolicys: make([]PropagationPolicy, 0),
 		ListMeta:           types.ListMeta{TotalItems: len(propagationpolicies)},
@@ -78,18 +77,25 @@ func toPropagationPolicyList(k8sClient kubernetes.Interface, propagationpolicies
 	propagationpolicyList.ListMeta = types.ListMeta{TotalItems: filteredTotal}
 	propagationpolicyList.Errors = nonCriticalErrors
 
+	verberClient, err := client.VerberClient(nil)
+	if err != nil {
+		panic(err)
+	}
 	for _, propagationpolicy := range propagationpolicies {
-		// propagationpolicy.karmada.io/name=nginx-propagation,propagationpolicy.karmada.io/namespace=default
-		deployments, err := k8sClient.AppsV1().Deployments("").List(context.TODO(), metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("propagationpolicy.karmada.io/name=%s,propagationpolicy.karmada.io/namespace=%s",
-				propagationpolicy.Name, propagationpolicy.Namespace),
-		})
-		pp := toPropagationPolicy(&propagationpolicy)
-		if err == nil {
-			pp.Deployments = lo.Map(deployments.Items, func(item appsv1.Deployment, _ int) string {
-				return fmt.Sprintf("%s/%s", item.Namespace, item.Name)
-			})
+		relatedResources := make([]string, 0)
+		for _, rs := range propagationpolicy.Spec.ResourceSelectors {
+			getRes, getErr := verberClient.Get(strings.ToLower(rs.Kind), rs.Namespace, rs.Name)
+			if getErr != nil {
+				continue
+			}
+			if errors.IsNotFound(err) || getRes == nil {
+				continue
+			}
+			relatedResources = append(relatedResources, fmt.Sprintf("%s/%s", rs.Namespace, rs.Name))
 		}
+
+		pp := toPropagationPolicy(&propagationpolicy)
+		pp.RelatedResources = relatedResources
 		propagationpolicyList.PropagationPolicys = append(propagationpolicyList.PropagationPolicys, pp)
 	}
 	return propagationpolicyList
