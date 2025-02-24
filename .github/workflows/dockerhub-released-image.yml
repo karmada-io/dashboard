@@ -1,0 +1,123 @@
+name: Push released image to DockerHub
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-fronted:
+    name: build frontend bundle
+    if: ${{ github.repository == 'karmada-io/dashboard' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: install node dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.6
+      - name: build dashboard
+        run: |
+          echo "Start build"
+          pnpm --version
+          cd ui
+          pnpm install -w
+          pnpm run dashboard:build
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: ui/apps/dashboard/dist
+          name: dashboard_artifact
+
+  build-and-push-web:
+    name: build and push web image
+    if: ${{ github.repository == 'karmada-io/dashboard' }}
+    runs-on: ubuntu-22.04
+    needs: [ "build-fronted" ]
+    env:
+      IMAGE_NAME: karmada/karmada-dashboard-web
+      BINARY_NAME: karmada-dashboard-web
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: detect misc info
+        id: misc
+        run: |
+          echo "os=$(go env GOHOSTOS)" >> $GITHUB_OUTPUT
+          echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+      - name: login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER_NAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build karmada-dashboard-web binary
+        run: make karmada-dashboard-web
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dashboard_artifact
+          path: _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+      - name: display artifact
+        run: |
+          ls -al _output/bin
+          ls -al _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+      - name: build and push image
+        uses: docker/build-push-action@v6
+        with:
+          file: "cluster/images/build-web.Dockerfile"
+          context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
+          push: true
+          tags: ${{ steps.misc.outputs.image_name }}:${{ github.ref_name }}
+          build-args: |
+            BINARY=${{ steps.misc.outputs.binary_name }}
+            BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}
+
+  build-and-push-api:
+    name: build and push api image
+    if: ${{ github.repository == 'karmada-io/dashboard' }}
+    runs-on: ubuntu-22.04
+    env:
+      IMAGE_NAME: karmada/karmada-dashboard-api
+      BINARY_NAME: karmada-dashboard-api
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: detect misc info
+        id: misc
+        run: |
+          echo "os=$(go env GOHOSTOS)" >> $GITHUB_OUTPUT
+          echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+      - name: login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER_NAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build karmada-dashboard-api binary
+        run: make karmada-dashboard-api
+      - name: build and push image
+        uses: docker/build-push-action@v6
+        with:
+          file: "cluster/images/Dockerfile"
+          context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
+          push: true
+          tags: ${{ steps.misc.outputs.image_name }}:${{ github.ref_name }}
+          build-args: |
+            BINARY=${{ steps.misc.outputs.binary_name }}
+            BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}
