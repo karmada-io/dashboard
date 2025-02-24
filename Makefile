@@ -141,6 +141,17 @@ endif
 	@echo
 
 ###################
+# Helm chart      #
+###################
+.PHONY: package-chart
+package-chart:
+	hack/package-helm-chart.sh $(VERSION)
+
+.PHONY: push-chart
+push-chart:
+	helm push _output/charts/karmada-dashboard-chart-${VERSION}.tgz oci://docker.io/karmada
+
+###################
 # Help            #
 ###################
 
