@@ -105,7 +105,7 @@ func handlePostCluster(c *gin.Context) {
 			common.Success(c, "ok")
 		}
 	} else if clusterRequest.SyncMode == v1alpha1.Push {
-		memberClusterRestConfig, err := client.LoadeRestConfigFromKubeConfig(clusterRequest.MemberClusterKubeConfig)
+		memberClusterRestConfig, err := client.LoadRestConfigFromKubeConfig(clusterRequest.MemberClusterKubeConfig)
 		if err != nil {
 			klog.ErrorS(err, "Generate rest config from memberClusterKubeconfig failed")
 			common.Fail(c, err)
@@ -226,7 +226,7 @@ func handleDeleteCluster(c *gin.Context) {
 }
 
 func parseEndpointFromKubeconfig(kubeconfigContents string) (string, error) {
-	restConfig, err := client.LoadeRestConfigFromKubeConfig(kubeconfigContents)
+	restConfig, err := client.LoadRestConfigFromKubeConfig(kubeconfigContents)
 	if err != nil {
 		return "", err
 	}

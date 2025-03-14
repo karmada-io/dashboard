@@ -85,8 +85,8 @@ func LoadAPIConfig(kubeconfig string, currentContext string) (*clientcmdapi.Conf
 	return apiConfig, nil
 }
 
-// LoadeRestConfigFromKubeConfig creates a rest.Config from a kubeconfig string.
-func LoadeRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
+// LoadRestConfigFromKubeConfig creates a rest.Config from a kubeconfig string.
+func LoadRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
 	apiConfig, err := clientcmd.Load([]byte(kubeconfig))
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func LoadeRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
 
 // KubeClientSetFromKubeConfig creates a Kubernetes clientset from a kubeconfig string.
 func KubeClientSetFromKubeConfig(kubeconfig string) (*kubeclient.Clientset, error) {
-	restConfig, err := LoadeRestConfigFromKubeConfig(kubeconfig)
+	restConfig, err := LoadRestConfigFromKubeConfig(kubeconfig)
 	if err != nil {
 		return nil, err
 	}
