@@ -213,6 +213,10 @@ class BaseTerminal implements IDisposable {
     this.isXtermOpened = true;
   };
 
+  public attachOnDataListener = (callback: (data: string) => void) => {
+    this.terminal.onData(callback);
+  };
+
   /**
    * return the terminal object for some special use-cases
    */
