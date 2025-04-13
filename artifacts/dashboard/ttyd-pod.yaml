@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ttyd-cbf14e3f-f53a-4e0c-99e2-b39ebc0d221d
+  namespace: karmada-system
+spec:
+  containers:
+  - image: docker.io/sayem4604/ttyd:latest
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      tcpSocket:
+        port: 7681
+      timeoutSeconds: 1
+    name: ttyd-cbf14e3f-f53a-4e0c-99e2-b39ebc0d221d
+    ports:
+    - containerPort: 7681
+      name: tcp
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      tcpSocket:
+        port: 7681
+      timeoutSeconds: 1
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-qqjwf
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  volumes:
+  - name: kube-api-access-qqjwf
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace

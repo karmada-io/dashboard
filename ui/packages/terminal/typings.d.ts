@@ -19,3 +19,5 @@ declare module 'sockjs-client/dist/sockjs' {
   export = SockJS;
   export as namespace SockJS;
 }
+declare module '@karmada/xterm-addon-zmodem';
+declare module '@karmada/xterm-addon-overlay';

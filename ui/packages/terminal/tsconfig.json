@@ -20,6 +20,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    
+
+    /* Path aliases */
     "paths": {
       "@/*": ["src/*"]
     }

@@ -19,6 +19,7 @@ import '@xterm/xterm/css/xterm.css';// Import xterm styles
 //import { FitAddon } from '@xterm/addon-fit';
 import BaseTerminal from './base.ts';
 import { BaseTerminalOptions } from './typing';
+import TtydTerminal from './ttyd';
 
 interface TerminalPopupProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ interface TerminalPopupProps {
 const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const terminalInstanceRef = useRef<BaseTerminal | null>(null);
+  const ttydTerminalRef = useRef<TtydTerminal | null>(null);
 
   useEffect(() => {
     if (isOpen && containerRef.current) {
@@ -58,27 +60,55 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }
           unicodeVersion: "11"      // Unicode version as a string
         },
       };
+
+
+      // Define the Ttyd-specific options for the WebSocket connection
+      const ttydOptions = {
+        wsUrl: 'ws://localhost:7681/ws', // Adjust with your ttyd endpoint
+        tokenUrl: 'https://karmada-apiserver.karmada-system.svc.cluster.local:5443', // Adjust with your token API endpoint
+        flowControl: {
+          limit: 10000,
+          highWater: 50,
+          lowWater: 10,
+        },
+      };      
         
       // Create a new advanced terminal instance
-      terminalInstanceRef.current = new BaseTerminal(terminalOptions);
+      //terminalInstanceRef.current = new BaseTerminal(terminalOptions);
 
       // Open the terminal on the container element
-      terminalInstanceRef.current.open(containerRef.current);
+      //terminalInstanceRef.current.open(containerRef.current);
 
       // Attach onData listener after opening the terminal
-      terminalInstanceRef.current.attachOnDataListener((data: string) => {
-        console.log('User typed:', data);
+      //terminalInstanceRef.current.attachOnDataListener((data: string) => {
+        //console.log('User typed:', data);
       
         // Local echo: write typed characters back to the terminal
         // (Only do this if you don't have a real shell backend, or you'll double-echo.)
         //terminalInstanceRef.current.write(data);
+      //});
+
+      // Create a new TtydTerminal instance
+      ttydTerminalRef.current = new TtydTerminal(terminalOptions, ttydOptions);
+
+      // Open the terminal on the container element
+      ttydTerminalRef.current.open(containerRef.current);
+
+      // Optionally, attach an onData listener if you want to monitor input
+      ttydTerminalRef.current.attachOnDataListener((data: string) => {
+        console.log('User typed:', data);
+        // Note: TtydTerminal.sendData internally sends data via WebSocket
       });
 
+
       // Set focus to the terminal to allow input
-      terminalInstanceRef.current.getTerminal().focus();
+      //terminalInstanceRef.current.getTerminal().focus();
 
       // Optionally, write an initial welcome message
-      terminalInstanceRef.current.write('Welcome to the Advanced Terminal!\r\n');
+      //terminalInstanceRef.current.write('Welcome to the Advanced Terminal!\r\n');
+
+      // Connect to the ttyd backend via WebSocket
+      ttydTerminalRef.current.connect();      
 
       // Optionally, you can add more configuration or event listeners here
 

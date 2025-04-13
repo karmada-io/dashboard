@@ -18,6 +18,7 @@ import type { ITerminalOptions } from '@xterm/xterm';
 import { addEventListener, getDebugger } from './utils';
 import BaseTerminal from './base.ts';
 import { BaseTerminalOptions, ClientOptions } from './typing';
+//import ZmodemAddon from '@karmada/xterm-addon-zmodem';
 import OverlayAddon from '@karmada/xterm-addon-overlay';
 import ZmodemAddon from '@karmada/xterm-addon-zmodem';
 
@@ -191,7 +192,7 @@ class TtydTerminal extends BaseTerminal {
           this.textEncoder.encode(Command.RESIZE_TERMINAL + msg),
         );
         if (this.resizeOverlay) {
-          this.getAddon<OverlayAddon>('overlay')?.showOverlay(
+          this.getAddon<InstanceType<typeof OverlayAddon>>('overlay')?.showOverlay(
             `${cols}x${rows}`,
             300,
           );
@@ -204,7 +205,7 @@ class TtydTerminal extends BaseTerminal {
         } catch (e) {
           return;
         }
-        this.getAddon<OverlayAddon>('overlay')?.showOverlay('\u2702', 200);
+        this.getAddon<InstanceType<typeof OverlayAddon>>('overlay')?.showOverlay('\u2702', 200);
       }),
       addEventListener(window, 'beforeunload', this.onWindowUnload),
     );
@@ -313,7 +314,7 @@ class TtydTerminal extends BaseTerminal {
         writer: this.writeData,
       });
       this.writeFunc = (data) => {
-        return this.getAddon<ZmodemAddon>('zmodem')?.consume(data);
+        return this.getAddon<InstanceType<typeof ZmodemAddon>>('zmodem')?.consume(data);
       };
       this.setAddon('zmodem', zmodemAddon);
     }
