@@ -15,7 +15,8 @@ limitations under the License.
 */
 
 declare module 'sockjs-client/dist/sockjs' {
-  import SockJS from '@types/sockjs-client';
+  //import SockJS from '@types/sockjs-client';
+  export default SockJS;
   export = SockJS;
   export as namespace SockJS;
 }
