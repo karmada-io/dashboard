@@ -34,6 +34,21 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }
   useEffect(() => {
     if (isOpen && containerRef.current) {
       // Define your terminal options:
+     // Make an API call to trigger the terminal setup
+     fetch('/api/v1/terminal')
+     .then(response => {
+       if (!response.ok) {
+         throw new Error('Failed to trigger terminal');
+       }
+       return response.json();
+     })
+     .then(data => {
+       console.log('Terminal triggered:', data);
+       // Proceed with initializing the terminal UI
+     })
+     .catch(error => {
+       console.error('Error triggering terminal:', error);
+     });      
       const terminalOptions: BaseTerminalOptions = {
         // Options for xterm.js instance
         xtermOptions: {
