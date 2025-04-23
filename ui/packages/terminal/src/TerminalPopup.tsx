@@ -87,21 +87,7 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }
           lowWater: 10,
         },
       };      
-        
-      // Create a new advanced terminal instance
-      //terminalInstanceRef.current = new BaseTerminal(terminalOptions);
 
-      // Open the terminal on the container element
-      //terminalInstanceRef.current.open(containerRef.current);
-
-      // Attach onData listener after opening the terminal
-      //terminalInstanceRef.current.attachOnDataListener((data: string) => {
-        //console.log('User typed:', data);
-      
-        // Local echo: write typed characters back to the terminal
-        // (Only do this if you don't have a real shell backend, or you'll double-echo.)
-        //terminalInstanceRef.current.write(data);
-      //});
 
       // Create a new TtydTerminal instance
       ttydTerminalRef.current = new TtydTerminal(terminalOptions, ttydOptions);
@@ -116,12 +102,6 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }
       });
 
 
-      // Set focus to the terminal to allow input
-      //terminalInstanceRef.current.getTerminal().focus();
-
-      // Optionally, write an initial welcome message
-      //terminalInstanceRef.current.write('Welcome to the Advanced Terminal!\r\n');
-
       // Connect to the ttyd backend via WebSocket
       ttydTerminalRef.current.connect();      
 
@@ -134,12 +114,6 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }
       };
     }
   }, [isOpen]);
-
-      //return () => {
-        //xterm.current?.dispose();
-      //};
-    //}
-  //}, [isOpen]);
 
   return (
     <div

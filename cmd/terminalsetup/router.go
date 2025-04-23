@@ -14,14 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package terminal_setup
+package terminalsetup
 
 import (
     "github.com/gin-gonic/gin"
 )
+
 
 // V1 returns a new router instance for version 1 of the API
 func V1() *gin.RouterGroup {
     r := gin.Default() // Initialize a new Gin router
     return r.Group("/api/v1") // This sets the base path for the group
 }
+

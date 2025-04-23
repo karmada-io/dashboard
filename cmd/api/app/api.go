@@ -51,8 +51,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
-	"github.com/karmada-io/dashboard/ui/packages/terminal/src/terminal_setup"
-
+	"github.com/karmada-io/dashboard/cmd/terminalsetup"
 )
 
 // NewAPICommand creates a *cobra.Command object with default parameters
@@ -111,8 +110,8 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
 	)
 	ensureAPIServerConnectionOrDie()
+	webterminal()
 	serve(opts)
-	web_terminal()
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	<-ctx.Done()
 	os.Exit(0)
@@ -147,13 +146,7 @@ func serve(opts *options.Options) {
 
 
 // Custom function to initialize the application
-func web_terminal() {
-	// Your existing setup code...
-	// Ensure that the terminal setup routes are registered
-	terminal_setup.Init()// Call the init function if it exists
+func webterminal() {
+	terminalsetup.Init()// Call the init function 
 }
 
-// Call the web_terminal function from the main entry point
-func main() {
-	web_terminal() // Ensure this is called to initialize the terminal setup
-}

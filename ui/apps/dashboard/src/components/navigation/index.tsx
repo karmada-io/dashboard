@@ -66,7 +66,8 @@ const Navigation: FC<INavigationProps> = (props) => {
           </div>
           <div className={styles.right}>
             {/* extra components */}
-            <span className={styles.terminalIcon} onClick={() => onTerminalClick && onTerminalClick()}>
+            <span className={styles.terminalIcon}
+             onClick={() => onTerminalClick?.()}>
             <CodeOutlined />
             </span>
 

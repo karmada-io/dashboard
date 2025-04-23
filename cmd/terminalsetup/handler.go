@@ -14,17 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package terminal_setup
+package terminalsetup
 
 import (
-	//"net/http"
-
-	//v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 )
 
-// Exported function to initialize terminal routes
+
+
+// Init initializes the terminal routes
 func Init() {
 	r := router.V1()
 	r.GET("/terminal", TriggerTerminal)
 }
+
+
