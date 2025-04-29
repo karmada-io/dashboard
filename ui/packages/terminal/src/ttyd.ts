@@ -211,6 +211,7 @@ class TtydTerminal extends BaseTerminal {
   };
 
   public connect = () => {
+    console.log('[ttyd] connecting to', this.ttydTerminalOptions.wsUrl);
     this.socket = new WebSocket(this.ttydTerminalOptions.wsUrl, ['tty']);
     const { socket, register } = this;
     socket.binaryType = 'arraybuffer';
