@@ -10,7 +10,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/karmada-io/karmada v1.13.0
 	github.com/prometheus/common v0.55.0
-	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	gopkg.in/yaml.v3 v3.0.1
