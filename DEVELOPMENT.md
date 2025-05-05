@@ -49,6 +49,16 @@ _output/bin/${os name}/${os arch}/karmada-dashboard-api \
   --context=karmada-host \
   --insecure-port=8000
 ```
+
+```shell
+./root/dashboard/_output/bin/linux/amd64/karmada-dashboard-api \
+  --karmada-kubeconfig=/root/.kube/karmada.config \
+  --karmada-context=karmada-apiserver \
+  --kubeconfig=/root/.kube/karmada.config \
+  --context=karmada-host \
+  --insecure-port=8000
+```
+
 After that, you can start the dashboard fronted project, install frontend dependencies with `cd ui && pnpm install` firstly. And then start the dashboard fronted project by executing:
 ```shell
 cd ui
@@ -97,11 +107,11 @@ bash hack/local-up-karmada.sh
 
 最小环境由一个主集群和三个成员集群组成，主集群负责部署karmada控制平面，karmada控制平面启动后，成员集群将由karmada控制平面管理，member1和member2集群将以`push`模式管理，member3集群将以`pull`模式管理。当您看到安装成功提示后，您可以启动`api`项目。要在本地启动`api`项目，您应该获取`karmada-apiserver`和`karmada-host`上下文的kubeconfig，您可以在`$HOME/.kubeconfig/karmada.config`下获取文件。执行命令`make karmada-dashboard-api`构建`api`项目的二进制文件，您可以通过以下方式启动`api`：
 ```shell
-_output/bin/${os name}/${os arch}/karmada-dashboard-api \
-  --karmada-kubeconfig=${path/to/karmada.config} \
+./_output/bin/linux/amd64/karmada-dashboard-api \
+  --karmada-kubeconfig=/root/.kube/karmada.config \
   --karmada-context=karmada-apiserver \
   --skip-karmada-apiserver-tls-verify \
-  --kubeconfig=${path/to/karmada.config} \
+  --kubeconfig=/root/.kube/karmada.config \
   --context=karmada-host \
   --insecure-port=8000
 ```

@@ -93,8 +93,19 @@ func NewAPICommand(ctx context.Context) *cobra.Command {
 }
 
 func run(ctx context.Context, opts *options.Options) error {
+	// klog 是 karmada 的日志库，这里使用 klog 打印日志 (k8s.io/klog/v2)
+	// 基础日志
+	// klog.Info("普通信息")
+	// klog.Error("错误信息")
+
+	// 结构化日志
+	// klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
+
+	// 分级日志
+	// klog.V(1).Info("详细日志信息")
 	klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
 
+	// client 是 karmada 的客户端库，这里使用 client 初始化 karmada 的配置 (github.com/karmada-io/dashboard/pkg/client)
 	client.InitKarmadaConfig(
 		client.WithUserAgent(environment.UserAgent()),
 		client.WithKubeconfig(opts.KarmadaKubeConfig),

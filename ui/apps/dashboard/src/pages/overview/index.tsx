@@ -16,10 +16,25 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { Badge, Descriptions, DescriptionsProps, Statistic, Spin } from 'antd';
+import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin, Statistic, Tag } from 'antd';
 import { useQuery } from '@tanstack/react-query';
+import { GetClusters } from '@/services';
 import { GetOverview } from '@/services/overview.ts';
 import dayjs from 'dayjs';
+import { Icons } from '@/components/icons';
+
+const getPercentColor = (v: number): string => {
+  // 0~60 #52C41A
+  // 60~80 #FAAD14
+  // > 80 #F5222D
+  if (v <= 60) {
+    return '#52C41A';
+  } else if (v <= 80) {
+    return '#FAAD14';
+  } else {
+    return '#F5222D';
+  }
+};
 
 const Overview = () => {
   const { data, isLoading } = useQuery({
@@ -29,6 +44,15 @@ const Overview = () => {
       return ret.data;
     },
   });
+
+  const { data: clusterData, isLoading: isClusterLoading } = useQuery({
+    queryKey: ['GetClusters'],
+    queryFn: async () => {
+      const ret = await GetClusters();
+      return ret.data;
+    },
+  });
+
   const basicItems: DescriptionsProps['items'] = [
     {
       key: 'karmada-version',
@@ -62,78 +86,6 @@ const Overview = () => {
           dayjs(data?.karmadaInfo.createTime).format('YYYY-MM-DD HH:mm:ss')) ||
         '-',
     },
-    {
-      key: 'cluster-info',
-      label: i18nInstance.t('a0d6cb39b547d45a530a3308dce79c86', '工作集群信息'),
-      children: (
-        <>
-          <div>
-            <span>
-              {i18nInstance.t('6860e13ac48e930f8076ebfe37176b78', '节点数量')}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus.nodeSummary.readyNum}/
-              {data?.memberClusterStatus.nodeSummary.totalNum}
-            </span>
-          </div>
-          <div>
-            <span>
-              {i18nInstance.t(
-                'a1dacced95ddca3603110bdb1ae46af1',
-                'CPU使用情况',
-              )}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus.cpuSummary.allocatedCPU &&
-                data?.memberClusterStatus.cpuSummary.allocatedCPU.toFixed(2)}
-              /{data?.memberClusterStatus.cpuSummary.totalCPU}
-            </span>
-          </div>
-          <div>
-            <span>
-              {i18nInstance.t(
-                '5eaa09de6e55b322fcc299f641d73ce7',
-                'Memory使用情况',
-              )}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus?.memorySummary?.allocatedMemory &&
-                (
-                  data.memberClusterStatus.memorySummary.allocatedMemory /
-                  8 /
-                  1024 /
-                  1024
-                ).toFixed(2)}
-              GiB /
-              {data?.memberClusterStatus?.memorySummary?.totalMemory &&
-                data.memberClusterStatus.memorySummary.totalMemory /
-                  8 /
-                  1024 /
-                  1024}
-              GiB
-            </span>
-          </div>
-          <div>
-            <span>
-              {i18nInstance.t(
-                '820c4003e23553b3124f1608916d5282',
-                'Pod分配情况',
-              )}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus?.podSummary?.allocatedPod}/
-              {data?.memberClusterStatus?.podSummary?.totalPod}
-            </span>
-          </div>
-        </>
-      ),
-
-      span: 3,
-    },
   ];
 
   const resourceItems: DescriptionsProps['items'] = [
@@ -163,69 +115,214 @@ const Overview = () => {
       span: 3,
     },
     {
-      key: 'multicloud-resources-info',
-      label: i18nInstance.t('612af712ef5ed7868a6b2f1d3d68530c', '多云资源信息'),
+      key: 'resource-info',
+      label: i18nInstance.t('1f3ad14abef7d52e60324c174da27ca2', '资源信息'),
       children: (
         <div className="flex flex-row space-x-4">
           <Statistic
             title={i18nInstance.t(
-              '1200778cf86309309154ef88804fa22e',
-              '多云命名空间',
+              '06ff2e9eba7ae422587c6536e337395f',
+              '命名空间',
             )}
             value={data?.clusterResourceStatus.namespaceNum}
           />
 
           <Statistic
             title={i18nInstance.t(
-              '3692cf6a2e079d34e7e5035aa98b1335',
-              '多云工作负载',
+              '1e02cae704efe124f1a6f1f8b112fd52',
+              '工作负载',
             )}
             value={data?.clusterResourceStatus.workloadNum}
           />
 
           <Statistic
             title={i18nInstance.t(
-              '2030a6e845ad6476fecbc1711c9f139d',
-              '多云服务与路由',
+              '61d4e9d7e94ce41f7697aab2bbe1ae4e',
+              '服务与路由',
             )}
             value={data?.clusterResourceStatus.serviceNum}
           />
 
           <Statistic
             title={i18nInstance.t(
-              '0287028ec7eefa1333b56ee340d325a0',
-              '多云配置与秘钥',
+              '9f1f65c8c39bb0afe83f8f1d6e93bfe4',
+              '配置与存储',
             )}
             value={data?.clusterResourceStatus.configNum}
           />
         </div>
       ),
-
       span: 3,
     },
   ];
 
-  return (
-    <Spin spinning={isLoading}>
-      <Panel>
-        <Descriptions
-          className={'mt-8'}
-          title={i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息')}
-          bordered
-          items={basicItems}
+  const mcResourceInfoItems: DescriptionsProps['items'] = [
+    {
+      key: 'ns',
+      label: i18nInstance.t('5b4e3f2c5bf82e61e046bc883222bb47', '多云命名空间'),
+      children: (
+        <Statistic
+          value={data?.clusterResourceStatus.namespaceNum}
+          valueStyle={{ color: '#3f8600' }}
         />
+      ),
+    },
+    {
+      key: 'workload-num',
+      label: i18nInstance.t('b1a8c384b64e1b7b15d33b93099fe148', '多云工作负载'),
+      children: (
+        <Statistic
+          value={data?.clusterResourceStatus.workloadNum}
+          valueStyle={{ color: '#3f8600' }}
+        />
+      ),
+    },
+    {
+      key: 'service-num',
+      label: i18nInstance.t(
+        '35af2c02bbc5119edaedc6dde9c63f82',
+        '多云服务与路由',
+      ),
+      children: (
+        <Statistic
+          value={data?.clusterResourceStatus.serviceNum}
+          valueStyle={{ color: '#3f8600' }}
+        />
+      ),
+    },
+    {
+      key: 'config-num',
+      label: i18nInstance.t(
+        'f14178f2f0cfd9a887abb5ef87a5bc9b',
+        '多云配置与存储',
+      ),
+      children: (
+        <Statistic
+          value={data?.clusterResourceStatus.configNum}
+          valueStyle={{ color: '#3f8600' }}
+        />
+      ),
+    },
+  ];
 
+  return (
+    <Panel>
+      <div className="mb-8">
+        <h2 className="text-lg font-medium mb-4">
+          {i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')}
+        </h2>
         <Descriptions
-          className={'mt-8'}
-          title={i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息')}
           bordered
-          items={resourceItems}
-          labelStyle={{
-            width: i18nInstance.language === 'en-US' ? '200px' : '150px',
-          }}
+          size={'middle'}
+          items={basicItems}
+          column={3}
+          layout={'horizontal'}
         />
-      </Panel>
-    </Spin>
+      </div>
+      
+      <div className="mb-8">
+        <h2 className="text-lg font-medium mb-4">
+          {i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', 'Kubernetes 集群列表')}
+        </h2>
+        <Spin spinning={isClusterLoading}>
+          <Row gutter={[16, 16]}>
+            {clusterData?.clusters?.map((cluster) => (
+              <Col xs={24} sm={12} md={8} lg={8} xl={6} key={cluster.objectMeta.name}>
+                <Card 
+                  hoverable 
+                  className="h-full" 
+                  title={
+                    <div className="flex items-center">
+                      <div className="flex items-center justify-center w-10 h-10 bg-blue-50 rounded-full mr-3">
+                        <Icons.clusters width={24} height={24} />
+                      </div>
+                      <span className="font-medium">{cluster.objectMeta.name}</span>
+                    </div>
+                  }
+                >
+                  <div className="mb-2 pb-2 border-b border-gray-100">
+                    <div className="text-xs text-gray-500 mb-1">
+                      {cluster.objectMeta.creationTimestamp && 
+                        `${i18nInstance.t('b55ea36e7cb0ca40c0d9ec5f40b4a80d', '已创建')} ${dayjs().diff(dayjs(cluster.objectMeta.creationTimestamp), 'year') > 0 ? `${dayjs().diff(dayjs(cluster.objectMeta.creationTimestamp), 'year')} ${i18nInstance.t('93cf1ebc3a9ae31bac4600e9e5b9a14a', '年')}` : `${dayjs().diff(dayjs(cluster.objectMeta.creationTimestamp), 'day')} ${i18nInstance.t('b0daf2a2d14aabfaa8f505a8b8d204b3', '天')}`}`
+                      }
+                    </div>
+                    <div className="text-base font-medium">
+                      {cluster.kubernetesVersion}
+                    </div>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <Tag color={cluster.ready ? "success" : "error"} className="mb-2">
+                      {cluster.ready ? i18nInstance.t('96a27a13837269f929bbf3f449984ad9', '已就绪') : i18nInstance.t('5e742e851d1f58f97ea0ccedee59d0a0', '未就绪')}
+                    </Tag>
+                    <Tag color={cluster.syncMode === 'Push' ? "gold" : "blue"}>
+                      {cluster.syncMode}
+                    </Tag>
+                  </div>
+                  
+                  <div className="mb-1 flex justify-between">
+                    <span className="text-sm text-gray-600">{i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')}</span>
+                    <span className="text-sm font-medium">
+                      {cluster.nodeSummary ? `${cluster.nodeSummary.readyNum}/${cluster.nodeSummary.totalNum}` : '-'}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-3">
+                    <div className="mb-1 flex justify-between">
+                      <span className="text-sm text-gray-600">CPU</span>
+                      <span className="text-sm">{`${parseFloat(cluster.allocatedResources.cpuFraction.toFixed(2))}%`}</span>
+                    </div>
+                    <Progress 
+                      percent={parseFloat(cluster.allocatedResources.cpuFraction.toFixed(2))} 
+                      strokeColor={getPercentColor(parseFloat(cluster.allocatedResources.cpuFraction.toFixed(2)))}
+                      showInfo={false}
+                      size="small"
+                    />
+                  </div>
+                  
+                  <div>
+                    <div className="mb-1 flex justify-between">
+                      <span className="text-sm text-gray-600">Memory</span>
+                      <span className="text-sm">{`${parseFloat(cluster.allocatedResources.memoryFraction.toFixed(2))}%`}</span>
+                    </div>
+                    <Progress 
+                      percent={parseFloat(cluster.allocatedResources.memoryFraction.toFixed(2))} 
+                      strokeColor={getPercentColor(parseFloat(cluster.allocatedResources.memoryFraction.toFixed(2)))}
+                      showInfo={false}
+                      size="small"
+                    />
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Spin>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-medium mb-4">
+          {i18nInstance.t('1f3ad14abef7d52e60324c174da27ca2', '资源信息')}
+        </h2>
+        <Descriptions
+          bordered
+          size={'middle'}
+          items={resourceItems}
+          column={3}
+          layout={'horizontal'}
+        />
+      </div>
+
+      <h2 className="text-lg font-medium mb-4">
+        {i18nInstance.t('16a0936770e82ce9a7f0c07f663c85fd', '多云资源信息')}
+      </h2>
+      <Descriptions
+        bordered
+        size={'middle'}
+        items={mcResourceInfoItems}
+        column={4}
+        layout={'horizontal'}
+      />
+    </Panel>
   );
 };
 

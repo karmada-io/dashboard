@@ -57,7 +57,19 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
   });
   const filteredMenuItems = useMemo(() => {
     if (!data) return menuItems;
-    const menuInfo = traverseMenuConfig(data.menu_configs);
+    
+    // 尝试从data.menu_configs获取菜单配置
+    let menuInfo = {};
+    if (data.menu_configs && Array.isArray(data.menu_configs)) {
+      menuInfo = traverseMenuConfig(data.menu_configs);
+    }
+    
+    // 如果menuInfo为空对象，则返回所有菜单项
+    if (Object.keys(menuInfo).length === 0) {
+      return menuItems;
+    }
+    
+    // 否则根据配置过滤菜单项
     return filterMenuItems(menuItems, menuInfo);
   }, [data, menuItems]);
   return (
@@ -82,6 +94,11 @@ function traverseMenuConfig(
   menu_configs: menuConfig[],
 ): Record<string, boolean> {
   let menuInfo = {} as Record<string, boolean>;
+  
+  if (!menu_configs || !Array.isArray(menu_configs)) {
+    return menuInfo;
+  }
+  
   for (const menu_config of menu_configs) {
     menuInfo[menu_config.sidebar_key] = menu_config.enable;
     const childrenMenuInfo = menu_config.children

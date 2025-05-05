@@ -85,7 +85,7 @@ export function getRoutes() {
           element: <Overview />,
           handle: {
             sidebarKey: 'OVERVIEW',
-            sidebarName: i18nInstance.t('86385379cf9cfbc2c554944f1c054a45'),
+            sidebarName: i18nInstance.t('86385379cf9cfbc2c554944f1c05a4a5', '概览'),
             icon: <Icons.overview {...IconStyles} />,
           },
         },
@@ -323,11 +323,17 @@ export function filterMenuItems(
   menuItems: MenuItem[],
   menuInfo: Record<string, boolean>,
 ): MenuItem[] {
+  // 如果menuInfo为空对象，默认显示所有菜单项
+  if (Object.keys(menuInfo).length === 0) {
+    return menuItems;
+  }
+  
   return menuItems
     .filter((menuItem) => {
       if (!menuItem) return;
       const menuKey = menuItem.key as string;
-      if (menuKey && !menuInfo[menuKey]) {
+      // 如果menuInfo中存在该key且值为false，则过滤掉
+      if (menuKey && menuInfo[menuKey] === false) {
         return;
       }
       if (menuItem.children && menuItem.children.length > 0) {
