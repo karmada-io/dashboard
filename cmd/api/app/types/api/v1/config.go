@@ -19,8 +19,12 @@ package v1
 import "github.com/karmada-io/dashboard/pkg/config"
 
 // SetDashboardConfigRequest is the request for setting dashboard config
+// SetDashboardConfigRequest 是设置 dashboard 配置的请求
 type SetDashboardConfigRequest struct {
+	// DockerRegistries 是 docker 注册表
 	DockerRegistries []config.DockerRegistry `json:"docker_registries"`
+	// ChartRegistries 是 chart 注册表
 	ChartRegistries  []config.ChartRegistry  `json:"chart_registries"`
+	// MenuConfigs 是菜单配置
 	MenuConfigs      []config.MenuConfig     `json:"menu_configs"`
 }

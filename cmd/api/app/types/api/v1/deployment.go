@@ -17,11 +17,16 @@ limitations under the License.
 package v1
 
 // CreateDeploymentRequest defines the request structure for creating a deployment.
+// CreateDeploymentRequest 是创建部署的请求
 type CreateDeploymentRequest struct {
+	// Namespace 是命名空间
 	Namespace string `json:"namespace"`
+	// Name 是名称
 	Name      string `json:"name"`
+	// Content 是内容
 	Content   string `json:"content"`
 }
 
 // CreateDeploymentResponse defines the response structure for creating a deployment.
+// CreateDeploymentResponse 是创建部署的响应
 type CreateDeploymentResponse struct{}

@@ -192,6 +192,7 @@ func GetKubeConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	return kubernetesRestConfig, kubernetesAPIConfig, nil
 }
 
+// isKarmadaInitialized 检查 Karmada config 是否已初始化
 func isKarmadaInitialized() bool {
 	if karmadaRestConfig == nil || karmadaAPIConfig == nil {
 		klog.Errorf(`karmada/karmada-dashboard/client' package has not been initialized properly. Run 'client.InitKarmadaConfig(...)' to initialize it. `)

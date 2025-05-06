@@ -26,8 +26,13 @@ import (
 )
 
 func main() {
+	// 创建一个上下文
 	ctx := context.TODO()
+	// 创建一个 API 命令
 	cmd := app.NewAPICommand(ctx)
+	// 运行命令
+	// cli.Run(cmd) 是 Kubernetes 代码库中 k8s.io/component-base/cli 包提供的一个函数，它的作用是运行一个命令行工具（cmd）并返回执行结果的退出码（exit code）。
 	code := cli.Run(cmd)
+	// 退出程序
 	os.Exit(code)
 }

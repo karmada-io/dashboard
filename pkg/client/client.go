@@ -110,14 +110,19 @@ func KubeClientSetFromKubeConfig(kubeconfig string) (*kubeclient.Clientset, erro
 }
 
 // GetKarmadaClientFromRequest creates a Karmada clientset from an HTTP request.
+// GetKarmadaClientFromRequest 从 HTTP 请求创建一个 Karmada 客户端
 func GetKarmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface, error) {
+	// 检查 Karmada 是否已初始化
 	if !isKarmadaInitialized() {
 		return nil, fmt.Errorf("client package not initialized")
 	}
+	// 从 HTTP 请求创建 Karmada 客户端
 	return karmadaClientFromRequest(request)
 }
 
+// karmadaClientFromRequest 从 HTTP 请求创建一个 Karmada 客户端
 func karmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface, error) {
+	// 从 HTTP 请求创建 Karmada 配置
 	config, err := karmadaConfigFromRequest(request)
 	if err != nil {
 		return nil, err

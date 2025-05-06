@@ -15,23 +15,28 @@
 package dataselect
 
 // NoPagination By default backend pagination will not be applied.
+// 默认情况下后端分页不会被应用
+// 没有项目会被返回
 var NoPagination = NewPaginationQuery(-1, -1)
 
 // EmptyPagination No items will be returned
+// 没有项目会被返回
 var EmptyPagination = NewPaginationQuery(0, 0)
 
 // DefaultPagination Returns 10 items from page 1
+// 返回第 1 页的 10 个项目
 var DefaultPagination = NewPaginationQuery(10, 0)
 
-// PaginationQuery structure represents pagination settings
+// PaginationQuery 结构体表示分页设置
 type PaginationQuery struct {
-	// How many items per page should be returned
+	// 每页应该返回多少个项目
 	ItemsPerPage int
-	// Number of page that should be returned when pagination is applied to the list
+	// 当应用分页时应该返回的页码
 	Page int
 }
 
 // NewPaginationQuery return pagination query structure based on given parameters
+// 根据给定的参数返回一个分页查询结构体
 func NewPaginationQuery(itemsPerPage, page int) *PaginationQuery {
 	return &PaginationQuery{itemsPerPage, page}
 }

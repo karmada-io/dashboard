@@ -24,28 +24,38 @@ import (
 const (
 	// DefaultQPS is the default globalClient QPS configuration. High enough QPS to fit all expected use cases.
 	// QPS=0 is not set here, because globalClient code is overriding it.
+	// 默认 QPS
 	DefaultQPS = 1e6
 	// DefaultBurst is the default globalClient burst configuration. High enough Burst to fit all expected use cases.
 	// Burst=0 is not set here, because globalClient code is overriding it.
+	// 默认突发
 	DefaultBurst = 1e6
 	// DefaultUserAgent is the default http header for user-agent
+	// 默认用户代理
 	DefaultUserAgent = "dashboard"
 	// DefaultCmdConfigName is the default cluster/context/auth name to be set in clientcmd config
+	// 默认集群/上下文/认证名称
 	DefaultCmdConfigName = "kubernetes"
 	// ImpersonateUserHeader is the header name to identify username to act as.
+	// 模拟用户头名称
 	ImpersonateUserHeader = "Impersonate-User"
 	// ImpersonateGroupHeader is the header name to identify group name to act as.
-	// Can be provided multiple times to set multiple groups.
+	// 模拟组头名称
 	ImpersonateGroupHeader = "Impersonate-Group"
 	// ImpersonateUserExtraHeader is the header name used to associate extra fields with the user.
+	// 模拟用户额外头名称
 	// It is optional, and it requires ImpersonateUserHeader to be set.
 	ImpersonateUserExtraHeader = "Impersonate-Extra-"
 )
 
-// ResourceVerber is responsible for performing generic CRUD operations on all supported resources.
+// ResourceVerber 是负责对所有支持的资源执行通用 CRUD 操作的接口
 type ResourceVerber interface {
+	// Update 更新资源
 	Update(object *unstructured.Unstructured) error
+	// Get 获取资源
 	Get(kind string, namespace string, name string) (runtime.Object, error)
+	// Delete 删除资源
 	Delete(kind string, namespace string, name string, deleteNow bool) error
+	// Create 创建资源
 	Create(object *unstructured.Unstructured) (*unstructured.Unstructured, error)
 }

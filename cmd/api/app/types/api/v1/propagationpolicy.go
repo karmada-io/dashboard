@@ -18,35 +18,51 @@ package v1
 
 // PostPropagationPolicyRequest defines the request structure for creating a propagation policy.
 // todo this is only a simple version of pp request, just for POC
+// PostPropagationPolicyRequest 是创建传播策略的请求
 type PostPropagationPolicyRequest struct {
+	// PropagationData 是传播策略的数据
 	PropagationData string `json:"propagationData" binding:"required"`
+	// IsClusterScope 是是否集群范围
 	IsClusterScope  bool   `json:"isClusterScope"`
+	// Namespace 是命名空间
 	Namespace       string `json:"namespace"`
 }
 
 // PostPropagationPolicyResponse defines the response structure for creating a propagation policy.
+// PostPropagationPolicyResponse 是创建传播策略的响应
 type PostPropagationPolicyResponse struct {
 }
 
 // PutPropagationPolicyRequest defines the request structure for updating a propagation policy.
+// PutPropagationPolicyRequest 是更新传播策略的请求
 type PutPropagationPolicyRequest struct {
+	// PropagationData 是传播策略的数据
 	PropagationData string `json:"propagationData" binding:"required"`
+	// IsClusterScope 是是否集群范围
 	IsClusterScope  bool   `json:"isClusterScope"`
+	// Namespace 是命名空间
 	Namespace       string `json:"namespace"`
+	// Name 是名称
 	Name            string `json:"name" binding:"required"`
 }
 
 // PutPropagationPolicyResponse defines the response structure for updating a propagation policy.
+// PutPropagationPolicyResponse 是更新传播策略的响应
 type PutPropagationPolicyResponse struct {
 }
 
 // DeletePropagationPolicyRequest defines the request structure for deleting a propagation policy.
+// DeletePropagationPolicyRequest 是删除传播策略的请求
 type DeletePropagationPolicyRequest struct {
+	// IsClusterScope 是是否集群范围
 	IsClusterScope bool   `json:"isClusterScope"`
+	// Namespace 是命名空间
 	Namespace      string `json:"namespace"`
+	// Name 是名称
 	Name           string `json:"name" binding:"required"`
 }
 
 // DeletePropagationPolicyResponse defines the response structure for deleting a propagation policy.
+// DeletePropagationPolicyResponse 是删除传播策略的响应
 type DeletePropagationPolicyResponse struct {
 }

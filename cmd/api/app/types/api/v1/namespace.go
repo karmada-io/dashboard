@@ -17,10 +17,14 @@ limitations under the License.
 package v1
 
 // CreateNamesapceRequest is the request body for creating a namespace.
+// CreateNamesapceRequest 是创建命名空间的请求
 type CreateNamesapceRequest struct {
+	// Name 是命名空间的名称
 	Name                string `json:"name" required:"true"`
+	// SkipAutoPropagation 是是否跳过自动传播
 	SkipAutoPropagation bool   `json:"skipAutoPropagation"`
 }
 
 // CreateNamesapceResponse is the response body for creating a namespace.
+// CreateNamesapceResponse 是创建命名空间的响应
 type CreateNamesapceResponse struct{}

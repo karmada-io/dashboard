@@ -36,6 +36,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/cluster"
 )
 
+// 获取集群列表
 func handleGetClusterList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -48,6 +49,7 @@ func handleGetClusterList(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取集群详情
 func handleGetClusterDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	name := c.Param("name")
@@ -60,6 +62,7 @@ func handleGetClusterDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 创建集群
 func handlePostCluster(c *gin.Context) {
 	clusterRequest := new(v1.PostClusterRequest)
 	if err := c.ShouldBind(clusterRequest); err != nil {
@@ -136,6 +139,7 @@ func handlePostCluster(c *gin.Context) {
 	}
 }
 
+// 更新集群
 func handlePutCluster(c *gin.Context) {
 	clusterRequest := new(v1.PutClusterRequest)
 	name := c.Param("name")
@@ -182,6 +186,7 @@ func handlePutCluster(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 删除集群
 func handleDeleteCluster(c *gin.Context) {
 	ctx := context.Context(c)
 	clusterRequest := new(v1.DeleteClusterRequest)
@@ -225,6 +230,7 @@ func handleDeleteCluster(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 解析kubeconfig中的endpoint
 func parseEndpointFromKubeconfig(kubeconfigContents string) (string, error) {
 	restConfig, err := client.LoadRestConfigFromKubeConfig(kubeconfigContents)
 	if err != nil {
@@ -233,6 +239,7 @@ func parseEndpointFromKubeconfig(kubeconfigContents string) (string, error) {
 	return restConfig.Host, nil
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
 	r.GET("/cluster", handleGetClusterList)

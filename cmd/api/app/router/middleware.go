@@ -28,17 +28,22 @@ import (
 )
 
 // EnsureMemberClusterMiddleware ensures that the member cluster exists.
+// 确保成员集群存在。
 func EnsureMemberClusterMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// InClusterKarmadaClient 获取集群的karmada客户端
 		karmadaClient := client.InClusterKarmadaClient()
+		// 获取成员集群的名称
 		_, err := karmadaClient.ClusterV1alpha1().Clusters().Get(context.TODO(), c.Param("clustername"), metav1.GetOptions{})
 		if err != nil {
+			// 如果成员集群不存在，返回错误信息
 			c.AbortWithStatusJSON(http.StatusOK, common.BaseResponse{
 				Code: 500,
 				Msg:  err.Error(),
 			})
 			return
 		}
+		// 如果成员集群存在，继续处理请求
 		c.Next()
 	}
 }

@@ -17,12 +17,18 @@ package dataselect
 // DataSelectQuery is options for GenericDataSelect which takes []GenericDataCell and returns selected data.
 // Can be extended to include any kind of selection - for example filtering.
 // Currently included only Pagination and Sort options.
+// DataSelectQuery 是用于 GenericDataSelect 的选项，它接受 []GenericDataCell 并返回选定的数据。
+// 可以扩展以包括任何类型的选择 - 例如过滤。
+// 目前仅包含分页和排序选项。
 type DataSelectQuery struct {
 	// PaginationQuery holds options for pagination of data select.
+	// PaginationQuery 持有数据选择功能的分页选项
 	PaginationQuery *PaginationQuery
 	// SortQuery holds options for sort functionality of data select.
+	// SortQuery 持有数据选择功能的排序选项
 	SortQuery *SortQuery
 	// FilterQuery holds options for filter functionality of data select.
+	// FilterQuery 持有数据选择功能的过滤选项
 	FilterQuery *FilterQuery
 	//MetricQuery     *MetricQuery
 }
@@ -48,24 +54,31 @@ var NoSort = &SortQuery{
 }
 
 // FilterQuery holds options for filter functionality of data select.
+// FilterQuery 持有数据选择功能的过滤选项
 type FilterQuery struct {
 	// FilterByList is a list of filter criteria for data selection.
+	// FilterByList 是数据选择功能的过滤条件列表
 	FilterByList []FilterBy
 }
 
 // FilterBy defines a filter criterion for data selection.
 // It specifies a property to filter on and the value to compare against.
+// FilterBy 定义了一个数据选择功能的过滤条件
 type FilterBy struct {
 	// Property is the name of the field or attribute to filter by.
+	// Property 是过滤的属性名称
 	Property PropertyName
 
 	// Value is the comparable value to match against the specified property.
+	// Value 是可比较的值，用于与指定的属性进行比较
 	Value ComparableValue
 }
 
 // NoFilter is an option for no filter.
+// NoFilter 是一个没有过滤选项的选项
 var NoFilter = &FilterQuery{
 	// FilterByList is a list of filter criteria for data selection.
+	// FilterByList 是数据选择功能的过滤条件列表
 	FilterByList: []FilterBy{},
 }
 
@@ -73,10 +86,14 @@ var NoFilter = &FilterQuery{
 var NoDataSelect = NewDataSelectQuery(NoPagination, NoSort, NoFilter)
 
 // NewDataSelectQuery creates DataSelectQuery object from simpler data select queries.
+// NewDataSelectQuery 从更简单的数据选择查询创建 DataSelectQuery 对象
 func NewDataSelectQuery(paginationQuery *PaginationQuery, sortQuery *SortQuery, filterQuery *FilterQuery) *DataSelectQuery {
 	return &DataSelectQuery{
+		// 分页查询
 		PaginationQuery: paginationQuery,
+		// 排序查询
 		SortQuery:       sortQuery,
+		// 过滤查询
 		FilterQuery:     filterQuery,
 	}
 }

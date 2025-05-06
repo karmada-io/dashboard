@@ -23,6 +23,7 @@ import (
 )
 
 // BaseResponse is the base response
+// BaseResponse 是基础响应
 type BaseResponse struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"message"`
@@ -30,16 +31,19 @@ type BaseResponse struct {
 }
 
 // Success generate success response
+// Success 生成成功响应
 func Success(c *gin.Context, obj interface{}) {
 	Response(c, nil, obj)
 }
 
 // Fail generate fail response
+// Fail 生成失败响应
 func Fail(c *gin.Context, err error) {
 	Response(c, err, nil)
 }
 
 // Response generate response
+// Response 生成响应
 func Response(c *gin.Context, err error, data interface{}) {
 	code := 200          // biz status code
 	message := "success" // biz status message

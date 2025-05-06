@@ -64,7 +64,7 @@ type pullModeOption struct {
 	memberClusterEndpoint  string
 }
 
-// createSecretAndRBACInMemberCluster create required secrets and rbac in member cluster
+// createSecretAndRBACInMemberCluster 在成员集群中创建所需的秘密和RBAC
 func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	configBytes, err := clientcmd.Write(*o.karmadaAgentCfg)
 	if err != nil {
@@ -85,6 +85,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	}
 
 	// create karmada-kubeconfig secret to be used by karmada-agent component.
+	// 创建karmada-kubeconfig秘密，供karmada-agent组件使用。
 	if err := cmdutil.CreateOrUpdateSecret(o.memberClusterClient, kubeConfigSecret); err != nil {
 		return fmt.Errorf("create secret %s failed: %v", kubeConfigSecret.Name, err)
 	}
@@ -107,6 +108,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	}
 
 	// create a karmada-agent ClusterRole in member cluster.
+	// 在成员集群中创建karmada-agent ClusterRole。
 	if err := cmdutil.CreateOrUpdateClusterRole(o.memberClusterClient, clusterRole); err != nil {
 		return err
 	}
@@ -119,6 +121,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	}
 
 	// create service account for karmada-agent
+	// 在成员集群中创建karmada-agent ServiceAccount。
 	_, err = karmadautil.EnsureServiceAccountExist(o.memberClusterClient, sa, false)
 	if err != nil {
 		return err
@@ -143,6 +146,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	}
 
 	// grant karmada-agent clusterrole to karmada-agent service account
+	// 授予karmada-agent ClusterRole给karmada-agent ServiceAccount。
 	if err := cmdutil.CreateOrUpdateClusterRoleBinding(o.memberClusterClient, clusterRoleBinding); err != nil {
 		return err
 	}
@@ -151,6 +155,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 }
 
 // makeKarmadaAgentDeployment generate karmada-agent Deployment
+// 生成karmada-agent Deployment
 func (o pullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
 	karmadaAgent := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -239,6 +244,7 @@ func (o pullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
 	return karmadaAgent
 }
 
+// accessClusterInPullMode 在拉取模式下访问集群
 func accessClusterInPullMode(opts *pullModeOption) error {
 	_, exist, err := karmadautil.GetClusterWithKarmadaClient(opts.karmadaClient, opts.memberClusterName)
 	if err != nil {
@@ -271,6 +277,7 @@ func accessClusterInPullMode(opts *pullModeOption) error {
 	return nil
 }
 
+// pushModeOption 推送模式选项
 type pushModeOption struct {
 	karmadaClient           karmadaclientset.Interface
 	clusterName             string
@@ -278,6 +285,7 @@ type pushModeOption struct {
 	memberClusterRestConfig *rest.Config
 }
 
+// accessClusterInPushMode 在推送模式下访问集群
 func accessClusterInPushMode(opts *pushModeOption) error {
 	registerOption := karmadautil.ClusterRegisterOption{
 		ClusterNamespace:   ClusterNamespace,
@@ -320,6 +328,7 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 	return nil
 }
 
+// generateClusterInControllerPlane 在控制平面中生成集群对象
 func generateClusterInControllerPlane(opts karmadautil.ClusterRegisterOption) (*clusterv1alpha1.Cluster, error) {
 	clusterObj := &clusterv1alpha1.Cluster{}
 	clusterObj.Name = opts.ClusterName
