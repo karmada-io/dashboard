@@ -177,7 +177,7 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
           onChange={handleEditorChange}
         />
         <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
-          {workloadKindDescriptions[String(filter.kind).toLowerCase()]}
+          {/* 这里原本使用了未定义的filter变量，暂时注释掉 */}
         </div>
       </div>
     </Drawer>
