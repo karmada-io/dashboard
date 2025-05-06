@@ -22,6 +22,8 @@ import { parse } from 'yaml';
 import _ from 'lodash';
 import { CreateResource, PutResource } from '@/services/unstructured';
 import { IResponse, WorkloadKind } from '@/services/base.ts';
+import { workloadTemplates } from './workloadTemplates';
+
 export interface NewWorkloadEditorModalProps {
   mode: 'create' | 'edit';
   open: boolean;
@@ -34,9 +36,18 @@ export interface NewWorkloadEditorModalProps {
 const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
   const { mode, open, workloadContent = '', onOk, onCancel, kind } = props;
   const [content, setContent] = useState<string>(workloadContent);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+
   useEffect(() => {
     setContent(workloadContent);
-  }, [workloadContent]);
+    if (mode === 'create' && !workloadContent) {
+      const template = workloadTemplates.find(t => t.type.toLowerCase() === kind.toLowerCase());
+      if (template) {
+        setContent(template.yaml);
+        setSelectedTemplate(template.type);
+      }
+    }
+  }, [workloadContent, kind, mode]);
 
   function handleEditorChange(value: string | undefined) {
     setContent(value || '');
@@ -123,6 +134,22 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
           style={{
             width: 200,
           }}
+        />
+      </Form.Item>
+      <Form.Item label={i18nInstance.t('模板选择', '模板选择')}>
+        <Select
+          value={selectedTemplate}
+          placeholder="请选择模板"
+          style={{ width: 300, marginBottom: 16 }}
+          onChange={(value) => {
+            setSelectedTemplate(value);
+            const template = workloadTemplates.find(t => t.type === value);
+            if (template) {
+              setContent(template.yaml);
+            }
+          }}
+          options={workloadTemplates.map(t => ({ label: t.label, value: t.type }))}
+          allowClear
         />
       </Form.Item>
       <Editor

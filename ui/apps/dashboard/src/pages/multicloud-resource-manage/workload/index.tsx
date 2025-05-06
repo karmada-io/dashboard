@@ -27,6 +27,7 @@ import {
   Table,
   TableColumnProps,
   Tag,
+  Alert,
 } from 'antd';
 import { Icons } from '@/components/icons';
 import type { DeploymentWorkload } from '@/services/workload';
@@ -45,6 +46,13 @@ import { WorkloadKind } from '@/services/base.ts';
 import useNamespace from '@/hooks/use-namespace.ts';
 
 const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
+const workloadKindDescriptions: Record<string, string> = {
+  deployment: 'Deployment 适用于无状态应用的自动化部署和弹性伸缩，支持滚动升级和回滚。',
+  statefulset: 'StatefulSet 适用于有状态服务，支持有序部署、稳定网络标识和持久化存储。',
+  daemonset: 'DaemonSet 确保每个节点上都运行一个 Pod，常用于日志、监控等场景。',
+  cronjob: 'CronJob 用于定时任务，按计划周期性地运行 Job。',
+  job: 'Job 用于一次性任务，确保任务完成指定次数后自动结束。',
+};
 const WorkloadPage = () => {
   const [filter, setFilter] = useState<{
     kind: WorkloadKind;
@@ -215,6 +223,7 @@ const WorkloadPage = () => {
   const { message: messageApi } = App.useApp();
   return (
     <Panel>
+      <Alert message="工作负载用于统一管理和调度多集群中的 Deployment、StatefulSet、DaemonSet 等工作负载。" type="info" showIcon style={{ marginBottom: 16 }} />
       <div className={'flex flex-row justify-between mb-4'}>
         <div>
           <Segmented
@@ -273,6 +282,9 @@ const WorkloadPage = () => {
         >
           {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0', '新增工作负载')}
         </Button>
+      </div>
+      <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
+        {workloadKindDescriptions[String(filter.kind).toLowerCase()]}
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
         <h3 className={'leading-[32px]'}>

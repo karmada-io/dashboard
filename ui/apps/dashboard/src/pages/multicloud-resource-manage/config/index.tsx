@@ -23,7 +23,7 @@ import { stringify } from 'yaml';
 import { useTagNum, useNamespace } from '@/hooks/index';
 import ConfigEditorModal from './components/config-editor-modal';
 import { useStore } from './store.ts';
-import { message } from 'antd';
+import { message, Alert } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
@@ -49,8 +49,13 @@ const ConfigPage = () => {
   );
   const queryClient = useQueryClient();
   const [messageApi, messageContextHolder] = message.useMessage();
+  const configKindDescriptions: Record<string, string> = {
+    configmap: 'ConfigMap 用于存储非敏感的配置信息，支持多集群分发和集中管理。',
+    secret: 'Secret 用于存储敏感数据（如密码、密钥），安全分发到多集群，保障数据安全。',
+  };
   return (
     <Panel>
+      <Alert message="配置管理用于多集群下 ConfigMap、Secret 等配置的集中管理与分发。" type="info" showIcon style={{ marginBottom: 16 }} />
       <QueryFilter
         filter={filter}
         setFilter={(v) => {
@@ -60,6 +65,9 @@ const ConfigPage = () => {
         nsOptions={nsOptions}
         isNsDataLoading={isNsDataLoading}
       />
+      <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
+        {configKindDescriptions[String(filter.kind).toLowerCase()]}
+      </div>
 
       {filter.kind === ConfigKind.ConfigMap && (
         <ConfigMapTable

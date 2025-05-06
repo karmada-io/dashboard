@@ -93,7 +93,7 @@ export function getRoutes() {
           path: '/multicloud-resource-manage',
           handle: {
             sidebarKey: 'MULTICLOUD-RESOURCE-MANAGE',
-            sidebarName: i18nInstance.t('21a4e07b08a4efbbfe2b9d88c208836a'),
+            sidebarName: i18nInstance.t('21a4e07b08a4efbbfe2b9d88c208836a', '多集群资源管理'),
             isPage: false,
             icon: <Icons.resource {...IconStyles} />,
           },
@@ -139,7 +139,7 @@ export function getRoutes() {
           path: '/multicloud-policy-manage',
           handle: {
             sidebarKey: 'MULTICLOUD-POLICY-MANAGE',
-            sidebarName: i18nInstance.t('8654db688fcb1f7f11f6d7ea6b208a55'),
+            sidebarName: i18nInstance.t('8654db688fcb1f7f11f6d7ea6b208a55', '多集群策略管理'),
             icon: <Icons.policy {...IconStyles} />,
             isPage: false,
           },

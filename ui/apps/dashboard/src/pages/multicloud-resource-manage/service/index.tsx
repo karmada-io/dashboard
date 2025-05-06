@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { App, Button, Input, Segmented, Select } from 'antd';
+import { App, Button, Input, Segmented, Select, Alert } from 'antd';
 import { ServiceKind } from '@/services/base';
 import { Icons } from '@/components/icons';
 import { useCallback, useState } from 'react';
@@ -57,8 +57,13 @@ const ServicePage = () => {
   }, []);
   const { message: messageApi } = App.useApp();
   const queryClient = useQueryClient();
+  const serviceKindDescriptions: Record<string, string> = {
+    service: 'Service 用于集群内外部服务的统一暴露与访问，支持负载均衡和服务发现。',
+    ingress: 'Ingress 用于 HTTP/HTTPS 路由和七层流量管理，实现外部流量接入集群服务。',
+  };
   return (
     <Panel>
+      <Alert message="服务管理用于跨集群服务的统一发布、暴露与治理。" type="info" showIcon style={{ marginBottom: 16 }} />
       <div className={'flex flex-row justify-between mb-4'}>
         <div>
           <Segmented
@@ -104,6 +109,9 @@ const ServicePage = () => {
         >
           {i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')}
         </Button>
+      </div>
+      <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
+        {serviceKindDescriptions[String(filter.kind).toLowerCase()]}
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
         <h3 className={'leading-[32px]'}>

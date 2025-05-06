@@ -26,6 +26,7 @@ import {
   Table,
   TableColumnProps,
   Tag,
+  Alert,
 } from 'antd';
 import { GetNamespaces } from '@/services/namespace.ts';
 import type { Namespace } from '@/services/namespace.ts';
@@ -163,6 +164,7 @@ const NamespacePage = () => {
   const { message: messageApi } = App.useApp();
   return (
     <Panel>
+      <Alert message="命名空间用于多集群环境下资源的逻辑隔离和管理。" type="info" showIcon style={{ marginBottom: 16 }} />
       <div className={'flex flex-row justify-between mb-4'}>
         <Input.Search
           placeholder={i18nInstance.t(

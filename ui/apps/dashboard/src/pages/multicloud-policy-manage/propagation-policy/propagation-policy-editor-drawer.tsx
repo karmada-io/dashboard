@@ -17,12 +17,14 @@ limitations under the License.
 import i18nInstance from '@/utils/i18n';
 import { FC, useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
-import { Button, Drawer, Space } from 'antd';
+import { Button, Drawer, Space, Select } from 'antd';
 import { CreatePropagationPolicy } from '@/services/propagationpolicy.ts';
 import { PutResource } from '@/services/unstructured';
 import { IResponse } from '@/services/base.ts';
 import { parse } from 'yaml';
 import _ from 'lodash';
+import { schedulingPolicyTemplates } from './schedulingPolicyTemplates';
+
 export interface PropagationPolicyEditorDrawerProps {
   open: boolean;
   mode: 'create' | 'edit' | 'detail';
@@ -33,6 +35,7 @@ export interface PropagationPolicyEditorDrawerProps {
   onUpdate: (ret: IResponse<string>) => void;
   onCreate: (ret: IResponse<string>) => void;
 }
+
 function getTitle(
   mode: PropagationPolicyEditorDrawerProps['mode'],
   name: string = '',
@@ -48,6 +51,15 @@ function getTitle(
       return '';
   }
 }
+
+const workloadKindDescriptions: Record<string, string> = {
+  deployment: 'Deployment 适用于无状态应用的自动化部署和弹性伸缩，支持滚动升级和回滚。',
+  statefulset: 'StatefulSet 适用于有状态服务，支持有序部署、稳定网络标识和持久化存储。',
+  daemonset: 'DaemonSet 确保每个节点上都运行一个 Pod，常用于日志、监控等场景。',
+  cronjob: 'CronJob 用于定时任务，按计划周期性地运行 Job。',
+  job: 'Job 用于一次性任务，确保任务完成指定次数后自动结束。',
+};
+
 const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
   props,
 ) => {
@@ -62,12 +74,21 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
     onUpdate,
   } = props;
   const [content, setContent] = useState<string>(propagationContent || '');
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+
   useEffect(() => {
     setContent(propagationContent || '');
-  }, [propagationContent]);
+    if (mode === 'create' && !propagationContent) {
+      const template = schedulingPolicyTemplates[0];
+      setContent(template.yaml);
+      setSelectedTemplate(template.type);
+    }
+  }, [propagationContent, mode]);
+
   function handleEditorChange(value: string | undefined) {
     setContent(value || '');
   }
+
   return (
     <Drawer
       open={open}
@@ -117,23 +138,50 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
         </div>
       }
     >
-      <Editor
-        defaultLanguage="yaml"
-        value={content}
-        theme="vs"
-        options={{
-          theme: 'vs',
-          lineNumbers: 'on',
-          fontSize: 15,
-          readOnly: mode === 'detail',
-          minimap: {
-            enabled: false,
-          },
-          wordWrap: 'on',
-        }}
-        onChange={handleEditorChange}
-      />
+      <div style={{ padding: 24 }}>
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center' }}>
+          <span style={{ marginRight: 12, fontWeight: 500, fontSize: 16 }}>模板选择：</span>
+          <Select
+            value={selectedTemplate}
+            style={{ width: 600, maxWidth: '100%' }}
+            onChange={value => {
+              setSelectedTemplate(value);
+              const template = schedulingPolicyTemplates.find(t => t.type === value);
+              if (template) setContent(template.yaml);
+            }}
+            options={schedulingPolicyTemplates.map(t => ({
+              label: (
+                <span style={{ whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                  {t.label}
+                </span>
+              ),
+              value: t.type,
+            }))}
+            placeholder="请选择调度策略模板"
+            dropdownStyle={{ fontSize: 15, minWidth: 600 }}
+          />
+        </div>
+        <Editor
+          height="600px"
+          defaultLanguage="yaml"
+          value={content}
+          theme="vs"
+          options={{
+            theme: 'vs',
+            lineNumbers: 'on',
+            fontSize: 15,
+            readOnly: mode === 'detail',
+            minimap: { enabled: false },
+            wordWrap: 'on',
+          }}
+          onChange={handleEditorChange}
+        />
+        <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
+          {workloadKindDescriptions[String(filter.kind).toLowerCase()]}
+        </div>
+      </div>
     </Drawer>
   );
 };
+
 export default PropagationPolicyEditorDrawer;

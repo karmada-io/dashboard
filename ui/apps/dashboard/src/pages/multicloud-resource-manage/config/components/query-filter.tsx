@@ -20,6 +20,7 @@ import { Icons } from '@/components/icons';
 import { FC } from 'react';
 import { FilterState } from '../types';
 import { ConfigKind } from '@/services/base.ts';
+
 interface QueryFilterProps {
   filter: FilterState;
   setFilter: (d: Partial<FilterState>) => void;
@@ -30,6 +31,12 @@ interface QueryFilterProps {
   }[];
   isNsDataLoading: boolean;
 }
+
+const configKindDescriptions: Record<string, string> = {
+  configmap: 'ConfigMap 用于存储非敏感的配置信息，支持多集群分发和集中管理。',
+  secret: 'Secret 用于存储敏感数据（如密码、密钥），安全分发到多集群，保障数据安全。',
+};
+
 const QueryFilter: FC<QueryFilterProps> = (props) => {
   const { filter, setFilter, onNewConfig, nsOptions, isNsDataLoading } = props;
   return (
@@ -78,6 +85,9 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
             ? i18nInstance.t('80e2ca37eabd710ead8581de48a54fed', '新增配置')
             : i18nInstance.t('12f9985489b76f8cd0775f5757b293d4', '新增秘钥')}
         </Button>
+      </div>
+      <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
+        {configKindDescriptions[String(filter.kind).toLowerCase()]}
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
         <h3 className={'leading-[32px]'}>
