@@ -19,16 +19,19 @@ import Panel from '@/components/panel';
 import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin, Statistic, Tag, Table, Tooltip, Space, Typography, Avatar, Empty, Button, Divider } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
-import { GetOverview, GetNodeSummary, GetPodSummary } from '@/services/overview.ts';
-import { Cluster } from '@/services/cluster';
+import { GetOverview, GetNodeSummary, GetSchedulePreview } from '@/services/overview.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Icons } from '@/components/icons';
-import { Pie, Column, Line } from '@ant-design/charts';
-import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, QuestionCircleFilled, WarningFilled } from '@ant-design/icons';
-import { useMemo } from 'react';
+import { Pie, Column } from '@ant-design/charts';
+import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, QuestionCircleFilled, SyncOutlined } from '@ant-design/icons';
+import { useMemo, useState } from 'react';
+import SchedulePreview from '@/components/schedule-preview';
 
 const { Title, Text } = Typography;
+
+// 刷新时间间隔（30秒）
+const REFRESH_INTERVAL = 30 * 1000;
 
 const getPercentColor = (v: number): string => {
   // 0~60 #52C41A
@@ -103,6 +106,9 @@ interface ResourcesSummary {
 const Overview = () => {
   const { clusterName } = useParams<{ clusterName: string }>();
   const navigate = useNavigate();
+  
+  // 添加刷新状态控制
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   const { data, isLoading } = useQuery({
     queryKey: ['GetOverview'],
@@ -138,16 +144,34 @@ const Overview = () => {
     enabled: !clusterName
   });
 
-  // 获取Pod汇总数据
-  const { data: podData, isLoading: isPodLoading } = useQuery({
-    queryKey: ['GetPodSummary'],
+  // 获取集群调度预览数据
+  const { data: scheduleData, isLoading: isScheduleLoading, refetch: refetchScheduleData, dataUpdatedAt } = useQuery({
+    queryKey: ['GetSchedulePreview'],
     queryFn: async () => {
-      const ret = await GetPodSummary();
+      const ret = await GetSchedulePreview();
       return ret.data;
     },
-    // 仅在全局概览页面时获取
-    enabled: !clusterName
+    // 仅在全局概览页面且自动刷新启用时获取
+    enabled: !clusterName,
+    // 根据autoRefresh状态决定是否启用自动刷新
+    refetchInterval: autoRefresh ? REFRESH_INTERVAL : false,
   });
+
+  // 处理手动刷新
+  const handleRefreshScheduleData = () => {
+    refetchScheduleData();
+  };
+
+  // 处理自动刷新切换
+  const toggleAutoRefresh = () => {
+    setAutoRefresh(!autoRefresh);
+  };
+
+  // 格式化更新时间
+  const formatLastUpdatedTime = () => {
+    if (!dataUpdatedAt) return i18nInstance.t('fe9d3c42a76af06e21a2279e9d2f0fc9', '暂无数据');
+    return dayjs(dataUpdatedAt).format('YYYY-MM-DD HH:mm:ss');
+  };
 
   const { data: clusterData, isLoading: isClusterLoading } = useQuery({
     queryKey: ['GetClusters', clusterName],
@@ -201,134 +225,6 @@ const Overview = () => {
     },
   ];
 
-  const resourceItems: DescriptionsProps['items'] = [
-    {
-      key: 'policy-info',
-      label: i18nInstance.t('85c6051762df2fe8f93ebc1083b7f6a4', '策略信息'),
-      children: (
-        <div className="flex flex-row space-x-4">
-          <Statistic
-            title={i18nInstance.t(
-              'a95abe7b8eeb55427547e764bf39f1c4',
-              '调度策略',
-            )}
-            value={data?.clusterResourceStatus.propagationPolicyNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '0a7e9443c41575378d2db1e288d3f1cb',
-              '差异化策略',
-            )}
-            value={data?.clusterResourceStatus.overridePolicyNum}
-          />
-        </div>
-      ),
-
-      span: 3,
-    },
-    {
-      key: 'resource-info',
-      label: i18nInstance.t('1f3ad14abef7d52e60324c174da27ca2', '资源信息'),
-      children: (
-        <div className="flex flex-row space-x-4">
-          <Statistic
-            title={i18nInstance.t(
-              '06ff2e9eba7ae422587c6536e337395f',
-              '命名空间',
-            )}
-            value={data?.clusterResourceStatus.namespaceNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '1e02cae704efe124f1a6f1f8b112fd52',
-              '工作负载',
-            )}
-            value={data?.clusterResourceStatus.workloadNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '61d4e9d7e94ce41f7697aab2bbe1ae4e',
-              '服务与路由',
-            )}
-            value={data?.clusterResourceStatus.serviceNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '9f1f65c8c39bb0afe83f8f1d6e93bfe4',
-              '配置与存储'
-            )}
-            value={data?.clusterResourceStatus?.configNum}
-            valueStyle={{ color: '#52c41a' }}
-          />
-        </div>
-      ),
-      span: 3,
-    },
-  ];
-
-  // 最近表格数据
-  const recentClusterEvents = useMemo(() => {
-    if (!clusterData?.clusters?.length) return [];
-    
-    return clusterData.clusters.slice(0, 4).map((cluster, index) => ({
-      key: index.toString(),
-      name: cluster.objectMeta.name,
-      action: cluster.ready ? '集群就绪' : '集群未就绪',
-      status: cluster.ready ? 'success' : 'error',
-      time: dayjs(cluster.objectMeta.creationTimestamp).format('YYYY-MM-DD HH:mm:ss'),
-    }));
-  }, [clusterData]);
-
-  const columns = [
-    {
-      title: '集群名称',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: string) => <a onClick={() => navigate(`/cluster-manage/${text}/overview`)}>{text}</a>,
-    },
-    {
-      title: '操作类型',
-      dataIndex: 'action',
-      key: 'action',
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: 'success' | 'processing' | 'warning' | 'error') => {
-        const statusMap: Record<string, React.ReactNode> = {
-          success: <Badge status="success" text="成功" />,
-          processing: <Badge status="processing" text="处理中" />,
-          warning: <Badge status="warning" text="警告" />,
-          error: <Badge status="error" text="失败" />,
-        };
-        return statusMap[status];
-      },
-    },
-    {
-      title: '时间',
-      dataIndex: 'time',
-      key: 'time',
-    },
-  ];
-
-  const pieConfig = {
-    appendPadding: 10,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 0.8,
-    label: {
-      type: 'outer',
-      content: '{name}: {percentage}',
-    },
-    interactions: [{ type: 'element-active' }],
-    legend: { position: 'bottom' },
-  };
-
   // 修改renderStatisticCards函数，使用新的节点和Pod数据
   const renderStatisticCards = () => {
     if (!resourcesData) {
@@ -337,7 +233,7 @@ const Overview = () => {
 
     const categories = [
       {
-        title: i18nInstance.t('15d5d9ff9e3bbead979f01ed3cb49d2c', '进行中'),
+        title: i18nInstance.t('15d5d9ff9e3bbead979f01ed3cb49d2c', '节点状态'),
         count: resourcesData.node.ready,
         color: '#1890ff',
         subtext: i18nInstance.t('1cd541f2e05b4b4f71d09d62df69f10a', '就绪节点'),
@@ -345,7 +241,7 @@ const Overview = () => {
         total: resourcesData.node.total
       },
       {
-        title: i18nInstance.t('3078bd68dd36e0e50b43a5a5b377701c', '已完成'),
+        title: i18nInstance.t('3078bd68dd36e0e50b43a5a5b377701c', 'Pod状态'),
         count: resourcesData.pod.allocated,
         color: '#ff4d4f',
         subtext: i18nInstance.t('b8921fbb0c6ab42911dfd752d095c252', '已分配Pod'),
@@ -353,7 +249,7 @@ const Overview = () => {
         total: resourcesData.pod.capacity
       },
       {
-        title: i18nInstance.t('6f13a917708cfd547e9617a95f7938b9', '商业版'),
+        title: i18nInstance.t('6f13a917708cfd547e9617a95f7938b9', 'CPU状态'),
         count: Math.round(resourcesData.cpu.usage), // 以核显示
         color: '#722ed1',
         subtext: i18nInstance.t('07267d1bb99c0e9d0646eae571ca9afb', 'CPU使用(核)'),
@@ -361,7 +257,7 @@ const Overview = () => {
         total: resourcesData.cpu.capacity
       },
       {
-        title: i18nInstance.t('dfef19e8c4e168600f58c3b8e31ef277', '居民版'),
+        title: i18nInstance.t('dfef19e8c4e168600f58c3b8e31ef277', '内存状态'),
         count: Math.round(resourcesData.memory.usage / 1024 / 1024), // 转为GB显示
         color: '#13c2c2',
         subtext: i18nInstance.t('89daa2a0673e61276eaabc0aa1298361', '内存使用(GB)'),
@@ -374,7 +270,7 @@ const Overview = () => {
       <Row gutter={[16, 16]} className="mb-6">
         {categories.map((category, index) => (
           <Col xs={24} sm={12} md={6} key={index}>
-            <Card bordered={false}>
+            <Card bordered={false} className="h-full shadow-sm">
               <Statistic
                 title={
                   <div className="flex flex-row items-center">
@@ -387,7 +283,7 @@ const Overview = () => {
                   </div>
                 }
                 value={category.count}
-                valueStyle={{ color: category.color }}
+                valueStyle={{ color: category.color, fontSize: '28px' }}
               />
               {category.completed > 0 && category.total > 0 && (
                 <Progress 
@@ -558,75 +454,41 @@ const Overview = () => {
     );
   };
 
-  // 添加Pod状态详情展示
-  const renderPodStatus = () => {
-    if (!podData || podData.items.length === 0) {
-      return (
-        <div className="h-[200px] flex items-center justify-center">
-          <Empty description={i18nInstance.t('6f21c1bfa15eb362a82a062aeb31b8ae', '暂无数据')} />
-        </div>
-      );
-    }
-
-    // 计算Pod状态数据
-    const statusData = [
-      { type: 'Running', value: podData.statusStats.running },
-      { type: 'Pending', value: podData.statusStats.pending },
-      { type: 'Succeeded', value: podData.statusStats.succeeded },
-      { type: 'Failed', value: podData.statusStats.failed },
-      { type: 'Unknown', value: podData.statusStats.unknown },
-    ];
-
-    // 准备命名空间统计数据
-    const namespaceData = podData.namespaceStats
-      .sort((a, b) => b.podCount - a.podCount)
-      .slice(0, 5);
-
+  // 集群调度预览组件包装器，添加刷新控制
+  const renderSchedulePreview = () => {
     return (
-      <Spin spinning={isPodLoading}>
-        <Row gutter={[16, 16]}>
-          {/* Pod状态分布 */}
-          <Col span={12}>
-            <div className="card-title mb-2">{i18nInstance.t('f9b0d2b0ca9381a29d3335b70be3c5a1', 'Pod状态分布')}</div>
-            <Pie 
-              {...pieConfig} 
-              data={statusData} 
-              height={200}
-              colorField="type"
-              legend={{
-                position: 'bottom'
-              }}
-            />
-          </Col>
-          
-          {/* 命名空间分布 */}
-          <Col span={12}>
-            <div className="card-title mb-2">{i18nInstance.t('3f2b4e2e04b55c77da7a5c16c73c88c4', '命名空间分布（Top 5）')}</div>
-            <Column 
-              data={namespaceData}
-              xField='namespace'
-              yField='podCount'
-              label={{
-                position: 'middle',
-                style: {
-                  fill: '#FFFFFF',
-                  opacity: 0.6,
-                },
-              }}
-              colorField="namespace"
-              height={200}
-            />
-          </Col>
-        </Row>
-
-        <Divider className="my-2" />
-
-        <div className="text-center">
-          <Button type="link" onClick={() => {}}>
-            {i18nInstance.t('16e554d9aa0bd6fcf8a36cad74a467a5', '查看所有Pod')}
-          </Button>
-        </div>
-      </Spin>
+      <div className="mb-6">
+        <Card bordered={false} className="shadow-sm mb-2" styles={{ body: { padding: '16px' } }}>
+          <div className="flex justify-between items-center">
+            <Space>
+              <Text type="secondary">
+                {i18nInstance.t('2ca48325646a61d53eb35cb7e9c309c6', '上次更新时间')}:
+              </Text>
+              <Text>{formatLastUpdatedTime()}</Text>
+            </Space>
+            <Space>
+              <Button
+                type={autoRefresh ? "primary" : "default"}
+                size="small"
+                onClick={toggleAutoRefresh}
+              >
+                {autoRefresh 
+                  ? i18nInstance.t('9f73314cbeef65d8fdc5d97c4cebf7c5', '自动刷新已开启') 
+                  : i18nInstance.t('992a0f0542384f1ee5ef51b7cf4ae6c4', '自动刷新已关闭')}
+              </Button>
+              <Button 
+                type="default"
+                icon={<SyncOutlined />} 
+                size="small"
+                onClick={handleRefreshScheduleData}
+              >
+                {i18nInstance.t('7ed21143bb50d5f9c19f5e1217587170', '刷新数据')}
+              </Button>
+            </Space>
+          </div>
+        </Card>
+        <SchedulePreview data={scheduleData} loading={isScheduleLoading} />
+      </div>
     );
   };
 
@@ -639,52 +501,22 @@ const Overview = () => {
       )}
       
       {!clusterName && (
-        <>
-          {/* 基本信息和最近事件 */}
-          <Row gutter={[16, 16]} className="mb-6">
-            <Col xs={24} md={8}>
-              <Card title={i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')} bordered={false}>
-                <Descriptions size="small" column={1} items={basicItems} />
-              </Card>
-            </Col>
-            
-            <Col xs={24} md={16}>
-              <Card 
-                title={
-                  <div className="flex items-center justify-between">
-                    <span>{i18nInstance.t('b3fb2beda48e46dd05fd0e8024c91209', '最近事件')}</span>
-                    <Text type="secondary" className="text-xs cursor-pointer">查看全部</Text>
-                  </div>
-                } 
-                bordered={false}
-                styles={{ body: { padding: 0 } }}
-              >
-                <Table
-                  dataSource={recentClusterEvents}
-                  columns={columns}
-                  pagination={false}
-                  size="small"
-                />
-              </Card>
-            </Col>
-          </Row>
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} md={8}>
+            <Card title={i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')} bordered={false} className="h-full shadow-sm">
+              <Descriptions size="small" column={1} items={basicItems} />
+            </Card>
+          </Col>
           
-          {/* 节点状态和Pod使用情况 */}
-          <Row gutter={[16, 16]} className="mb-6">
-            <Col xs={24} md={12}>
-              <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')} bordered={false}>
-                {renderNodeStatus()}
-              </Card>
-            </Col>
-            
-            <Col xs={24} md={12}>
-              <Card title={i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', 'Pod使用情况')} bordered={false}>
-                {renderPodStatus()}
-              </Card>
-            </Col>
-          </Row>
-        </>
+          <Col xs={24} md={16}>
+            <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')} bordered={false} className="h-full shadow-sm">
+              {renderNodeStatus()}
+            </Card>
+          </Col>
+        </Row>
       )}
+      
+      {!clusterName && renderSchedulePreview()}
       
       <div className="mb-6">
         <Title level={4} className="mb-4">
@@ -699,10 +531,9 @@ const Overview = () => {
                 <Col xs={24} sm={12} md={8} lg={6} key={cluster.objectMeta.name}>
                   <Card 
                     hoverable 
-                    className="h-full" 
+                    className="h-full shadow-sm" 
                     onClick={() => navigate(`/cluster-manage/${cluster.objectMeta.name}/overview`)}
-                    style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
-                    bodyStyle={{ padding: '16px', height: '100%' }}
+                    styles={{ body: { padding: '16px', height: '100%' } }}
                     actions={[
                       <Tooltip title={i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看详情')} key="view">
                         <InfoCircleFilled />

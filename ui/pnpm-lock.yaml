@@ -13,9 +13,15 @@ importers:
 
   .:
     dependencies:
+      '@ant-design/graphs':
+        specifier: ^2.0.5
+        version: 2.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(workerize-loader@2.0.2(webpack@5.99.8(@swc/core@1.7.22)(esbuild@0.21.5)))
       dayjs:
         specifier: ^1.11.11
         version: 1.11.11
+      insert-css:
+        specifier: ^2.0.0
+        version: 2.0.0
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.6
@@ -44,6 +50,9 @@ importers:
       '@ant-design/charts':
         specifier: ^2.2.7
         version: 2.2.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(workerize-loader@2.0.2(webpack@5.99.8(@swc/core@1.7.22)(esbuild@0.21.5)))
+      '@ant-design/graphs':
+        specifier: ^2.0.5
+        version: 2.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(workerize-loader@2.0.2(webpack@5.99.8(@swc/core@1.7.22)(esbuild@0.21.5)))
       '@ant-design/icons':
         specifier: ^6.0.0
         version: 6.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -74,6 +83,9 @@ importers:
       i18next:
         specifier: ^23.15.2
         version: 23.15.2
+      insert-css:
+        specifier: ^2.0.0
+        version: 2.0.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3283,6 +3295,9 @@ packages:
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
+
+  insert-css@2.0.0:
+    resolution: {integrity: sha512-xGq5ISgcUP5cvGkS2MMFLtPDBtrtQPSFfC6gA6U8wHKqfjTIMZLZNxOItQnoSjdOzlXOLU/yD32RKC4SvjNbtA==}
 
   internal-slot@1.0.7:
     resolution: {integrity: sha512-NGnrKwXzSms2qUUih/ILZ5JBqNTSa1+ZmP6flaIp6KmSElgE9qdndzS3cqjrDovwFdmwsGsLdeFgB6suw+1e9g==}
@@ -8721,6 +8736,8 @@ snapshots:
       wrappy: 1.0.2
 
   inherits@2.0.4: {}
+
+  insert-css@2.0.0: {}
 
   internal-slot@1.0.7:
     dependencies:

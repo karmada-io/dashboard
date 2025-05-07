@@ -69,4 +69,6 @@ func init() {
 	r.GET("/overview/nodes", HandleGetNodeSummary)
 	// 添加Pod汇总接口路由
 	r.GET("/overview/pods", HandleGetPodSummary)
+	// 添加集群调度预览接口路由
+	r.GET("/overview/schedule", HandleGetSchedulePreview)
 }

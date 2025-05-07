@@ -157,3 +157,46 @@ export async function GetPodSummary() {
   const resp = await karmadaClient.get<IResponse<PodsResponse>>('/overview/pods');
   return resp.data;
 }
+
+// 集群调度预览API相关类型定义
+export interface ScheduleNode {
+  id: string;
+  name: string;
+  type: string;
+}
+
+export interface ScheduleLink {
+  source: string;
+  target: string;
+  value: number;
+  type: string;
+}
+
+export interface ClusterDistribution {
+  clusterName: string;
+  count: number;
+}
+
+export interface ResourceTypeDistribution {
+  resourceType: string;
+  clusterDist: ClusterDistribution[];
+}
+
+export interface ScheduleSummary {
+  totalClusters: number;
+  totalPropagationPolicy: number;
+  totalResourceBinding: number;
+}
+
+export interface SchedulePreviewResponse {
+  nodes: ScheduleNode[];
+  links: ScheduleLink[];
+  resourceDist: ResourceTypeDistribution[];
+  summary: ScheduleSummary;
+}
+
+// 获取集群调度预览信息
+export async function GetSchedulePreview() {
+  const resp = await karmadaClient.get<IResponse<SchedulePreviewResponse>>('/overview/schedule');
+  return resp.data;
+}

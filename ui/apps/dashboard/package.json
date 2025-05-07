@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@ant-design/charts": "^2.2.7",
+    "@ant-design/graphs": "^2.0.5",
     "@ant-design/icons": "^6.0.0",
     "@karmada/i18n-tool": "workspace:*",
     "@karmada/utils": "workspace:*",
@@ -37,6 +38,7 @@
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "i18next": "^23.15.2",
+    "insert-css": "^2.0.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.368.0",
     "monaco-editor": "^0.48.0",
