@@ -458,15 +458,15 @@ const Overview = () => {
               <div className="mr-3">
                 <div className="text-xs text-gray-500 mb-1">{i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'Memory用量')}</div>
                 <div className="text-sm font-medium">
-                  {Math.round(resourcesData.memory.usage * resourcesData.memory.capacity / 100) / 1024} GB/
-                  {Math.round(resourcesData.memory.capacity / 1024)} GB
+                  {Math.round(resourcesData.memory.usage / 1024 / 1024)} GB/
+                  {Math.round(resourcesData.memory.capacity / 1024 / 1024)} GB
                 </div>
               </div>
               <Progress 
                 type="circle" 
-                percent={Math.round(resourcesData.memory.usage)} 
+                percent={Math.round((resourcesData.memory.usage / resourcesData.memory.capacity) * 100)} 
                 size={60}
-                strokeColor={getPercentColor(resourcesData.memory.usage)}
+                strokeColor={getPercentColor(Math.round((resourcesData.memory.usage / resourcesData.memory.capacity) * 100))}
                 format={(percent) => (
                   <div className="text-center">
                     <div className="text-sm font-bold">{percent}%</div>
