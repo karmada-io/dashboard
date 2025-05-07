@@ -33,6 +33,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
+// 创建deployment
 func handlerCreateDeployment(c *gin.Context) {
 	ctx := context.Context(c)
 	createDeploymentRequest := new(v1.CreateDeploymentRequest)
@@ -67,6 +68,7 @@ func handlerCreateDeployment(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取deployment列表
 func handleGetDeployments(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -79,6 +81,7 @@ func handleGetDeployments(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取deployment详情
 func handleGetDeploymentDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("deployment")
@@ -91,6 +94,7 @@ func handleGetDeploymentDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取deployment事件
 func handleGetDeploymentEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("deployment")
@@ -103,11 +107,18 @@ func handleGetDeploymentEvents(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取deployment列表
 	r.GET("/deployment", handleGetDeployments)
+	// 获取deployment列表
 	r.GET("/deployment/:namespace", handleGetDeployments)
+	// 获取deployment详情
 	r.GET("/deployment/:namespace/:deployment", handleGetDeploymentDetail)
+	// 获取deployment事件
 	r.GET("/deployment/:namespace/:deployment/event", handleGetDeploymentEvents)
+	// 创建deployment
 	r.POST("/deployment", handlerCreateDeployment)
 }

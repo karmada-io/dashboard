@@ -19,23 +19,27 @@ import (
 	"testing"
 )
 
+// PaginationTestCase 表示分页测试用例
 type PaginationTestCase struct {
 	Info            string
 	PaginationQuery *PaginationQuery
 	ExpectedOrder   []int
 }
 
+// SortTestCase 表示排序测试用例	
 type SortTestCase struct {
 	Info          string
 	SortQuery     *SortQuery
 	ExpectedOrder []int
 }
 
+// TestDataCell 表示测试数据单元
 type TestDataCell struct {
 	Name string
 	ID   int
 }
 
+// GetProperty 获取属性
 func (c TestDataCell) GetProperty(name PropertyName) ComparableValue {
 	switch name {
 	case NameProperty:
@@ -47,6 +51,7 @@ func (c TestDataCell) GetProperty(name PropertyName) ComparableValue {
 	}
 }
 
+// toCells 将标准数据单元转换为数据单元
 func toCells(std []TestDataCell) []DataCell {
 	cells := make([]DataCell, len(std))
 	for i := range std {
@@ -55,6 +60,7 @@ func toCells(std []TestDataCell) []DataCell {
 	return cells
 }
 
+// fromCells 将数据单元转换为标准数据单元
 func fromCells(cells []DataCell) []TestDataCell {
 	std := make([]TestDataCell, len(cells))
 	for i := range std {
@@ -63,6 +69,7 @@ func fromCells(cells []DataCell) []TestDataCell {
 	return std
 }
 
+// getDataCellList 获取数据单元列表
 func getDataCellList() []DataCell {
 	return toCells([]TestDataCell{
 		{"ab", 1},
@@ -78,6 +85,7 @@ func getDataCellList() []DataCell {
 	})
 }
 
+// getOrder 获取排序顺序
 func getOrder(dataList []TestDataCell) []int {
 	idOrder := []int{}
 	for _, e := range dataList {
@@ -86,6 +94,7 @@ func getOrder(dataList []TestDataCell) []int {
 	return idOrder
 }
 
+// TestSort 测试排序
 func TestSort(t *testing.T) {
 	testCases := []SortTestCase{
 		{
@@ -154,6 +163,7 @@ func TestSort(t *testing.T) {
 	}
 }
 
+// TestPagination 测试分页
 func TestPagination(t *testing.T) {
 	testCases := []PaginationTestCase{
 		{

@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
+// 获取daemonset列表
 func handleGetDaemonset(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -38,6 +39,7 @@ func handleGetDaemonset(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取daemonset详情
 func handleGetDaemonsetDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -50,6 +52,7 @@ func handleGetDaemonsetDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取daemonset事件
 func handleGetDaemonsetEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -62,10 +65,15 @@ func handleGetDaemonsetEvents(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取daemonset列表
 	r.GET("/daemonset", handleGetDaemonset)
+	// 获取daemonset详情
 	r.GET("/daemonset/:namespace", handleGetDaemonset)
 	r.GET("/daemonset/:namespace/:statefulset", handleGetDaemonsetDetail)
+	// 获取daemonset事件
 	r.GET("/daemonset/:namespace/:statefulset/event", handleGetDaemonsetEvents)
 }

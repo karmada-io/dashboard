@@ -34,6 +34,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/propagationpolicy"
 )
 
+// 获取传播策略列表
 func handleGetPropagationPolicyList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -47,6 +48,8 @@ func handleGetPropagationPolicyList(c *gin.Context) {
 	}
 	common.Success(c, propagationList)
 }
+
+// 获取传播策略详情
 func handleGetPropagationPolicyDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	namespace := c.Param("namespace")
@@ -59,6 +62,8 @@ func handleGetPropagationPolicyDetail(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 创建传播策略
 func handlePostPropagationPolicy(c *gin.Context) {
 	// todo precheck existence of namespace, now we tested it under scope of default, it's ok till now.
 	ctx := context.Context(c)
@@ -97,6 +102,8 @@ func handlePostPropagationPolicy(c *gin.Context) {
 	}
 	common.Success(c, "ok")
 }
+
+// 更新传播策略
 func handlePutPropagationPolicy(c *gin.Context) {
 	ctx := context.Context(c)
 	propagationpolicyRequest := new(v1.PutPropagationPolicyRequest)
@@ -138,6 +145,8 @@ func handlePutPropagationPolicy(c *gin.Context) {
 	}
 	common.Success(c, "ok")
 }
+
+// 删除传播策略
 func handleDeletePropagationPolicy(c *gin.Context) {
 	ctx := context.Context(c)
 	propagationpolicyRequest := new(v1.DeletePropagationPolicyRequest)
@@ -175,11 +184,17 @@ func handleDeletePropagationPolicy(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取传播策略列表
 	r.GET("/propagationpolicy", handleGetPropagationPolicyList)
+	// 获取传播策略详情
 	r.GET("/propagationpolicy/namespace/:namespace/:propagationPolicyName", handleGetPropagationPolicyDetail)
+	// 创建传播策略
 	r.POST("/propagationpolicy", handlePostPropagationPolicy)
+	// 更新传播策略
 	r.PUT("/propagationpolicy", handlePutPropagationPolicy)
+	// 删除传播策略
 	r.DELETE("/propagationpolicy", handleDeletePropagationPolicy)
 }

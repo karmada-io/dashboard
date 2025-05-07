@@ -17,6 +17,7 @@ limitations under the License.
 package config
 
 // DockerRegistry represents a Docker registry configuration.
+// DockerRegistry 表示 Docker 注册表配置
 type DockerRegistry struct {
 	Name     string `yaml:"name" json:"name"`
 	URL      string `yaml:"url" json:"url"`
@@ -25,7 +26,7 @@ type DockerRegistry struct {
 	AddTime  int64  `yaml:"add_time" json:"add_time"`
 }
 
-// ChartRegistry represents a Helm chart registry configuration.
+// ChartRegistry 表示 Helm 图表注册表配置
 type ChartRegistry struct {
 	Name     string `yaml:"name" json:"name"`
 	URL      string `yaml:"url" json:"url"`
@@ -34,7 +35,7 @@ type ChartRegistry struct {
 	AddTime  int64  `yaml:"add_time" json:"add_time"`
 }
 
-// MenuConfig represents a menu configuration.
+// MenuConfig 表示菜单配置
 type MenuConfig struct {
 	Path       string       `yaml:"path" json:"path"`
 	Enable     bool         `yaml:"enable" json:"enable"`
@@ -42,7 +43,7 @@ type MenuConfig struct {
 	Children   []MenuConfig `yaml:"children" json:"children,omitempty"`
 }
 
-// DashboardConfig represents the configuration structure for the Karmada dashboard.
+// DashboardConfig 表示 Karmada 仪表板的配置结构
 type DashboardConfig struct {
 	DockerRegistries []DockerRegistry `yaml:"docker_registries" json:"docker_registries"`
 	ChartRegistries  []ChartRegistry  `yaml:"chart_registries" json:"chart_registries"`

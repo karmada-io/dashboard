@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
+// 获取cronjob列表
 func handleGetCronJob(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -38,6 +39,7 @@ func handleGetCronJob(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取cronjob详情
 func handleGetCronJobDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -50,6 +52,7 @@ func handleGetCronJobDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取cronjob事件
 func handleGetCronJobEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -62,10 +65,15 @@ func handleGetCronJobEvents(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取cronjob列表
 	r.GET("/cronjob", handleGetCronJob)
+	// 获取cronjob详情
 	r.GET("/cronjob/:namespace", handleGetCronJob)
 	r.GET("/cronjob/:namespace/:statefulset", handleGetCronJobDetail)
+	// 获取cronjob事件
 	r.GET("/cronjob/:namespace/:statefulset/event", handleGetCronJobEvents)
 }

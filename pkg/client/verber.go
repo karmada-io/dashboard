@@ -36,16 +36,17 @@ import (
 )
 
 var (
+	// kindToGroupVersionResource 是 kind 到 GroupVersionResource 的映射
 	kindToGroupVersionResource = map[string]schema.GroupVersionResource{}
 )
 
-// resourceVerber is a struct responsible for doing common verb operations on resources, like
-// DELETE, PUT, UPDATE.
+// resourceVerber 是一个负责对资源执行常见 CRUD 操作的结构体，例如 DELETE、PUT、UPDATE。
 type resourceVerber struct {
 	client    dynamic.Interface
 	discovery discovery.DiscoveryInterface
 }
 
+// groupVersionResourceFromUnstructured 从 Unstructured 对象获取 GroupVersionResource
 func (v *resourceVerber) groupVersionResourceFromUnstructured(object *unstructured.Unstructured) schema.GroupVersionResource {
 	gvk := object.GetObjectKind().GroupVersionKind()
 
@@ -56,6 +57,7 @@ func (v *resourceVerber) groupVersionResourceFromUnstructured(object *unstructur
 	}
 }
 
+// groupVersionResourceFromKind 从 kind 获取 GroupVersionResource
 func (v *resourceVerber) groupVersionResourceFromKind(kind string) (schema.GroupVersionResource, error) {
 	if gvr, exists := kindToGroupVersionResource[kind]; exists {
 		klog.V(3).InfoS("GroupVersionResource cache hit", "kind", kind)
@@ -80,6 +82,7 @@ func (v *resourceVerber) groupVersionResourceFromKind(kind string) (schema.Group
 	return schema.GroupVersionResource{}, fmt.Errorf("could not find GVR for kind %s", kind)
 }
 
+// buildGroupVersionResourceCache 构建 GroupVersionResource 缓存
 func (v *resourceVerber) buildGroupVersionResourceCache(resourceList []*metav1.APIResourceList) error {
 	for _, resource := range resourceList {
 		gv, err := schema.ParseGroupVersion(resource.GroupVersion)
@@ -111,7 +114,7 @@ func (v *resourceVerber) buildGroupVersionResourceCache(resourceList []*metav1.A
 	return nil
 }
 
-// Delete deletes the resource of the given kind in the given namespace with the given name.
+// Delete 删除指定命名空间和名称的资源
 func (v *resourceVerber) Delete(kind string, namespace string, name string, deleteNow bool) error {
 	gvr, err := v.groupVersionResourceFromKind(kind)
 	if err != nil {
@@ -132,7 +135,7 @@ func (v *resourceVerber) Delete(kind string, namespace string, name string, dele
 	return v.client.Resource(gvr).Namespace(namespace).Delete(context.TODO(), name, defaultDeleteOptions)
 }
 
-// Update patches resource of the given kind in the given namespace with the given name.
+// Update 更新指定命名空间和名称的资源
 func (v *resourceVerber) Update(object *unstructured.Unstructured) error {
 	name := object.GetName()
 	namespace := object.GetNamespace()
@@ -168,7 +171,7 @@ func (v *resourceVerber) Update(object *unstructured.Unstructured) error {
 	})
 }
 
-// Get gets the resource of the given kind in the given namespace with the given name.
+// Get 获取指定命名空间和名称的资源
 func (v *resourceVerber) Get(kind string, namespace string, name string) (runtime.Object, error) {
 	gvr, err := v.groupVersionResourceFromKind(kind)
 	if err != nil {
@@ -177,7 +180,7 @@ func (v *resourceVerber) Get(kind string, namespace string, name string) (runtim
 	return v.client.Resource(gvr).Namespace(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
-// Create creates the resource of the given kind in the given namespace with the given name.
+// Create 创建指定命名空间和名称的资源
 func (v *resourceVerber) Create(object *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 	namespace := object.GetNamespace()
 	gvr := v.groupVersionResourceFromUnstructured(object)
@@ -185,7 +188,7 @@ func (v *resourceVerber) Create(object *unstructured.Unstructured) (*unstructure
 	return v.client.Resource(gvr).Namespace(namespace).Create(context.TODO(), object, metav1.CreateOptions{})
 }
 
-// VerberClient returns a resourceVerber client.
+// VerberClient 返回一个 resourceVerber 客户端
 func VerberClient(_ *http.Request) (ResourceVerber, error) {
 	// todo currently ignore rest.config from http.Request
 	restConfig, _, err := GetKarmadaConfig()

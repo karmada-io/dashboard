@@ -24,6 +24,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 )
 
+// 获取仪表盘概览
 func handleGetOverview(c *gin.Context) {
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	karmadaInfo, err := GetControllerManagerInfo()
@@ -51,6 +52,7 @@ func handleGetOverview(c *gin.Context) {
 	})
 }
 
+// 初始化路由
 func init() {
 	/*
 		创建时间	2024-01-01

@@ -25,6 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/node"
 )
 
+// 获取成员集群的node列表
 func handleGetClusterNode(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -36,7 +37,9 @@ func handleGetClusterNode(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.MemberV1()
+	// 获取成员集群的node列表
 	r.GET("/node", handleGetClusterNode)
 }

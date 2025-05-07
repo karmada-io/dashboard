@@ -32,6 +32,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/clusteroverridepolicy"
 )
 
+// 获取集群覆盖策略列表
 func handleGetClusterOverridePolicyList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -44,6 +45,7 @@ func handleGetClusterOverridePolicyList(c *gin.Context) {
 	common.Success(c, clusterOverrideList)
 }
 
+// 获取集群覆盖策略详情
 func handleGetClusterOverridePolicyDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	name := c.Param("clusterOverridePolicyName")
@@ -56,6 +58,7 @@ func handleGetClusterOverridePolicyDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 创建集群覆盖策略
 func handlePostClusterOverridePolicy(c *gin.Context) {
 	ctx := context.Context(c)
 	overridepolicyRequest := new(v1.PostOverridePolicyRequest)
@@ -91,9 +94,13 @@ func handlePostClusterOverridePolicy(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取集群覆盖策略列表
 	r.GET("/clusteroverridepolicy", handleGetClusterOverridePolicyList)
+	// 获取集群覆盖策略详情
 	r.GET("/clusteroverridepolicy/:clusterOverridePolicyName", handleGetClusterOverridePolicyDetail)
+	// 创建集群覆盖策略
 	r.POST("/clusteroverridepolicy", handlePostClusterOverridePolicy)
 }

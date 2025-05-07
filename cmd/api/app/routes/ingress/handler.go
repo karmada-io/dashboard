@@ -25,6 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/ingress"
 )
 
+// 获取ingress列表
 func handleGetIngress(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -37,6 +38,7 @@ func handleGetIngress(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取ingress详情
 func handleGetIngressDetail(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
@@ -49,9 +51,13 @@ func handleGetIngressDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取ingress列表
 	r.GET("/ingress", handleGetIngress)
+	// 获取ingress列表
 	r.GET("/ingress/:namespace", handleGetIngress)
+	// 获取ingress详情
 	r.GET("/ingress/:namespace/:service", handleGetIngressDetail)
 }

@@ -30,6 +30,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 )
 
+// 删除资源
 func handleDeleteResource(c *gin.Context) {
 	verber, err := client.VerberClient(c.Request)
 	if err != nil {
@@ -112,6 +113,7 @@ func handlePutResource(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 创建资源
 func handleCreateResource(c *gin.Context) {
 	// todo double-check existence of target resources, if exist return directly.
 	verber, err := client.VerberClient(c.Request)
@@ -141,16 +143,25 @@ func handleCreateResource(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 删除资源
 	r.DELETE("/_raw/:kind/namespace/:namespace/name/:name", handleDeleteResource)
+	// 获取资源
 	r.GET("/_raw/:kind/namespace/:namespace/name/:name", handleGetResource)
+	// 更新资源
 	r.PUT("/_raw/:kind/namespace/:namespace/name/:name", handlePutResource)
+	// 创建资源
 	r.POST("/_raw/:kind/namespace/:namespace/name/:name", handleCreateResource)
 
 	// Verber (non-namespaced)
+	// 删除资源
 	r.DELETE("/_raw/:kind/name/:name", handleDeleteResource)
+	// 获取资源
 	r.GET("/_raw/:kind/name/:name", handleGetResource)
+	// 更新资源
 	r.PUT("/_raw/:kind/name/:name", handlePutResource)
+	// 创建资源
 	r.POST("/_raw/:kind/name/:name", handleCreateResource)
 }

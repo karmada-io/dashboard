@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/event"
 )
 
+// 获取成员集群的deployment列表
 func handleGetMemberDeployments(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	namespace := common.ParseNamespacePathParameter(c)
@@ -38,6 +39,7 @@ func handleGetMemberDeployments(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取成员集群的deployment详情
 func handleGetMemberDeploymentDetail(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	namespace := c.Param("namespace")
@@ -50,6 +52,7 @@ func handleGetMemberDeploymentDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取成员集群的deployment事件
 func handleGetMemberDeploymentEvents(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	namespace := c.Param("namespace")
@@ -63,10 +66,15 @@ func handleGetMemberDeploymentEvents(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.MemberV1()
+	// 获取成员集群的deployment列表
 	r.GET("/deployment", handleGetMemberDeployments)
+	// 获取成员集群的deployment列表
 	r.GET("/deployment/:namespace", handleGetMemberDeployments)
+	// 获取成员集群的deployment详情
 	r.GET("/deployment/:namespace/:deployment", handleGetMemberDeploymentDetail)
+	// 获取成员集群的deployment事件
 	r.GET("/deployment/:namespace/:deployment/event", handleGetMemberDeploymentEvents)
 }

@@ -26,6 +26,7 @@ import (
 	ns "github.com/karmada-io/dashboard/pkg/resource/namespace"
 )
 
+// 获取成员集群的namespace列表
 func handleGetMemberNamespace(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 
@@ -38,6 +39,7 @@ func handleGetMemberNamespace(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取成员集群的namespace详情
 func handleGetMemberNamespaceDetail(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 
@@ -50,6 +52,7 @@ func handleGetMemberNamespaceDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取成员集群的namespace事件
 func handleGetMemberNamespaceEvents(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 
@@ -63,9 +66,13 @@ func handleGetMemberNamespaceEvents(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.MemberV1()
+	// 获取成员集群的namespace列表
 	r.GET("/namespace", handleGetMemberNamespace)
+	// 获取成员集群的namespace详情
 	r.GET("/namespace/:name", handleGetMemberNamespaceDetail)
+	// 获取成员集群的namespace事件
 	r.GET("/namespace/:name/event", handleGetMemberNamespaceEvents)
 }

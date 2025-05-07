@@ -31,6 +31,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// dashboardConfig 是 dashboard 的配置
 var dashboardConfig DashboardConfig
 
 const (
@@ -47,7 +48,7 @@ var (
 	}
 )
 
-// GetConfigKey returns the configuration key based on the environment name.
+// GetConfigKey 根据环境名称返回配置键
 func GetConfigKey() string {
 	envName := os.Getenv("ENV_NAME")
 	if envName == "" {
@@ -56,7 +57,7 @@ func GetConfigKey() string {
 	return fmt.Sprintf("%s.yaml", envName)
 }
 
-// InitDashboardConfig initializes the dashboard configuration using a Kubernetes client.
+// InitDashboardConfig 使用 Kubernetes 客户端初始化 dashboard 配置
 func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}) {
 	factory := informers.NewSharedInformerFactory(k8sClient, 0)
 	resource, err := factory.ForResource(configmapGVR)
@@ -100,7 +101,7 @@ func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}
 	klog.Infof("ConfigMap informer started, waiting for ConfigMap events...")
 }
 
-// GetDashboardConfig returns a copy of the current dashboard configuration.
+// GetDashboardConfig 返回当前 dashboard 配置的副本
 func GetDashboardConfig() DashboardConfig {
 	return DashboardConfig{
 		DockerRegistries: dashboardConfig.DockerRegistries,
@@ -110,7 +111,7 @@ func GetDashboardConfig() DashboardConfig {
 	}
 }
 
-// UpdateDashboardConfig updates the dashboard configuration in the Kubernetes ConfigMap.
+// UpdateDashboardConfig 更新 Kubernetes ConfigMap 中的 dashboard 配置
 func UpdateDashboardConfig(k8sClient kubernetes.Interface, newDashboardConfig DashboardConfig) error {
 	ctx := context.TODO()
 	oldConfigMap, err := k8sClient.CoreV1().ConfigMaps(configNamespace).Get(ctx, configName, metav1.GetOptions{})
@@ -133,7 +134,7 @@ func UpdateDashboardConfig(k8sClient kubernetes.Interface, newDashboardConfig Da
 	return nil
 }
 
-// InitDashboardConfigFromMountFile initializes the dashboard configuration from a mounted file.
+// InitDashboardConfigFromMountFile 从挂载的文件初始化 dashboard 配置
 func InitDashboardConfigFromMountFile(mountPath string) error {
 	_, err := os.Stat(mountPath)
 	if os.IsNotExist(err) {

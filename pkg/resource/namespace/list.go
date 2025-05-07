@@ -29,29 +29,29 @@ import (
 	"github.com/karmada-io/dashboard/pkg/dataselect"
 )
 
-// NamespaceList contains a list of namespaces in the cluster.
+// NamespaceList 包含集群中的命名空间列表
 type NamespaceList struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
-	// Unordered list of Namespaces.
+	// 未排序的命名空间列表
 	Namespaces []Namespace `json:"namespaces"`
 
-	// List of non-critical errors, that occurred during resource retrieval.
+	// 在资源检索期间发生的非关键错误列表
 	Errors []error `json:"errors"`
 }
 
-// Namespace is a presentation layer view of Kubernetes namespaces. This means it is namespace plus
-// additional augmented data we can get from other sources.
+// Namespace 是 Kubernetes 命名空间的表示层视图。这意味着它是一个命名空间加上
+// 其他来源可以获取到的附加增强数据。
 type Namespace struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
 
-	// Phase is the current lifecycle phase of the namespace.
+	// Phase 是命名空间的当前生命周期阶段。
 	Phase               v1.NamespacePhase `json:"phase"`
 	SkipAutoPropagation bool              `json:"skipAutoPropagation"`
 }
 
-// GetNamespaceList returns a list of all namespaces in the cluster.
+// GetNamespaceList 返回集群中所有命名空间的列表。
 func GetNamespaceList(client kubernetes.Interface, dsQuery *dataselect.DataSelectQuery) (*NamespaceList, error) {
 	log.Println("Getting list of namespaces")
 	namespaces, err := client.CoreV1().Namespaces().List(context.TODO(), helpers.ListEverything)
@@ -64,6 +64,7 @@ func GetNamespaceList(client kubernetes.Interface, dsQuery *dataselect.DataSelec
 	return toNamespaceList(namespaces.Items, nonCriticalErrors, dsQuery), nil
 }
 
+// toNamespaceList 将命名空间列表转换为命名空间列表
 func toNamespaceList(namespaces []v1.Namespace, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *NamespaceList {
 	namespaceList := &NamespaceList{
 		Namespaces: make([]Namespace, 0),
@@ -82,6 +83,7 @@ func toNamespaceList(namespaces []v1.Namespace, nonCriticalErrors []error, dsQue
 	return namespaceList
 }
 
+// toNamespace 将命名空间转换为命名空间
 func toNamespace(namespace v1.Namespace) Namespace {
 	_, exist := namespace.Labels[skipAutoPropagationLable]
 

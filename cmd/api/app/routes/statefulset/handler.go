@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/statefulset"
 )
 
+// 获取statefulset列表
 func handleGetStatefulsets(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -38,6 +39,7 @@ func handleGetStatefulsets(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取statefulset详情
 func handleGetStatefulsetDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -50,6 +52,7 @@ func handleGetStatefulsetDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取statefulset事件
 func handleGetStatefulsetEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -62,10 +65,16 @@ func handleGetStatefulsetEvents(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取statefulset列表
 	r.GET("/statefulset", handleGetStatefulsets)
+	// 获取statefulset列表
 	r.GET("/statefulset/:namespace", handleGetStatefulsets)
+	// 获取statefulset详情
 	r.GET("/statefulset/:namespace/:statefulset", handleGetStatefulsetDetail)
+	// 获取statefulset事件
 	r.GET("/statefulset/:namespace/:statefulset/event", handleGetStatefulsetEvents)
 }

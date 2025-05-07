@@ -32,6 +32,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/clusterpropagationpolicy"
 )
 
+// 获取集群传播策略列表
 func handleGetClusterPropagationPolicyList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -44,6 +45,7 @@ func handleGetClusterPropagationPolicyList(c *gin.Context) {
 	common.Success(c, clusterPropagationList)
 }
 
+// 获取集群传播策略详情
 func handleGetClusterPropagationPolicyDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	name := c.Param("clusterPropagationPolicyName")
@@ -56,6 +58,7 @@ func handleGetClusterPropagationPolicyDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 创建集群传播策略
 func handlePostClusterPropagationPolicy(c *gin.Context) {
 	ctx := context.Context(c)
 	propagationpolicyRequest := new(v1.PostPropagationPolicyRequest)
@@ -91,9 +94,13 @@ func handlePostClusterPropagationPolicy(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取集群传播策略列表
 	r.GET("/clusterpropagationpolicy", handleGetClusterPropagationPolicyList)
+	// 获取集群传播策略详情
 	r.GET("/clusterpropagationpolicy/:clusterPropagationPolicyName", handleGetClusterPropagationPolicyDetail)
+	// 创建集群传播策略
 	r.POST("/clusterpropagationpolicy", handlePostClusterPropagationPolicy)
 }

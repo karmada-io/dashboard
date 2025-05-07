@@ -43,6 +43,7 @@ const (
 )
 
 // GetControllerManagerVersionInfo returns the version info of karmada-controller-manager.
+// 获取karmada-controller-manager的版本信息
 func GetControllerManagerVersionInfo() (*version.Info, error) {
 	kubeClient := client.InClusterClient()
 	restConfig, _, err := client.GetKubeConfig()
@@ -96,6 +97,7 @@ func GetControllerManagerVersionInfo() (*version.Info, error) {
 }
 
 // ParseVersion parses the version string to version.Info.
+// 解析版本字符串到version.Info
 func ParseVersion(versionStr string) *version.Info {
 	versionInfo := &version.Info{}
 	leftBraceIdx := strings.IndexByte(versionStr, '{')
@@ -134,6 +136,7 @@ func ParseVersion(versionStr string) *version.Info {
 }
 
 // GetControllerManagerInfo returns the version info of karmada-controller-manager.
+// 获取karmada-controller-manager的版本信息
 func GetControllerManagerInfo() (*v1.KarmadaInfo, error) {
 	versionInfo, err := GetControllerManagerVersionInfo()
 	if err != nil {
@@ -161,6 +164,7 @@ func GetControllerManagerInfo() (*v1.KarmadaInfo, error) {
 }
 
 // GetMemberClusterInfo returns the status of member clusters.
+// 获取成员集群的状态
 func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStatus, error) {
 	karmadaClient := client.InClusterKarmadaClient()
 	result, err := cluster.GetClusterList(karmadaClient, ds)
@@ -194,6 +198,7 @@ func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStat
 }
 
 // GetClusterResourceStatus returns the status of cluster resources.
+// 获取集群资源的状态
 func GetClusterResourceStatus() (*v1.ClusterResourceStatus, error) {
 	clusterResourceStatus := &v1.ClusterResourceStatus{}
 	ctx := context.TODO()

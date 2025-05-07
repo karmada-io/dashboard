@@ -29,21 +29,33 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// proxyURL 代理 URL
 const proxyURL = "/apis/cluster.karmada.io/v1alpha1/clusters/%s/proxy/"
 
 var (
+	// kubernetesRestConfig 是 Kubernetes 的 rest.Config
 	kubernetesRestConfig               *rest.Config
+	// kubernetesAPIConfig 是 Kubernetes 的 clientcmdapi.Config
 	kubernetesAPIConfig                *clientcmdapi.Config
+	// inClusterClient 是 Kubernetes 的客户端
 	inClusterClient                    kubeclient.Interface
+	// karmadaRestConfig 是 Karmada 的 rest.Config
 	karmadaRestConfig                  *rest.Config
+	// karmadaAPIConfig 是 Karmada 的 clientcmdapi.Config
 	karmadaAPIConfig                   *clientcmdapi.Config
+	// karmadaMemberConfig 是 Karmada 的 rest.Config
 	karmadaMemberConfig                *rest.Config
+	// inClusterKarmadaClient 是 Karmada 的客户端
 	inClusterKarmadaClient             karmadaclientset.Interface
+	// inClusterClientForKarmadaAPIServer 是 Karmada 的客户端
 	inClusterClientForKarmadaAPIServer kubeclient.Interface
+	// inClusterClientForMemberAPIServer 是 Karmada 的客户端
 	inClusterClientForMemberAPIServer  kubeclient.Interface
+	// memberClients 是成员集群的客户端
 	memberClients                      sync.Map
 )
 
+// configBuilder 是 config 的构建器
 type configBuilder struct {
 	kubeconfigPath string
 	kubeContext    string
@@ -51,37 +63,38 @@ type configBuilder struct {
 	userAgent      string
 }
 
-// Option is a function that configures a configBuilder.
+// Option 是 configBuilder 的配置选项
 type Option func(*configBuilder)
 
-// WithUserAgent is an option to set the user agent.
+// WithUserAgent 是设置 user agent 的选项
 func WithUserAgent(agent string) Option {
 	return func(c *configBuilder) {
 		c.userAgent = agent
 	}
 }
 
-// WithKubeconfig is an option to set the kubeconfig path.
+// WithKubeconfig 是设置 kubeconfig 路径的选项
 func WithKubeconfig(path string) Option {
 	return func(c *configBuilder) {
 		c.kubeconfigPath = path
 	}
 }
 
-// WithKubeContext is an option to set the kubeconfig context.
+// WithKubeContext 是设置 kubeconfig 上下文的选项
 func WithKubeContext(kubecontext string) Option {
 	return func(c *configBuilder) {
 		c.kubeContext = kubecontext
 	}
 }
 
-// WithInsecureTLSSkipVerify is an option to set the insecure tls skip verify.
+// WithInsecureTLSSkipVerify 是设置不安全的 TLS 跳过验证的选项
 func WithInsecureTLSSkipVerify(insecure bool) Option {
 	return func(c *configBuilder) {
 		c.insecure = insecure
 	}
 }
 
+// newConfigBuilder 是创建 configBuilder 的函数
 func newConfigBuilder(options ...Option) *configBuilder {
 	builder := &configBuilder{}
 
@@ -92,6 +105,7 @@ func newConfigBuilder(options ...Option) *configBuilder {
 	return builder
 }
 
+// buildRestConfig 是构建 rest.Config 的函数
 func (in *configBuilder) buildRestConfig() (*rest.Config, error) {
 	if len(in.kubeconfigPath) == 0 {
 		return nil, errors.New("must specify kubeconfig")
@@ -112,6 +126,7 @@ func (in *configBuilder) buildRestConfig() (*rest.Config, error) {
 	return restConfig, nil
 }
 
+// buildAPIConfig 是构建 clientcmdapi.Config 的函数
 func (in *configBuilder) buildAPIConfig() (*clientcmdapi.Config, error) {
 	if len(in.kubeconfigPath) == 0 {
 		return nil, errors.New("must specify kubeconfig")
@@ -124,6 +139,7 @@ func (in *configBuilder) buildAPIConfig() (*clientcmdapi.Config, error) {
 	return apiConfig, nil
 }
 
+// isKubeInitialized 检查 Kubernetes config 是否已初始化
 func isKubeInitialized() bool {
 	if kubernetesRestConfig == nil || kubernetesAPIConfig == nil {
 		klog.Errorf(`karmada/karmada-dashboard/client' package has not been initialized properly. Run 'client.InitKubeConfig(...)' to initialize it. `)
@@ -132,7 +148,7 @@ func isKubeInitialized() bool {
 	return true
 }
 
-// InitKubeConfig initializes the kubernetes client config.
+// InitKubeConfig 初始化 Kubernetes 客户端配置
 func InitKubeConfig(options ...Option) {
 	builder := newConfigBuilder(options...)
 	// prefer InClusterConfig, if something wrong, use explicit kubeconfig path
@@ -163,7 +179,7 @@ func InitKubeConfig(options ...Option) {
 	}
 }
 
-// InClusterClient returns a kubernetes client.
+// InClusterClient 返回一个 Kubernetes 客户端
 func InClusterClient() kubeclient.Interface {
 	if !isKubeInitialized() {
 		return nil
@@ -184,7 +200,7 @@ func InClusterClient() kubeclient.Interface {
 	return inClusterClient
 }
 
-// GetKubeConfig returns the kubernetes client config.
+// GetKubeConfig 返回 Kubernetes 客户端配置
 func GetKubeConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	if !isKubeInitialized() {
 		return nil, nil, fmt.Errorf("client package not initialized")
@@ -201,7 +217,7 @@ func isKarmadaInitialized() bool {
 	return true
 }
 
-// InitKarmadaConfig initializes the karmada client config.
+// InitKarmadaConfig 初始化 Karmada 客户端配置
 func InitKarmadaConfig(options ...Option) {
 	builder := newConfigBuilder(options...)
 	restConfig, err := builder.buildRestConfig()
@@ -226,7 +242,7 @@ func InitKarmadaConfig(options ...Option) {
 	karmadaMemberConfig = memberConfig
 }
 
-// InClusterKarmadaClient returns a karmada client.
+// InClusterKarmadaClient 返回一个 Karmada 客户端
 func InClusterKarmadaClient() karmadaclientset.Interface {
 	if !isKarmadaInitialized() {
 		return nil
@@ -245,7 +261,7 @@ func InClusterKarmadaClient() karmadaclientset.Interface {
 	return inClusterKarmadaClient
 }
 
-// GetKarmadaConfig returns the karmada client config.
+// GetKarmadaConfig 返回 Karmada 客户端配置
 func GetKarmadaConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	if !isKarmadaInitialized() {
 		return nil, nil, fmt.Errorf("client package not initialized")
@@ -253,7 +269,7 @@ func GetKarmadaConfig() (*rest.Config, *clientcmdapi.Config, error) {
 	return karmadaRestConfig, karmadaAPIConfig, nil
 }
 
-// GetMemberConfig returns the member client config.
+// GetMemberConfig 返回成员集群的客户端配置
 func GetMemberConfig() (*rest.Config, error) {
 	if !isKarmadaInitialized() {
 		return nil, fmt.Errorf("client package not initialized")
@@ -261,7 +277,7 @@ func GetMemberConfig() (*rest.Config, error) {
 	return karmadaMemberConfig, nil
 }
 
-// InClusterClientForKarmadaAPIServer returns a kubernetes client for karmada apiserver.
+// InClusterClientForKarmadaAPIServer 返回一个 Karmada API 服务器的 Kubernetes 客户端
 func InClusterClientForKarmadaAPIServer() kubeclient.Interface {
 	if !isKarmadaInitialized() {
 		return nil
@@ -283,13 +299,14 @@ func InClusterClientForKarmadaAPIServer() kubeclient.Interface {
 	return inClusterClientForKarmadaAPIServer
 }
 
-// InClusterClientForMemberCluster returns a kubernetes client for member apiserver.
+// InClusterClientForMemberCluster 返回一个成员集群的 Kubernetes 客户端
 func InClusterClientForMemberCluster(clusterName string) kubeclient.Interface {
 	if !isKarmadaInitialized() {
 		return nil
 	}
 
 	// Load and return Interface for member apiserver if already exist
+	// 如果成员 API 服务器已经存在，则加载并返回 Interface
 	if value, ok := memberClients.Load(clusterName); ok {
 		if inClusterClientForMemberAPIServer, ok = value.(kubeclient.Interface); ok {
 			return inClusterClientForMemberAPIServer
@@ -298,7 +315,7 @@ func InClusterClientForMemberCluster(clusterName string) kubeclient.Interface {
 		return nil
 	}
 
-	// Client for new member apiserver
+	// 为新的成员 API 服务器创建客户端
 	restConfig, _, err := GetKarmadaConfig()
 	if err != nil {
 		klog.ErrorS(err, "Could not get karmada restConfig")
@@ -320,7 +337,7 @@ func InClusterClientForMemberCluster(clusterName string) kubeclient.Interface {
 	return inClusterClientForMemberAPIServer
 }
 
-// ConvertRestConfigToAPIConfig converts a rest.Config to a clientcmdapi.Config.
+// ConvertRestConfigToAPIConfig 将 rest.Config 转换为 clientcmdapi.Config
 func ConvertRestConfigToAPIConfig(restConfig *rest.Config) *clientcmdapi.Config {
 	// 将 rest.Config 转换为 clientcmdapi.Config
 	clientcmdConfig := clientcmdapi.NewConfig()

@@ -17,8 +17,12 @@ limitations under the License.
 package member
 
 import (
+	// 导入成员集群的deployment路由
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/deployment" // Importing member route packages forces route registration
+	// 导入成员集群的namespace路由
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/namespace"  // Importing member route packages forces route registration
+	// 导入成员集群的node路由
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/node"       // Importing member route packages forces route registration
+	// 导入成员集群的pod路由
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/member/pod"        // Importing member route packages forces route registration
 )

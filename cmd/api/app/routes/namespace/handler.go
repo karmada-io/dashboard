@@ -27,6 +27,7 @@ import (
 	ns "github.com/karmada-io/dashboard/pkg/resource/namespace"
 )
 
+// 创建namespace
 func handleCreateNamespace(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	createNamespaceRequest := new(v1.CreateNamesapceRequest)
@@ -44,6 +45,8 @@ func handleCreateNamespace(c *gin.Context) {
 	}
 	common.Success(c, "ok")
 }
+
+// 获取namespace列表
 func handleGetNamespaces(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -54,6 +57,8 @@ func handleGetNamespaces(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 获取namespace详情
 func handleGetNamespaceDetail(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	name := c.Param("name")
@@ -64,6 +69,8 @@ func handleGetNamespaceDetail(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 获取namespace事件
 func handleGetNamespaceEvents(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	name := c.Param("name")
@@ -75,10 +82,16 @@ func handleGetNamespaceEvents(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 创建namespace
 	r.POST("/namespace", handleCreateNamespace)
+	// 获取namespace列表
 	r.GET("/namespace", handleGetNamespaces)
+	// 获取namespace详情
 	r.GET("/namespace/:name", handleGetNamespaceDetail)
+	// 获取namespace事件
 	r.GET("/namespace/:name/event", handleGetNamespaceEvents)
 }

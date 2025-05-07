@@ -34,6 +34,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/overridepolicy"
 )
 
+// 获取覆盖策略列表
 func handleGetOverridePolicyList(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -47,6 +48,8 @@ func handleGetOverridePolicyList(c *gin.Context) {
 	}
 	common.Success(c, overrideList)
 }
+
+// 获取覆盖策略详情
 func handleGetOverridePolicyDetail(c *gin.Context) {
 	karmadaClient := client.InClusterKarmadaClient()
 	namespace := c.Param("namespace")
@@ -59,6 +62,8 @@ func handleGetOverridePolicyDetail(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 创建覆盖策略
 func handlePostOverridePolicy(c *gin.Context) {
 	// todo precheck existence of namespace, now we tested it under scope of default, it's ok till now.
 	ctx := context.Context(c)
@@ -97,6 +102,8 @@ func handlePostOverridePolicy(c *gin.Context) {
 	}
 	common.Success(c, "ok")
 }
+
+// 更新覆盖策略
 func handlePutOverridePolicy(c *gin.Context) {
 	ctx := context.Context(c)
 	overridepolicyRequest := new(v1.PutOverridePolicyRequest)
@@ -138,6 +145,8 @@ func handlePutOverridePolicy(c *gin.Context) {
 	}
 	common.Success(c, "ok")
 }
+
+// 删除覆盖策略
 func handleDeleteOverridePolicy(c *gin.Context) {
 	ctx := context.Context(c)
 	overridepolicyRequest := new(v1.DeleteOverridePolicyRequest)
@@ -175,12 +184,19 @@ func handleDeleteOverridePolicy(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取覆盖策略列表
 	r.GET("/overridepolicy", handleGetOverridePolicyList)
+	// 获取覆盖策略列表
 	r.GET("/overridepolicy/:namespace", handleGetOverridePolicyList)
+	// 获取覆盖策略详情
 	r.GET("/overridepolicy/namespace/:namespace/:overridePolicyName", handleGetOverridePolicyDetail)
+	// 创建覆盖策略
 	r.POST("/overridepolicy", handlePostOverridePolicy)
+	// 更新覆盖策略
 	r.PUT("/overridepolicy", handlePutOverridePolicy)
+	// 删除覆盖策略
 	r.DELETE("/overridepolicy", handleDeleteOverridePolicy)
 }

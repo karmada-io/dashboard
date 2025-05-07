@@ -26,6 +26,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/job"
 )
 
+// 获取job列表
 func handleGetJob(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -38,6 +39,7 @@ func handleGetJob(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取job详情
 func handleGetJobDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -50,6 +52,7 @@ func handleGetJobDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取job事件
 func handleGetJobEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("statefulset")
@@ -62,10 +65,16 @@ func handleGetJobEvents(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取job列表
 	r.GET("/job", handleGetJob)
+	// 获取job列表
 	r.GET("/job/:namespace", handleGetJob)
+	// 获取job详情
 	r.GET("/job/:namespace/:statefulset", handleGetJobDetail)
+	// 获取job事件
 	r.GET("/job/:namespace/:statefulset/event", handleGetJobEvents)
 }

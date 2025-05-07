@@ -25,6 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/service"
 )
 
+// 获取service列表
 func handleGetServices(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -37,6 +38,7 @@ func handleGetServices(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取service详情
 func handleGetServiceDetail(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
@@ -49,6 +51,7 @@ func handleGetServiceDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取service事件
 func handleGetServiceEvents(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
@@ -62,10 +65,15 @@ func handleGetServiceEvents(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取service列表
 	r.GET("/service", handleGetServices)
+	// 获取service列表
 	r.GET("/service/:namespace", handleGetServices)
+	// 获取service详情
 	r.GET("/service/:namespace/:service", handleGetServiceDetail)
+	// 获取service事件
 	r.GET("/service/:namespace/:service/event", handleGetServiceEvents)
 }

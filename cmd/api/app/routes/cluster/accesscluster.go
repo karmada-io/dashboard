@@ -38,39 +38,56 @@ import (
 
 const (
 	// KarmadaKubeconfigName is the name of karmada kubeconfig
+	// KarmadaKubeconfigName 是 karmada kubeconfig 的名称
 	KarmadaKubeconfigName = "karmada-kubeconfig"
 	// KarmadaAgentServiceAccountName is the name of karmada-agent serviceaccount
+	// KarmadaAgentServiceAccountName 是 karmada-agent serviceaccount 的名称
 	KarmadaAgentServiceAccountName = "karmada-agent-sa"
 	// KarmadaAgentName is the name of karmada-agent
+	// KarmadaAgentName 是 karmada-agent 的名称
 	KarmadaAgentName = "karmada-agent"
 	// KarmadaAgentImage is the image of karmada-agent
+	// KarmadaAgentImage 是 karmada-agent 的镜像
 	KarmadaAgentImage = "karmada/karmada-agent:latest"
 	// ClusterNamespace is the namespace of cluster
+	// ClusterNamespace 是集群的命名空间
 	ClusterNamespace = "karmada-cluster"
 )
 
 var (
+	// karmadaAgentLabels 是 karmada-agent 的标签
 	karmadaAgentLabels   = map[string]string{"app": KarmadaAgentName}
+	// karmadaAgentReplicas 是 karmada-agent 的副本数
 	karmadaAgentReplicas = int32(2)
+	// timeout 是超时时间
 	timeout              = 5 * time.Minute
 )
 
+// pullModeOption 是拉取模式选项
 type pullModeOption struct {
+	// karmadaClient 是 karmada 客户端
 	karmadaClient          karmadaclientset.Interface
+	// karmadaAgentCfg 是 karmada-agent 的配置
 	karmadaAgentCfg        *clientcmdapi.Config
+	// memberClusterNamespace 是成员集群的命名空间
 	memberClusterNamespace string
+	// memberClusterClient 是成员集群的客户端
 	memberClusterClient    *kubeclient.Clientset
+	// memberClusterName 是成员集群的名称
 	memberClusterName      string
+	// memberClusterEndpoint 是成员集群的端点
 	memberClusterEndpoint  string
 }
 
 // createSecretAndRBACInMemberCluster 在成员集群中创建所需的秘密和RBAC
 func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
+	// 序列化 karmada-agent 的 kubeconfig
 	configBytes, err := clientcmd.Write(*o.karmadaAgentCfg)
 	if err != nil {
 		return fmt.Errorf("failure while serializing karmada-agent kubeConfig. %w", err)
 	}
 
+	// 创建 karmada-kubeconfig 秘密
 	kubeConfigSecret := &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
@@ -90,6 +107,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 		return fmt.Errorf("create secret %s failed: %v", kubeConfigSecret.Name, err)
 	}
 
+	// 创建 karmada-agent ClusterRole
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: KarmadaAgentName,
@@ -113,6 +131,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 		return err
 	}
 
+	// 创建 karmada-agent ServiceAccount
 	sa := &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      KarmadaAgentServiceAccountName,
@@ -127,6 +146,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 		return err
 	}
 
+	// 创建 karmada-agent ClusterRoleBinding
 	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: KarmadaAgentName,
@@ -154,8 +174,7 @@ func (o pullModeOption) createSecretAndRBACInMemberCluster() error {
 	return nil
 }
 
-// makeKarmadaAgentDeployment generate karmada-agent Deployment
-// 生成karmada-agent Deployment
+// makeKarmadaAgentDeployment 生成karmada-agent Deployment
 func (o pullModeOption) makeKarmadaAgentDeployment() *appsv1.Deployment {
 	karmadaAgent := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -295,35 +314,43 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 		ClusterConfig:      opts.memberClusterRestConfig,
 	}
 
+	// 创建控制平面客户端
 	controlPlaneKubeClient := kubeclient.NewForConfigOrDie(opts.karmadaRestConfig)
+	// 创建成员集群客户端
 	memberClusterKubeClient := kubeclient.NewForConfigOrDie(opts.memberClusterRestConfig)
+	// 获取成员集群ID
 	id, err := karmadautil.ObtainClusterID(memberClusterKubeClient)
 	if err != nil {
 		klog.ErrorS(err, "ObtainClusterID failed")
 		return err
 	}
+	// 检查集群ID是否唯一
 	exist, name, err := karmadautil.IsClusterIdentifyUnique(opts.karmadaClient, id)
 	if err != nil {
 		klog.ErrorS(err, "Check ClusterIdentify failed")
 		return err
 	}
+	// 如果集群ID不唯一，返回错误
 	if !exist {
 		return fmt.Errorf("the same cluster has been registered with name %s", name)
 	}
+	// 设置集群ID
 	registerOption.ClusterID = id
-
+	// 获取成员集群凭证
 	clusterSecret, impersonatorSecret, err := karmadautil.ObtainCredentialsFromMemberCluster(memberClusterKubeClient, registerOption)
 	if err != nil {
 		klog.ErrorS(err, "ObtainCredentialsFromMemberCluster failed")
 		return err
 	}
+	// 设置集群凭证
 	registerOption.Secret = *clusterSecret
 	registerOption.ImpersonatorSecret = *impersonatorSecret
-
+	// 注册集群
 	err = karmadautil.RegisterClusterInControllerPlane(registerOption, controlPlaneKubeClient, generateClusterInControllerPlane)
 	if err != nil {
 		return err
 	}
+	// 打印成功信息
 	klog.Infof("cluster(%s) is joined successfully\n", opts.clusterName)
 	return nil
 }
@@ -331,14 +358,20 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 // generateClusterInControllerPlane 在控制平面中生成集群对象
 func generateClusterInControllerPlane(opts karmadautil.ClusterRegisterOption) (*clusterv1alpha1.Cluster, error) {
 	clusterObj := &clusterv1alpha1.Cluster{}
+	// 设置集群名称
 	clusterObj.Name = opts.ClusterName
+	// 设置同步模式
 	clusterObj.Spec.SyncMode = clusterv1alpha1.Push
+	// 设置API端点
 	clusterObj.Spec.APIEndpoint = opts.ClusterConfig.Host
+	// 设置集群ID
 	clusterObj.Spec.ID = opts.ClusterID
+	// 设置集群凭证
 	clusterObj.Spec.SecretRef = &clusterv1alpha1.LocalSecretReference{
 		Namespace: opts.Secret.Namespace,
 		Name:      opts.Secret.Name,
 	}
+	// 设置集群凭证
 	clusterObj.Spec.ImpersonatorSecretRef = &clusterv1alpha1.LocalSecretReference{
 		Namespace: opts.ImpersonatorSecret.Namespace,
 		Name:      opts.ImpersonatorSecret.Name,
@@ -356,6 +389,7 @@ func generateClusterInControllerPlane(opts karmadautil.ClusterRegisterOption) (*
 		clusterObj.Spec.Region = opts.ClusterRegion
 	}
 
+	// 设置集群配置
 	clusterObj.Spec.InsecureSkipTLSVerification = opts.ClusterConfig.TLSClientConfig.Insecure
 
 	if opts.ClusterConfig.Proxy != nil {
@@ -366,11 +400,13 @@ func generateClusterInControllerPlane(opts karmadautil.ClusterRegisterOption) (*
 		clusterObj.Spec.ProxyURL = url.String()
 	}
 
+	// 创建控制平面Karmada客户端
 	controlPlaneKarmadaClient := karmadaclientset.NewForConfigOrDie(opts.ControlPlaneConfig)
+	// 创建集群对象
 	cluster, err := karmadautil.CreateClusterObject(controlPlaneKarmadaClient, clusterObj)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cluster(%s) object. error: %v", opts.ClusterName, err)
 	}
-
+	// 返回集群对象
 	return cluster, nil
 }

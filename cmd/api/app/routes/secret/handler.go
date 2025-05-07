@@ -25,6 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/secret"
 )
 
+// 获取secret列表
 func handleGetSecrets(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -37,6 +38,7 @@ func handleGetSecrets(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取secret详情
 func handleGetSecretDetail(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
@@ -48,9 +50,14 @@ func handleGetSecretDetail(c *gin.Context) {
 	}
 	common.Success(c, result)
 }
+
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取secret列表
 	r.GET("/secret", handleGetSecrets)
+	// 获取secret列表
 	r.GET("/secret/:namespace", handleGetSecrets)
+	// 获取secret详情
 	r.GET("/secret/:namespace/:service", handleGetSecretDetail)
 }

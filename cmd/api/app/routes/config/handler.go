@@ -28,12 +28,14 @@ import (
 )
 
 // GetDashboardConfig handles the request to retrieve the dashboard configuration.
+// 获取仪表盘配置
 func GetDashboardConfig(c *gin.Context) {
 	dashboardConfig := config.GetDashboardConfig()
 	common.Success(c, dashboardConfig)
 }
 
 // SetDashboardConfig handles the request to update the dashboard configuration.
+// 更新仪表盘配置
 func SetDashboardConfig(c *gin.Context) {
 	setDashboardConfigRequest := new(v1.SetDashboardConfigRequest)
 	if err := c.ShouldBind(setDashboardConfigRequest); err != nil {
@@ -62,8 +64,11 @@ func SetDashboardConfig(c *gin.Context) {
 	common.Success(c, "ok")
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取仪表盘配置
 	r.GET("/config", GetDashboardConfig)
+	// 更新仪表盘配置
 	r.POST("/config", SetDashboardConfig)
 }

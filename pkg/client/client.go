@@ -29,6 +29,7 @@ import (
 )
 
 // LoadRestConfig creates a rest.Config using the passed kubeconfig. If context is empty, current context in kubeconfig will be used.
+// LoadRestConfig 使用传递的 kubeconfig 创建一个 rest.Config。如果 context 为空，则使用 kubeconfig 中的当前上下文。
 func LoadRestConfig(kubeconfig string, context string) (*rest.Config, error) {
 	loader := &clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfig}
 	loadedConfig, err := loader.Load()
@@ -50,6 +51,7 @@ func LoadRestConfig(kubeconfig string, context string) (*rest.Config, error) {
 }
 
 // LoadAPIConfig creates a clientcmdapi.Config using the passed kubeconfig. If currentContext is empty, current context in kubeconfig will be used.
+// LoadAPIConfig 使用传递的 kubeconfig 创建一个 clientcmdapi.Config。如果 currentContext 为空，则使用 kubeconfig 中的当前上下文。
 func LoadAPIConfig(kubeconfig string, currentContext string) (*clientcmdapi.Config, error) {
 	config, err := clientcmd.LoadFromFile(kubeconfig)
 	if err != nil {
@@ -86,6 +88,7 @@ func LoadAPIConfig(kubeconfig string, currentContext string) (*clientcmdapi.Conf
 }
 
 // LoadRestConfigFromKubeConfig creates a rest.Config from a kubeconfig string.
+// LoadRestConfigFromKubeConfig 从 kubeconfig 字符串创建一个 rest.Config。
 func LoadRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
 	apiConfig, err := clientcmd.Load([]byte(kubeconfig))
 	if err != nil {
@@ -100,6 +103,7 @@ func LoadRestConfigFromKubeConfig(kubeconfig string) (*rest.Config, error) {
 }
 
 // KubeClientSetFromKubeConfig creates a Kubernetes clientset from a kubeconfig string.
+// KubeClientSetFromKubeConfig 从 kubeconfig 字符串创建一个 Kubernetes 客户端。
 func KubeClientSetFromKubeConfig(kubeconfig string) (*kubeclient.Clientset, error) {
 	restConfig, err := LoadRestConfigFromKubeConfig(kubeconfig)
 	if err != nil {

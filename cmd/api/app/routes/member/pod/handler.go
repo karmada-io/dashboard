@@ -26,6 +26,7 @@ import (
 )
 
 // return a pods list
+// 获取成员集群的pod列表
 func handleGetMemberPod(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -39,6 +40,7 @@ func handleGetMemberPod(c *gin.Context) {
 }
 
 // return a pod detail
+// 获取成员集群的pod详情
 func handleGetMemberPodDetail(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	namespace := c.Param("namespace")
@@ -51,9 +53,13 @@ func handleGetMemberPodDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.MemberV1()
+	// 获取成员集群的pod列表
 	r.GET("/pod", handleGetMemberPod)
+	// 获取成员集群的pod列表
 	r.GET("/pod/:namespace", handleGetMemberPod)
+	// 获取成员集群的pod详情
 	r.GET("/pod/:namespace/:name", handleGetMemberPodDetail)
 }

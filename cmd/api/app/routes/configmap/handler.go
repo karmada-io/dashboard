@@ -25,6 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/configmap"
 )
 
+// 获取配置map列表
 func handleGetConfigMap(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	dataSelect := common.ParseDataSelectPathParameter(c)
@@ -37,6 +38,7 @@ func handleGetConfigMap(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 获取配置map详情
 func handleGetConfigMapDetail(c *gin.Context) {
 	k8sClient := client.InClusterClientForKarmadaAPIServer()
 	namespace := c.Param("namespace")
@@ -49,9 +51,12 @@ func handleGetConfigMapDetail(c *gin.Context) {
 	common.Success(c, result)
 }
 
+// 初始化路由
 func init() {
 	r := router.V1()
+	// 获取配置map列表
 	r.GET("/configmap", handleGetConfigMap)
+	// 获取配置map详情
 	r.GET("/configmap/:namespace", handleGetConfigMap)
 	r.GET("/configmap/:namespace/:name", handleGetConfigMapDetail)
 }
