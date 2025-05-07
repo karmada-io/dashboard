@@ -152,18 +152,18 @@ const ClusterOverview = () => {
     },
   ];
 
-  // 资源统计描述项 - 根据可用数据调整
+  // 资源统计描述项
   const resourceItems: DescriptionsProps['items'] = [
     {
       key: 'node-status',
-      label: i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态'),
+      label: i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '可用节点状态'),
       children: currentCluster?.nodeSummary 
         ? `${currentCluster.nodeSummary.readyNum}/${currentCluster.nodeSummary.totalNum}`
         : '-',
     },
     {
       key: 'pod-status',
-      label: i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', 'Pod状态'),
+      label: i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', '应用服务数量'),
       children: currentCluster?.allocatedResources 
         ? `${currentCluster.allocatedResources.allocatedPods}/${currentCluster.allocatedResources.podCapacity} (${currentCluster.allocatedResources.podFraction.toFixed(2)}%)`
         : '-',

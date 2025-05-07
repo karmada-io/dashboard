@@ -379,7 +379,7 @@ const Overview = () => {
                 {resourcesData.node.ready}
               </div>
               <div>
-                <div className="text-xs text-gray-500">{i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')}</div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '可用节点状态')}</div>
                 <div className="text-sm">{resourcesData.node.ready}/{resourcesData.node.total}</div>
               </div>
             </div>
@@ -404,7 +404,7 @@ const Overview = () => {
                 {resourcesData.pod.allocated}
               </div>
               <div>
-                <div className="text-xs text-gray-500">{i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', 'Pod状态')}</div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', '应用服务数量')}</div>
                 <div className="text-sm">{resourcesData.pod.allocated}/{resourcesData.pod.capacity}</div>
               </div>
             </div>
@@ -424,20 +424,25 @@ const Overview = () => {
               body: { padding: '12px' },
             }}
           >
-            <div className="status-value-container">
-              <div className="status-value-block status-cpu-block">
-                {Math.round(resourcesData.cpu.usage)}%
+            <div className="flex items-center justify-between">
+              <div className="mr-3">
+                <div className="text-xs text-gray-500 mb-1">{i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'CPU用量')}</div>
+                <div className="text-sm font-medium">
+                  {Math.round(resourcesData.cpu.usage * 100) / 100}/{resourcesData.cpu.capacity} 核
+                </div>
               </div>
-              <div>
-                <div className="text-xs text-gray-500">{i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'CPU用量')}</div>
-                <div className="text-sm">{resourcesData.cpu.capacity}</div>
-              </div>
+              <Progress 
+                type="circle" 
+                percent={Math.round(resourcesData.cpu.usage)} 
+                size={60}
+                strokeColor={getPercentColor(resourcesData.cpu.usage)}
+                format={(percent) => (
+                  <div className="text-center">
+                    <div className="text-sm font-bold">{percent}%</div>
+                  </div>
+                )}
+              />
             </div>
-            <Progress 
-              percent={resourcesData.cpu.usage} 
-              size="small"
-              strokeColor={getPercentColor(resourcesData.cpu.usage)}
-            />
           </Card>
         </Col>
         
@@ -449,20 +454,26 @@ const Overview = () => {
               body: { padding: '12px' },
             }}
           >
-            <div className="status-value-container">
-              <div className="status-value-block status-memory-block">
-                {Math.round(resourcesData.memory.usage)}%
+            <div className="flex items-center justify-between">
+              <div className="mr-3">
+                <div className="text-xs text-gray-500 mb-1">{i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'Memory用量')}</div>
+                <div className="text-sm font-medium">
+                  {Math.round(resourcesData.memory.usage * resourcesData.memory.capacity / 100) / 1024} GB/
+                  {Math.round(resourcesData.memory.capacity / 1024)} GB
+                </div>
               </div>
-              <div>
-                <div className="text-xs text-gray-500">{i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'Memory用量')}</div>
-                <div className="text-sm">{resourcesData.memory.capacity}</div>
-              </div>
+              <Progress 
+                type="circle" 
+                percent={Math.round(resourcesData.memory.usage)} 
+                size={60}
+                strokeColor={getPercentColor(resourcesData.memory.usage)}
+                format={(percent) => (
+                  <div className="text-center">
+                    <div className="text-sm font-bold">{percent}%</div>
+                  </div>
+                )}
+              />
             </div>
-            <Progress 
-              percent={resourcesData.memory.usage} 
-              size="small"
-              strokeColor={getPercentColor(resourcesData.memory.usage)}
-            />
           </Card>
         </Col>
         
@@ -728,7 +739,7 @@ const Overview = () => {
           </Col>
           
           <Col xs={24} md={18}>
-            <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')} 
+            <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '可用节点状态')} 
                   bordered={false} 
                   className="h-full shadow-sm overview-node-status-card"
                   styles={{ 

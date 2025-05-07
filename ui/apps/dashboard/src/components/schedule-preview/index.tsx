@@ -354,7 +354,7 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
         <div>{nodeType}</div>
         {data.resourceCount && (
           <div className="resource-flow-node-metric--value">
-            {data.resourceCount} {i18nInstance.t('ca3c5f0304a60ce1abe05ec67f28dbde', '资源')}
+            {data.resourceCount} {i18nInstance.t('ca3c5f0304a60ce1abe05ec67f28dbde', '服务')}
           </div>
         )}
       </div>
@@ -1070,7 +1070,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               ),
                             },
                             {
-                              title: i18nInstance.t('9db64fc5139a9a43a5f3e8ae8f7f3cb1', '总数量'),
+                              title: i18nInstance.t('9db64fc5139a9a43a5f3e8ae8f7f3cb1', '服务总数'),
                               dataIndex: 'totalCount',
                               key: 'totalCount',
                               width: 100,
