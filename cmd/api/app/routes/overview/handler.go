@@ -63,4 +63,10 @@ func init() {
 	*/
 	r := router.V1()
 	r.GET("/overview", handleGetOverview)
+	// 添加资源汇总接口路由
+	r.GET("/overview/resources", HandleGetResourcesSummary)
+	// 添加节点汇总接口路由
+	r.GET("/overview/nodes", HandleGetNodeSummary)
+	// 添加Pod汇总接口路由
+	r.GET("/overview/pods", HandleGetPodSummary)
 }

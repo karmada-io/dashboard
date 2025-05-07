@@ -1,0 +1,210 @@
+/*
+Copyright 2024 The Karmada Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package overview
+
+import (
+	"context"
+	"sync"
+
+	"github.com/gin-gonic/gin"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/klog/v2"
+
+	apiV1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
+	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
+	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/dataselect"
+)
+
+// GetNodeSummary 获取节点汇总信息
+func GetNodeSummary(dataSelect *dataselect.DataSelectQuery) (*apiV1.NodesResponse, error) {
+	// 初始化汇总结构
+	response := &apiV1.NodesResponse{
+		Items: []apiV1.NodeItem{},
+		Summary: apiV1.NodeSummary{
+			TotalNum: 0,
+			ReadyNum: 0,
+		},
+	}
+
+	// 获取Karmada客户端
+	karmadaClient := client.InClusterKarmadaClient()
+
+	// 获取集群列表
+	clusterList, err := karmadaClient.ClusterV1alpha1().Clusters().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		klog.ErrorS(err, "Failed to get cluster list")
+		return nil, err
+	}
+
+	// 使用WaitGroup来管理并发请求
+	var wg sync.WaitGroup
+	// 使用互斥锁保护共享数据
+	var mu sync.Mutex
+
+	// 遍历所有集群
+	for _, cluster := range clusterList.Items {
+		wg.Add(1)
+		go func(clusterName string) {
+			defer wg.Done()
+
+			// 获取成员集群的客户端
+			memberClient := client.InClusterClientForMemberCluster(clusterName)
+			if memberClient == nil {
+				klog.Warningf("Failed to get client for cluster %s", clusterName)
+				return
+			}
+
+			// 获取该集群的节点
+			nodes, err := getNodesForCluster(memberClient, clusterName)
+			if err != nil {
+				klog.ErrorS(err, "Failed to get nodes", "cluster", clusterName)
+				return
+			}
+
+			// 加锁更新共享数据
+			mu.Lock()
+			defer mu.Unlock()
+
+			// 更新全局统计信息
+			response.Summary.TotalNum += int32(len(nodes))
+			for _, node := range nodes {
+				if node.Ready {
+					response.Summary.ReadyNum++
+				}
+			}
+
+			// 追加节点信息
+			response.Items = append(response.Items, nodes...)
+		}(cluster.Name)
+	}
+
+	// 等待所有请求完成
+	wg.Wait()
+
+	// 如果使用了数据选择器，则过滤和排序节点
+	if dataSelect != nil && len(response.Items) > 0 {
+		// 这里可以根据需要实现节点的排序和分页
+		// 目前为简单实现，实际使用时可能需要更复杂的逻辑
+	}
+
+	return response, nil
+}
+
+// getNodesForCluster 获取指定集群的所有节点
+func getNodesForCluster(client kubernetes.Interface, clusterName string) ([]apiV1.NodeItem, error) {
+	// 获取节点列表
+	nodeList, err := client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	nodes := make([]apiV1.NodeItem, 0, len(nodeList.Items))
+	for _, node := range nodeList.Items {
+		nodeItem := apiV1.NodeItem{
+			ClusterName:       clusterName,
+			Name:              node.Name,
+			Ready:             isNodeReady(node),
+			Role:              getNodeRole(node),
+			CPUCapacity:       getNodeCPUCapacity(node),
+			CPUUsage:          0, // 实际实现中需要从指标服务获取
+			MemoryCapacity:    getNodeMemoryCapacity(node),
+			MemoryUsage:       0, // 实际实现中需要从指标服务获取
+			PodCapacity:       getNodePodCapacity(node),
+			PodUsage:          0, // 实际实现中需要从指标服务获取
+			Status:            getNodeStatus(node),
+			Labels:            node.Labels,
+			CreationTimestamp: node.CreationTimestamp,
+		}
+		nodes = append(nodes, nodeItem)
+	}
+
+	return nodes, nil
+}
+
+// isNodeReady 检查节点是否就绪
+func isNodeReady(node v1.Node) bool {
+	for _, condition := range node.Status.Conditions {
+		if condition.Type == v1.NodeReady && condition.Status == v1.ConditionTrue {
+			return true
+		}
+	}
+	return false
+}
+
+// getNodeRole 获取节点角色
+func getNodeRole(node v1.Node) string {
+	if _, isMaster := node.Labels["node-role.kubernetes.io/master"]; isMaster {
+		return "master"
+	}
+	if _, isControl := node.Labels["node-role.kubernetes.io/control-plane"]; isControl {
+		return "master"
+	}
+	return "worker"
+}
+
+// getNodeCPUCapacity 获取节点CPU容量(核)
+func getNodeCPUCapacity(node v1.Node) int64 {
+	if cpu := node.Status.Capacity.Cpu(); cpu != nil {
+		return cpu.MilliValue() / 1000
+	}
+	return 0
+}
+
+// getNodeMemoryCapacity 获取节点内存容量(KB)
+func getNodeMemoryCapacity(node v1.Node) int64 {
+	if mem := node.Status.Capacity.Memory(); mem != nil {
+		return mem.Value() / 1024
+	}
+	return 0
+}
+
+// getNodePodCapacity 获取节点Pod容量
+func getNodePodCapacity(node v1.Node) int64 {
+	if pods := node.Status.Capacity.Pods(); pods != nil {
+		return pods.Value()
+	}
+	return 0
+}
+
+// getNodeStatus 获取节点状态
+func getNodeStatus(node v1.Node) string {
+	for _, condition := range node.Status.Conditions {
+		if condition.Type == v1.NodeReady {
+			if condition.Status == v1.ConditionTrue {
+				return "Ready"
+			}
+			return string(condition.Reason)
+		}
+	}
+	return "Unknown"
+}
+
+// HandleGetNodeSummary 处理获取节点汇总信息的请求
+func HandleGetNodeSummary(c *gin.Context) {
+	dataSelect := common.ParseDataSelectPathParameter(c)
+	summary, err := GetNodeSummary(dataSelect)
+	if err != nil {
+		klog.ErrorS(err, "Failed to get node summary")
+		common.Fail(c, err)
+		return
+	}
+
+	common.Success(c, summary)
+}

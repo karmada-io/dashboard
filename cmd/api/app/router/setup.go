@@ -26,7 +26,7 @@ import (
 var (
 	router *gin.Engine
 	// v1 是 /api/v1 的路由组
-	v1     *gin.RouterGroup
+	v1 *gin.RouterGroup
 	// member 是 /api/v1/member/:clustername 的路由组
 	member *gin.RouterGroup
 )
@@ -46,10 +46,14 @@ func init() {
 	_ = router.SetTrustedProxies(nil)
 	// 创建 /api/v1 的路由组
 	v1 = router.Group("/api/v1")
+	// 为全局API添加CORS中间件
+	v1.Use(CorsMiddleware())
 	// 创建 /api/v1/member/:clustername 的路由组
 	member = v1.Group("/member/:clustername")
 	// 使用 EnsureMemberClusterMiddleware 中间件
 	member.Use(EnsureMemberClusterMiddleware())
+	// 使用 CorsMiddleware 中间件
+	member.Use(CorsMiddleware())
 
 	// 创建 /livez 的路由
 	router.GET("/livez", func(c *gin.Context) {

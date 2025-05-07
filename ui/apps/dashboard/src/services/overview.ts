@@ -78,3 +78,82 @@ export async function GetOverview() {
   const resp = await karmadaClient.get<IResponse<OverviewInfo>>('/overview');
   return resp.data;
 }
+
+// 节点汇总API相关类型定义
+export interface NodeItem {
+  clusterName: string;
+  name: string;
+  ready: boolean;
+  role: string;
+  cpuCapacity: number;
+  cpuUsage: number;
+  memoryCapacity: number;
+  memoryUsage: number;
+  podCapacity: number;
+  podUsage: number;
+  status: string;
+  labels: Record<string, string>;
+  creationTimestamp: string;
+}
+
+export interface NodesResponse {
+  items: NodeItem[];
+  summary: NodeSummary;
+}
+
+// 获取节点汇总信息
+export async function GetNodeSummary() {
+  const resp = await karmadaClient.get<IResponse<NodesResponse>>('/overview/nodes');
+  return resp.data;
+}
+
+// Pod汇总API相关类型定义
+export interface PodItem {
+  clusterName: string;
+  namespace: string;
+  name: string;
+  phase: string;
+  status: string;
+  readyContainers: number;
+  totalContainers: number;
+  cpuRequest: number;
+  memoryRequest: number;
+  cpuLimit: number;
+  memoryLimit: number;
+  restartCount: number;
+  podIP: string;
+  nodeName: string;
+  creationTimestamp: string;
+}
+
+export interface PodSummaryStats {
+  running: number;
+  pending: number;
+  succeeded: number;
+  failed: number;
+  unknown: number;
+  total: number;
+}
+
+export interface NamespacePodsStats {
+  namespace: string;
+  podCount: number;
+}
+
+export interface ClusterPodsStats {
+  clusterName: string;
+  podCount: number;
+}
+
+export interface PodsResponse {
+  items: PodItem[];
+  statusStats: PodSummaryStats;
+  namespaceStats: NamespacePodsStats[];
+  clusterStats: ClusterPodsStats[];
+}
+
+// 获取Pod汇总信息
+export async function GetPodSummary() {
+  const resp = await karmadaClient.get<IResponse<PodsResponse>>('/overview/pods');
+  return resp.data;
+}
