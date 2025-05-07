@@ -64,6 +64,44 @@ type ScheduleSummary struct {
 	TotalResourceBinding int `json:"totalResourceBinding"`
 }
 
+// ResourceDeploymentStatus 表示资源在集群中的部署状态
+type ResourceDeploymentStatus struct {
+	// Scheduled 是否已调度
+	Scheduled bool `json:"scheduled"`
+	// Actual 是否实际部署
+	Actual bool `json:"actual"`
+	// ScheduledCount 调度计划的数量
+	ScheduledCount int `json:"scheduledCount"`
+	// ActualCount 实际部署的数量
+	ActualCount int `json:"actualCount"`
+}
+
+// ActualClusterDistribution 表示资源在单个集群中的实际分布情况
+type ActualClusterDistribution struct {
+	// ClusterName 集群名称
+	ClusterName string `json:"clusterName"`
+	// ScheduledCount 调度计划数量
+	ScheduledCount int `json:"scheduledCount"`
+	// ActualCount 实际部署数量
+	ActualCount int `json:"actualCount"`
+	// Status 部署状态
+	Status ResourceDeploymentStatus `json:"status"`
+}
+
+// ActualResourceTypeDistribution 表示单种资源类型在各集群中的实际部署情况
+type ActualResourceTypeDistribution struct {
+	// ResourceType 资源类型
+	ResourceType string `json:"resourceType"`
+	// ResourceGroup 资源分组
+	ResourceGroup string `json:"resourceGroup"`
+	// ClusterDist 各集群实际分布情况
+	ClusterDist []ActualClusterDistribution `json:"clusterDist"`
+	// TotalScheduledCount 总调度计划数量
+	TotalScheduledCount int `json:"totalScheduledCount"`
+	// TotalActualCount 总实际部署数量
+	TotalActualCount int `json:"totalActualCount"`
+}
+
 // SchedulePreviewResponse 集群调度预览响应
 type SchedulePreviewResponse struct {
 	// Nodes 节点列表
@@ -74,4 +112,6 @@ type SchedulePreviewResponse struct {
 	ResourceDist []ResourceTypeDistribution `json:"resourceDist"`
 	// Summary 概览统计信息
 	Summary ScheduleSummary `json:"summary"`
+	// ActualResourceDist 实际资源分布统计（可选，扩展功能）
+	ActualResourceDist []ActualResourceTypeDistribution `json:"actualResourceDist,omitempty"`
 }

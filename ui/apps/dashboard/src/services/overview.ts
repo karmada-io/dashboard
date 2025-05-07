@@ -182,6 +182,29 @@ export interface ResourceTypeDistribution {
   clusterDist: ClusterDistribution[];
 }
 
+// 添加实际资源部署状态相关类型
+export interface ResourceDeploymentStatus {
+  scheduled: boolean;
+  actual: boolean;
+  scheduledCount: number;
+  actualCount: number;
+}
+
+export interface ActualClusterDistribution {
+  clusterName: string;
+  scheduledCount: number;
+  actualCount: number;
+  status: ResourceDeploymentStatus;
+}
+
+export interface ActualResourceTypeDistribution {
+  resourceType: string;
+  resourceGroup: string;
+  clusterDist: ActualClusterDistribution[];
+  totalScheduledCount: number;
+  totalActualCount: number;
+}
+
 export interface ScheduleSummary {
   totalClusters: number;
   totalPropagationPolicy: number;
@@ -193,6 +216,8 @@ export interface SchedulePreviewResponse {
   links: ScheduleLink[];
   resourceDist: ResourceTypeDistribution[];
   summary: ScheduleSummary;
+  // 添加实际资源分布信息字段
+  actualResourceDist?: ActualResourceTypeDistribution[];
 }
 
 // 获取集群调度预览信息

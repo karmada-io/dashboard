@@ -368,14 +368,54 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
       ? colorScheme.resourceGroups[data.name as ResourceGroupType]?.color || colorScheme.resourceGroups.Others.color
       : colorScheme.nodeColors.member;
   
+  // 计算一致性比例
+  const consistencyRatio = data.consistencyRatio || 1;
+  const isConsistent = consistencyRatio === 1;
+  
+  // 根据一致性状态选择背景色
+  let bgColor = '#f6f7f9';
+  if (!isConsistent) {
+    if (consistencyRatio === 0) {
+      // 实际部署为0，红色警告
+      bgColor = '#fff1f0';
+    } else if (consistencyRatio < 1) {
+      // 实际部署少于计划，黄色警告
+      bgColor = '#fffbe6';
+    } else {
+      // 实际部署多于计划，紫色提示
+      bgColor = '#f9f0ff';
+    }
+  }
+  
+  // 确定指标颜色
+  const metricsColor = isConsistent 
+    ? '#1890ff' 
+    : consistencyRatio === 0 
+      ? '#f5222d' 
+      : consistencyRatio < 1 
+        ? '#faad14' 
+        : '#722ed1';
+  
   return (
-    <div className="resource-flow-node" style={{ borderLeft: `4px solid ${borderColor}` }}>
+    <div className="resource-flow-node" style={{ borderLeft: `4px solid ${borderColor}`, backgroundColor: bgColor }}>
       <div className="resource-flow-node-name">{data.name}</div>
       <div className="resource-flow-node-metric">
         <div>{nodeType}</div>
-        {data.resourceCount && (
+        {data.resourceCount !== undefined && (
           <div className="resource-flow-node-metric--value">
-            {data.resourceCount} {i18nInstance.t('ca3c5f0304a60ce1abe05ec67f28dbde', '服务')}
+            {!isConsistent ? (
+              <Tooltip title={`调度计划: ${data.resourceCount} / 实际部署: ${data.actualResourceCount}`}>
+                <span style={{ color: metricsColor }}>
+                  {data.actualResourceCount}/{data.resourceCount}
+                  {' '}
+                  <span style={{ fontSize: '12px', opacity: 0.8 }}>
+                    {consistencyRatio > 1 ? '↑' : '↓'}
+                  </span>
+                </span>
+              </Tooltip>
+            ) : (
+              <span>{data.resourceCount} {i18nInstance.t('ca3c5f0304a60ce1abe05ec67f28dbde', '服务')}</span>
+            )}
           </div>
         )}
       </div>
@@ -422,7 +462,8 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
 
     // 创建节点和边的映射，用于计算节点的资源总数
     const nodeResourceCount: Record<string, number> = {};
-    const resourceTypeStats: Record<string, { count: number, group: ResourceGroupType }> = {};
+    const nodeActualResourceCount: Record<string, number> = {};
+    const resourceTypeStats: Record<string, { count: number, actualCount: number, group: ResourceGroupType }> = {};
     
     // 计算每个节点的资源总数
     data.links.forEach(link => {
@@ -431,25 +472,67 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
       
       // 统计资源类型
       const group = getResourceGroup(link.type);
-      resourceTypeStats[link.type] = {
-        count: (resourceTypeStats[link.type]?.count || 0) + link.value,
-        group
-      };
+      if (!resourceTypeStats[link.type]) {
+        resourceTypeStats[link.type] = {
+          count: 0,
+          actualCount: 0,
+          group
+        };
+      }
+      resourceTypeStats[link.type].count += link.value;
     });
+    
+    // 如果有实际部署数据，计算每个节点的实际资源数
+    if (data.actualResourceDist && data.actualResourceDist.length > 0) {
+      data.actualResourceDist.forEach(resource => {
+        resource.clusterDist.forEach(cluster => {
+          // 累加集群的实际资源数
+          nodeActualResourceCount[cluster.clusterName] = (nodeActualResourceCount[cluster.clusterName] || 0) + cluster.actualCount;
+          // 累加控制平面的实际资源数
+          nodeActualResourceCount['karmada-control-plane'] = (nodeActualResourceCount['karmada-control-plane'] || 0) + cluster.actualCount;
+          
+          // 更新资源类型统计
+          if (resourceTypeStats[resource.resourceType]) {
+            resourceTypeStats[resource.resourceType].actualCount += cluster.actualCount;
+          }
+        });
+      });
+    } else {
+      // 如果没有实际部署数据，假设实际部署与计划一致
+      Object.keys(nodeResourceCount).forEach(node => {
+        nodeActualResourceCount[node] = nodeResourceCount[node];
+      });
+      
+      Object.keys(resourceTypeStats).forEach(type => {
+        resourceTypeStats[type].actualCount = resourceTypeStats[type].count;
+      });
+    }
 
     // 处理节点数据
     const nodes = data.nodes.map(node => {
       const isControlPlane = node.id === 'karmada-control-plane' || node.type === 'control-plane';
+      const scheduledCount = nodeResourceCount[node.id] || 0;
+      const actualCount = nodeActualResourceCount[node.id] || 0;
+      const consistencyRatio = scheduledCount > 0 ? actualCount / scheduledCount : 1;
+      
       return {
         id: node.id,
         name: node.name || node.id,
         nodeType: node.type,
-        resourceCount: nodeResourceCount[node.id] || 0,
+        resourceCount: scheduledCount,
+        actualResourceCount: actualCount,
+        consistencyRatio: consistencyRatio,
         layerName: isControlPlane ? 'ControlPlane' : 'MemberClusters',
         measure: {
           name: '资源数',
-          value: nodeResourceCount[node.id] || 0,
-          formattedValue: nodeResourceCount[node.id] || 0,
+          value: scheduledCount,
+          formattedValue: scheduledCount,
+          formattedUnit: '个',
+        },
+        actualMeasure: {
+          name: '实际资源数',
+          value: actualCount,
+          formattedValue: actualCount,
           formattedUnit: '个',
         },
         relatedMeasures: [],
@@ -479,6 +562,20 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         existingEdge.resourceTypes.push(resourceType);
         existingEdge.counts[resourceType] = link.value;
       } else {
+        // 查找实际部署信息
+        let actualCount = link.value; // 默认与计划一致
+        
+        // 如果有实际资源部署信息，更新实际部署数量
+        if (data.actualResourceDist) {
+          const actualResource = data.actualResourceDist.find(r => r.resourceType === resourceType);
+          if (actualResource) {
+            const actualCluster = actualResource.clusterDist.find(c => c.clusterName === link.target);
+            if (actualCluster) {
+              actualCount = actualCluster.actualCount;
+            }
+          }
+        }
+        
         // 创建新的连接
         groupedEdges.set(key, {
           id: `edge-${link.source}-${link.target}-${group}`,
@@ -488,18 +585,29 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
           resourceTypes: [resourceType],
           counts: { [resourceType]: link.value },
           measure: {
-            name: '资源数',
+            name: '计划资源数',
             value: link.value,
             formattedValue: link.value,
+            formattedUnit: '个',
+          },
+          actualMeasure: {
+            name: '实际资源数',
+            value: actualCount,
+            formattedValue: actualCount,
             formattedUnit: '个',
           },
           data: {
             type: 'proportion',
             ratio: link.value / nodeResourceCount[link.source],
+            actualRatio: actualCount / (nodeActualResourceCount[link.source] || 1),
             group,
           },
           style: {
             stroke: groupColor,
+            // 如果实际与计划不一致，增加虚线效果
+            lineDash: actualCount !== link.value ? [5, 5] : [],
+            // 如果实际为0，则显示警告色
+            opacity: actualCount === 0 ? 0.4 : 0.8,
           }
         });
       }
@@ -507,23 +615,37 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     
     // 创建中间层资源分组节点
     const resourceGroupNodes = Object.keys(colorScheme.resourceGroups).map(group => {
-      // 计算该分组的资源总数
+      // 计算该分组的资源总数与实际部署数量
       const groupResourceCount = Object.entries(resourceTypeStats)
         .filter(([_, stats]) => stats.group === group)
         .reduce((sum, [_, stats]) => sum + stats.count, 0);
       
+      const groupActualResourceCount = Object.entries(resourceTypeStats)
+        .filter(([_, stats]) => stats.group === group)
+        .reduce((sum, [_, stats]) => sum + stats.actualCount, 0);
+      
       if (groupResourceCount === 0) return null;
+      
+      const consistencyRatio = groupResourceCount > 0 ? groupActualResourceCount / groupResourceCount : 1;
       
       return {
         id: `group-${group}`,
         name: group,
         nodeType: 'resource-group',
         resourceCount: groupResourceCount,
+        actualResourceCount: groupActualResourceCount,
+        consistencyRatio: consistencyRatio,
         layerName: 'ResourceGroups',
         measure: {
-          name: '资源数',
+          name: '计划资源数',
           value: groupResourceCount,
           formattedValue: groupResourceCount,
+          formattedUnit: '个',
+        },
+        actualMeasure: {
+          name: '实际资源数',
+          value: groupActualResourceCount,
+          formattedValue: groupActualResourceCount,
           formattedUnit: '个',
         },
         relatedMeasures: [],
@@ -538,6 +660,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     const controlPlaneToGroupEdges = resourceGroupNodes.map(node => {
       const group = node!.name as ResourceGroupType;
       const groupColor = colorScheme.resourceGroups[group].color;
+      const consistencyRatio = node!.consistencyRatio;
       
       return {
         id: `edge-karmada-control-plane-${node!.id}`,
@@ -545,18 +668,29 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         target: node!.id,
         resourceGroup: group,
         measure: {
-          name: '资源数',
+          name: '计划资源数',
           value: node!.resourceCount,
           formattedValue: node!.resourceCount,
+          formattedUnit: '个',
+        },
+        actualMeasure: {
+          name: '实际资源数',
+          value: node!.actualResourceCount,
+          formattedValue: node!.actualResourceCount,
           formattedUnit: '个',
         },
         data: {
           type: 'split',
           ratio: node!.resourceCount / (nodeResourceCount['karmada-control-plane'] || 1),
+          actualRatio: node!.actualResourceCount / (nodeActualResourceCount['karmada-control-plane'] || 1),
           group,
         },
         style: {
           stroke: `l(0) 0:${colorScheme.nodeColors.controlPlane} 0.5:#7EC2F3 1:${groupColor}`,
+          // 如果实际与计划不一致，增加虚线效果
+          lineDash: consistencyRatio !== 1 ? [5, 5] : [],
+          // 如果实际为0，则显示警告色
+          opacity: node!.actualResourceCount === 0 ? 0.4 : 0.8,
         }
       };
     });
@@ -570,6 +704,8 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         const nodeData = resourceGroupNodes.find(n => n?.id === groupNode);
         if (!nodeData) return;
         
+        const consistencyRatio = edge.actualMeasure.value / edge.measure.value;
+        
         groupToMemberEdges.push({
           id: `edge-${groupNode}-${edge.target}`,
           source: groupNode,
@@ -578,13 +714,19 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
           resourceTypes: edge.resourceTypes,
           counts: edge.counts,
           measure: edge.measure,
+          actualMeasure: edge.actualMeasure,
           data: {
             type: 'proportion',
             ratio: edge.measure.value / nodeData.resourceCount,
+            actualRatio: edge.actualMeasure.value / nodeData.actualResourceCount,
             group: edge.resourceGroup,
           },
           style: {
             stroke: `l(0) 0:${colorScheme.resourceGroups[edge.resourceGroup as ResourceGroupType].color} 0.5:#7EC2F3 1:${colorScheme.nodeColors.member}`,
+            // 如果实际与计划不一致，增加虚线效果
+            lineDash: consistencyRatio !== 1 ? [5, 5] : [],
+            // 如果实际为0，则显示警告色
+            opacity: edge.actualMeasure.value === 0 ? 0.4 : 0.8,
           }
         });
       }
@@ -603,24 +745,57 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     }
 
     // 为每种资源类型添加分组信息
-    return data.resourceDist.map(item => ({
-      key: item.resourceType,
-      resourceType: item.resourceType,
-      resourceGroup: getResourceGroup(item.resourceType),
-      clusterDist: item.clusterDist,
-      totalCount: item.clusterDist.reduce((sum, cluster) => sum + cluster.count, 0),
-      clusterCount: new Set(item.clusterDist.map(c => c.clusterName)).size,
-    }));
+    return data.resourceDist.map(item => {
+      // 查找对应的实际部署数据
+      const actualDist = data.actualResourceDist?.find(
+        actual => actual.resourceType === item.resourceType
+      );
+      
+      // 对集群分布进行处理，添加实际部署信息
+      const clusterDist = item.clusterDist.map(cluster => {
+        // 查找对应集群的实际部署情况
+        const actualClusterDist = actualDist?.clusterDist.find(
+          actual => actual.clusterName === cluster.clusterName
+        );
+        
+        return {
+          ...cluster,
+          // 如果有实际部署信息，则添加；否则设为空或0
+          actualCount: actualClusterDist?.actualCount || 0,
+          scheduledCount: actualClusterDist?.scheduledCount || cluster.count,
+          // 计算差异
+          difference: (actualClusterDist?.actualCount || 0) - cluster.count,
+          // 判断是否一致
+          isConsistent: (actualClusterDist?.actualCount || 0) === cluster.count
+        };
+      });
+      
+      return {
+        key: item.resourceType,
+        resourceType: item.resourceType,
+        resourceGroup: getResourceGroup(item.resourceType),
+        clusterDist: clusterDist,
+        totalCount: item.clusterDist.reduce((sum, cluster) => sum + cluster.count, 0),
+        actualTotalCount: actualDist?.totalActualCount || 
+                          clusterDist.reduce((sum, cluster) => sum + cluster.actualCount, 0),
+        clusterCount: new Set(item.clusterDist.map(c => c.clusterName)).size,
+        // 一致性指标：实际部署的资源数与计划部署的资源数之比
+        consistencyRatio: actualDist ? 
+          (actualDist.totalActualCount / (actualDist.totalScheduledCount || 1)) : 1
+      };
+    });
   }, [data]);
 
-  // 类型记录，用于表格过滤
+  // 更新类型记录，用于表格过滤
   type ResourceRecord = {
     key: string;
     resourceType: string;
     resourceGroup: ResourceGroupType;
     clusterDist: any[];
     totalCount: number;
+    actualTotalCount: number;
     clusterCount: number;
+    consistencyRatio: number;
   };
 
   // 在组件挂载后延迟设置 shouldRenderGraph 为 true
@@ -764,6 +939,54 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     }
   };
 
+  // 添加状态图例组件
+  const StatusLegend = () => {
+    return (
+      <div style={{ 
+        padding: '8px 12px', 
+        background: '#fff', 
+        borderRadius: '6px', 
+        marginTop: '10px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '12px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        border: '1px solid rgba(0,0,0,0.05)'
+      }}>
+        <Text type="secondary" style={{ width: '100%', marginBottom: '4px', fontSize: '12px' }}>部署状态图例：</Text>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ width: '12px', height: '12px', background: '#f6f7f9', border: '1px solid #eee', borderRadius: '2px' }}></div>
+          <Text style={{ fontSize: '12px' }}>调度计划与实际一致</Text>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ width: '12px', height: '12px', background: '#fff1f0', border: '1px solid #eee', borderRadius: '2px' }}></div>
+          <Text style={{ fontSize: '12px' }}>实际部署为0</Text>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ width: '12px', height: '12px', background: '#fffbe6', border: '1px solid #eee', borderRadius: '2px' }}></div>
+          <Text style={{ fontSize: '12px' }}>实际少于计划</Text>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ width: '12px', height: '12px', background: '#f9f0ff', border: '1px solid #eee', borderRadius: '2px' }}></div>
+          <Text style={{ fontSize: '12px' }}>实际多于计划</Text>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ width: '16px', height: '2px', background: '#aaa' }}></div>
+          <Text style={{ fontSize: '12px' }}>实线表示一致</Text>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ 
+            width: '16px', 
+            height: '2px', 
+            background: 'transparent',
+            borderBottom: '2px dashed #aaa'
+          }}></div>
+          <Text style={{ fontSize: '12px' }}>虚线表示不一致</Text>
+        </div>
+      </div>
+    );
+  };
+
   // 修改垂直图例组件实现
   const VerticalLegend = () => {
     const [loaded, setLoaded] = useState(false);
@@ -808,6 +1031,9 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
             <div key={`placeholder-${index}`} className="vertical-legend-placeholder"></div>
           ))
         )}
+        
+        {/* 添加状态图例 */}
+        <StatusLegend />
       </div>
     );
   };
@@ -980,10 +1206,18 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                     edge={{
                                       style: {
                                         labelText: (d: any) => {
-                                          const { type, ratio } = d.data;
+                                          const { type, ratio, actualRatio } = d.data;
                                           const text = type === 'split' ? '分流' : '占比';
                                           const percentage = (Number(ratio) * 100).toFixed(1);
-                                          return `${text} ${percentage}%`;
+                                          
+                                          // 如果计划与实际一致，只显示一个百分比
+                                          if (ratio === actualRatio || !actualRatio) {
+                                            return `${text} ${percentage}%`;
+                                          }
+                                          
+                                          // 否则显示计划和实际的对比
+                                          const actualPercentage = (Number(actualRatio) * 100).toFixed(1);
+                                          return `计划${text} ${percentage}% / 实际${text} ${actualPercentage}%`;
                                         },
                                         labelBackground: true,
                                         labelFontSize: 12,
@@ -1099,22 +1333,54 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                             },
                             {
                               title: i18nInstance.t('9db64fc5139a9a43a5f3e8ae8f7f3cb1', '服务总数'),
-                              dataIndex: 'totalCount',
-                              key: 'totalCount',
-                              width: 100,
+                              key: 'resourceCount',
+                              width: 160,
                               sorter: (a: ResourceRecord, b: ResourceRecord) => a.totalCount - b.totalCount,
-                              render: (text) => (
-                                <span style={{ 
-                                  fontWeight: 'bold', 
-                                  color: '#fff',
-                                  backgroundColor: '#ff9800',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '16px',
-                                  display: 'inline-block'
-                                }}>
-                                  {text}
-                                </span>
+                              render: (text, record) => (
+                                <Tooltip title={`调度计划: ${record.totalCount} / 实际部署: ${record.actualTotalCount}`}>
+                                  <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                      <span style={{ 
+                                        fontWeight: 'bold', 
+                                        color: '#fff',
+                                        backgroundColor: '#ff9800',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '16px',
+                                        display: 'inline-block'
+                                      }}>
+                                        {record.totalCount}
+                                      </span>
+                                      <span style={{ margin: '0 4px' }}>→</span>
+                                      <span style={{ 
+                                        fontWeight: 'bold', 
+                                        color: '#fff',
+                                        backgroundColor: record.totalCount === record.actualTotalCount 
+                                          ? '#52c41a' // 绿色表示一致
+                                          : record.totalCount < record.actualTotalCount 
+                                            ? '#722ed1' // 紫色表示实际多于计划
+                                            : '#f5222d', // 红色表示实际少于计划
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '16px',
+                                        display: 'inline-block'
+                                      }}>
+                                        {record.actualTotalCount}
+                                      </span>
+                                    </div>
+                                    <div style={{ marginTop: '4px', textAlign: 'center' }}>
+                                      <Tag color={
+                                        record.consistencyRatio === 1 
+                                          ? 'success' 
+                                          : record.consistencyRatio > 0.8 
+                                            ? 'warning' 
+                                            : 'error'
+                                      }>
+                                        一致性: {Math.round(record.consistencyRatio * 100)}%
+                                      </Tag>
+                                    </div>
+                                  </div>
+                                </Tooltip>
                               )
                             },
                             {
@@ -1162,20 +1428,40 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                   {clusterDist.map((cluster: any, index: number) => (
                                     <Tooltip
                                       key={`cluster-tooltip-${cluster.clusterName}-${index}`}
-                                      title={`${cluster.clusterName}: ${cluster.count}`}
+                                      title={
+                                        <div>
+                                          <div>{cluster.clusterName}</div>
+                                          <div>调度计划: {cluster.count}</div>
+                                          <div>实际部署: {cluster.actualCount}</div>
+                                          <div>差异: {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}</div>
+                                        </div>
+                                      }
                                     >
                                       <Badge
                                         key={`cluster-badge-${cluster.clusterName}-${index}`}
-                                        count={cluster.count}
+                                        count={
+                                          <div style={{ 
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            background: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                                            borderRadius: '10px',
+                                            padding: '0 5px',
+                                            fontSize: '12px',
+                                            color: 'white'
+                                          }}>
+                                            {cluster.actualCount}/{cluster.count}
+                                          </div>
+                                        }
+                                        offset={[5, 0]}
                                         style={{ 
-                                          backgroundColor: '#ff9800',
+                                          backgroundColor: cluster.isConsistent ? 'transparent' : '#ffccc7',
                                           marginRight: '3px'
                                         }}
                                       >
                                         <span className="px-2 py-1 rounded" style={{ 
-                                          background: '#fff6e6', 
+                                          background: cluster.isConsistent ? '#fff6e6' : '#fff2f0', 
                                           fontSize: '12px',
-                                          border: '1px solid #ffcc80'
+                                          border: `1px solid ${cluster.isConsistent ? '#ffcc80' : '#ffccc7'}`
                                         }}>
                                           {cluster.clusterName}
                                         </span>

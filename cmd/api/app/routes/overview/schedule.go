@@ -18,11 +18,19 @@ package overview
 
 import (
 	"context"
+	"fmt"
 	"sort"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
+
+	clusterv1alpha1 "github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
@@ -40,23 +48,82 @@ var resourceGroupMap = map[string]string{
 	"Pod":                   "Workloads",
 	"ReplicaSet":            "Workloads",
 	"ReplicationController": "Workloads",
-	
+
 	// 网络
-	"Service":               "Network",
-	"Ingress":               "Network",
-	"NetworkPolicy":         "Network",
-	
+	"Service":       "Network",
+	"Ingress":       "Network",
+	"NetworkPolicy": "Network",
+
 	// 存储
 	"PersistentVolume":      "Storage",
 	"PersistentVolumeClaim": "Storage",
 	"StorageClass":          "Storage",
-	
+
 	// 配置
-	"ConfigMap":             "Configuration",
-	"Secret":                "Configuration",
-	
+	"ConfigMap": "Configuration",
+	"Secret":    "Configuration",
+
 	// 其他类型
 	"CustomResourceDefinition": "CustomResources",
+}
+
+// 添加常用资源类型的GVR映射表
+var supportedResources = map[string]schema.GroupVersionResource{
+	"Deployment": {
+		Group:    "apps",
+		Version:  "v1",
+		Resource: "deployments",
+	},
+	"Service": {
+		Group:    "",
+		Version:  "v1",
+		Resource: "services",
+	},
+	"Pod": {
+		Group:    "",
+		Version:  "v1",
+		Resource: "pods",
+	},
+	"ConfigMap": {
+		Group:    "",
+		Version:  "v1",
+		Resource: "configmaps",
+	},
+	"Secret": {
+		Group:    "",
+		Version:  "v1",
+		Resource: "secrets",
+	},
+	"StatefulSet": {
+		Group:    "apps",
+		Version:  "v1",
+		Resource: "statefulsets",
+	},
+	"DaemonSet": {
+		Group:    "apps",
+		Version:  "v1",
+		Resource: "daemonsets",
+	},
+	"Ingress": {
+		Group:    "networking.k8s.io",
+		Version:  "v1",
+		Resource: "ingresses",
+	},
+	"Job": {
+		Group:    "batch",
+		Version:  "v1",
+		Resource: "jobs",
+	},
+	"CronJob": {
+		Group:    "batch",
+		Version:  "v1",
+		Resource: "cronjobs",
+	},
+	"PersistentVolumeClaim": {
+		Group:    "",
+		Version:  "v1",
+		Resource: "persistentvolumeclaims",
+	},
 }
 
 // 获取资源类型的分组
@@ -115,65 +182,312 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		return nil, err
 	}
 
-	// 资源类型统计
-	resourceTypeMap := make(map[string]map[string]int)
-	// 资源类型和集群间的链接统计
-	resourceClusterLinks := make(map[string]map[string]int)
-	
-	// 处理资源绑定
+	// 资源类型统计 - 从绑定中获取的调度信息
+	scheduledResourceMap := make(map[string]map[string]int)
+	// 资源类型和集群间的链接统计 - 从绑定中获取的调度信息
+	scheduledResourceLinks := make(map[string]map[string]int)
+
+	// 实际部署的资源统计
+	actualResourceMap := make(map[string]map[string]int)
+	// 实际部署的资源链接
+	actualResourceLinks := make(map[string]map[string]int)
+
+	// 处理资源绑定 - 获取调度信息
 	for _, binding := range resourceBindings.Items {
 		resourceKind := binding.Spec.Resource.Kind
 
 		// 将资源添加到类型统计
-		if _, ok := resourceTypeMap[resourceKind]; !ok {
-			resourceTypeMap[resourceKind] = make(map[string]int)
+		if _, ok := scheduledResourceMap[resourceKind]; !ok {
+			scheduledResourceMap[resourceKind] = make(map[string]int)
 		}
 
 		// 如果链接映射不存在此资源类型，则初始化
-		if _, ok := resourceClusterLinks[resourceKind]; !ok {
-			resourceClusterLinks[resourceKind] = make(map[string]int)
+		if _, ok := scheduledResourceLinks[resourceKind]; !ok {
+			scheduledResourceLinks[resourceKind] = make(map[string]int)
 		}
 
 		// 为每个集群绑定创建链接
 		for _, cluster := range binding.Spec.Clusters {
 			clusterName := cluster.Name
-			
+
 			// 增加资源类型到特定集群的链接计数
-			resourceClusterLinks[resourceKind][clusterName]++
-			
+			scheduledResourceLinks[resourceKind][clusterName]++
+
 			// 增加资源类型统计
-			resourceTypeMap[resourceKind][clusterName]++
+			scheduledResourceMap[resourceKind][clusterName]++
 		}
 	}
 
-	// 处理集群资源绑定
+	// 处理集群资源绑定 - 获取调度信息
 	for _, binding := range clusterResourceBindings.Items {
 		resourceKind := binding.Spec.Resource.Kind
 
 		// 将资源添加到类型统计
-		if _, ok := resourceTypeMap[resourceKind]; !ok {
-			resourceTypeMap[resourceKind] = make(map[string]int)
+		if _, ok := scheduledResourceMap[resourceKind]; !ok {
+			scheduledResourceMap[resourceKind] = make(map[string]int)
 		}
 
 		// 如果链接映射不存在此资源类型，则初始化
-		if _, ok := resourceClusterLinks[resourceKind]; !ok {
-			resourceClusterLinks[resourceKind] = make(map[string]int)
+		if _, ok := scheduledResourceLinks[resourceKind]; !ok {
+			scheduledResourceLinks[resourceKind] = make(map[string]int)
 		}
 
 		// 为每个集群绑定创建链接
 		for _, cluster := range binding.Spec.Clusters {
 			clusterName := cluster.Name
-			
+
 			// 增加资源类型到特定集群的链接计数
-			resourceClusterLinks[resourceKind][clusterName]++
-			
+			scheduledResourceLinks[resourceKind][clusterName]++
+
 			// 增加资源类型统计
-			resourceTypeMap[resourceKind][clusterName]++
+			scheduledResourceMap[resourceKind][clusterName]++
 		}
 	}
 
-	// 创建链接
-	for resourceKind, clusterMap := range resourceClusterLinks {
+	// 收集实际部署的资源信息
+	// 并发获取各集群资源
+	var wg sync.WaitGroup
+	var mu sync.Mutex // 保护map的并发访问
+
+	for i := range clusterList.Items {
+		cluster := &clusterList.Items[i]
+		wg.Add(1)
+
+		go func(c *clusterv1alpha1.Cluster) {
+			defer wg.Done()
+
+			// 使用现有的客户端函数获取成员集群客户端
+			kubeClient := client.InClusterClientForMemberCluster(c.Name)
+			if kubeClient == nil {
+				klog.ErrorS(fmt.Errorf("failed to get client"), "Could not get client for cluster", "cluster", c.Name)
+				return
+			}
+
+			// 创建动态客户端 - 通过设置相同的配置
+			config, err := client.GetMemberConfig()
+			if err != nil {
+				klog.ErrorS(err, "Failed to get member config", "cluster", c.Name)
+				return
+			}
+
+			// 修改配置以指向特定集群
+			restConfig := rest.CopyConfig(config)
+			// 获取karmada配置
+			karmadaConfig, _, err := client.GetKarmadaConfig()
+			if err != nil {
+				klog.ErrorS(err, "Failed to get karmada config", "cluster", c.Name)
+				return
+			}
+			// 使用固定的代理URL格式 - client包中定义的proxyURL常量为非导出
+			proxyURL := "/apis/cluster.karmada.io/v1alpha1/clusters/%s/proxy/"
+			restConfig.Host = karmadaConfig.Host + fmt.Sprintf(proxyURL, c.Name)
+
+			dynamicClient, err := dynamic.NewForConfig(restConfig)
+			if err != nil {
+				klog.ErrorS(err, "Failed to create dynamic client", "cluster", c.Name)
+				return
+			}
+
+			// 初始化该集群的资源统计
+			clusterResources := make(map[string]int)
+
+			// 查询所有支持的资源类型
+			for resourceKind, gvr := range supportedResources {
+				// 查询资源列表
+				list, err := dynamicClient.Resource(gvr).Namespace(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
+				if err != nil {
+					klog.ErrorS(err, "Failed to list resources", "cluster", c.Name, "resource", resourceKind)
+					continue
+				}
+
+				// 记录资源数量
+				count := len(list.Items)
+
+				// 对于Deployment类型，需要获取实际的Pod数量而不是Deployment对象数量
+				if resourceKind == "Deployment" && count > 0 {
+					// Pod计数总和
+					totalPodCount := 0
+
+					// 遍历每个Deployment
+					for _, deployment := range list.Items {
+						// 提取Deployment名称和命名空间
+						deployName, _, _ := unstructured.NestedString(deployment.Object, "metadata", "name")
+						deployNamespace, _, _ := unstructured.NestedString(deployment.Object, "metadata", "namespace")
+
+						if deployName == "" {
+							continue
+						}
+
+						// 构建标签选择器来查找属于该Deployment的Pod
+						// 典型的Pod会有app标签或app.kubernetes.io/name标签匹配Deployment名称
+						labelSelectors := []string{
+							fmt.Sprintf("app=%s", deployName),
+							fmt.Sprintf("app.kubernetes.io/name=%s", deployName),
+						}
+
+						// 尝试从deployment中获取标签选择器
+						var deployLabels map[string]interface{}
+						var matchLabels map[string]interface{}
+
+						// 提取selector.matchLabels
+						deployLabels, _, _ = unstructured.NestedMap(deployment.Object, "spec", "selector", "matchLabels")
+						if deployLabels != nil {
+							matchLabels = deployLabels
+						}
+
+						deployPodCount := 0
+
+						// 使用标签选择器尝试获取属于该Deployment的Pod
+						for _, labelSelector := range labelSelectors {
+							podListOptions := metav1.ListOptions{
+								LabelSelector: labelSelector,
+							}
+
+							// 在Deployment所在的命名空间中查找Pod
+							namespacePodList, err := dynamicClient.Resource(supportedResources["Pod"]).Namespace(deployNamespace).List(ctx, podListOptions)
+							if err != nil {
+								klog.ErrorS(err, "Failed to list pods with selector", "cluster", c.Name, "selector", labelSelector)
+								continue
+							}
+
+							// 统计运行中的Pod
+							for _, pod := range namespacePodList.Items {
+								podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
+								if !found || err != nil {
+									continue
+								}
+
+								// 只计算Running状态的Pod
+								if podStatus == "Running" {
+									deployPodCount++
+								}
+							}
+
+							// 如果找到了Pod，则不再继续尝试其他选择器
+							if deployPodCount > 0 {
+								break
+							}
+						}
+
+						// 如果通过常见标签选择器没有找到Pod，且我们有matchLabels，尝试直接使用matchLabels
+						if deployPodCount == 0 && matchLabels != nil {
+							// 构建标签选择器字符串
+							labelSelector := ""
+							for key, value := range matchLabels {
+								if strValue, ok := value.(string); ok {
+									if labelSelector != "" {
+										labelSelector += ","
+									}
+									labelSelector += fmt.Sprintf("%s=%s", key, strValue)
+								}
+							}
+
+							if labelSelector != "" {
+								podListOptions := metav1.ListOptions{
+									LabelSelector: labelSelector,
+								}
+
+								namespacePodList, err := dynamicClient.Resource(supportedResources["Pod"]).Namespace(deployNamespace).List(ctx, podListOptions)
+								if err != nil {
+									klog.ErrorS(err, "Failed to list pods with matchLabels", "cluster", c.Name, "selector", labelSelector)
+								} else {
+									// 统计运行中的Pod
+									for _, pod := range namespacePodList.Items {
+										podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
+										if !found || err != nil {
+											continue
+										}
+
+										// 只计算Running状态的Pod
+										if podStatus == "Running" {
+											deployPodCount++
+										}
+									}
+								}
+							}
+						}
+
+						// 记录该Deployment的Pod数量
+						klog.V(4).Infof("Cluster %s, Deployment %s/%s has %d running pods",
+							c.Name, deployNamespace, deployName, deployPodCount)
+
+						// 累加Pod数量
+						totalPodCount += deployPodCount
+					}
+
+					// 如果找到了运行中的Pod，使用Pod总数作为实际部署数量
+					if totalPodCount > 0 {
+						klog.Infof("Cluster %s has total %d running pods for all deployments", c.Name, totalPodCount)
+						count = totalPodCount
+					}
+				}
+
+				if count > 0 {
+					clusterResources[resourceKind] = count
+
+					mu.Lock()
+					// 更新实际资源统计
+					if _, ok := actualResourceMap[resourceKind]; !ok {
+						actualResourceMap[resourceKind] = make(map[string]int)
+					}
+					actualResourceMap[resourceKind][c.Name] = count
+
+					// 更新实际资源链接
+					if _, ok := actualResourceLinks[resourceKind]; !ok {
+						actualResourceLinks[resourceKind] = make(map[string]int)
+					}
+					actualResourceLinks[resourceKind][c.Name] = count
+					mu.Unlock()
+				}
+			}
+
+			klog.Infof("Cluster %s has resources: %v", c.Name, clusterResources)
+		}(cluster)
+	}
+
+	// 等待所有集群资源收集完成
+	wg.Wait()
+
+	// 合并调度信息和实际部署信息
+	// 对于实际资源部署，使用实际发现的数量
+	// 如果实际未发现资源，但存在调度记录，则保留调度记录
+	mergedResourceMap := make(map[string]map[string]int)
+	mergedResourceLinks := make(map[string]map[string]int)
+
+	// 先处理所有调度信息
+	for resourceKind, clusterMap := range scheduledResourceMap {
+		if _, ok := mergedResourceMap[resourceKind]; !ok {
+			mergedResourceMap[resourceKind] = make(map[string]int)
+		}
+
+		if _, ok := mergedResourceLinks[resourceKind]; !ok {
+			mergedResourceLinks[resourceKind] = make(map[string]int)
+		}
+
+		for clusterName, count := range clusterMap {
+			mergedResourceMap[resourceKind][clusterName] = count
+			mergedResourceLinks[resourceKind][clusterName] = count
+		}
+	}
+
+	// 再用实际部署信息更新
+	for resourceKind, clusterMap := range actualResourceMap {
+		if _, ok := mergedResourceMap[resourceKind]; !ok {
+			mergedResourceMap[resourceKind] = make(map[string]int)
+		}
+
+		if _, ok := mergedResourceLinks[resourceKind]; !ok {
+			mergedResourceLinks[resourceKind] = make(map[string]int)
+		}
+
+		for clusterName, count := range clusterMap {
+			mergedResourceMap[resourceKind][clusterName] = count
+			mergedResourceLinks[resourceKind][clusterName] = count
+		}
+	}
+
+	// 创建链接 - 使用合并后的信息
+	for resourceKind, clusterMap := range mergedResourceLinks {
 		for clusterName, count := range clusterMap {
 			response.Links = append(response.Links, v1.ScheduleLink{
 				Source: "karmada-control-plane",
@@ -184,15 +498,15 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		}
 	}
 
-	// 转换资源类型统计为响应格式，并按资源类型排序
+	// 转换资源类型统计为响应格式，并按资源类型排序 - 使用合并后的信息
 	var resourceTypes []string
-	for resourceType := range resourceTypeMap {
+	for resourceType := range mergedResourceMap {
 		resourceTypes = append(resourceTypes, resourceType)
 	}
 	sort.Strings(resourceTypes)
 
 	for _, resourceType := range resourceTypes {
-		clusterMap := resourceTypeMap[resourceType]
+		clusterMap := mergedResourceMap[resourceType]
 		typeDist := v1.ResourceTypeDistribution{
 			ResourceType: resourceType,
 			ClusterDist:  []v1.ClusterDistribution{},
@@ -215,6 +529,71 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 
 		response.ResourceDist = append(response.ResourceDist, typeDist)
 	}
+
+	// 添加实际资源分布信息
+	// 这一部分将同时显示调度计划和实际部署情况
+	actualResourceDist := make([]v1.ActualResourceTypeDistribution, 0)
+
+	// 使用与前面相同的资源类型列表，保持一致性
+	for _, resourceType := range resourceTypes {
+		dist := v1.ActualResourceTypeDistribution{
+			ResourceType:        resourceType,
+			ResourceGroup:       getResourceGroup(resourceType),
+			ClusterDist:         []v1.ActualClusterDistribution{},
+			TotalScheduledCount: 0,
+			TotalActualCount:    0,
+		}
+
+		// 合并调度和实际部署信息
+		scheduledMap := scheduledResourceMap[resourceType]
+		actualMap := actualResourceMap[resourceType]
+
+		// 收集所有相关集群
+		clustersSet := make(map[string]bool)
+		for cluster := range scheduledMap {
+			clustersSet[cluster] = true
+		}
+		for cluster := range actualMap {
+			clustersSet[cluster] = true
+		}
+
+		// 对集群名称进行排序
+		var clusters []string
+		for cluster := range clustersSet {
+			clusters = append(clusters, cluster)
+		}
+		sort.Strings(clusters)
+
+		// 为每个集群创建分布记录
+		for _, clusterName := range clusters {
+			scheduledCount := scheduledMap[clusterName]
+			actualCount := actualMap[clusterName]
+
+			dist.TotalScheduledCount += scheduledCount
+			dist.TotalActualCount += actualCount
+
+			clusterDist := v1.ActualClusterDistribution{
+				ClusterName:    clusterName,
+				ScheduledCount: scheduledCount,
+				ActualCount:    actualCount,
+				Status: v1.ResourceDeploymentStatus{
+					Scheduled:      scheduledCount > 0,
+					Actual:         actualCount > 0,
+					ScheduledCount: scheduledCount,
+					ActualCount:    actualCount,
+				},
+			}
+			dist.ClusterDist = append(dist.ClusterDist, clusterDist)
+		}
+
+		// 只有当至少有一个调度记录或实际部署记录时，才添加到结果中
+		if dist.TotalScheduledCount > 0 || dist.TotalActualCount > 0 {
+			actualResourceDist = append(actualResourceDist, dist)
+		}
+	}
+
+	// 将实际资源分布添加到响应中
+	response.ActualResourceDist = actualResourceDist
 
 	// 获取传播策略
 	propagationPolicies, err := karmadaClient.PolicyV1alpha1().PropagationPolicies(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
@@ -252,4 +631,3 @@ func HandleGetSchedulePreview(c *gin.Context) {
 }
 
 // 在init中已注册，此处不需要额外添加路由
-
