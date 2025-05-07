@@ -25,10 +25,143 @@ import dayjs from 'dayjs';
 import { Icons } from '@/components/icons';
 import { Pie, Column } from '@ant-design/charts';
 import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, QuestionCircleFilled, SyncOutlined } from '@ant-design/icons';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import SchedulePreview from '@/components/schedule-preview';
+import insertCss from 'insert-css';
 
 const { Title, Text } = Typography;
+
+// 修改CSS样式
+insertCss(`
+  /* 移除边框，使用背景色填充统计卡片 */
+  .overview-stats-card {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(24, 144, 255, 0.15);
+    position: relative;
+    background-color: rgba(24, 144, 255, 0.08);
+    height: 120px; /* 缩小高度 */
+  }
+  
+  .overview-node-card {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(82, 196, 26, 0.15);
+    position: relative;
+    background-color: rgba(82, 196, 26, 0.08);
+    height: 120px; /* 缩小高度 */
+  }
+  
+  .overview-pod-card {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(255, 77, 79, 0.15);
+    position: relative;
+    background-color: rgba(255, 77, 79, 0.08);
+    height: 120px; /* 缩小高度 */
+  }
+  
+  .overview-cpu-card {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(114, 46, 209, 0.15);
+    position: relative;
+    background-color: rgba(114, 46, 209, 0.08);
+    height: 120px; /* 缩小高度 */
+  }
+  
+  .overview-memory-card {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(19, 194, 194, 0.15);
+    position: relative;
+    background-color: rgba(19, 194, 194, 0.08);
+    height: 120px; /* 缩小高度 */
+  }
+  
+  /* 基本信息卡片保留边框 */
+  .overview-basic-info-card {
+    border: 2px solid #faad14 !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  
+  .overview-basic-info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #faad14;
+  }
+  
+  /* 节点状态卡片 */
+  .overview-node-status-card {
+    border: 2px solid #52C41A !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  
+  .overview-node-status-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #52C41A;
+  }
+  
+  /* 集群卡片 */
+  .overview-cluster-card {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(24, 144, 255, 0.15);
+    position: relative;
+    background-color: rgba(24, 144, 255, 0.08);
+  }
+  
+  .overview-cluster-card:hover {
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25) !important;
+    transform: translateY(-2px);
+    transition: all 0.3s;
+  }
+  
+  /* 增强状态数值显示 */
+  .status-value-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .status-value-block {
+    font-size: 28px;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: white;
+    margin-right: 10px;
+    min-width: 60px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  
+  .status-node-block { background-color: #52C41A; }
+  .status-pod-block { background-color: #ff4d4f; }
+  .status-cpu-block { background-color: #722ed1; }
+  .status-memory-block { background-color: #13c2c2; }
+`);
 
 // 刷新时间间隔（30秒）
 const REFRESH_INTERVAL = 30 * 1000;
@@ -227,103 +360,193 @@ const Overview = () => {
     },
   ];
 
-  // 修改renderStatisticCards函数，使用新的节点和Pod数据
+  // 更新渲染统计卡片函数
   const renderStatisticCards = () => {
-    if (!resourcesData) {
-      return <Empty description={i18nInstance.t('6f21c1bfa15eb362a82a062aeb31b8ae', '暂无数据')} />;
-    }
-
-    const categories = [
-      {
-        title: i18nInstance.t('15d5d9ff9e3bbead979f01ed3cb49d2c', '节点状态'),
-        count: resourcesData.node.ready,
-        color: '#1890ff',
-        subtext: i18nInstance.t('1cd541f2e05b4b4f71d09d62df69f10a', '就绪节点'),
-        completed: resourcesData.node.ready,
-        total: resourcesData.node.total
-      },
-      {
-        title: i18nInstance.t('3078bd68dd36e0e50b43a5a5b377701c', 'Pod状态'),
-        count: resourcesData.pod.allocated,
-        color: '#ff4d4f',
-        subtext: i18nInstance.t('b8921fbb0c6ab42911dfd752d095c252', '已分配Pod'),
-        completed: resourcesData.pod.allocated,
-        total: resourcesData.pod.capacity
-      },
-      {
-        title: i18nInstance.t('6f13a917708cfd547e9617a95f7938b9', 'CPU状态'),
-        count: Math.round(resourcesData.cpu.usage), // 以核显示
-        color: '#722ed1',
-        subtext: i18nInstance.t('07267d1bb99c0e9d0646eae571ca9afb', 'CPU使用(核)'),
-        completed: resourcesData.cpu.usage,
-        total: resourcesData.cpu.capacity
-      },
-      {
-        title: i18nInstance.t('dfef19e8c4e168600f58c3b8e31ef277', '内存状态'),
-        count: Math.round(resourcesData.memory.usage / 1024 / 1024), // 转为GB显示
-        color: '#13c2c2',
-        subtext: i18nInstance.t('89daa2a0673e61276eaabc0aa1298361', '内存使用(GB)'),
-        completed: resourcesData.memory.usage,
-        total: resourcesData.memory.capacity
-      }
-    ];
-
+    if (!resourcesData) return null;
+    
     return (
-      <Row gutter={[16, 16]} className="mb-6">
-        {categories.map((category, index) => (
-          <Col xs={24} sm={12} md={6} key={index}>
-            <Card bordered={false} className="h-full shadow-sm">
-              <Statistic
-                title={
-                  <div className="flex flex-row items-center">
-                    <span>{category.subtext}</span>
-                    {category.completed > 0 && category.total > 0 && (
-                      <Text type="secondary" className="ml-2 text-xs">
-                        {Math.round((category.completed / category.total) * 100)}%
-                      </Text>
-                    )}
-                  </div>
-                }
-                value={category.count}
-                valueStyle={{ color: category.color, fontSize: '28px' }}
-              />
-              {category.completed > 0 && category.total > 0 && (
-                <Progress 
-                  percent={Math.min(Math.round((category.completed / category.total) * 100), 100)} 
-                  strokeColor={category.color}
-                  showInfo={false}
-                  size="small"
-                  className="mt-2"
+      <Row gutter={[12, 12]} className="mb-4">
+        <Col xs={24} sm={12} md={12} lg={8} xl={4}>
+          <Card
+            bordered={false}
+            className="shadow-sm overview-node-card"
+            styles={{ 
+              body: { padding: '12px' },
+            }}
+          >
+            <div className="status-value-container">
+              <div className="status-value-block status-node-block">
+                {resourcesData.node.ready}
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')}</div>
+                <div className="text-sm">{resourcesData.node.ready}/{resourcesData.node.total}</div>
+              </div>
+            </div>
+            <Progress 
+              percent={Math.round((resourcesData.node.ready / resourcesData.node.total) * 100)} 
+              size="small"
+              strokeColor={getPercentColor(Math.round((resourcesData.node.ready / resourcesData.node.total) * 100))}
+            />
+          </Card>
+        </Col>
+        
+        <Col xs={24} sm={12} md={12} lg={8} xl={4}>
+          <Card
+            bordered={false}
+            className="shadow-sm overview-pod-card"
+            styles={{ 
+              body: { padding: '12px' },
+            }}
+          >
+            <div className="status-value-container">
+              <div className="status-value-block status-pod-block">
+                {resourcesData.pod.allocated}
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', 'Pod状态')}</div>
+                <div className="text-sm">{resourcesData.pod.allocated}/{resourcesData.pod.capacity}</div>
+              </div>
+            </div>
+            <Progress 
+              percent={Math.round((resourcesData.pod.allocated / resourcesData.pod.capacity) * 100)} 
+              size="small"
+              strokeColor={getPercentColor(Math.round((resourcesData.pod.allocated / resourcesData.pod.capacity) * 100))}
+            />
+          </Card>
+        </Col>
+        
+        <Col xs={24} sm={12} md={12} lg={8} xl={4}>
+          <Card
+            bordered={false}
+            className="shadow-sm overview-cpu-card"
+            styles={{ 
+              body: { padding: '12px' },
+            }}
+          >
+            <div className="status-value-container">
+              <div className="status-value-block status-cpu-block">
+                {Math.round(resourcesData.cpu.usage)}%
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'CPU用量')}</div>
+                <div className="text-sm">{resourcesData.cpu.capacity}</div>
+              </div>
+            </div>
+            <Progress 
+              percent={resourcesData.cpu.usage} 
+              size="small"
+              strokeColor={getPercentColor(resourcesData.cpu.usage)}
+            />
+          </Card>
+        </Col>
+        
+        <Col xs={24} sm={12} md={12} lg={8} xl={4}>
+          <Card
+            bordered={false}
+            className="shadow-sm overview-memory-card"
+            styles={{ 
+              body: { padding: '12px' },
+            }}
+          >
+            <div className="status-value-container">
+              <div className="status-value-block status-memory-block">
+                {Math.round(resourcesData.memory.usage)}%
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'Memory用量')}</div>
+                <div className="text-sm">{resourcesData.memory.capacity}</div>
+              </div>
+            </div>
+            <Progress 
+              percent={resourcesData.memory.usage} 
+              size="small"
+              strokeColor={getPercentColor(resourcesData.memory.usage)}
+            />
+          </Card>
+        </Col>
+        
+        <Col xs={24} sm={24} md={24} lg={8} xl={8}>
+          <Card
+            bordered={false}
+            className="shadow-sm overview-stats-card"
+            styles={{ 
+              body: { padding: '12px' },
+            }}
+          >
+            <Row gutter={16}>
+              <Col span={8}>
+                <Statistic 
+                  title={<div className="text-xs">{i18nInstance.t('6a73118a4a4d5159cbb889b3b3fbc157', '传播策略')}</div>} 
+                  value={data?.clusterResourceStatus.propagationPolicyNum || 0}
+                  valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#1890ff' }}
                 />
-              )}
-            </Card>
-          </Col>
-        ))}
+              </Col>
+              <Col span={8}>
+                <Statistic 
+                  title={<div className="text-xs">{i18nInstance.t('cee0aa74f1af5f41ee7e20044193498f', '覆盖策略')}</div>} 
+                  value={data?.clusterResourceStatus.overridePolicyNum || 0}
+                  valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#13c2c2' }}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic 
+                  title={<div className="text-xs">{i18nInstance.t('8c669a5e9ad11c4c91ba89ccde1e6167', '命名空间')}</div>} 
+                  value={data?.clusterResourceStatus.namespaceNum || 0}
+                  valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#722ed1' }}
+                />
+              </Col>
+            </Row>
+            <Row gutter={16} className="mt-2">
+              <Col span={8}>
+                <Statistic 
+                  title={<div className="text-xs">{i18nInstance.t('f1f64d9fded4a72e82b1e9f8c42c3d60', '工作负载')}</div>} 
+                  value={data?.clusterResourceStatus.workloadNum || 0}
+                  valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#ff4d4f' }}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic 
+                  title={<div className="text-xs">{i18nInstance.t('44d4e7c3d38eb5e0818174e76cf42241', '服务')}</div>} 
+                  value={data?.clusterResourceStatus.serviceNum || 0}
+                  valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#faad14' }}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic 
+                  title={<div className="text-xs">{i18nInstance.t('c230d78d91375a307f6c2e3e6d435519', '配置')}</div>} 
+                  value={data?.clusterResourceStatus.configNum || 0}
+                  valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#52c41a' }}
+                />
+              </Col>
+            </Row>
+          </Card>
+        </Col>
       </Row>
     );
   };
 
-  // 修改renderNodeStatus函数，重新组织显示方式
+  // 修改renderNodeStatus函数，减小尺寸
   const renderNodeStatus = () => {
     return (
       <Spin spinning={isNodeLoading}>
         {nodeData && nodeData.items.length > 0 ? (
           <div>
-            <div className="mb-4">
+            <div className="mb-2">
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <div className="mr-4">
+                  <div className="mr-3">
                     <Statistic 
-                      title={i18nInstance.t('15d5d9ff9e3bbead979f01ed3cb49d2c', '就绪节点')}
+                      title={<Text style={{ fontSize: '13px' }}>{i18nInstance.t('15d5d9ff9e3bbead979f01ed3cb49d2c', '就绪节点')}</Text>}
                       value={`${nodeData.summary.readyNum}/${nodeData.summary.totalNum}`}
-                      valueStyle={{ color: '#1890ff', fontSize: 20 }}
+                      valueStyle={{ color: '#1890ff', fontSize: '18px' }}
                     />
                   </div>
                   <div>
                     <Progress 
                       type="circle" 
                       percent={Math.round((nodeData.summary.readyNum / nodeData.summary.totalNum) * 100)} 
-                      size={60} 
+                      size={50} 
                       strokeColor={getPercentColor(Math.round((nodeData.summary.readyNum / nodeData.summary.totalNum) * 100))}
                     />
                   </div>
@@ -334,7 +557,7 @@ const Overview = () => {
                     acc[node.clusterName] = (acc[node.clusterName] || 0) + 1;
                     return acc;
                   }, {} as Record<string, number>)).map(([cluster, count], index) => (
-                    <Tag color="blue" key={`cluster-count-${cluster}-${index}`} className="mr-2">
+                    <Tag color="blue" key={`cluster-count-${cluster}-${index}`} className="mr-1" style={{ fontSize: '12px' }}>
                       {cluster}: {count}
                     </Tag>
                   ))}
@@ -342,33 +565,33 @@ const Overview = () => {
               </div>
             </div>
             
-            <div className="overflow-auto" style={{ maxHeight: '400px' }}>
+            <div className="overflow-auto" style={{ maxHeight: '300px' }}>
               <Table 
                 dataSource={nodeData.items} 
                 rowKey={(record) => `${record.clusterName}-${record.name}`}
                 size="small"
                 pagination={false}
-                scroll={{ x: 800, y: 300 }}
+                scroll={{ x: 800, y: 240 }}
                 columns={[
                   {
                     title: i18nInstance.t('c35a681d41a9dcd9217e1bc21e5c808c', '集群'),
                     dataIndex: 'clusterName',
                     key: 'clusterName',
-                    width: 100,
+                    width: 90,
                     fixed: 'left',
                   },
                   {
                     title: i18nInstance.t('a10443964156a7532691a7c1d8a5d610', '节点名称'),
                     dataIndex: 'name',
                     key: 'name',
-                    width: 180,
+                    width: 160,
                     ellipsis: true,
                   },
                   {
                     title: i18nInstance.t('c0af5a6d0a161be903ec3390183b887e', '状态'),
                     dataIndex: 'status',
                     key: 'status',
-                    width: 90,
+                    width: 80,
                     render: (text: string, record: any) => (
                       <Badge
                         key={`status-${record.clusterName}-${record.name}`}
@@ -381,16 +604,16 @@ const Overview = () => {
                     title: i18nInstance.t('3fea7ca76cdece641436d7ab0d02ab1b', '角色'),
                     dataIndex: 'role',
                     key: 'role',
-                    width: 100,
+                    width: 80,
                     render: (text: string) => text || 'worker',
                   },
                   {
                     title: i18nInstance.t('42ccb9730b2948a5dda0a431bcb0eadd', 'CPU负载'),
                     key: 'cpu',
-                    width: 150,
+                    width: 140,
                     render: (text: string, record: any) => (
                       <div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between" style={{ fontSize: '12px' }}>
                           <span>{record.cpuUsage || 0}/{record.cpuCapacity}</span>
                           <span>{Math.round((record.cpuUsage || 0) / record.cpuCapacity * 100)}%</span>
                         </div>
@@ -406,10 +629,10 @@ const Overview = () => {
                   {
                     title: i18nInstance.t('4da7a9e0a4129fc7c5a53bf938e17a05', '内存负载'),
                     key: 'memory',
-                    width: 150,
+                    width: 140,
                     render: (text: string, record: any) => (
                       <div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between" style={{ fontSize: '12px' }}>
                           <span>{Math.round((record.memoryUsage || 0) / 1024 / 1024)}GB/{Math.round(record.memoryCapacity / 1024 / 1024)}GB</span>
                           <span>{Math.round((record.memoryUsage || 0) / record.memoryCapacity * 100)}%</span>
                         </div>
@@ -428,7 +651,7 @@ const Overview = () => {
                     width: 120,
                     render: (text: string, record: any) => (
                       <div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between" style={{ fontSize: '12px' }}>
                           <span>{record.podUsage || 0}/{record.podCapacity}</span>
                           <span>{Math.round((record.podUsage || 0) / record.podCapacity * 100)}%</span>
                         </div>
@@ -445,15 +668,14 @@ const Overview = () => {
               />
             </div>
             
-            <Divider className="my-2" />
-            <div className="text-center">
-              <Button type="link" onClick={() => navigate('/cluster-manage')}>
+            <div className="text-center mt-1">
+              <Button type="link" size="small" onClick={() => navigate('/cluster-manage')}>
                 {i18nInstance.t('a3b0de5784df7fd24b5a97e719f214a8', '查看所有节点')}
               </Button>
             </div>
           </div>
         ) : (
-          <div className="h-[200px] flex items-center justify-center">
+          <div className="h-[180px] flex items-center justify-center">
             <Empty description={i18nInstance.t('6f21c1bfa15eb362a82a062aeb31b8ae', '暂无数据')} />
           </div>
         )}
@@ -464,37 +686,15 @@ const Overview = () => {
   // 集群调度预览组件包装器，添加刷新控制
   const renderSchedulePreview = () => {
     return (
-      <div className="mb-6">
-        <Card bordered={false} className="shadow-sm mb-2" styles={{ body: { padding: '16px' } }}>
-          <div className="flex justify-between items-center">
-            <Space>
-              <Text type="secondary">
-                {i18nInstance.t('2ca48325646a61d53eb35cb7e9c309c6', '上次更新时间')}:
-              </Text>
-              <Text>{formatLastUpdatedTime()}</Text>
-            </Space>
-            <Space>
-              <Button
-                type={autoRefresh ? "primary" : "default"}
-                size="small"
-                onClick={toggleAutoRefresh}
-              >
-                {autoRefresh 
-                  ? i18nInstance.t('9f73314cbeef65d8fdc5d97c4cebf7c5', '自动刷新已开启') 
-                  : i18nInstance.t('992a0f0542384f1ee5ef51b7cf4ae6c4', '自动刷新已关闭')}
-              </Button>
-              <Button 
-                type="default"
-                icon={<SyncOutlined />} 
-                size="small"
-                onClick={handleRefreshScheduleData}
-              >
-                {i18nInstance.t('7ed21143bb50d5f9c19f5e1217587170', '刷新数据')}
-              </Button>
-            </Space>
-          </div>
-        </Card>
-        <SchedulePreview data={scheduleData} loading={isScheduleLoading} />
+      <div className="mb-2">
+        <SchedulePreview 
+          data={scheduleData} 
+          loading={isScheduleLoading} 
+          lastUpdatedAt={dataUpdatedAt} 
+          onRefresh={handleRefreshScheduleData}
+          autoRefresh={autoRefresh}
+          onToggleAutoRefresh={toggleAutoRefresh}
+        />
       </div>
     );
   };
@@ -508,37 +708,53 @@ const Overview = () => {
       )}
       
       {!clusterName && (
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} md={8}>
-            <Card title={i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')} bordered={false} className="h-full shadow-sm">
+        <div className="mb-2">
+          {renderSchedulePreview()}
+        </div>
+      )}
+      
+      {!clusterName && (
+        <Row gutter={[12, 12]} className="mb-4">
+          <Col xs={24} md={6}>
+            <Card title={i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')} 
+                  bordered={false} 
+                  className="h-full shadow-sm overview-basic-info-card"
+                  styles={{ 
+                    body: { padding: '12px' },
+                    title: { fontSize: '15px', fontWeight: 'bold' }
+                  }}>
               <Descriptions size="small" column={1} items={basicItems} />
             </Card>
           </Col>
           
-          <Col xs={24} md={16}>
-            <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')} bordered={false} className="h-full shadow-sm">
+          <Col xs={24} md={18}>
+            <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态')} 
+                  bordered={false} 
+                  className="h-full shadow-sm overview-node-status-card"
+                  styles={{ 
+                    body: { padding: '12px' },
+                    title: { fontSize: '15px', fontWeight: 'bold' }
+                  }}>
               {renderNodeStatus()}
             </Card>
           </Col>
         </Row>
       )}
       
-      {!clusterName && renderSchedulePreview()}
-      
-      <div className="mb-6">
-        <Title level={4} className="mb-4">
+      <div className="mb-4">
+        <Title level={5} className="mb-3">
           {clusterName 
             ? i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', '集群概览') + `: ${clusterName}` 
             : i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', 'Kubernetes 集群列表')}
         </Title>
         <Spin spinning={isClusterLoading}>
           {clusterData?.clusters && clusterData.clusters.length > 0 ? (
-            <Row gutter={[16, 16]}>
+            <Row gutter={[12, 12]}>
               {clusterData.clusters.map((cluster) => (
                 <Col xs={24} sm={12} md={8} lg={6} key={cluster.objectMeta.name}>
                   <Card 
                     hoverable 
-                    className="h-full shadow-sm" 
+                    className="h-full shadow-sm overview-cluster-card"
                     onClick={() => navigate(`/cluster-manage/${cluster.objectMeta.name}/overview`)}
                     styles={{ body: { padding: '16px', height: '100%' } }}
                     actions={[
@@ -554,7 +770,10 @@ const Overview = () => {
                     ]}
                   >
                     <div className="flex items-center">
-                      <Avatar size={40} style={{ backgroundColor: cluster.ready ? '#1890ff' : '#ff4d4f' }}>
+                      <Avatar size={40} style={{ 
+                        backgroundColor: cluster.ready ? '#1890ff' : '#ff4d4f',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                      }}>
                         {cluster.objectMeta.name.charAt(0).toUpperCase()}
                       </Avatar>
                       <div className="ml-3">
@@ -568,21 +787,23 @@ const Overview = () => {
                         <Text type="secondary">就绪状态:</Text>
                         <Space>
                           {cluster.ready ? 
-                            <CheckCircleFilled key="ready-icon" style={{ color: '#52c41a' }} /> : 
-                            <CloseCircleFilled key="not-ready-icon" style={{ color: '#f5222d' }} />
+                            <CheckCircleFilled key="ready-icon" style={{ color: '#52c41a', fontSize: '16px' }} /> : 
+                            <CloseCircleFilled key="not-ready-icon" style={{ color: '#f5222d', fontSize: '16px' }} />
                           }
-                          <Text>{cluster.ready ? '已就绪' : '未就绪'}</Text>
+                          <Text strong={true}>{cluster.ready ? '已就绪' : '未就绪'}</Text>
                         </Space>
                       </div>
                       <div className="flex justify-between mb-2">
                         <Text type="secondary">同步模式:</Text>
-                        <Tag color={cluster.syncMode === 'Push' ? "gold" : "blue"}>
+                        <Tag color={cluster.syncMode === 'Push' ? "gold" : "blue"} style={{ fontSize: '12px', padding: '0 6px' }}>
                           {cluster.syncMode}
                         </Tag>
                       </div>
                       <div className="flex justify-between mb-2">
                         <Text type="secondary">节点状态:</Text>
-                        <Text>{cluster.nodeSummary ? `${cluster.nodeSummary.readyNum}/${cluster.nodeSummary.totalNum}` : '-'}</Text>
+                        <Text strong={true} style={{ fontSize: '14px', color: '#52C41A' }}>
+                          {cluster.nodeSummary ? `${cluster.nodeSummary.readyNum}/${cluster.nodeSummary.totalNum}` : '-'}
+                        </Text>
                       </div>
                     </div>
                     
@@ -590,7 +811,10 @@ const Overview = () => {
                       <div className="mb-1">
                         <div className="flex justify-between mb-1">
                           <Text type="secondary">CPU使用率:</Text>
-                          <Text style={{ color: getPercentColor(cluster.allocatedResources.cpuFraction) }}>
+                          <Text style={{ 
+                            color: getPercentColor(cluster.allocatedResources.cpuFraction),
+                            fontWeight: 'bold'
+                          }}>
                             {parseFloat(cluster.allocatedResources.cpuFraction.toFixed(2))}%
                           </Text>
                         </div>
@@ -605,7 +829,10 @@ const Overview = () => {
                       <div>
                         <div className="flex justify-between mb-1">
                           <Text type="secondary">内存使用率:</Text>
-                          <Text style={{ color: getPercentColor(cluster.allocatedResources.memoryFraction) }}>
+                          <Text style={{ 
+                            color: getPercentColor(cluster.allocatedResources.memoryFraction),
+                            fontWeight: 'bold'
+                          }}>
                             {parseFloat(cluster.allocatedResources.memoryFraction.toFixed(2))}%
                           </Text>
                         </div>
