@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import { SchedulePreviewResponse } from '@/services/overview';
-import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag, Progress, Alert, Button, Typography } from 'antd';
+import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag, Progress, Alert, Button, Typography, message } from 'antd';
 import { FlowDirectionGraph } from '@ant-design/graphs';
 import i18nInstance from '@/utils/i18n';
 import { useMemo, useRef, useEffect, useState } from 'react';
@@ -77,7 +77,7 @@ insertCss(`
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 垂直图例样式 */
+  /* 垂直图例样式 - 优化防止抖动 */
   .vertical-legend {
     display: flex;
     flex-direction: column;
@@ -86,10 +86,12 @@ insertCss(`
     background: #f9f9f9;
     border-radius: 8px;
     width: 120px;
+    min-height: 280px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     border: 1px solid rgba(0,0,0,0.05);
     border-left: 3px solid #8a5cf5;
-    animation: fadeIn 0.3s ease-in-out;
+    transition: all 0.3s ease;
+    will-change: transform;
   }
   
   .vertical-legend-item {
@@ -99,10 +101,29 @@ insertCss(`
     padding: 6px;
     border-radius: 4px;
     transition: background-color 0.2s;
+    height: 36px; 
+    width: 100%;
+    margin-bottom: 4px;
   }
   
   .vertical-legend-item:hover {
     background-color: rgba(0,0,0,0.03);
+  }
+  
+  /* 添加占位符动画 */
+  @keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.3; }
+  }
+  
+  .vertical-legend-placeholder {
+    height: 36px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 4px;
+    margin-bottom: 4px;
+    animation: pulse 1.5s infinite ease-in-out;
   }
   
   /* 卡片彩色边框样式 - 全包裹式边框 */
@@ -183,10 +204,12 @@ insertCss(`
       gap: 5px;
       height: auto;
       padding: 8px;
+      min-height: unset;
     }
     
     .vertical-legend-item {
       margin-right: 5px;
+      height: auto;
     }
   }
   
@@ -215,19 +238,17 @@ insertCss(`
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
   
-  /* 锁定覆盖层 */
-  .graph-lock-overlay {
+  /* 锁定覆盖层 - 透明但可捕获鼠标事件 */
+  .graph-lock-overlay-transparent {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(0, 0, 0, 0);
     z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     cursor: not-allowed;
+    pointer-events: all; /* 确保捕获所有鼠标事件 */
   }
   
   /* 自定义选项卡样式 */
@@ -725,20 +746,6 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     }
   }, []);
 
-  // 如果没有数据，显示空状态
-  if (!data && !loading) {
-    return (
-      <Card 
-        title={i18nInstance.t('b50ac8089a3096636ae1aa7e5a61d80b', '集群调度预览')} 
-        bordered={false} 
-        className="shadow-sm"
-        styles={{ body: { padding: '24px' } }}
-      >
-        <Empty description={i18nInstance.t('85db55baab6a80756102fc75d1972dc9', '暂无调度数据')} />
-      </Card>
-    );
-  }
-
   // 处理图表渲染错误
   const handleGraphError = (error: Error) => {
     console.error('流向图渲染错误:', error);
@@ -757,33 +764,53 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     }
   };
 
-  // 垂直图例组件
-  const VerticalLegend = () => (
-    <div className="vertical-legend">
-      <div className="text-center mb-2">
-        <Text type="secondary" className="text-sm font-medium">
-          {i18nInstance.t('d5d5d1f16ece92ab99b4dcc7bb859e3b', '资源类型图例')}
-        </Text>
-      </div>
-      {Object.entries(colorScheme.resourceGroups).map(([group, config]) => (
-        <div key={`group-${group}`} className="vertical-legend-item">
-          <Tag 
-            color={config.color}
-            style={{ 
-              marginBottom: '4px', 
-              fontSize: '12px', 
-              padding: '1px 8px',
-              borderRadius: '12px',
-              width: '100%',
-              textAlign: 'center'
-            }}
-          >
-            {group}
-          </Tag>
+  // 修改垂直图例组件实现
+  const VerticalLegend = () => {
+    const [loaded, setLoaded] = useState(false);
+    
+    // 在组件挂载后延迟设置loaded状态以确保平滑过渡
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoaded(true);
+      }, 50);
+      
+      return () => clearTimeout(timer);
+    }, []);
+    
+    return (
+      <div className="vertical-legend">
+        <div className="text-center mb-2">
+          <Text type="secondary" className="text-sm font-medium">
+            {i18nInstance.t('d5d5d1f16ece92ab99b4dcc7bb859e3b', '资源类型图例')}
+          </Text>
         </div>
-      ))}
-    </div>
-  );
+        {loaded ? (
+          Object.entries(colorScheme.resourceGroups).map(([group, config]) => (
+            <div key={`group-${group}`} className="vertical-legend-item">
+              <Tag 
+                color={config.color}
+                style={{ 
+                  marginBottom: '0', 
+                  fontSize: '12px', 
+                  padding: '1px 8px',
+                  borderRadius: '12px',
+                  width: '100%',
+                  textAlign: 'center'
+                }}
+              >
+                {group}
+              </Tag>
+            </div>
+          ))
+        ) : (
+          // 显示占位符
+          Array.from({ length: 5 }).map((_, index) => (
+            <div key={`placeholder-${index}`} className="vertical-legend-placeholder"></div>
+          ))
+        )}
+      </div>
+    );
+  };
 
   return (
     <Spin spinning={loading}>
@@ -899,22 +926,32 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               size="small"
                               type={isGraphLocked ? "primary" : "default"}
                               icon={isGraphLocked ? <LockOutlined /> : <UnlockOutlined />}
-                              onClick={toggleGraphLock}
+                              onClick={() => {
+                                toggleGraphLock();
+                                if (!isGraphLocked) {
+                                  message.info('图表已锁定，点击右上角按钮解锁可进行交互');
+                                }
+                              }}
                               className="graph-lock-button"
                               title={isGraphLocked ? "图表已锁定，点击解锁" : "图表未锁定，点击锁定"}
                             />
                             
-                            {/* 锁定覆盖层 */}
+                            {/* 透明覆盖层 - 用于阻止鼠标交互但不影响视觉效果 */}
                             {isGraphLocked && (
-                              <div className="graph-lock-overlay">
-                                <Text type="secondary" strong style={{ fontSize: '14px' }}>
-                                  图表已锁定，点击右上角按钮解锁
-                                </Text>
-                              </div>
+                              <div 
+                                className="graph-lock-overlay-transparent" 
+                                onClick={(e) => {
+                                  // 阻止事件冒泡
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  // 提示用户图表已锁定
+                                  message.info('图表已锁定，点击右上角按钮解锁可进行交互');
+                                }}
+                              />
                             )}
                             
                             <div className="flow-chart-wrapper">
-                              {flowData.nodes.length > 0 && flowData.edges.length > 0 && !isGraphLocked ? (
+                              {flowData.nodes.length > 0 && flowData.edges.length > 0 ? (
                                 <ErrorBoundary
                                   fallback={
                                     <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -1003,17 +1040,8 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                   height: '100%',
                                   color: '#999'
                                 }}>
-                                  {isGraphLocked ? (
-                                    <div style={{ textAlign: 'center' }}>
-                                      <LockOutlined style={{ fontSize: '24px', marginBottom: '8px' }} />
-                                      <div>图表已锁定，点击右上角按钮解锁</div>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <Spin size="large" />
-                                      <div style={{ marginTop: '12px' }}>加载图表中...</div>
-                                    </>
-                                  )}
+                                  <Spin size="large" />
+                                  <div style={{ marginTop: '12px' }}>加载图表中...</div>
                                 </div>
                               )}
                             </div>
