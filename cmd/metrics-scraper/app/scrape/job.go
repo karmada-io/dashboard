@@ -35,6 +35,7 @@ import (
 )
 
 // SaveRequest Define a struct for save requests
+// SaveRequest 定义一个用于保存请求的结构体
 type SaveRequest struct {
 	appName string
 	podName string
@@ -42,10 +43,10 @@ type SaveRequest struct {
 	result  chan error
 }
 
-// FetchMetrics fetches metrics from all pods of the given app name
+// FetchMetrics 从给定应用名称的所有 pod 中获取指标
 func FetchMetrics(ctx context.Context, appName string, requests chan SaveRequest) (map[string]*db.ParsedData, []string, error) {
 	kubeClient := client.InClusterClient()
-	podsMap, errors := getKarmadaPods(ctx, appName) // Pass context here
+	podsMap, errors := getKarmadaPods(ctx, appName) // 传递上下文
 	if len(podsMap) == 0 && len(errors) > 0 {
 		return nil, errors, fmt.Errorf("no pods found")
 	}
@@ -119,6 +120,7 @@ func FetchMetrics(ctx context.Context, appName string, requests chan SaveRequest
 	return allMetrics, errors, nil
 }
 
+// getKarmadaPods 获取 karmada 的 pod 信息
 func getKarmadaPods(ctx context.Context, appName string) (map[string][]db.PodInfo, []string) {
 	kubeClient := client.InClusterClient()
 	podsMap := make(map[string][]db.PodInfo)
@@ -159,6 +161,7 @@ func getKarmadaPods(ctx context.Context, appName string) (map[string][]db.PodInf
 	return podsMap, errors
 }
 
+// getClusterPods 获取集群的 pod 信息
 func getClusterPods(ctx context.Context, cluster *v1alpha1.Cluster) ([]db.PodInfo, error) {
 	fmt.Printf("Getting pods for cluster: %s\n", cluster.Name)
 
@@ -200,6 +203,7 @@ func getClusterPods(ctx context.Context, cluster *v1alpha1.Cluster) ([]db.PodInf
 	return podInfos, nil
 }
 
+// getKarmadaAgentMetrics 获取 karmada 代理的指标
 func getKarmadaAgentMetrics(ctx context.Context, podName string, clusterName string, requests chan SaveRequest) (*db.ParsedData, error) {
 	kubeClient := client.InClusterKarmadaClient()
 	clusters, err := kubeClient.ClusterV1alpha1().Clusters().List(ctx, metav1.ListOptions{})

@@ -16,12 +16,12 @@ limitations under the License.
 
 package db
 
-// PodInfo is the pod info.
+// PodInfo 是 pod 信息。
 type PodInfo struct {
 	Name string `json:"name"`
 }
 
-// Metric is the metric info.
+// Metric 是指标信息。
 type Metric struct {
 	Name   string        `json:"name"`
 	Help   string        `json:"help"`
@@ -29,14 +29,14 @@ type Metric struct {
 	Values []MetricValue `json:"values,omitempty"`
 }
 
-// MetricValue is the metric value info.
+// MetricValue 是指标值信息。
 type MetricValue struct {
 	Labels  map[string]string `json:"labels,omitempty"`
 	Value   string            `json:"value"`
 	Measure string            `json:"measure"`
 }
 
-// ParsedData is the parsed data info.
+// ParsedData 是解析的数据信息。
 type ParsedData struct {
 	CurrentTime string             `json:"currentTime"`
 	Metrics     map[string]*Metric `json:"metrics"`

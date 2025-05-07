@@ -25,6 +25,7 @@ import { getAntdLocale } from '@/utils/i18n.tsx';
 const queryClient = new QueryClient();
 
 function App() {
+  // 配置提供者
   return (
     <ConfigProvider
       locale={getAntdLocale()}

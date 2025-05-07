@@ -39,6 +39,8 @@ import {
 import { Icons } from '@/components/icons';
 import NewClusterModal from './new-cluster-modal';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 function getPercentColor(v: number): string {
   // 0~60 #52C41A
   // 60~80 #FAAD14
@@ -51,7 +53,9 @@ function getPercentColor(v: number): string {
     return '#F5222D';
   }
 }
+
 const ClusterManagePage = () => {
+  const navigate = useNavigate();
   const [messageApi, messageContextHolder] = message.useMessage();
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetClusters'],
@@ -74,8 +78,14 @@ const ClusterManagePage = () => {
       key: 'clusterName',
       width: 150,
       render: (_, r) => {
-        r.ready;
-        return r.objectMeta.name;
+        return (
+          <a
+            onClick={() => navigate(`/cluster-manage/${encodeURIComponent(r.objectMeta.name)}/overview`)}
+            style={{ cursor: 'pointer' }}
+          >
+            {r.objectMeta.name}
+          </a>
+        );
       },
     },
     {

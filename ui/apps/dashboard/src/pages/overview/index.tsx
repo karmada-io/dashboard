@@ -20,6 +20,8 @@ import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin,
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
 import { GetOverview } from '@/services/overview.ts';
+import { Cluster } from '@/services/cluster';
+import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Icons } from '@/components/icons';
 
@@ -37,6 +39,8 @@ const getPercentColor = (v: number): string => {
 };
 
 const Overview = () => {
+  const { clusterName } = useParams<{ clusterName: string }>();
+
   const { data, isLoading } = useQuery({
     queryKey: ['GetOverview'],
     queryFn: async () => {
@@ -46,9 +50,18 @@ const Overview = () => {
   });
 
   const { data: clusterData, isLoading: isClusterLoading } = useQuery({
-    queryKey: ['GetClusters'],
+    queryKey: ['GetClusters', clusterName],
     queryFn: async () => {
       const ret = await GetClusters();
+      if (clusterName && ret.data?.clusters) {
+        const filteredClusters = ret.data.clusters.filter(
+          (cluster) => cluster.objectMeta.name === clusterName
+        );
+        if (filteredClusters.length > 0) {
+            return { ...ret.data, clusters: filteredClusters };
+        }
+        return { ...ret.data, clusters: [] }; 
+      }
       return ret.data;
     },
   });
@@ -207,22 +220,26 @@ const Overview = () => {
 
   return (
     <Panel>
-      <div className="mb-8">
-        <h2 className="text-lg font-medium mb-4">
-          {i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')}
-        </h2>
-        <Descriptions
-          bordered
-          size={'middle'}
-          items={basicItems}
-          column={3}
-          layout={'horizontal'}
-        />
-      </div>
+      {!clusterName && (
+        <div className="mb-8">
+          <h2 className="text-lg font-medium mb-4">
+            {i18nInstance.t('cf8a7f2456d7e99df632e6c081ca8a96', '基本信息')}
+          </h2>
+          <Descriptions
+            bordered
+            size={'middle'}
+            items={basicItems}
+            column={3}
+            layout={'horizontal'}
+          />
+        </div>
+      )}
       
       <div className="mb-8">
         <h2 className="text-lg font-medium mb-4">
-          {i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', 'Kubernetes 集群列表')}
+          {clusterName 
+            ? i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', '集群概览') + `: ${clusterName}` 
+            : i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', 'Kubernetes 集群列表')}
         </h2>
         <Spin spinning={isClusterLoading}>
           <Row gutter={[16, 16]}>

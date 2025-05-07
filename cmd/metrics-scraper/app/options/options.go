@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// Options contains everything necessary to create and run api.
+// Options 包含创建和运行 api 所需的所有内容。
 type Options struct {
 	BindAddress                   net.IP
 	Port                          int
@@ -39,12 +39,12 @@ type Options struct {
 	OpenAPIEnabled                bool
 }
 
-// NewOptions returns initialized Options.
+// NewOptions 返回初始化的 Options。
 func NewOptions() *Options {
 	return &Options{}
 }
 
-// AddFlags adds flags of api to the specified FlagSet
+// AddFlags 将 api 的标志添加到指定的 FlagSet。
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	if o == nil {
 		return

@@ -28,7 +28,7 @@ var (
 	dbMapLock sync.RWMutex
 )
 
-// GetDB returns an existing database connection or creates a new one
+// GetDB 返回一个现有的数据库连接或创建一个新的连接
 func GetDB(appName string) (*sql.DB, error) {
 	sanitizedAppName := strings.ReplaceAll(appName, "-", "_")
 
@@ -43,7 +43,7 @@ func GetDB(appName string) (*sql.DB, error) {
 	dbMapLock.Lock()
 	defer dbMapLock.Unlock()
 
-	// Double-check after acquiring write lock
+	// 在获取写锁后再次检查
 	if db, exists := dbMap[sanitizedAppName]; exists {
 		return db, nil
 	}
@@ -53,8 +53,8 @@ func GetDB(appName string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	// Set connection pool settings
-	db.SetMaxOpenConns(1) // Restrict to 1 connection to prevent lock conflicts
+	// 设置连接池设置
+	db.SetMaxOpenConns(1) // 限制为 1 个连接以防止锁冲突
 	db.SetMaxIdleConns(1)
 
 	dbMap[sanitizedAppName] = db

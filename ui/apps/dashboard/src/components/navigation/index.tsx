@@ -26,12 +26,14 @@ import {
 } from '@/utils/i18n';
 import { Dropdown } from 'antd';
 
+// 用户信息接口
 export interface IUserInfo {
   id: number;
   username: string;
   avatar: string;
 }
 
+// 导航组件接口
 interface INavigationProps {
   headerStyle?: CSSProperties;
   usePlaceholder?: boolean;
@@ -39,6 +41,7 @@ interface INavigationProps {
   userInfo?: IUserInfo;
 }
 
+// 导航组件
 const Navigation: FC<INavigationProps> = (props) => {
   const {
     headerStyle = {},

@@ -26,7 +26,7 @@ import (
 
 var requests = make(chan scrape.SaveRequest)
 
-// GetMetrics returns the metrics for the given app name
+// GetMetrics 返回给定应用名称的指标
 func GetMetrics(c *gin.Context) {
 	appName := c.Param("app_name")
 	queryType := c.Query("type")

@@ -42,6 +42,8 @@ import {
 import { Failover, Permission, Reschedule } from '@/pages/advanced-config';
 import { BuildInAddon, ThridPartyAddon } from '@/pages/addon';
 import ClusterManage from '@/pages/cluster-manage';
+import ClusterManageLayout from '@/pages/cluster-manage/layout';
+import ClusterOverview from '@/pages/cluster-manage/cluster-overview';
 import Login from '@/pages/login';
 import { Icons } from '@/components/icons';
 
@@ -88,6 +90,34 @@ export function getRoutes() {
             sidebarName: i18nInstance.t('86385379cf9cfbc2c554944f1c05a4a5', '概览'),
             icon: <Icons.overview {...IconStyles} />,
           },
+        },
+        {
+          path: '/cluster-manage',
+          element: <ClusterManageLayout />,
+          handle: {
+            sidebarKey: 'CLUSTER-MANAGE',
+            sidebarName: i18nInstance.t('74ea72bbd64d8251bbc2642cc38e7bb1', '集群管理'),
+            icon: <Icons.clusters {...IconStyles} />,
+            isPage: false,
+          },
+          children: [
+            {
+              path: '',
+              element: <ClusterManage />,
+              handle: {
+                sidebarKey: 'CLUSTER_MANAGE_LIST',
+                sidebarName: i18nInstance.t('74ea72bbd64d8251bbc2642cc38e7bb1', '集群列表'),
+              }
+            },
+            {
+              path: ':clusterName/overview',
+              element: <ClusterOverview />,
+              handle: {
+                sidebarKey: 'CLUSTER_MANAGE_OVERVIEW',
+                sidebarName: i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', '集群概览'),
+              },
+            },
+          ]
         },
         {
           path: '/multicloud-resource-manage',
@@ -161,16 +191,6 @@ export function getRoutes() {
               },
             },
           ],
-        },
-        {
-          path: '/cluster-manage',
-          element: <ClusterManage />,
-          handle: {
-            sidebarKey: 'CLUSTER-MANAGE',
-            sidebarName: i18nInstance.t('74ea72bbd64d8251bbc2642cc38e7bb1'),
-            icon: <Icons.clusters {...IconStyles} />,
-            isPage: false,
-          },
         },
         {
           path: '/basic-config',

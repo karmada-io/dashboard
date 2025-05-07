@@ -18,17 +18,24 @@ package db
 
 const (
 	// Namespace is the namespace of karmada.
+	// Namespace 是 karmada 的命名空间
 	Namespace = "karmada-system"
 	// KarmadaAgent is the name of karmada agent.
+	// KarmadaAgent 是 karmada 代理的名称
 	KarmadaAgent = "karmada-agent"
 	// KarmadaScheduler is the name of karmada scheduler.
+	// KarmadaScheduler 是 karmada 调度器的名称
 	KarmadaScheduler = "karmada-scheduler"
 	// KarmadaSchedulerEstimator is the name of karmada scheduler estimator.
+	// KarmadaSchedulerEstimator 是 karmada 调度器估计器的名称
 	KarmadaSchedulerEstimator = "karmada-scheduler-estimator"
 	// KarmadaControllerManager is the name of karmada controller manager.
+	// KarmadaControllerManager 是 karmada 控制器管理器的名称
 	KarmadaControllerManager = "karmada-controller-manager"
 	// SchedulerPort is the port of karmada scheduler.
+	// SchedulerPort 是 karmada 调度器的端口
 	SchedulerPort = "10351"
 	// ControllerManagerPort is the port of karmada controller manager.
+	// ControllerManagerPort 是 karmada 控制器管理器的端口
 	ControllerManagerPort = "8080"
 )

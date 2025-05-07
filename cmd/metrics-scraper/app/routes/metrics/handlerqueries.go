@@ -29,18 +29,18 @@ import (
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
 
-// MetricInfo represents the information about a metric.
+// MetricInfo 表示指标信息。
 type MetricInfo struct {
 	Help string `json:"help"`
 	Type string `json:"type"`
 }
 
-// QueryMetrics handles the querying of metrics.
+// QueryMetrics 处理指标查询。
 func QueryMetrics(c *gin.Context) {
 	appName := c.Param("app_name")
 	podName := c.Param("pod_name")
-	queryType := c.Query("type")   // Use a query parameter to determine the action
-	metricName := c.Query("mname") // Optional: only needed for details
+	queryType := c.Query("type") // 使用查询参数来确定操作
+	metricName := c.Query("mname") // 可选：仅在需要时需要
 
 	sanitizedAppName := strings.ReplaceAll(appName, "-", "_")
 	sanitizedPodName := strings.ReplaceAll(podName, "-", "_")
@@ -52,7 +52,7 @@ func QueryMetrics(c *gin.Context) {
 		return
 	}
 
-	// Add transaction for consistent reads
+	// 添加事务以确保一致的读取
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("Error starting transaction: %v", err)
@@ -73,6 +73,7 @@ func QueryMetrics(c *gin.Context) {
 	}
 }
 
+// queryMetricNames 查询指标名称
 func queryMetricNames(c *gin.Context, tx *sql.Tx, sanitizedPodName string) {
 	rows, err := tx.Query(fmt.Sprintf("SELECT DISTINCT name FROM %s", sanitizedPodName))
 	if err != nil {
@@ -96,6 +97,7 @@ func queryMetricNames(c *gin.Context, tx *sql.Tx, sanitizedPodName string) {
 	c.JSON(http.StatusOK, gin.H{"metricNames": metricNames})
 }
 
+// queryMetricDetailsByName 查询指标详细信息
 func queryMetricDetailsByName(c *gin.Context, tx *sql.Tx, sanitizedPodName, metricName string) {
 	if metricName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
@@ -185,6 +187,7 @@ func queryMetricDetailsByName(c *gin.Context, tx *sql.Tx, sanitizedPodName, metr
 	c.JSON(http.StatusOK, gin.H{"details": detailsMap})
 }
 
+// queryMetricDetails 查询指标详细信息
 func queryMetricDetails(c *gin.Context, appName string) {
 	// Handle metricsdetails query type
 	db, err := sql.Open("sqlite", strings.ReplaceAll(appName, "-", "_")+".db")

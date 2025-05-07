@@ -17,6 +17,7 @@ limitations under the License.
 package scrape
 
 const (
+	// createMainTableSQL 创建主表的 SQL 语句
 	createMainTableSQL = `
         CREATE TABLE IF NOT EXISTS %s (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,6 +28,7 @@ const (
         )
     `
 
+	// createValuesTableSQL 创建值表的 SQL 语句
 	createValuesTableSQL = `
         CREATE TABLE IF NOT EXISTS %s_values (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,36 +39,44 @@ const (
         )
     `
 
+	// createTimeLoadTableSQL 创建时间加载表的 SQL 语句
 	createTimeLoadTableSQL = `
         CREATE TABLE IF NOT EXISTS %s (
             time_entry DATETIME PRIMARY KEY
         )
     `
 
+	// insertTimeLoadSQL 插入时间加载的 SQL 语句
 	insertTimeLoadSQL = `
         INSERT OR REPLACE INTO %s (time_entry) VALUES (?)
     `
-	// 900 is 15 minutes in seconds
+
+	// getOldestTimeSQL 获取最旧时间的 SQL 语句
 	getOldestTimeSQL = `
         SELECT time_entry FROM %s
         ORDER BY time_entry DESC
         LIMIT 1 OFFSET 900  
     `
 
+	// deleteOldTimeSQL 删除旧时间的 SQL 语句
 	deleteOldTimeSQL = `DELETE FROM %s WHERE time_entry <= ?`
 
 	deleteAssociatedMetricsSQL = `
         DELETE FROM %s WHERE currentTime <= ?
     `
 
+	// deleteAssociatedValuesSQL 删除关联值的 SQL 语句
 	deleteAssociatedValuesSQL = `
         DELETE FROM %s_values WHERE metric_id NOT IN (SELECT id FROM %s)
     `
 
+	// insertMainSQL 插入主表的 SQL 语句
 	insertMainSQL = `
         INSERT INTO %s (name, help, type, currentTime) 
         VALUES (?, ?, ?, ?)
     `
+
+	// createLabelsTableSQL 创建标签表的 SQL 语句
 	createLabelsTableSQL = `CREATE TABLE IF NOT EXISTS %s_labels (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         value_id INTEGER,

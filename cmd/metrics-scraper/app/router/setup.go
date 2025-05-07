@@ -27,6 +27,7 @@ var (
 	v1     *gin.RouterGroup
 )
 
+// init 初始化函数
 func init() {
 	if !environment.IsDev() {
 		gin.SetMode(gin.ReleaseMode)
@@ -44,12 +45,12 @@ func init() {
 	})
 }
 
-// V1 returns the router group for /api/v1.
+// V1 返回 /api/v1 的路由组
 func V1() *gin.RouterGroup {
 	return v1
 }
 
-// Router returns the main Gin engine instance.
+// Router 返回主 Gin 引擎实例
 func Router() *gin.Engine {
 	return router
 }
