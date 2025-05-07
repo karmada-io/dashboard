@@ -54,10 +54,10 @@ i18nInstance
     lng: getLang(), // if you're using a language detector, do not define the lng option
     fallbackLng: ['zh-CN'],
     resources: {
-      zh: {
+      'zh-CN': {
         translation: zhTexts,
       },
-      en: {
+      'en-US': {
         translation: enTexts,
       },
     },

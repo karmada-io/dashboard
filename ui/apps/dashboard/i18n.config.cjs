@@ -49,4 +49,13 @@ module.exports = {
         key: 'please input your key',
         token: '',
     },
+    // [i18n resources]
+    resources: {
+        zh: {
+            translation: zhTexts,
+        },
+        en: {
+            translation: enTexts,
+        },
+    },
 };

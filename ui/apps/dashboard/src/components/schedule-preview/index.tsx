@@ -15,11 +15,12 @@ limitations under the License.
 */
 
 import { SchedulePreviewResponse } from '@/services/overview';
-import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag } from 'antd';
+import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag, Progress, Alert } from 'antd';
 import { FlowDirectionGraph } from '@ant-design/graphs';
 import i18nInstance from '@/utils/i18n';
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect, useState } from 'react';
 import insertCss from 'insert-css';
+import ErrorBoundary from '@/components/error-boundary';
 
 // 插入自定义CSS样式
 insertCss(`
@@ -180,6 +181,21 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
 };
 
 const SchedulePreview: React.FC<SchedulePreviewProps> = ({ data, loading }) => {
+  // 添加图表引用
+  const graphRef = useRef<any>(null);
+  
+  // 添加状态来跟踪图表是否已经被销毁
+  const isDestroyed = useRef(false);
+  
+  // 添加状态控制图表是否应该被渲染
+  const [shouldRenderGraph, setShouldRenderGraph] = useState(false);
+  
+  // 添加状态跟踪渲染错误
+  const [renderError, setRenderError] = useState(false);
+  
+  // 添加图表容器引用
+  const graphContainerRef = useRef<HTMLDivElement>(null);
+
   // 准备流向图的数据
   const flowData = useMemo(() => {
     if (!data || !data.nodes || !data.links || data.nodes.length === 0 || data.links.length === 0) {
@@ -389,6 +405,97 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({ data, loading }) => {
     clusterCount: number;
   };
 
+  // 在组件挂载后延迟设置 shouldRenderGraph 为 true
+  useEffect(() => {
+    // 设置标志表示组件正在挂载
+    isDestroyed.current = false;
+    setRenderError(false);
+    
+    // 先确保组件完全挂载
+    const timer = setTimeout(() => {
+      if (!isDestroyed.current) {
+        setShouldRenderGraph(true);
+      }
+    }, 300); // 增加延迟时间，确保DOM完全就绪
+    
+    return () => {
+      // 设置标志表示组件已卸载
+      isDestroyed.current = true;
+      
+      // 清除定时器
+      clearTimeout(timer);
+      
+      // 在卸载前立即设置不渲染图表
+      setShouldRenderGraph(false);
+      
+      // 确保清理图表实例
+      if (graphRef.current) {
+        try {
+          const graph = graphRef.current;
+          graphRef.current = null; // 先清空引用，防止重复销毁
+          setTimeout(() => {
+            try {
+              graph.destroy();
+            } catch (e) {
+              console.warn('清理图表实例时出错:', e);
+            }
+          }, 0);
+        } catch (e) {
+          console.warn('访问图表实例时出错:', e);
+        }
+      }
+    };
+  }, []);
+
+  // 当数据变化时，如果图表已经存在，尝试更新而不是重新渲染
+  useEffect(() => {
+    // 只有当图表存在且没有发生渲染错误时才尝试更新数据
+    if (graphRef.current && !isDestroyed.current && !renderError && 
+        data && flowData.nodes.length > 0 && flowData.edges.length > 0) {
+      try {
+        // 尝试使用数据更新图表而不是重新渲染
+        graphRef.current.changeData(flowData);
+      } catch (e) {
+        console.warn('更新图表数据时出错:', e);
+        // 发生错误时，标记渲染错误，防止后续尝试更新
+        setRenderError(true);
+        
+        // 尝试清理损坏的图表实例
+        try {
+          const graph = graphRef.current;
+          graphRef.current = null;
+          if (graph) {
+            graph.destroy();
+          }
+        } catch (destroyError) {
+          console.warn('清理损坏的图表实例时出错:', destroyError);
+        }
+      }
+    }
+  }, [data, flowData, renderError]);
+
+  // 检测图表容器大小变化，在需要时调整图表大小
+  useEffect(() => {
+    if (!graphRef.current || !graphContainerRef.current) return;
+    
+    const resizeObserver = new ResizeObserver(() => {
+      if (graphRef.current && !isDestroyed.current) {
+        try {
+          // 容器大小变化时调整图表大小
+          graphRef.current.resize();
+        } catch (e) {
+          console.warn('调整图表大小时出错:', e);
+        }
+      }
+    });
+    
+    resizeObserver.observe(graphContainerRef.current);
+    
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [shouldRenderGraph]);
+
   // 如果没有数据，显示空状态
   if (!data && !loading) {
     return (
@@ -402,6 +509,24 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({ data, loading }) => {
       </Card>
     );
   }
+
+  // 处理图表渲染错误
+  const handleGraphError = (error: Error) => {
+    console.error('流向图渲染错误:', error);
+    setRenderError(true);
+    
+    // 如果图表实例存在，尝试销毁它
+    if (graphRef.current) {
+      try {
+        const graph = graphRef.current;
+        graphRef.current = null; // 先清空引用，防止重复销毁
+        graph.destroy();
+      } catch (e) {
+        // 忽略销毁时的错误
+        console.warn('销毁图表时出错:', e);
+      }
+    }
+  };
 
   return (
     <Spin spinning={loading}>
@@ -477,55 +602,109 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({ data, loading }) => {
                               ))}
                             </div>
                           </div>
-                          <div style={{ 
-                            background: '#fff', 
-                            borderRadius: '12px', 
-                            padding: '16px',
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            height: '520px',
-                            border: '1px solid rgba(0,0,0,0.05)'
-                          }}>
-                            <FlowDirectionGraph 
-                              autoFit="view"
-                              padding={120}
-                              data={flowData}
-                              node={{
-                                style: {
-                                  component: (data: any) => <ResourceFlowNode data={data} />,
-                                  size: [180, 90],
-                                },
-                              }}
-                              edge={{
-                                style: {
-                                  labelText: (d: any) => {
-                                    const { type, ratio } = d.data;
-                                    const text = type === 'split' ? '分流' : '占比';
-                                    const percentage = (Number(ratio) * 100).toFixed(1);
-                                    return `${text} ${percentage}%`;
-                                  },
-                                  labelBackground: true,
-                                },
-                              }}
-                              transforms={(prev: any) => [
-                                ...prev,
-                                {
-                                  type: 'map-edge-line-width',
-                                  key: 'map-edge-line-width',
-                                  value: (d: any) => d.data.ratio,
-                                  minValue: 0,
-                                  maxValue: 1,
-                                  minLineWidth: 1,
-                                  maxLineWidth: 24,
-                                },
-                              ]}
-                              layout={{
-                                type: 'antv-dagre',
-                                nodesep: 50,
-                                ranksep: 120,
-                              }}
-                            />
+                          <div 
+                            ref={graphContainerRef}
+                            style={{ 
+                              background: '#fff', 
+                              borderRadius: '12px', 
+                              padding: '16px',
+                              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                              position: 'relative',
+                              overflow: 'hidden',
+                              height: '520px',
+                              border: '1px solid rgba(0,0,0,0.05)'
+                            }}
+                          >
+                            {shouldRenderGraph && !renderError && flowData.nodes.length > 0 && (
+                              <ErrorBoundary
+                                fallback={
+                                  <div style={{ padding: '20px', textAlign: 'center' }}>
+                                    <Alert
+                                      message="图表渲染失败"
+                                      description="无法加载流向图，请刷新页面重试。"
+                                      type="error"
+                                      showIcon
+                                    />
+                                  </div>
+                                }
+                                onError={handleGraphError}
+                              >
+                                <FlowDirectionGraph 
+                                  autoFit="view"
+                                  padding={120}
+                                  data={flowData as any}
+                                  node={{
+                                    style: {
+                                      component: (data: any) => <ResourceFlowNode data={data} />,
+                                      size: [180, 90],
+                                    },
+                                  }}
+                                  edge={{
+                                    style: {
+                                      labelText: (d: any) => {
+                                        const { type, ratio } = d.data;
+                                        const text = type === 'split' ? '分流' : '占比';
+                                        const percentage = (Number(ratio) * 100).toFixed(1);
+                                        return `${text} ${percentage}%`;
+                                      },
+                                      labelBackground: true,
+                                    },
+                                  }}
+                                  transforms={(prev: any) => [
+                                    ...prev,
+                                    {
+                                      type: 'map-edge-line-width',
+                                      key: 'map-edge-line-width',
+                                      value: (d: any) => d.data.ratio,
+                                      minValue: 0,
+                                      maxValue: 1,
+                                      minLineWidth: 1,
+                                      maxLineWidth: 24,
+                                    },
+                                  ]}
+                                  layout={{
+                                    type: 'antv-dagre',
+                                    nodesep: 50,
+                                    ranksep: 120,
+                                  }}
+                                  onReady={(graph) => {
+                                    if (!isDestroyed.current) {
+                                      // 只有在组件还未被销毁时才保存图表实例
+                                      graphRef.current = graph;
+                                    } else if (graph) {
+                                      // 如果组件已被销毁但图表实例仍被创建，则直接销毁它
+                                      try {
+                                        graph.destroy();
+                                      } catch (e) {
+                                        console.warn('图表实例创建后立即销毁出错:', e);
+                                      }
+                                    }
+                                  }}
+                                />
+                              </ErrorBoundary>
+                            )}
+                            {(!shouldRenderGraph || renderError) && (
+                              <div 
+                                style={{ 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  justifyContent: 'center', 
+                                  height: '100%',
+                                  color: '#999'
+                                }}
+                              >
+                                {renderError ? (
+                                  <Alert
+                                    message="图表渲染失败"
+                                    description="无法加载流向图，请刷新页面重试。"
+                                    type="error"
+                                    showIcon
+                                  />
+                                ) : (
+                                  <Spin tip="加载图表中..." />
+                                )}
+                              </div>
+                            )}
                           </div>
                         </>
                       ) : (
@@ -621,10 +800,11 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({ data, loading }) => {
                               <div className="flex flex-wrap gap-2">
                                 {clusterDist.map((cluster: any, index: number) => (
                                   <Tooltip
-                                    key={`cluster-${cluster.clusterName}-${index}`}
+                                    key={`cluster-tooltip-${cluster.clusterName}-${index}`}
                                     title={`${cluster.clusterName}: ${cluster.count}`}
                                   >
                                     <Badge
+                                      key={`cluster-badge-${cluster.clusterName}-${index}`}
                                       count={cluster.count}
                                       style={{ 
                                         backgroundColor: colorScheme.nodeColors.member,

@@ -243,7 +243,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                         : ''
                     }
                     required
-                    key={key}
+                    key={`label-form-item-${key}-${index}`}
                   >
                     <div className={'flex flex-row items-center space-x-4'}>
                       <Form.Item
@@ -333,7 +333,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
                             : ''
                         }
                         required
-                        key={field.key}
+                        key={`taint-form-item-${field.key}-${index}`}
                       >
                         <div className={'flex flex-row items-center space-x-4'}>
                           <Form.Item

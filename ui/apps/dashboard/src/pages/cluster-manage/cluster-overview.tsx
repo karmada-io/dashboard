@@ -173,7 +173,7 @@ const ClusterOverview = () => {
       label: i18nInstance.t('b48b95ef13ecb71a28d900367a8c12ab', '污点'),
       children: clusterDetail?.taints && clusterDetail.taints.length > 0
         ? clusterDetail.taints.map((taint, index) => (
-            <Tag key={index} color="orange">
+            <Tag key={`taint-${taint.key}-${taint.value}-${taint.effect}-${index}`} color="orange">
               {`${taint.key}=${taint.value}:${taint.effect}`}
             </Tag>
           ))

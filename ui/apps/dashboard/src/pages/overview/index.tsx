@@ -202,11 +202,13 @@ const Overview = () => {
       children:
         data?.karmadaInfo.status === 'running' ? (
           <Badge
+            key="karmada-status-running"
             color={'green'}
             text={i18nInstance.t('d679aea3aae1201e38c4baaaeef86efe', '运行中')}
           />
         ) : (
           <Badge
+            key="karmada-status-unknown"
             color={'red'}
             text={i18nInstance.t(
               '903b25f64e1c0d9b7f56ed80c256a2e7',
@@ -321,7 +323,7 @@ const Overview = () => {
                     <Progress 
                       type="circle" 
                       percent={Math.round((nodeData.summary.readyNum / nodeData.summary.totalNum) * 100)} 
-                      width={60} 
+                      size={60} 
                       strokeColor={getPercentColor(Math.round((nodeData.summary.readyNum / nodeData.summary.totalNum) * 100))}
                     />
                   </div>
@@ -331,8 +333,8 @@ const Overview = () => {
                   {Object.entries(nodeData.items.reduce((acc, node) => {
                     acc[node.clusterName] = (acc[node.clusterName] || 0) + 1;
                     return acc;
-                  }, {} as Record<string, number>)).map(([cluster, count]) => (
-                    <Tag color="blue" key={cluster} className="mr-2">
+                  }, {} as Record<string, number>)).map(([cluster, count], index) => (
+                    <Tag color="blue" key={`cluster-count-${cluster}-${index}`} className="mr-2">
                       {cluster}: {count}
                     </Tag>
                   ))}
@@ -343,6 +345,7 @@ const Overview = () => {
             <div className="overflow-auto" style={{ maxHeight: '400px' }}>
               <Table 
                 dataSource={nodeData.items} 
+                rowKey={(record) => `${record.clusterName}-${record.name}`}
                 size="small"
                 pagination={false}
                 scroll={{ x: 800, y: 300 }}
@@ -367,7 +370,11 @@ const Overview = () => {
                     key: 'status',
                     width: 90,
                     render: (text: string, record: any) => (
-                      <Badge status={record.ready ? 'success' : 'error'} text={record.ready ? '就绪' : '未就绪'} />
+                      <Badge
+                        key={`status-${record.clusterName}-${record.name}`}
+                        status={record.ready ? 'success' : 'error'}
+                        text={record.ready ? '就绪' : '未就绪'}
+                      />
                     ),
                   },
                   {
@@ -535,13 +542,13 @@ const Overview = () => {
                     onClick={() => navigate(`/cluster-manage/${cluster.objectMeta.name}/overview`)}
                     styles={{ body: { padding: '16px', height: '100%' } }}
                     actions={[
-                      <Tooltip title={i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看详情')} key="view">
+                      <Tooltip title={i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看详情')} key={`view-${cluster.objectMeta.name}`}>
                         <InfoCircleFilled />
                       </Tooltip>,
-                      <Tooltip title={i18nInstance.t('74ea72bbd64d8251bbc2642cc38e7bb1', '集群管理')} key="manage">
+                      <Tooltip title={i18nInstance.t('74ea72bbd64d8251bbc2642cc38e7bb1', '集群管理')} key={`manage-${cluster.objectMeta.name}`}>
                         <Icons.clusters width={16} height={16} />
                       </Tooltip>,
-                      <Tooltip title={i18nInstance.t('1200778cf86309309154ef88804fa22e', '更多')} key="more">
+                      <Tooltip title={i18nInstance.t('1200778cf86309309154ef88804fa22e', '更多')} key={`more-${cluster.objectMeta.name}`}>
                         <QuestionCircleFilled />
                       </Tooltip>,
                     ]}
@@ -561,8 +568,8 @@ const Overview = () => {
                         <Text type="secondary">就绪状态:</Text>
                         <Space>
                           {cluster.ready ? 
-                            <CheckCircleFilled style={{ color: '#52c41a' }} /> : 
-                            <CloseCircleFilled style={{ color: '#f5222d' }} />
+                            <CheckCircleFilled key="ready-icon" style={{ color: '#52c41a' }} /> : 
+                            <CloseCircleFilled key="not-ready-icon" style={{ color: '#f5222d' }} />
                           }
                           <Text>{cluster.ready ? '已就绪' : '未就绪'}</Text>
                         </Space>
