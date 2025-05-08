@@ -24,6 +24,8 @@ type ScheduleNode struct {
 	Name string `json:"name"`
 	// Type 节点类型 (control-plane/member-cluster)
 	Type string `json:"type"`
+	// SchedulingParams 集群调度参数
+	SchedulingParams *SchedulingParams `json:"schedulingParams,omitempty"`
 }
 
 // ScheduleLink 表示调度图中的连接线
@@ -116,4 +118,38 @@ type SchedulePreviewResponse struct {
 	Summary ScheduleSummary `json:"summary"`
 	// ActualResourceDist 实际资源分布统计（可选，扩展功能）
 	ActualResourceDist []ActualResourceTypeDistribution `json:"actualResourceDist,omitempty"`
+}
+
+// Taint 表示集群污点
+type Taint struct {
+	// Key 污点键
+	Key string `json:"key"`
+	// Value 污点值
+	Value string `json:"value"`
+	// Effect 污点效果
+	Effect string `json:"effect"`
+}
+
+// Toleration 表示容忍
+type Toleration struct {
+	// Key 容忍键
+	Key string `json:"key"`
+	// Value 容忍值
+	Value string `json:"value,omitempty"`
+	// Effect 容忍效果
+	Effect string `json:"effect,omitempty"`
+	// Operator 操作符
+	Operator string `json:"operator,omitempty"`
+}
+
+// SchedulingParams 集群调度参数
+type SchedulingParams struct {
+	// Weight 集群权重
+	Weight int32 `json:"weight,omitempty"`
+	// Taints 集群污点
+	Taints []Taint `json:"taints,omitempty"`
+	// Tolerations 集群容忍
+	Tolerations []Toleration `json:"tolerations,omitempty"`
+	// Labels 集群标签
+	Labels map[string]string `json:"labels,omitempty"`
 }

@@ -22,7 +22,7 @@ import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import insertCss from 'insert-css';
 import ErrorBoundary from '@/components/error-boundary';
 import dayjs from 'dayjs';
-import { SyncOutlined, LockOutlined, UnlockOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
+import { SyncOutlined, LockOutlined, UnlockOutlined, CheckCircleOutlined, WarningOutlined, ExclamationCircleOutlined, ApiOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -314,8 +314,8 @@ const colorScheme = {
     Others: {
       color: '#8c8c8c',
       members: []
-    }
-  } as const
+    } as const
+  }
 };
 
 // 获取资源类型对应的分组
@@ -355,6 +355,7 @@ const getGroupColor = (group: ResourceGroupType): string => {
 const ResourceFlowNode = ({ data }: { data: any }) => {
   const isControlPlane = data.id === 'karmada-control-plane' || data.nodeType === 'control-plane';
   const isResourceGroup = data.nodeType === 'resource-group';
+  const isMemberCluster = data.nodeType === 'member-cluster';
   
   // 根据节点类型选择不同的边框颜色
   let borderColor = isControlPlane 
@@ -379,188 +380,168 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
   // 根据是否有差异状态，调整显示状态
   const hasDiff = data.status === 'inconsistent' || data.status === 'diff';
   let statusText = '一致';
-  let statusColor = '#52C41A';
+  let statusIcon = <CheckCircleOutlined style={{ color: '#52c41a' }} />; 
   
   if (hasDiff) {
     statusText = '不一致';
-    statusColor = '#ff4d4f';
-    borderColor = '#ff4d4f';
-    backgroundColor = 'rgba(255, 77, 79, 0.05)';
+    statusIcon = <ExclamationCircleOutlined style={{ color: '#faad14' }} />;
   }
   
-  // 获取资源类型计数
-  const resourceCount = data.resourceCount || 0;
-  
-  // 获取资源名称列表，如果存在
-  const resourceNames = data.resourceNames || [];
-  const resourceType = data.resourceType || '';
-
-  // 资源组节点显示
-  if (isResourceGroup && resourceNames.length > 0) {
-    // 选取第一个资源名称作为主显示，如果有多个则添加"等X个"
-    const primaryResourceName = resourceNames[0];
-    const additionalCount = resourceNames.length > 1 ? resourceNames.length - 1 : 0;
+  // 显示集群调度参数
+  const renderSchedulingParams = () => {
+    if (!isMemberCluster || !data.schedulingParams) return null;
     
     return (
-      <div 
-        style={{
-          padding: '12px',
-          border: `2px solid ${borderColor}`,
-          borderRadius: '8px',
-          backgroundColor,
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
-        }}
-      >
-        <div>
-          {/* 资源名称作为主显示 */}
-          <div style={{ 
-            fontSize: '18px',
-            fontWeight: 'bold', 
-            marginBottom: '6px',
-            lineHeight: '1.4',
-            overflow: 'hidden', 
-            textOverflow: 'ellipsis', 
-            whiteSpace: 'nowrap'
-          }}>
-            {primaryResourceName}
-            {additionalCount > 0 && <span style={{fontSize: '15px', color: '#666'}}> 等{additionalCount}个</span>}
+      <div style={{ 
+        marginTop: '5px', 
+        padding: '5px', 
+        backgroundColor: 'rgba(0,0,0,0.03)',
+        borderRadius: '4px',
+        fontSize: '12px'
+      }}>
+        {/* 显示权重 */}
+        {data.schedulingParams.weight && (
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2px' }}>
+            <Badge status="processing" />
+            <span style={{ marginLeft: '4px' }}>权重: {data.schedulingParams.weight}</span>
           </div>
-          
-          {/* 资源类型标签 */}
-          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-            <Tag color="#ff6b6b" style={{ 
-              marginRight: 0, 
-              fontSize: '13px',
-              padding: '1px 6px'
-            }}>
-              {resourceType}
-            </Tag>
-            
-            <Tag color="#9254de" style={{ 
-              marginRight: 0, 
-              fontSize: '13px',
-              padding: '1px 6px'
-            }}>
-              {data.name}
-            </Tag>
-          </div>
-        </div>
+        )}
         
-        {/* 资源指标 */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginTop: '8px',
-          fontSize: '16px',
-          fontWeight: 'medium'
-        }}>
-          <span>调度资源数量</span>
-          <span style={{ 
-            fontWeight: 'bold', 
-            color: '#9254de',
-            fontSize: '18px'
-          }}>
-            {resourceCount}
-          </span>
-        </div>
+        {/* 显示污点 */}
+        {data.schedulingParams.taints && data.schedulingParams.taints.length > 0 && (
+          <div style={{ marginTop: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Badge status="warning" />
+              <span style={{ marginLeft: '4px' }}>污点:</span>
+            </div>
+            <div style={{ marginLeft: '12px', marginTop: '2px' }}>
+              {data.schedulingParams.taints.map((taint: any, idx: number) => (
+                <Tag key={idx} color="orange" style={{ margin: '2px' }}>
+                  {taint.key}:{taint.effect}
+                </Tag>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
-  }
-
-  // 支持资源组节点显示资源类型名称
-  const displayName = isResourceGroup ? data.resourceType || data.name : data.name || data.id;
-  const groupTypeTag = isResourceGroup ? data.name : undefined;
+  };
 
   return (
-    <div 
+    <div
       style={{
-        padding: '12px',
-        border: `2px solid ${borderColor}`,
-        borderRadius: '8px',
-        backgroundColor,
         width: '100%',
         height: '100%',
-        overflow: 'hidden',
-        boxSizing: 'border-box',
+        padding: '8px',
+        border: `2px solid ${borderColor}`,
+        borderRadius: '6px',
+        backgroundColor,
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between'
+        overflow: 'hidden'
       }}
     >
-      <div>
-        {/* 节点名称 - 进一步增大字体和增加行高 */}
-        <div style={{ 
-          fontSize: '18px', // 增大字体
-          fontWeight: 'bold', 
-          marginBottom: '6px',
-          lineHeight: '1.4',
-          overflow: 'hidden', 
-          textOverflow: 'ellipsis', 
-          whiteSpace: 'nowrap'
-        }}>
-          {displayName}
+      {/* 节点标题 */}
+      <div style={{ borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '5px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography.Text strong style={{ fontSize: '16px' }}>
+            {data.name || data.label}
+          </Typography.Text>
+          
+          {!isControlPlane && !isResourceGroup && data.status && (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {statusIcon}
+              <span style={{ marginLeft: '4px', fontSize: '12px' }}>{statusText}</span>
+            </div>
+          )}
         </div>
         
-        {/* 资源组标签 - 调整样式更加明显 */}
-        {groupTypeTag && !isControlPlane && (
-          <Tag color="#9254de" style={{ 
-            marginRight: 0, 
-            fontSize: '15px', // 增大字体
-            padding: '1px 8px'
-          }}>
-            {groupTypeTag}
-          </Tag>
-        )}
-        
-        {/* 节点类型与状态 - 改善排版和间距 */}
-        {(isControlPlane || (!isControlPlane && !isResourceGroup)) && (
-          <div style={{ 
-            fontSize: '15px', // 增大字体
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            marginTop: '6px'
-          }}>
-            <span style={{ fontWeight: 'medium' }}>
-              {isControlPlane ? '控制平面' : '成员集群'}
-            </span>
-            {!isControlPlane && (
-              <Tag color={statusColor} style={{ 
-                margin: 0,
-                fontSize: '14px', // 增大字体
-                padding: '0 6px'
-              }}>
-                {statusText}
-              </Tag>
-            )}
-          </div>
-        )}
+        <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
+          {isControlPlane && '控制平面'}
+          {isResourceGroup && '资源组'}
+          {isMemberCluster && '成员集群'}
+        </div>
       </div>
       
-      {/* 资源指标 - 调整样式和大小 */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginTop: '8px',
-        fontSize: '16px', // 增大字体
-        fontWeight: 'medium'
-      }}>
-        <span>调度资源数量</span>
-        <span style={{ 
-          fontWeight: 'bold', 
-          color: isResourceGroup ? '#9254de' : '#1890ff',
-          fontSize: '18px' // 增大字体
-        }}>
-          {resourceCount}
-        </span>
+      {/* 节点内容 */}
+      <div style={{ flex: 1, overflow: 'hidden', marginTop: '5px' }}>
+        {isResourceGroup && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+              <div>
+                {data.resourceTypes && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    {data.resourceTypes.map((type: string, index: number) => (
+                      <Tag key={index} color="blue">{type}</Tag>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* 资源名称标签 */}
+            {data.resourceNames && data.resourceNames.length > 0 && (
+              <div style={{ marginTop: '5px', maxHeight: '65px', overflowY: 'auto' }}>
+                <div style={{ marginBottom: '2px', fontSize: '13px' }}>资源名称：</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  {data.resourceNames.map((name: string, idx: number) => (
+                    <Tag key={idx} color="processing" style={{ margin: '2px' }}>{name}</Tag>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+        
+        {isControlPlane && (
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <ApiOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
+            <div style={{ marginTop: '5px', fontSize: '13px' }}>调度控制中心</div>
+          </div>
+        )}
+        
+        {isMemberCluster && (
+          <div>
+            {data.resourceCount !== undefined && (
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                alignItems: 'center', 
+                padding: '5px',
+                backgroundColor: 'rgba(0,0,0,0.03)',
+                borderRadius: '4px'
+              }}>
+                <span style={{ fontSize: '13px' }}>调度资源数量</span>
+                <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{data.resourceCount}</span>
+              </div>
+            )}
+            
+            {data.actualResourceCount !== undefined && data.resourceCount !== undefined && (
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '5px', 
+                padding: '5px',
+                backgroundColor: 'rgba(0,0,0,0.03)',
+                borderRadius: '4px'
+              }}>
+                <span style={{ fontSize: '13px' }}>实际部署数量</span>
+                <span style={{ 
+                  fontWeight: 'bold', 
+                  fontSize: '16px',
+                  color: data.actualResourceCount < data.resourceCount ? '#f5222d' : '#52c41a'
+                }}>
+                  {data.actualResourceCount}
+                </span>
+              </div>
+            )}
+            
+            {/* 渲染集群调度参数 */}
+            {renderSchedulingParams()}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -628,7 +609,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     setIsGraphLocked(!isGraphLocked);
   };
 
-  // 准备流向图的数据
+  // 创建流向图数据
   const flowData = useMemo(() => {
     if (!data || !data.nodes || !data.links || !Array.isArray(data.nodes) || !Array.isArray(data.links) || data.nodes.length === 0 || data.links.length === 0) {
       return { nodes: [], edges: [] };
@@ -714,6 +695,9 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         style: {
           stroke: isControlPlane ? colorScheme.nodeColors.controlPlane : colorScheme.nodeColors.member,
         },
+        // 保留调度参数信息
+        schedulingParams: node.schedulingParams,
+        status: consistencyRatio !== 1 ? 'diff' : 'consistent',
       };
     });
 
@@ -807,23 +791,28 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         .filter(([_, stats]) => stats.group === group && stats.count > 0)
         .map(([type, _]) => type);
       
-      // 查找第一个资源类型的资源名称作为示例
-      const firstResourceType = resourceTypesInGroup[0];
+      // 查找资源名称
       let resourceNames: string[] = [];
       
-      // 从actualResourceDist中查找资源名称
-      if (data.actualResourceDist && firstResourceType) {
-        const resourceInfo = data.actualResourceDist.find(r => r.resourceType === firstResourceType);
-        if (resourceInfo && resourceInfo.resourceNames) {
-          resourceNames = resourceInfo.resourceNames;
-        }
+      // 从actualResourceDist中查找所有该组资源类型的资源名称
+      if (data.actualResourceDist) {
+        // 收集该组所有资源类型的资源名称
+        resourceTypesInGroup.forEach(resType => {
+          const resourceInfo = data.actualResourceDist?.find(r => r.resourceType === resType);
+          if (resourceInfo && resourceInfo.resourceNames) {
+            resourceNames = [...resourceNames, ...resourceInfo.resourceNames];
+          }
+        });
+        
+        // 去重
+        resourceNames = [...new Set(resourceNames)];
       }
       
       return {
         id: `group-${group}`,
         name: group,
         nodeType: 'resource-group',
-        resourceType: resourceTypesInGroup[0] || '',  // 使用第一个资源类型
+        resourceTypes: resourceTypesInGroup,
         resourceNames: resourceNames,  // 添加资源名称数据
         resourceCount: groupResourceCount,
         actualResourceCount: groupActualResourceCount,
@@ -855,7 +844,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
       const groupColor = colorScheme.resourceGroups[group].color;
       const consistencyRatio = node!.consistencyRatio;
       
-      return {
+      return { 
         id: `edge-karmada-control-plane-${node!.id}`,
         source: 'karmada-control-plane',
         target: node!.id,

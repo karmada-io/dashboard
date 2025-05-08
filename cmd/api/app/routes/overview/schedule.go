@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -162,10 +164,58 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 
 	// 为每个集群创建节点
 	for _, cluster := range clusterList.Items {
+		// 收集集群的调度参数
+		schedulingParams := &v1.SchedulingParams{
+			Labels: make(map[string]string),
+		}
+
+		// 从注解中获取集群权重（默认为1）
+		schedulingParams.Weight = 1
+		if weightStr, exists := cluster.Annotations["scheduling.karmada.io/weight"]; exists {
+			if weight, err := strconv.ParseInt(weightStr, 10, 32); err == nil {
+				schedulingParams.Weight = int32(weight)
+			}
+		}
+
+		// 从集群注解获取污点信息
+		// 注：实际实现中可能需要从其他地方获取污点信息
+		taints := []v1.Taint{}
+		for k, v := range cluster.Annotations {
+			if strings.HasPrefix(k, "taint.karmada.io/") {
+				// 简单解析，实际环境中可能需要更复杂的逻辑
+				key := strings.TrimPrefix(k, "taint.karmada.io/")
+				parts := strings.Split(v, ":")
+				effect := "NoSchedule" // 默认
+				value := ""
+
+				if len(parts) > 0 {
+					value = parts[0]
+				}
+				if len(parts) > 1 {
+					effect = parts[1]
+				}
+
+				taints = append(taints, v1.Taint{
+					Key:    key,
+					Value:  value,
+					Effect: effect,
+				})
+			}
+		}
+		schedulingParams.Taints = taints
+
+		// 获取集群标签
+		if len(cluster.Labels) > 0 {
+			for k, v := range cluster.Labels {
+				schedulingParams.Labels[k] = v
+			}
+		}
+
 		response.Nodes = append(response.Nodes, v1.ScheduleNode{
-			ID:   cluster.Name,
-			Name: cluster.Name,
-			Type: "member-cluster",
+			ID:               cluster.Name,
+			Name:             cluster.Name,
+			Type:             "member-cluster",
+			SchedulingParams: schedulingParams,
 		})
 	}
 
@@ -894,10 +944,58 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 
 	// 为每个集群创建节点
 	for _, cluster := range clusterList.Items {
+		// 收集集群的调度参数
+		schedulingParams := &v1.SchedulingParams{
+			Labels: make(map[string]string),
+		}
+
+		// 从注解中获取集群权重（默认为1）
+		schedulingParams.Weight = 1
+		if weightStr, exists := cluster.Annotations["scheduling.karmada.io/weight"]; exists {
+			if weight, err := strconv.ParseInt(weightStr, 10, 32); err == nil {
+				schedulingParams.Weight = int32(weight)
+			}
+		}
+
+		// 从集群注解获取污点信息
+		// 注：实际实现中可能需要从其他地方获取污点信息
+		taints := []v1.Taint{}
+		for k, v := range cluster.Annotations {
+			if strings.HasPrefix(k, "taint.karmada.io/") {
+				// 简单解析，实际环境中可能需要更复杂的逻辑
+				key := strings.TrimPrefix(k, "taint.karmada.io/")
+				parts := strings.Split(v, ":")
+				effect := "NoSchedule" // 默认
+				value := ""
+
+				if len(parts) > 0 {
+					value = parts[0]
+				}
+				if len(parts) > 1 {
+					effect = parts[1]
+				}
+
+				taints = append(taints, v1.Taint{
+					Key:    key,
+					Value:  value,
+					Effect: effect,
+				})
+			}
+		}
+		schedulingParams.Taints = taints
+
+		// 获取集群标签
+		if len(cluster.Labels) > 0 {
+			for k, v := range cluster.Labels {
+				schedulingParams.Labels[k] = v
+			}
+		}
+
 		response.Nodes = append(response.Nodes, v1.ScheduleNode{
-			ID:   cluster.Name,
-			Name: cluster.Name,
-			Type: "member-cluster",
+			ID:               cluster.Name,
+			Name:             cluster.Name,
+			Type:             "member-cluster",
+			SchedulingParams: schedulingParams,
 		})
 	}
 

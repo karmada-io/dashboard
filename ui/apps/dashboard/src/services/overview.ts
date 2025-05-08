@@ -163,6 +163,22 @@ export interface ScheduleNode {
   id: string;
   name: string;
   type: string;
+  // 集群调度参数
+  schedulingParams?: {
+    weight?: number;          // 集群权重
+    taints?: Array<{          // 集群污点
+      key: string;
+      value: string;
+      effect: string;
+    }>;
+    tolerations?: Array<{     // 集群容忍
+      key: string;
+      value?: string;
+      effect?: string;
+      operator?: string;
+    }>;
+    labels?: Record<string, string>;  // 集群标签
+  };
 }
 
 export interface ScheduleLink {
