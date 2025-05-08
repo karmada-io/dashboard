@@ -393,6 +393,86 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
   
   // 获取资源名称列表，如果存在
   const resourceNames = data.resourceNames || [];
+  const resourceType = data.resourceType || '';
+
+  // 资源组节点显示
+  if (isResourceGroup && resourceNames.length > 0) {
+    // 选取第一个资源名称作为主显示，如果有多个则添加"等X个"
+    const primaryResourceName = resourceNames[0];
+    const additionalCount = resourceNames.length > 1 ? resourceNames.length - 1 : 0;
+    
+    return (
+      <div 
+        style={{
+          padding: '12px',
+          border: `2px solid ${borderColor}`,
+          borderRadius: '8px',
+          backgroundColor,
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
+        }}
+      >
+        <div>
+          {/* 资源名称作为主显示 */}
+          <div style={{ 
+            fontSize: '18px',
+            fontWeight: 'bold', 
+            marginBottom: '6px',
+            lineHeight: '1.4',
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap'
+          }}>
+            {primaryResourceName}
+            {additionalCount > 0 && <span style={{fontSize: '15px', color: '#666'}}> 等{additionalCount}个</span>}
+          </div>
+          
+          {/* 资源类型标签 */}
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            <Tag color="#ff6b6b" style={{ 
+              marginRight: 0, 
+              fontSize: '13px',
+              padding: '1px 6px'
+            }}>
+              {resourceType}
+            </Tag>
+            
+            <Tag color="#9254de" style={{ 
+              marginRight: 0, 
+              fontSize: '13px',
+              padding: '1px 6px'
+            }}>
+              {data.name}
+            </Tag>
+          </div>
+        </div>
+        
+        {/* 资源指标 */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginTop: '8px',
+          fontSize: '15px',
+          fontWeight: 'medium'
+        }}>
+          <span>资源数量</span>
+          <span style={{ 
+            fontWeight: 'bold', 
+            color: '#9254de',
+            fontSize: '18px'
+          }}>
+            {resourceCount}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   // 支持资源组节点显示资源类型名称
   const displayName = isResourceGroup ? data.resourceType || data.name : data.name || data.id;
@@ -722,10 +802,29 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
       
       const consistencyRatio = groupResourceCount > 0 ? groupActualResourceCount / groupResourceCount : 1;
       
+      // 收集分组中的资源类型和资源名称
+      const resourceTypesInGroup = Object.entries(resourceTypeStats)
+        .filter(([_, stats]) => stats.group === group && stats.count > 0)
+        .map(([type, _]) => type);
+      
+      // 查找第一个资源类型的资源名称作为示例
+      const firstResourceType = resourceTypesInGroup[0];
+      let resourceNames: string[] = [];
+      
+      // 从actualResourceDist中查找资源名称
+      if (data.actualResourceDist && firstResourceType) {
+        const resourceInfo = data.actualResourceDist.find(r => r.resourceType === firstResourceType);
+        if (resourceInfo && resourceInfo.resourceNames) {
+          resourceNames = resourceInfo.resourceNames;
+        }
+      }
+      
       return {
         id: `group-${group}`,
         name: group,
         nodeType: 'resource-group',
+        resourceType: resourceTypesInGroup[0] || '',  // 使用第一个资源类型
+        resourceNames: resourceNames,  // 添加资源名称数据
         resourceCount: groupResourceCount,
         actualResourceCount: groupActualResourceCount,
         consistencyRatio: consistencyRatio,
@@ -1409,7 +1508,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                     node={{
                                       style: {
                                         component: (data: any) => <ResourceFlowNode data={data} />,
-                                        size: [260, 130], // 增大节点尺寸
+                                        size: [260, 150], // 增大节点尺寸高度
                                       },
                                     }}
                                     edge={{
@@ -1579,7 +1678,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               title: i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型'),
                               dataIndex: 'resourceType',
                               key: 'resourceType',
-                              width: 280,
+                              width: 220,
                               filters: Object.entries(colorScheme.resourceGroups).map(([group]) => ({
                                 text: group,
                                 value: group,
@@ -1613,49 +1712,41 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                       {record.resourceGroup}
                                     </Tag>
                                   </div>
-                                  
-                                  {/* 资源名称列表显示 */}
-                                  {record.resourceNames && record.resourceNames.length > 0 && (
-                                    <div style={{ marginTop: '4px' }}>
-                                      <Collapse
-                                        size="small"
-                                        ghost
-                                        style={{ margin: 0, padding: 0 }}
-                                        items={[
-                                          {
-                                            key: '1',
-                                            label: (
-                                              <Typography.Text style={{ fontSize: '13px', color: '#1890ff' }}>
-                                                查看资源名称 ({record.resourceNames.length})
-                                              </Typography.Text>
-                                            ),
-                                            children: (
-                                              <div style={{ 
-                                                maxHeight: '120px', 
-                                                overflowY: 'auto',
-                                                background: '#f0f5ff', 
-                                                padding: '8px',
-                                                borderRadius: '4px' 
-                                              }}>
-                                                {record.resourceNames.map((name: string, index: number) => (
-                                                  <Tag 
-                                                    key={`resource-${index}`}
-                                                    style={{ 
-                                                      margin: '2px', 
-                                                      fontSize: '12px',
-                                                      background: '#fff',
-                                                      border: '1px solid #d9d9d9'
-                                                    }}
-                                                  >
-                                                    {name}
-                                                  </Tag>
-                                                ))}
-                                              </div>
-                                            ),
-                                          },
-                                        ]}
-                                      />
+                                </div>
+                              ),
+                            },
+                            {
+                              title: i18nInstance.t('8a6dff9bbefda5a12ade59faacd9851c', '资源名称'),
+                              key: 'resourceNames',
+                              width: 220,
+                              render: (_, record) => (
+                                <div style={{ 
+                                  padding: '8px', 
+                                  background: '#f9f9f9', 
+                                  borderRadius: '6px',
+                                  maxHeight: '80px',
+                                  overflowY: 'auto',
+                                  border: '1px solid #f0f0f0'
+                                }}>
+                                  {record.resourceNames && record.resourceNames.length > 0 ? (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                      {record.resourceNames.map((name: string, index: number) => (
+                                        <Tag 
+                                          key={`resource-${index}`}
+                                          color="processing"
+                                          style={{ 
+                                            margin: '2px', 
+                                            fontSize: '13px',
+                                          }}
+                                        >
+                                          {name}
+                                        </Tag>
+                                      ))}
                                     </div>
+                                  ) : (
+                                    <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+                                      暂无资源名称
+                                    </Typography.Text>
                                   )}
                                 </div>
                               ),
