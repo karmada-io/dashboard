@@ -100,6 +100,8 @@ type ActualResourceTypeDistribution struct {
 	TotalScheduledCount int `json:"totalScheduledCount"`
 	// TotalActualCount 总实际部署数量
 	TotalActualCount int `json:"totalActualCount"`
+	// ResourceNames 该资源类型下的具体资源名称列表
+	ResourceNames []string `json:"resourceNames,omitempty"`
 }
 
 // SchedulePreviewResponse 集群调度预览响应

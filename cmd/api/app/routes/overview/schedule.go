@@ -192,6 +192,55 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 	// 实际部署的资源链接
 	actualResourceLinks := make(map[string]map[string]int)
 
+	// 存储资源类型对应的资源名称
+	resourceTypeToNameMap := make(map[string][]string)
+
+	// 收集各资源类型对应的资源名称
+	for _, binding := range resourceBindings.Items {
+		resourceType := binding.Spec.Resource.Kind
+		resourceName := binding.Spec.Resource.Name
+		if resourceName != "" {
+			// 如果该类型还没有初始化映射，则先初始化
+			if _, exists := resourceTypeToNameMap[resourceType]; !exists {
+				resourceTypeToNameMap[resourceType] = []string{}
+			}
+			// 检查资源名称是否已存在，避免重复
+			nameExists := false
+			for _, existingName := range resourceTypeToNameMap[resourceType] {
+				if existingName == resourceName {
+					nameExists = true
+					break
+				}
+			}
+			if !nameExists {
+				resourceTypeToNameMap[resourceType] = append(resourceTypeToNameMap[resourceType], resourceName)
+			}
+		}
+	}
+
+	// 处理集群级资源
+	for _, binding := range clusterResourceBindings.Items {
+		resourceType := binding.Spec.Resource.Kind
+		resourceName := binding.Spec.Resource.Name
+		if resourceName != "" {
+			// 如果该类型还没有初始化映射，则先初始化
+			if _, exists := resourceTypeToNameMap[resourceType]; !exists {
+				resourceTypeToNameMap[resourceType] = []string{}
+			}
+			// 检查资源名称是否已存在，避免重复
+			nameExists := false
+			for _, existingName := range resourceTypeToNameMap[resourceType] {
+				if existingName == resourceName {
+					nameExists = true
+					break
+				}
+			}
+			if !nameExists {
+				resourceTypeToNameMap[resourceType] = append(resourceTypeToNameMap[resourceType], resourceName)
+			}
+		}
+	}
+
 	// 处理资源绑定 - 获取调度信息
 	for _, binding := range resourceBindings.Items {
 		resourceKind := binding.Spec.Resource.Kind
@@ -722,7 +771,11 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 			ClusterDist:         []v1.ActualClusterDistribution{},
 			TotalScheduledCount: 0,
 			TotalActualCount:    0,
+			ResourceNames:       resourceTypeToNameMap[resourceType],
 		}
+
+		// 排序资源名称列表，使显示更加有序
+		sort.Strings(dist.ResourceNames)
 
 		// 合并调度和实际部署信息
 		scheduledMap := scheduledResourceMap[resourceType]
@@ -870,6 +923,55 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 	actualResourceMap := make(map[string]map[string]int)
 	// 实际部署的资源链接
 	actualResourceLinks := make(map[string]map[string]int)
+
+	// 存储资源类型对应的资源名称
+	resourceTypeToNameMap := make(map[string][]string)
+
+	// 收集各资源类型对应的资源名称
+	for _, binding := range resourceBindings.Items {
+		resourceType := binding.Spec.Resource.Kind
+		resourceName := binding.Spec.Resource.Name
+		if resourceName != "" {
+			// 如果该类型还没有初始化映射，则先初始化
+			if _, exists := resourceTypeToNameMap[resourceType]; !exists {
+				resourceTypeToNameMap[resourceType] = []string{}
+			}
+			// 检查资源名称是否已存在，避免重复
+			nameExists := false
+			for _, existingName := range resourceTypeToNameMap[resourceType] {
+				if existingName == resourceName {
+					nameExists = true
+					break
+				}
+			}
+			if !nameExists {
+				resourceTypeToNameMap[resourceType] = append(resourceTypeToNameMap[resourceType], resourceName)
+			}
+		}
+	}
+
+	// 处理集群级资源
+	for _, binding := range clusterResourceBindings.Items {
+		resourceType := binding.Spec.Resource.Kind
+		resourceName := binding.Spec.Resource.Name
+		if resourceName != "" {
+			// 如果该类型还没有初始化映射，则先初始化
+			if _, exists := resourceTypeToNameMap[resourceType]; !exists {
+				resourceTypeToNameMap[resourceType] = []string{}
+			}
+			// 检查资源名称是否已存在，避免重复
+			nameExists := false
+			for _, existingName := range resourceTypeToNameMap[resourceType] {
+				if existingName == resourceName {
+					nameExists = true
+					break
+				}
+			}
+			if !nameExists {
+				resourceTypeToNameMap[resourceType] = append(resourceTypeToNameMap[resourceType], resourceName)
+			}
+		}
+	}
 
 	// 处理资源绑定 - 获取调度信息
 	for _, binding := range resourceBindings.Items {
@@ -1369,13 +1471,22 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 
 	// 使用与前面相同的资源类型列表，保持一致性
 	for _, resourceType := range resourceTypes {
+		// 只有当该资源类型有调度信息时才进行处理
+		if _, exists := scheduledResourceMap[resourceType]; !exists {
+			continue
+		}
+
 		dist := v1.ActualResourceTypeDistribution{
 			ResourceType:        resourceType,
 			ResourceGroup:       getResourceGroup(resourceType),
 			ClusterDist:         []v1.ActualClusterDistribution{},
 			TotalScheduledCount: 0,
 			TotalActualCount:    0,
+			ResourceNames:       resourceTypeToNameMap[resourceType],
 		}
+
+		// 排序资源名称列表，使显示更加有序
+		sort.Strings(dist.ResourceNames)
 
 		// 合并调度和实际部署信息
 		scheduledMap := scheduledResourceMap[resourceType]
@@ -1386,8 +1497,11 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 		for cluster := range scheduledMap {
 			clustersSet[cluster] = true
 		}
+		// 只收集在scheduledMap中有记录的集群
 		for cluster := range actualMap {
-			clustersSet[cluster] = true
+			if _, hasSchedule := scheduledMap[cluster]; hasSchedule {
+				clustersSet[cluster] = true
+			}
 		}
 
 		// 对集群名称进行排序

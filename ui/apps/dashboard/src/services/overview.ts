@@ -203,6 +203,7 @@ export interface ActualResourceTypeDistribution {
   clusterDist: ActualClusterDistribution[];
   totalScheduledCount: number;
   totalActualCount: number;
+  resourceNames?: string[];
 }
 
 export interface ScheduleSummary {

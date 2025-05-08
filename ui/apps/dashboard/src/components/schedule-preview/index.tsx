@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import { SchedulePreviewResponse } from '@/services/overview';
-import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag, Progress, Alert, Button, Typography, message } from 'antd';
+import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag, Progress, Alert, Button, Typography, message, Collapse } from 'antd';
 import { FlowDirectionGraph } from '@ant-design/graphs';
 import i18nInstance from '@/utils/i18n';
 import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
@@ -875,7 +875,9 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         clusterCount: new Set(item.clusterDist.map(c => c.clusterName)).size,
         // 一致性指标：实际部署的资源数与计划部署的资源数之比
         consistencyRatio: actualDist ? 
-          (actualDist.totalActualCount / (actualDist.totalScheduledCount || 1)) : 1
+          (actualDist.totalActualCount / (actualDist.totalScheduledCount || 1)) : 1,
+        // 添加资源名称列表
+        resourceNames: actualDist?.resourceNames || []
       };
     });
   }, [data]);
@@ -1577,7 +1579,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               title: i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型'),
                               dataIndex: 'resourceType',
                               key: 'resourceType',
-                              width: 240,
+                              width: 280,
                               filters: Object.entries(colorScheme.resourceGroups).map(([group]) => ({
                                 text: group,
                                 value: group,
@@ -1611,6 +1613,50 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                       {record.resourceGroup}
                                     </Tag>
                                   </div>
+                                  
+                                  {/* 资源名称列表显示 */}
+                                  {record.resourceNames && record.resourceNames.length > 0 && (
+                                    <div style={{ marginTop: '4px' }}>
+                                      <Collapse
+                                        size="small"
+                                        ghost
+                                        style={{ margin: 0, padding: 0 }}
+                                        items={[
+                                          {
+                                            key: '1',
+                                            label: (
+                                              <Typography.Text style={{ fontSize: '13px', color: '#1890ff' }}>
+                                                查看资源名称 ({record.resourceNames.length})
+                                              </Typography.Text>
+                                            ),
+                                            children: (
+                                              <div style={{ 
+                                                maxHeight: '120px', 
+                                                overflowY: 'auto',
+                                                background: '#f0f5ff', 
+                                                padding: '8px',
+                                                borderRadius: '4px' 
+                                              }}>
+                                                {record.resourceNames.map((name: string, index: number) => (
+                                                  <Tag 
+                                                    key={`resource-${index}`}
+                                                    style={{ 
+                                                      margin: '2px', 
+                                                      fontSize: '12px',
+                                                      background: '#fff',
+                                                      border: '1px solid #d9d9d9'
+                                                    }}
+                                                  >
+                                                    {name}
+                                                  </Tag>
+                                                ))}
+                                              </div>
+                                            ),
+                                          },
+                                        ]}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               ),
                             },
