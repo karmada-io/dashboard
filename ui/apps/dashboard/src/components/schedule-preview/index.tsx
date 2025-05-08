@@ -18,11 +18,11 @@ import { SchedulePreviewResponse } from '@/services/overview';
 import { Card, Empty, Spin, Tabs, Table, Badge, Statistic, Row, Col, Tooltip, Space, Tag, Progress, Alert, Button, Typography, message } from 'antd';
 import { FlowDirectionGraph } from '@ant-design/graphs';
 import i18nInstance from '@/utils/i18n';
-import { useMemo, useRef, useEffect, useState } from 'react';
+import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import insertCss from 'insert-css';
 import ErrorBoundary from '@/components/error-boundary';
 import dayjs from 'dayjs';
-import { SyncOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { SyncOutlined, LockOutlined, UnlockOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -173,7 +173,7 @@ insertCss(`
     position: relative;
     background-color: #fff;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    height: 550px; /* 适当增加高度 */
+    height: 750px; /* 增大高度到750px */
     overflow: hidden;
   }
   
@@ -355,69 +355,132 @@ const getGroupColor = (group: ResourceGroupType): string => {
 const ResourceFlowNode = ({ data }: { data: any }) => {
   const isControlPlane = data.id === 'karmada-control-plane' || data.nodeType === 'control-plane';
   const isResourceGroup = data.nodeType === 'resource-group';
-  const nodeType = isControlPlane 
-    ? i18nInstance.t('d3da66a9b128ce43c29b95a35fb5cdef', '控制平面') 
-    : isResourceGroup
-      ? i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型')
-      : i18nInstance.t('58de9e3ce05d5f6eab77d20876ab1e3f', '成员集群');
   
   // 根据节点类型选择不同的边框颜色
   let borderColor = isControlPlane 
-    ? colorScheme.nodeColors.controlPlane 
-    : isResourceGroup
-      ? colorScheme.resourceGroups[data.name as ResourceGroupType]?.color || colorScheme.resourceGroups.Others.color
-      : colorScheme.nodeColors.member;
+    ? '#1890ff' 
+    : isResourceGroup 
+      ? '#9254de' 
+      : '#52C41A';
   
-  // 计算一致性比例
-  const consistencyRatio = data.consistencyRatio || 1;
-  const isConsistent = consistencyRatio === 1;
+  // 根据节点类型选择不同的背景颜色
+  let backgroundColor = isControlPlane 
+    ? 'rgba(24, 144, 255, 0.15)' 
+    : isResourceGroup 
+      ? 'rgba(146, 84, 222, 0.1)' 
+      : 'rgba(82, 196, 26, 0.1)';
   
-  // 根据一致性状态选择背景色
-  let bgColor = '#f6f7f9';
-  if (!isConsistent) {
-    if (consistencyRatio === 0) {
-      // 实际部署为0，红色警告
-      bgColor = '#fff1f0';
-    } else if (consistencyRatio < 1) {
-      // 实际部署少于计划，黄色警告
-      bgColor = '#fffbe6';
-    } else {
-      // 实际部署多于计划，紫色提示
-      bgColor = '#f9f0ff';
-    }
+  // 控制平面节点使用纯色填充
+  if (isControlPlane) {
+    backgroundColor = 'rgba(24, 144, 255, 0.2)';
+    borderColor = '#1890ff';
   }
   
-  // 确定指标颜色
-  const metricsColor = isConsistent 
-    ? '#1890ff' 
-    : consistencyRatio === 0 
-      ? '#f5222d' 
-      : consistencyRatio < 1 
-        ? '#faad14' 
-        : '#722ed1';
+  // 根据是否有差异状态，调整显示状态
+  const hasDiff = data.status === 'inconsistent' || data.status === 'diff';
+  let statusText = '一致';
+  let statusColor = '#52C41A';
   
+  if (hasDiff) {
+    statusText = '不一致';
+    statusColor = '#ff4d4f';
+    borderColor = '#ff4d4f';
+    backgroundColor = 'rgba(255, 77, 79, 0.05)';
+  }
+  
+  // 获取资源类型计数
+  const resourceCount = data.resourceCount || 0;
+  
+  // 获取资源名称列表，如果存在
+  const resourceNames = data.resourceNames || [];
+
+  // 支持资源组节点显示资源类型名称
+  const displayName = isResourceGroup ? data.resourceType || data.name : data.name || data.id;
+  const groupTypeTag = isResourceGroup ? data.name : undefined;
+
   return (
-    <div className="resource-flow-node" style={{ borderLeft: `4px solid ${borderColor}`, backgroundColor: bgColor }}>
-      <div className="resource-flow-node-name">{data.name}</div>
-      <div className="resource-flow-node-metric">
-        <div>{nodeType}</div>
-        {data.resourceCount !== undefined && (
-          <div className="resource-flow-node-metric--value">
-            {!isConsistent ? (
-              <Tooltip title={`调度计划: ${data.resourceCount} / 实际部署: ${data.actualResourceCount}`}>
-                <span style={{ color: metricsColor }}>
-                  {data.actualResourceCount}/{data.resourceCount}
-                  {' '}
-                  <span style={{ fontSize: '12px', opacity: 0.8 }}>
-                    {consistencyRatio > 1 ? '↑' : '↓'}
-                  </span>
-                </span>
-              </Tooltip>
-            ) : (
-              <span>{data.resourceCount} {i18nInstance.t('ca3c5f0304a60ce1abe05ec67f28dbde', '服务')}</span>
+    <div 
+      style={{
+        padding: '12px',
+        border: `2px solid ${borderColor}`,
+        borderRadius: '8px',
+        backgroundColor,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+      }}
+    >
+      <div>
+        {/* 节点名称 - 进一步增大字体和增加行高 */}
+        <div style={{ 
+          fontSize: '18px', // 增大字体
+          fontWeight: 'bold', 
+          marginBottom: '6px',
+          lineHeight: '1.4',
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis', 
+          whiteSpace: 'nowrap'
+        }}>
+          {displayName}
+        </div>
+        
+        {/* 资源组标签 - 调整样式更加明显 */}
+        {groupTypeTag && !isControlPlane && (
+          <Tag color="#9254de" style={{ 
+            marginRight: 0, 
+            fontSize: '15px', // 增大字体
+            padding: '1px 8px'
+          }}>
+            {groupTypeTag}
+          </Tag>
+        )}
+        
+        {/* 节点类型与状态 - 改善排版和间距 */}
+        {(isControlPlane || (!isControlPlane && !isResourceGroup)) && (
+          <div style={{ 
+            fontSize: '15px', // 增大字体
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginTop: '6px'
+          }}>
+            <span style={{ fontWeight: 'medium' }}>
+              {isControlPlane ? '控制平面' : '成员集群'}
+            </span>
+            {!isControlPlane && (
+              <Tag color={statusColor} style={{ 
+                margin: 0,
+                fontSize: '14px', // 增大字体
+                padding: '0 6px'
+              }}>
+                {statusText}
+              </Tag>
             )}
           </div>
         )}
+      </div>
+      
+      {/* 资源指标 - 调整样式和大小 */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginTop: '8px',
+        fontSize: '15px', // 增大字体
+        fontWeight: 'medium'
+      }}>
+        <span>资源数量</span>
+        <span style={{ 
+          fontWeight: 'bold', 
+          color: isResourceGroup ? '#9254de' : '#1890ff',
+          fontSize: '18px' // 增大字体
+        }}>
+          {resourceCount}
+        </span>
       </div>
     </div>
   );
@@ -448,6 +511,37 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
 
   // 添加锁定状态
   const [isGraphLocked, setIsGraphLocked] = useState(false);
+
+  // 增加布局是否准备好的状态
+  const [layoutReady, setLayoutReady] = useState(false);
+  
+  // 增加渲染错误恢复函数
+  const recoverFromError = useCallback(() => {
+    if (renderError && graphRef.current) {
+      console.log('尝试从渲染错误中恢复...');
+      setRenderError(false);
+      
+      // 延迟后重新尝试渲染
+      setTimeout(() => {
+        try {
+          if (graphRef.current && !isDestroyed.current) {
+            graphRef.current.fitView();
+            graphRef.current.zoomTo(0.85);
+            graphRef.current.render();
+          }
+        } catch (e) {
+          console.warn('恢复渲染失败:', e);
+        }
+      }, 500);
+    }
+  }, [renderError]);
+  
+  // 当数据变化时自动恢复
+  useEffect(() => {
+    if (data && data.nodes && data.nodes.length > 0) {
+      recoverFromError();
+    }
+  }, [data, recoverFromError]);
 
   // 切换锁定状态
   const toggleGraphLock = () => {
@@ -796,6 +890,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     actualTotalCount: number;
     clusterCount: number;
     consistencyRatio: number;
+    resourceNames?: string[]; // 添加可选的资源名称字段
   };
 
   // 在组件挂载后延迟设置 shouldRenderGraph 为 true
@@ -1127,6 +1222,29 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     };
   }, [shouldRenderGraph]);
 
+  // 添加数据变化时的状态重置
+  useEffect(() => {
+    if (data && flowData.nodes.length > 0 && flowData.edges.length > 0) {
+      // 如果数据变化，重置布局状态
+      setLayoutReady(false);
+      
+      // 延迟一段时间后，如果图表实例存在，主动触发一次渲染
+      setTimeout(() => {
+        if (graphRef.current && !isDestroyed.current) {
+          try {
+            graphRef.current.fitView();
+            graphRef.current.zoomTo(0.85);
+            
+            // 标记布局已准备好
+            setLayoutReady(true);
+          } catch (e) {
+            console.warn('数据变化后调整图表失败:', e);
+          }
+        }
+      }, 300);
+    }
+  }, [data]);
+
   return (
     <Spin spinning={loading}>
       <Card 
@@ -1289,7 +1407,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                     node={{
                                       style: {
                                         component: (data: any) => <ResourceFlowNode data={data} />,
-                                        size: [150, 70],
+                                        size: [260, 130], // 增大节点尺寸
                                       },
                                     }}
                                     edge={{
@@ -1301,7 +1419,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                           
                                           // 如果计划与实际一致，只显示一个百分比
                                           if (ratio === actualRatio || !actualRatio) {
-                                            return `${text} ${percentage}%`;
+                                            return `${percentage}%`;
                                           }
                                           
                                           // 否则显示计划和实际的对比
@@ -1309,8 +1427,8 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                           return `计划${text} ${percentage}% / 实际${text} ${actualPercentage}%`;
                                         },
                                         labelBackground: true,
-                                        labelFontSize: 12,
-                                        opacity: 0.8,
+                                        labelFontSize: 14,
+                                        opacity: 0.9,
                                       },
                                     }}
                                     transforms={(prev: any) => [
@@ -1321,64 +1439,96 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                         value: (d: any) => d.data.ratio,
                                         minValue: 0,
                                         maxValue: 1,
-                                        minLineWidth: 1,
-                                        maxLineWidth: 12,
+                                        minLineWidth: 2, // 增加最小线宽
+                                        maxLineWidth: 14, // 增加最大线宽
                                       },
                                     ]}
                                     layout={{
                                       type: 'antv-dagre',
-                                      nodesep: 30,
-                                      ranksep: 80,
+                                      nodesep: 50, // 减小节点水平间距
+                                      ranksep: 100, // 减小层级垂直间距
                                       controlPoints: true,
                                       rankdir: 'LR',
                                       align: 'UL',
-                                      marginx: 20,
-                                      marginy: 20,
+                                      marginx: 30, // 减小边距
+                                      marginy: 30, // 减小边距
                                     }}
                                     onReady={(graph) => {
                                       console.log('图表实例创建:', !!graph);
                                       
                                       if (!isDestroyed.current && graph) {
-                                        if (
-                                          typeof graph.destroyed === 'boolean' && 
-                                          !graph.destroyed && 
-                                          typeof graph.destroy === 'function'
-                                        ) {
-                                          // 保存有效的图表实例引用
-                                          graphRef.current = graph;
-                                          
-                                          // 多次尝试调整图表位置
-                                          // 初始立即执行一次
-                                          if (typeof graph.fitCenter === 'function') {
-                                            graph.fitCenter();
-                                            
-                                            // 延迟 300ms 再次执行，解决初始化渲染问题
-                                            setTimeout(() => {
-                                              if (!isDestroyed.current && graph && !graph.destroyed) {
-                                                graph.fitCenter();
-                                                graph.fitView(); // 同时尝试适应视图大小
-                                                
-                                                // 延迟 1000ms 进行最终位置调整
-                                                setTimeout(() => {
-                                                  if (!isDestroyed.current && graph && !graph.destroyed) {
-                                                    graph.fitCenter();
-                                                    // 强制重新计算布局
-                                                    try {
-                                                      // 尝试使用更通用的方法刷新布局
-                                                      if (typeof graph.layout === 'function') {
-                                                        graph.layout();
-                                                      } else if (typeof graph.render === 'function') {
-                                                        graph.render();
-                                                      }
-                                                    } catch (e) {
-                                                      console.warn('刷新布局时出错:', e);
-                                                    }
-                                                  }
-                                                }, 1000);
-                                              }
-                                            }, 300);
+                                        // 保存有效的图表实例引用
+                                        graphRef.current = graph;
+                                        
+                                        // 先设置不可见，避免闪烁
+                                        const container = document.querySelector('.flow-chart-container');
+                                        if (container) {
+                                          const graphElem = container.querySelector('.ant-flow-direction-graph');
+                                          if (graphElem) {
+                                            (graphElem as HTMLElement).style.opacity = '0';
                                           }
                                         }
+                                        
+                                        // 多次尝试调整位置，确保图表正确显示
+                                        const adjustTimes = [50, 150, 300, 600, 1000, 1500];
+                                        let successfulRender = false;
+                                        
+                                        adjustTimes.forEach((delay, index) => {
+                                          setTimeout(() => {
+                                            if (!isDestroyed.current && graph && !graph.destroyed) {
+                                              try {
+                                                // 先使用fitView适配视图
+                                                if (typeof graph.fitView === 'function') {
+                                                  graph.fitView();
+                                                }
+                                                // 设置合适的缩放比例
+                                                if (typeof graph.zoomTo === 'function') {
+                                                  graph.zoomTo(0.85);
+                                                }
+                                                
+                                                // 刷新布局
+                                                if (typeof graph.layout === 'function') {
+                                                  graph.layout();
+                                                }
+                                                
+                                                // 刷新渲染
+                                                if (typeof graph.render === 'function') {
+                                                  graph.render();
+                                                }
+                                                
+                                                // 最后一次调整后显示图表
+                                                if (index === adjustTimes.length - 1 || index >= 2) {
+                                                  const container = document.querySelector('.flow-chart-container');
+                                                  if (container) {
+                                                    const graphElem = container.querySelector('.ant-flow-direction-graph');
+                                                    if (graphElem) {
+                                                      (graphElem as HTMLElement).style.opacity = '1';
+                                                      (graphElem as HTMLElement).style.transition = 'opacity 0.3s ease-in';
+                                                    }
+                                                  }
+                                                  
+                                                  // 标记布局已准备好
+                                                  if (!successfulRender) {
+                                                    successfulRender = true;
+                                                    setLayoutReady(true);
+                                                  }
+                                                }
+                                              } catch (e) {
+                                                console.warn('调整图表失败:', e);
+                                                // 如果最后一次尝试仍然失败，还是显示图表
+                                                if (index === adjustTimes.length - 1) {
+                                                  const container = document.querySelector('.flow-chart-container');
+                                                  if (container) {
+                                                    const graphElem = container.querySelector('.ant-flow-direction-graph');
+                                                    if (graphElem) {
+                                                      (graphElem as HTMLElement).style.opacity = '1';
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }, delay);
+                                        });
                                       }
                                     }}
                                   />
@@ -1427,7 +1577,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               title: i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型'),
                               dataIndex: 'resourceType',
                               key: 'resourceType',
-                              width: 180,
+                              width: 240,
                               filters: Object.entries(colorScheme.resourceGroups).map(([group]) => ({
                                 text: group,
                                 value: group,
@@ -1435,18 +1585,33 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               })),
                               onFilter: (value: any, record: ResourceRecord) => record.resourceGroup === value,
                               render: (text, record) => (
-                                <Space direction="vertical" size={0}>
-                                  <Badge
-                                    color={getResourceColor(text)}
-                                    text={<span style={{ fontWeight: 'bold' }}>{text}</span>}
-                                  />
-                                  <Tag 
-                                    color={getGroupColor(record.resourceGroup)} 
-                                    style={{ fontSize: '0.7rem', marginLeft: '16px', marginTop: '4px' }}
-                                  >
-                                    {record.resourceGroup}
-                                  </Tag>
-                                </Space>
+                                <div 
+                                  style={{ 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    gap: '8px',
+                                    padding: '8px',
+                                    background: '#f9f9f9',
+                                    borderRadius: '6px',
+                                    borderLeft: `4px solid ${getResourceColor(text)}`
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Badge
+                                      color={getResourceColor(text)}
+                                      text={<span style={{ fontWeight: 'bold', fontSize: '16px' }}>{text}</span>}
+                                    />
+                                  </div>
+                                  
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                    <Tag 
+                                      color={getGroupColor(record.resourceGroup)} 
+                                      style={{ fontSize: '13px', margin: 0 }}
+                                    >
+                                      {record.resourceGroup}
+                                    </Tag>
+                                  </div>
+                                </div>
                               ),
                             },
                             {
@@ -1455,86 +1620,106 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               width: 160,
                               sorter: (a: ResourceRecord, b: ResourceRecord) => a.totalCount - b.totalCount,
                               render: (text, record) => (
-                                <Tooltip title={`调度计划: ${record.totalCount} / 实际部署: ${record.actualTotalCount}`}>
-                                  <div>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                      <span style={{ 
-                                        fontWeight: 'bold', 
-                                        color: '#fff',
-                                        backgroundColor: '#ff9800',
-                                        padding: '4px 8px',
-                                        borderRadius: '4px',
-                                        fontSize: '16px',
-                                        display: 'inline-block'
+                                <div>
+                                  <div style={{ 
+                                    padding: '8px 12px',
+                                    background: '#f8f8f8',
+                                    borderRadius: '6px',
+                                    border: '1px solid #f0f0f0'
+                                  }}>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      flexDirection: 'column',
+                                      gap: '6px'
+                                    }}>
+                                      <div style={{ 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
                                       }}>
-                                        {record.totalCount}
-                                      </span>
-                                      <span style={{ margin: '0 4px' }}>→</span>
-                                      <span style={{ 
-                                        fontWeight: 'bold', 
-                                        color: '#fff',
-                                        backgroundColor: record.totalCount === record.actualTotalCount 
-                                          ? '#52c41a' // 绿色表示一致
-                                          : record.totalCount < record.actualTotalCount 
-                                            ? '#722ed1' // 紫色表示实际多于计划
-                                            : '#f5222d', // 红色表示实际少于计划
-                                        padding: '4px 8px',
-                                        borderRadius: '4px',
-                                        fontSize: '16px',
-                                        display: 'inline-block'
+                                        <span style={{ fontWeight: 'medium', color: '#666' }}>调度计划:</span>
+                                        <span style={{ 
+                                          fontWeight: 'bold', 
+                                          color: '#fff',
+                                          backgroundColor: '#1890ff',
+                                          padding: '2px 8px',
+                                          borderRadius: '4px',
+                                          fontSize: '15px',
+                                        }}>
+                                          {record.totalCount}
+                                        </span>
+                                      </div>
+                                      <div style={{ 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
                                       }}>
-                                        {record.actualTotalCount}
-                                      </span>
+                                        <span style={{ fontWeight: 'medium', color: '#666' }}>实际部署:</span>
+                                        <span style={{ 
+                                          fontWeight: 'bold', 
+                                          color: '#fff',
+                                          backgroundColor: record.totalCount === record.actualTotalCount 
+                                            ? '#52c41a' // 绿色表示一致
+                                            : record.totalCount < record.actualTotalCount 
+                                              ? '#722ed1' // 紫色表示实际多于计划
+                                              : '#f5222d', // 红色表示实际少于计划
+                                          padding: '2px 8px',
+                                          borderRadius: '4px',
+                                          fontSize: '15px',
+                                        }}>
+                                          {record.actualTotalCount}
+                                        </span>
+                                      </div>
                                     </div>
-                                    <div style={{ marginTop: '4px', textAlign: 'center' }}>
-                                      <Tag color={
-                                        record.consistencyRatio === 1 
-                                          ? 'success' 
-                                          : record.consistencyRatio > 0.8 
-                                            ? 'warning' 
-                                            : 'error'
-                                      }>
-                                        一致性: {Math.round(record.consistencyRatio * 100)}%
-                                      </Tag>
+                                    
+                                    <div style={{ marginTop: '8px' }}>
+                                      <Progress 
+                                        percent={Math.round(record.consistencyRatio * 100)} 
+                                        size="small"
+                                        status={
+                                          record.consistencyRatio === 1 
+                                            ? 'success' 
+                                            : record.consistencyRatio > 0.8 
+                                              ? 'normal' 
+                                              : 'exception'
+                                        }
+                                      />
                                     </div>
                                   </div>
-                                </Tooltip>
+                                </div>
                               )
                             },
                             {
                               title: i18nInstance.t('3b5c24a09f316f42b0ac3ced25968959', '集群覆盖'),
                               dataIndex: 'clusterCount',
                               key: 'clusterCount',
-                              width: 120,
+                              width: 150,
                               sorter: (a: ResourceRecord, b: ResourceRecord) => a.clusterCount - b.clusterCount,
                               render: (text, record) => (
-                                <Tooltip 
-                                  title={`${text}/${data.summary.totalClusters} ${i18nInstance.t('c35a681d41a9dcd9217e1bc21e5c808c', '集群')}`}
-                                >
-                                  <div>
-                                    <div style={{ 
-                                      fontWeight: 'bold',
-                                      fontSize: '16px',
-                                      backgroundColor: '#f0f7ff',
-                                      padding: '4px 8px',
-                                      borderRadius: '4px',
-                                      marginBottom: '4px',
-                                      textAlign: 'center',
-                                      color: '#1890ff'
+                                <div style={{ padding: '8px', background: '#f8f8f8', borderRadius: '6px' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                    <span style={{ fontSize: '14px', color: '#666' }}>覆盖率:</span>
+                                    <span style={{ 
+                                      fontWeight: 'bold', 
+                                      fontSize: '15px',
+                                      color: '#fff',
+                                      backgroundColor: text === data.summary.totalClusters ? '#52c41a' : '#1890ff',
+                                      padding: '1px 8px',
+                                      borderRadius: '10px',
                                     }}>
-                                      {text}/{data.summary.totalClusters}
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-3 mt-1" style={{ background: '#f0f0f0' }}>
-                                      <div 
-                                        className="h-3 rounded-full" 
-                                        style={{ 
-                                          width: `${Math.round((text / data.summary.totalClusters) * 100)}%`,
-                                          background: getResourceColor(record.resourceType),
-                                        }}
-                                      ></div>
-                                    </div>
+                                      {Math.round((text / data.summary.totalClusters) * 100)}%
+                                    </span>
                                   </div>
-                                </Tooltip>
+                                  
+                                  <Tooltip title={`${text}/${data.summary.totalClusters} 个集群已部署`}>
+                                    <Progress 
+                                      percent={Math.round((text / data.summary.totalClusters) * 100)} 
+                                      size="small"
+                                      format={() => `${text}/${data.summary.totalClusters}`}
+                                      strokeColor={getResourceColor(record.resourceType)}
+                                    />
+                                  </Tooltip>
+                                </div>
                               ),
                             },
                             {
@@ -1542,50 +1727,59 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                               dataIndex: 'clusterDist',
                               key: 'clusterDist',
                               render: (clusterDist) => (
-                                <div className="flex flex-wrap gap-2">
-                                  {clusterDist.map((cluster: any, index: number) => (
-                                    <Tooltip
-                                      key={`cluster-tooltip-${cluster.clusterName}-${index}`}
-                                      title={
-                                        <div>
-                                          <div>{cluster.clusterName}</div>
-                                          <div>调度计划: {cluster.count}</div>
-                                          <div>实际部署: {cluster.actualCount}</div>
-                                          <div>差异: {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}</div>
-                                        </div>
-                                      }
-                                    >
-                                      <Badge
-                                        key={`cluster-badge-${cluster.clusterName}-${index}`}
-                                        count={
-                                          <div style={{ 
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            background: cluster.isConsistent ? '#52c41a' : '#f5222d',
-                                            borderRadius: '10px',
-                                            padding: '0 5px',
-                                            fontSize: '12px',
-                                            color: 'white'
-                                          }}>
-                                            {cluster.actualCount}/{cluster.count}
+                                <div style={{ 
+                                  padding: '8px', 
+                                  background: '#f9f9f9', 
+                                  borderRadius: '6px',
+                                  border: '1px solid #f0f0f0' 
+                                }}>
+                                  <div className="flex flex-wrap gap-2">
+                                    {clusterDist.map((cluster: any, index: number) => (
+                                      <Tooltip
+                                        key={`cluster-tooltip-${cluster.clusterName}-${index}`}
+                                        title={
+                                          <div>
+                                            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{cluster.clusterName}</div>
+                                            <div>调度计划: {cluster.count}</div>
+                                            <div>实际部署: {cluster.actualCount}</div>
+                                            <div>
+                                              差异: 
+                                              <span style={{ 
+                                                color: cluster.difference > 0 ? '#52c41a' : 
+                                                        cluster.difference < 0 ? '#f5222d' : '#666',
+                                                fontWeight: 'bold',
+                                                marginLeft: '4px'
+                                              }}>
+                                                {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}
+                                              </span>
+                                            </div>
                                           </div>
                                         }
-                                        offset={[5, 0]}
-                                        style={{ 
-                                          backgroundColor: cluster.isConsistent ? 'transparent' : '#ffccc7',
-                                          marginRight: '3px'
-                                        }}
                                       >
-                                        <span className="px-2 py-1 rounded" style={{ 
-                                          background: cluster.isConsistent ? '#fff6e6' : '#fff2f0', 
-                                          fontSize: '12px',
-                                          border: `1px solid ${cluster.isConsistent ? '#ffcc80' : '#ffccc7'}`
-                                        }}>
-                                          {cluster.clusterName}
-                                        </span>
-                                      </Badge>
-                                    </Tooltip>
-                                  ))}
+                                        <Tag
+                                          style={{ 
+                                            margin: '4px',
+                                            borderColor: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                                            background: cluster.isConsistent ? '#f6ffed' : '#fff2f0',
+                                            fontSize: '14px',
+                                            padding: '2px 8px'
+                                          }}
+                                          icon={cluster.isConsistent ? <CheckCircleOutlined /> : <WarningOutlined />}
+                                        >
+                                          <span style={{ marginRight: '4px' }}>{cluster.clusterName}</span>
+                                          <span style={{
+                                            color: '#fff',
+                                            background: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                                            padding: '0 4px',
+                                            borderRadius: '10px',
+                                            fontSize: '12px'
+                                          }}>
+                                            {cluster.actualCount}/{cluster.count}
+                                          </span>
+                                        </Tag>
+                                      </Tooltip>
+                                    ))}
+                                  </div>
                                 </div>
                               ),
                             },
