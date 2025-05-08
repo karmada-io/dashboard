@@ -458,10 +458,10 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
           justifyContent: 'space-between', 
           alignItems: 'center',
           marginTop: '8px',
-          fontSize: '15px',
+          fontSize: '16px',
           fontWeight: 'medium'
         }}>
-          <span>资源数量</span>
+          <span>调度资源数量</span>
           <span style={{ 
             fontWeight: 'bold', 
             color: '#9254de',
@@ -550,10 +550,10 @@ const ResourceFlowNode = ({ data }: { data: any }) => {
         justifyContent: 'space-between', 
         alignItems: 'center',
         marginTop: '8px',
-        fontSize: '15px', // 增大字体
+        fontSize: '16px', // 增大字体
         fontWeight: 'medium'
       }}>
-        <span>资源数量</span>
+        <span>调度资源数量</span>
         <span style={{ 
           fontWeight: 'bold', 
           color: isResourceGroup ? '#9254de' : '#1890ff',
