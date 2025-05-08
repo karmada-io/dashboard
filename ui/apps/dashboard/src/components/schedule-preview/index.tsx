@@ -870,18 +870,39 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     }
   }, [data, flowData, renderError]);
 
-  // 检测图表容器大小变化，在需要时调整图表大小
+  // 替换监听容器大小变化的 useEffect
   useEffect(() => {
-    if (!graphRef.current || !graphContainerRef.current) return;
+    if (!graphContainerRef.current) return;
     
     const resizeObserver = new ResizeObserver(() => {
       if (graphRef.current && !isDestroyed.current) {
         try {
           const graph = graphRef.current;
           // 检查图表是否有效
-          if (typeof graph.destroyed === 'boolean' && !graph.destroyed && typeof graph.resize === 'function') {
+          if (typeof graph.destroyed === 'boolean' && !graph.destroyed) {
             // 容器大小变化时调整图表大小
-            graph.resize();
+            if (typeof graph.resize === 'function') {
+              graph.resize();
+            }
+            
+            // 添加延迟调整位置的逻辑
+            setTimeout(() => {
+              if (!isDestroyed.current && graph && !graph.destroyed) {
+                if (typeof graph.fitCenter === 'function') {
+                  graph.fitCenter();
+                }
+                try {
+                  // 尝试使用更通用的方法刷新布局
+                  if (typeof graph.layout === 'function') {
+                    graph.layout();
+                  } else if (typeof graph.render === 'function') {
+                    graph.render();
+                  }
+                } catch (e) {
+                  console.warn('刷新布局时出错:', e);
+                }
+              }
+            }, 100);
           }
         } catch (e) {
           console.warn('调整图表大小时出错:', e);
@@ -895,6 +916,34 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
       resizeObserver.disconnect();
     };
   }, [shouldRenderGraph]);
+
+  // 添加数据变化时重新布局的 useEffect
+  useEffect(() => {
+    // 当流向图数据变化后，如果图表实例已存在，则调整布局
+    if (flowData.nodes.length > 0 && flowData.edges.length > 0 && graphRef.current && !isDestroyed.current) {
+      const graph = graphRef.current;
+      if (typeof graph.destroyed === 'boolean' && !graph.destroyed) {
+        // 延迟执行以确保图表已完全渲染
+        setTimeout(() => {
+          if (!isDestroyed.current && graph && !graph.destroyed) {
+            if (typeof graph.fitCenter === 'function') {
+              graph.fitCenter();
+            }
+            try {
+              // 尝试使用更通用的方法刷新布局
+              if (typeof graph.layout === 'function') {
+                graph.layout();
+              } else if (typeof graph.render === 'function') {
+                graph.render();
+              }
+            } catch (e) {
+              console.warn('刷新布局时出错:', e);
+            }
+          }
+        }, 300);
+      }
+    }
+  }, [flowData]);
 
   // 格式化更新时间
   const formatLastUpdatedTime = () => {
@@ -1037,6 +1086,46 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
       </div>
     );
   };
+
+  // 添加窗口大小变化监听
+  useEffect(() => {
+    const handleWindowResize = () => {
+      if (graphRef.current && !isDestroyed.current) {
+        try {
+          const graph = graphRef.current;
+          if (typeof graph.destroyed === 'boolean' && !graph.destroyed) {
+            // 延迟执行以等待DOM更新完成
+            setTimeout(() => {
+              if (typeof graph.resize === 'function') {
+                graph.resize();
+              }
+              if (typeof graph.fitCenter === 'function') {
+                graph.fitCenter();
+              }
+              // 尝试重新渲染图表
+              try {
+                if (typeof graph.layout === 'function') {
+                  graph.layout();
+                } else if (typeof graph.render === 'function') {
+                  graph.render();
+                }
+              } catch (e) {
+                console.warn('窗口大小变化时刷新布局出错:', e);
+              }
+            }, 200);
+          }
+        } catch (e) {
+          console.warn('窗口大小变化时调整图表出错:', e);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleWindowResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [shouldRenderGraph]);
 
   return (
     <Spin spinning={loading}>
@@ -1241,6 +1330,10 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                       nodesep: 30,
                                       ranksep: 80,
                                       controlPoints: true,
+                                      rankdir: 'LR',
+                                      align: 'UL',
+                                      marginx: 20,
+                                      marginy: 20,
                                     }}
                                     onReady={(graph) => {
                                       console.log('图表实例创建:', !!graph);
@@ -1254,10 +1347,35 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                           // 保存有效的图表实例引用
                                           graphRef.current = graph;
                                           
-                                          // 尝试缩放图表以适应容器
+                                          // 多次尝试调整图表位置
+                                          // 初始立即执行一次
                                           if (typeof graph.fitCenter === 'function') {
+                                            graph.fitCenter();
+                                            
+                                            // 延迟 300ms 再次执行，解决初始化渲染问题
                                             setTimeout(() => {
-                                              graph.fitCenter();
+                                              if (!isDestroyed.current && graph && !graph.destroyed) {
+                                                graph.fitCenter();
+                                                graph.fitView(); // 同时尝试适应视图大小
+                                                
+                                                // 延迟 1000ms 进行最终位置调整
+                                                setTimeout(() => {
+                                                  if (!isDestroyed.current && graph && !graph.destroyed) {
+                                                    graph.fitCenter();
+                                                    // 强制重新计算布局
+                                                    try {
+                                                      // 尝试使用更通用的方法刷新布局
+                                                      if (typeof graph.layout === 'function') {
+                                                        graph.layout();
+                                                      } else if (typeof graph.render === 'function') {
+                                                        graph.render();
+                                                      }
+                                                    } catch (e) {
+                                                      console.warn('刷新布局时出错:', e);
+                                                    }
+                                                  }
+                                                }, 1000);
+                                              }
                                             }, 300);
                                           }
                                         }

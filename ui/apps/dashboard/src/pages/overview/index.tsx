@@ -19,7 +19,7 @@ import Panel from '@/components/panel';
 import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin, Statistic, Tag, Table, Tooltip, Space, Typography, Avatar, Empty, Button, Divider } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
-import { GetOverview, GetNodeSummary, GetSchedulePreview } from '@/services/overview.ts';
+import { GetOverview, GetNodeSummary, GetSchedulePreview, GetAllClusterResourcesPreview } from '@/services/overview.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Icons } from '@/components/icons';
@@ -277,11 +277,11 @@ const Overview = () => {
     enabled: !clusterName
   });
 
-  // 获取集群调度预览数据
+  // 获取集群调度预览数据 - 只显示Karmada调度的资源
   const { data: scheduleData, isLoading: isScheduleLoading, refetch: refetchScheduleData, dataUpdatedAt } = useQuery({
     queryKey: ['GetSchedulePreview'],
     queryFn: async () => {
-      const ret = await GetSchedulePreview();
+      const ret = await GetSchedulePreview(); // 现在后端已修改，只返回Karmada调度的资源
       return ret.data;
     },
     // 仅在全局概览页面且自动刷新启用时获取

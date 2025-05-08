@@ -225,3 +225,9 @@ export async function GetSchedulePreview() {
   const resp = await karmadaClient.get<IResponse<SchedulePreviewResponse>>('/overview/schedule');
   return resp.data;
 }
+
+// 获取所有集群资源预览信息
+export async function GetAllClusterResourcesPreview() {
+  const resp = await karmadaClient.get<IResponse<SchedulePreviewResponse>>('/overview/all-resources');
+  return resp.data;
+}
