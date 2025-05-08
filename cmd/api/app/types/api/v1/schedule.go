@@ -26,6 +26,8 @@ type ScheduleNode struct {
 	Type string `json:"type"`
 	// SchedulingParams 集群调度参数
 	SchedulingParams *SchedulingParams `json:"schedulingParams,omitempty"`
+	// ResourceInfo 资源信息(当节点是资源时)
+	ResourceInfo *ResourceNodeInfo `json:"resourceInfo,omitempty"`
 }
 
 // ScheduleLink 表示调度图中的连接线
@@ -118,6 +120,42 @@ type SchedulePreviewResponse struct {
 	Summary ScheduleSummary `json:"summary"`
 	// ActualResourceDist 实际资源分布统计（可选，扩展功能）
 	ActualResourceDist []ActualResourceTypeDistribution `json:"actualResourceDist,omitempty"`
+	// DetailedResources 详细资源信息列表
+	DetailedResources []ResourceDetailInfo `json:"detailedResources,omitempty"`
+}
+
+// ResourceNodeInfo 资源节点信息
+type ResourceNodeInfo struct {
+	// ResourceKind 资源类型
+	ResourceKind string `json:"resourceKind"`
+	// ResourceGroup 资源分组
+	ResourceGroup string `json:"resourceGroup"`
+	// Namespace 命名空间
+	Namespace string `json:"namespace"`
+	// PropagationPolicy 传播策略
+	PropagationPolicy string `json:"propagationPolicy"`
+}
+
+// ResourceDetailInfo 资源详细信息
+type ResourceDetailInfo struct {
+	// ResourceName 资源名称
+	ResourceName string `json:"resourceName"`
+	// ResourceKind 资源类型
+	ResourceKind string `json:"resourceKind"`
+	// ResourceGroup 资源组
+	ResourceGroup string `json:"resourceGroup"`
+	// Namespace 命名空间
+	Namespace string `json:"namespace"`
+	// PropagationPolicy 传播策略
+	PropagationPolicy string `json:"propagationPolicy"`
+	// Weight 权重
+	Weight int32 `json:"weight"`
+	// ClusterDist 集群分布
+	ClusterDist []ActualClusterDistribution `json:"clusterDist"`
+	// TotalScheduledCount 计划总数
+	TotalScheduledCount int `json:"totalScheduledCount"`
+	// TotalActualCount 实际总数
+	TotalActualCount int `json:"totalActualCount"`
 }
 
 // Taint 表示集群污点

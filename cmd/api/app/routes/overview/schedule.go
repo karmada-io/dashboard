@@ -37,6 +37,8 @@ import (
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
+	policyv1alpha1 "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 )
 
 // 资源类型分组映射
@@ -134,6 +136,84 @@ func getResourceGroup(kind string) string {
 		return group
 	}
 	return "Others"
+}
+
+// 添加传播策略查找函数
+func findPropagationPolicyForResource(ctx context.Context, karmadaClient karmadaclientset.Interface, namespace, name, kind string) (string, int32, error) {
+	// 获取所有PropagationPolicy
+	policyList, err := karmadaClient.PolicyV1alpha1().PropagationPolicies(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		klog.ErrorS(err, "Failed to get propagation policies")
+		return "", 0, err
+	}
+
+	// 检查每个策略是否匹配该资源
+	for _, policy := range policyList.Items {
+		if policy.Namespace != namespace && namespace != "" {
+			continue
+		}
+
+		for _, rs := range policy.Spec.ResourceSelectors {
+			if rs.Kind == kind && (rs.Name == name || rs.Name == "") {
+				// 找到匹配的策略，返回名称和默认权重
+				defaultWeight := int32(1)
+				if policy.Spec.Placement.ReplicaScheduling != nil && policy.Spec.Placement.ReplicaScheduling.ReplicaDivisionPreference == policyv1alpha1.ReplicaDivisionPreferenceWeighted {
+					// 如果使用加权调度，则取第一个静态权重
+					if len(policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList) > 0 {
+						staticWeight := policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList[0]
+						defaultWeight = int32(staticWeight.Weight)
+						break
+					}
+				}
+				return policy.Name, defaultWeight, nil
+			}
+		}
+	}
+
+	// 查找ClusterPropagationPolicy
+	clusterPolicyList, err := karmadaClient.PolicyV1alpha1().ClusterPropagationPolicies().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		klog.ErrorS(err, "Failed to get cluster propagation policies")
+		return "", 0, err
+	}
+
+	for _, policy := range clusterPolicyList.Items {
+		for _, rs := range policy.Spec.ResourceSelectors {
+			if rs.Kind == kind && (rs.Name == name || rs.Name == "") {
+				// 找到匹配的策略，返回名称和默认权重
+				defaultWeight := int32(1)
+				if policy.Spec.Placement.ReplicaScheduling != nil && policy.Spec.Placement.ReplicaScheduling.ReplicaDivisionPreference == policyv1alpha1.ReplicaDivisionPreferenceWeighted {
+					// 如果使用加权调度，则取第一个静态权重
+					if len(policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList) > 0 {
+						staticWeight := policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList[0]
+						defaultWeight = int32(staticWeight.Weight)
+						break
+					}
+				}
+				return policy.Name, defaultWeight, nil
+			}
+		}
+	}
+
+	return "", 0, nil
+}
+
+// 在ActualResourceTypeDistribution结构中添加调度策略信息
+type ResourceSchedulingInfo struct {
+	// 资源名称
+	ResourceName string `json:"resourceName"`
+	// 命名空间
+	Namespace string `json:"namespace"`
+	// 调度策略名称
+	PropagationPolicy string `json:"propagationPolicy"`
+	// 调度权重
+	Weight int32 `json:"weight"`
+	// 集群分布情况
+	ClusterDist []v1.ActualClusterDistribution `json:"clusterDist"`
+	// 实际部署总数
+	ActualCount int `json:"actualCount"`
+	// 调度计划总数
+	ScheduledCount int `json:"scheduledCount"`
 }
 
 // GetClusterSchedulePreview 获取集群调度预览信息
@@ -234,16 +314,13 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 
 	// 资源类型统计 - 从绑定中获取的调度信息
 	scheduledResourceMap := make(map[string]map[string]int)
-	// 资源类型和集群间的链接统计 - 从绑定中获取的调度信息
-	scheduledResourceLinks := make(map[string]map[string]int)
-
-	// 实际部署的资源统计
-	actualResourceMap := make(map[string]map[string]int)
-	// 实际部署的资源链接
-	actualResourceLinks := make(map[string]map[string]int)
-
 	// 存储资源类型对应的资源名称
 	resourceTypeToNameMap := make(map[string][]string)
+	// 实际部署的资源统计
+	actualResourceMap := make(map[string]map[string]int)
+
+	// 存储资源详细调度信息
+	resourceSchedulingMap := make(map[string]map[string]*ResourceSchedulingInfo)
 
 	// 收集各资源类型对应的资源名称
 	for _, binding := range resourceBindings.Items {
@@ -294,52 +371,159 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 	// 处理资源绑定 - 获取调度信息
 	for _, binding := range resourceBindings.Items {
 		resourceKind := binding.Spec.Resource.Kind
+		resourceName := binding.Spec.Resource.Name
+		resourceNamespace := binding.Spec.Resource.Namespace
+
+		if resourceName == "" {
+			continue
+		}
 
 		// 将资源添加到类型统计
 		if _, ok := scheduledResourceMap[resourceKind]; !ok {
 			scheduledResourceMap[resourceKind] = make(map[string]int)
 		}
 
-		// 如果链接映射不存在此资源类型，则初始化
-		if _, ok := scheduledResourceLinks[resourceKind]; !ok {
-			scheduledResourceLinks[resourceKind] = make(map[string]int)
+		// 查找匹配的传播策略
+		policyName, weight, _ := findPropagationPolicyForResource(ctx, karmadaClient, resourceNamespace, resourceName, resourceKind)
+
+		// 资源唯一标识符
+		resourceKey := fmt.Sprintf("%s/%s/%s", resourceNamespace, resourceKind, resourceName)
+
+		// 初始化资源类型映射
+		if _, ok := resourceSchedulingMap[resourceKind]; !ok {
+			resourceSchedulingMap[resourceKind] = make(map[string]*ResourceSchedulingInfo)
 		}
 
-		// 为每个集群绑定创建链接
+		// 初始化资源信息
+		if _, ok := resourceSchedulingMap[resourceKind][resourceKey]; !ok {
+			resourceSchedulingMap[resourceKind][resourceKey] = &ResourceSchedulingInfo{
+				ResourceName:      resourceName,
+				Namespace:         resourceNamespace,
+				PropagationPolicy: policyName,
+				Weight:            weight,
+				ClusterDist:       []v1.ActualClusterDistribution{},
+				ActualCount:       0,
+				ScheduledCount:    0,
+			}
+		}
+
+		// 为每个集群绑定记录调度信息
 		for _, cluster := range binding.Spec.Clusters {
 			clusterName := cluster.Name
 
-			// 增加资源类型到特定集群的链接计数
-			scheduledResourceLinks[resourceKind][clusterName]++
-
 			// 增加资源类型统计
 			scheduledResourceMap[resourceKind][clusterName]++
+
+			// 增加调度计数
+			found := false
+			for i, dist := range resourceSchedulingMap[resourceKind][resourceKey].ClusterDist {
+				if dist.ClusterName == clusterName {
+					dist.ScheduledCount++
+					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist[i] = dist
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				// 添加新的集群分布记录
+				resourceSchedulingMap[resourceKind][resourceKey].ClusterDist = append(
+					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist,
+					v1.ActualClusterDistribution{
+						ClusterName:    clusterName,
+						ScheduledCount: 1,
+						ActualCount:    0,
+						Status: v1.ResourceDeploymentStatus{
+							Scheduled:      true,
+							Actual:         false,
+							ScheduledCount: 1,
+							ActualCount:    0,
+						},
+					},
+				)
+			}
+
+			// 增加总调度计数
+			resourceSchedulingMap[resourceKind][resourceKey].ScheduledCount++
 		}
 	}
 
-	// 处理集群资源绑定 - 获取调度信息
+	// 处理集群资源绑定
 	for _, binding := range clusterResourceBindings.Items {
 		resourceKind := binding.Spec.Resource.Kind
+		resourceName := binding.Spec.Resource.Name
+
+		if resourceName == "" {
+			continue
+		}
 
 		// 将资源添加到类型统计
 		if _, ok := scheduledResourceMap[resourceKind]; !ok {
 			scheduledResourceMap[resourceKind] = make(map[string]int)
 		}
 
-		// 如果链接映射不存在此资源类型，则初始化
-		if _, ok := scheduledResourceLinks[resourceKind]; !ok {
-			scheduledResourceLinks[resourceKind] = make(map[string]int)
+		// 查找匹配的传播策略
+		policyName, weight, _ := findPropagationPolicyForResource(ctx, karmadaClient, "", resourceName, resourceKind)
+
+		// 资源唯一标识符 (集群级资源无命名空间)
+		resourceKey := fmt.Sprintf("/%s/%s", resourceKind, resourceName)
+
+		// 初始化资源类型映射
+		if _, ok := resourceSchedulingMap[resourceKind]; !ok {
+			resourceSchedulingMap[resourceKind] = make(map[string]*ResourceSchedulingInfo)
 		}
 
-		// 为每个集群绑定创建链接
+		// 初始化资源信息
+		if _, ok := resourceSchedulingMap[resourceKind][resourceKey]; !ok {
+			resourceSchedulingMap[resourceKind][resourceKey] = &ResourceSchedulingInfo{
+				ResourceName:      resourceName,
+				Namespace:         "",
+				PropagationPolicy: policyName,
+				Weight:            weight,
+				ClusterDist:       []v1.ActualClusterDistribution{},
+				ActualCount:       0,
+				ScheduledCount:    0,
+			}
+		}
+
+		// 为每个集群绑定记录调度信息
 		for _, cluster := range binding.Spec.Clusters {
 			clusterName := cluster.Name
 
-			// 增加资源类型到特定集群的链接计数
-			scheduledResourceLinks[resourceKind][clusterName]++
-
 			// 增加资源类型统计
 			scheduledResourceMap[resourceKind][clusterName]++
+
+			// 增加调度计数
+			found := false
+			for i, dist := range resourceSchedulingMap[resourceKind][resourceKey].ClusterDist {
+				if dist.ClusterName == clusterName {
+					dist.ScheduledCount++
+					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist[i] = dist
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				// 添加新的集群分布记录
+				resourceSchedulingMap[resourceKind][resourceKey].ClusterDist = append(
+					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist,
+					v1.ActualClusterDistribution{
+						ClusterName:    clusterName,
+						ScheduledCount: 1,
+						ActualCount:    0,
+						Status: v1.ResourceDeploymentStatus{
+							Scheduled:      true,
+							Actual:         false,
+							ScheduledCount: 1,
+							ActualCount:    0,
+						},
+					},
+				)
+			}
+
+			// 增加总调度计数
+			resourceSchedulingMap[resourceKind][resourceKey].ScheduledCount++
 		}
 	}
 
@@ -684,12 +868,6 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 						actualResourceMap[resourceKind] = make(map[string]int)
 					}
 					actualResourceMap[resourceKind][c.Name] = count
-
-					// 更新实际资源链接
-					if _, ok := actualResourceLinks[resourceKind]; !ok {
-						actualResourceLinks[resourceKind] = make(map[string]int)
-					}
-					actualResourceLinks[resourceKind][c.Name] = count
 					mu.Unlock()
 				}
 			}
@@ -701,63 +879,76 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 	// 等待所有集群资源收集完成
 	wg.Wait()
 
-	// 合并调度信息和实际部署信息
-	// 只展示Karmada调度的资源，即有ResourceBinding或ClusterResourceBinding记录的资源
-	mergedResourceMap := make(map[string]map[string]int)
-	mergedResourceLinks := make(map[string]map[string]int)
-
-	// 只处理所有调度信息 - 这部分是Karmada调度的资源
-	for resourceKind, clusterMap := range scheduledResourceMap {
-		if _, ok := mergedResourceMap[resourceKind]; !ok {
-			mergedResourceMap[resourceKind] = make(map[string]int)
-		}
-
-		if _, ok := mergedResourceLinks[resourceKind]; !ok {
-			mergedResourceLinks[resourceKind] = make(map[string]int)
+	// 使用wg.Wait()之后，添加实际部署资源到调度信息中
+	// 处理actualResourceMap数据，更新到resourceSchedulingMap中
+	for resourceKind, clusterMap := range actualResourceMap {
+		if _, ok := resourceSchedulingMap[resourceKind]; !ok {
+			continue
 		}
 
 		for clusterName, count := range clusterMap {
-			mergedResourceMap[resourceKind][clusterName] = count
-			mergedResourceLinks[resourceKind][clusterName] = count
-		}
-	}
+			// 更新所有该类型资源的实际部署计数
+			for _, info := range resourceSchedulingMap[resourceKind] {
+				for i, dist := range info.ClusterDist {
+					if dist.ClusterName == clusterName {
+						// 这里简化处理，将实际数量按比例分配给各个资源
+						// 实际应用中可能需要更精确的匹配
+						actualCount := count / len(resourceSchedulingMap[resourceKind])
+						if actualCount < 1 {
+							actualCount = 1
+						}
 
-	// 再用实际部署信息更新，但只更新那些已经有调度信息的资源
-	for resourceKind, clusterMap := range actualResourceMap {
-		// 只有当该资源类型有调度信息时才进行处理
-		if _, exists := scheduledResourceMap[resourceKind]; exists {
-			if _, ok := mergedResourceMap[resourceKind]; !ok {
-				mergedResourceMap[resourceKind] = make(map[string]int)
-			}
-
-			if _, ok := mergedResourceLinks[resourceKind]; !ok {
-				mergedResourceLinks[resourceKind] = make(map[string]int)
-			}
-
-			for clusterName, count := range clusterMap {
-				// 只有当该集群对该资源类型有调度记录时才更新实际部署信息
-				if _, hasBinding := scheduledResourceMap[resourceKind][clusterName]; hasBinding {
-					mergedResourceMap[resourceKind][clusterName] = count
-					mergedResourceLinks[resourceKind][clusterName] = count
+						dist.ActualCount = actualCount
+						dist.Status.Actual = true
+						dist.Status.ActualCount = actualCount
+						info.ClusterDist[i] = dist
+						info.ActualCount += actualCount
+						break
+					}
 				}
 			}
 		}
 	}
 
+	// 添加详细的调度资源信息到响应中
+	detailedResources := make([]v1.ResourceDetailInfo, 0)
+
+	for resourceKind, resourcesMap := range resourceSchedulingMap {
+		for _, info := range resourcesMap {
+			detailedResource := v1.ResourceDetailInfo{
+				ResourceName:        info.ResourceName,
+				ResourceKind:        resourceKind,
+				ResourceGroup:       getResourceGroup(resourceKind),
+				Namespace:           info.Namespace,
+				PropagationPolicy:   info.PropagationPolicy,
+				Weight:              info.Weight,
+				ClusterDist:         info.ClusterDist,
+				TotalScheduledCount: info.ScheduledCount,
+				TotalActualCount:    info.ActualCount,
+			}
+			detailedResources = append(detailedResources, detailedResource)
+		}
+	}
+
+	// 按资源类型和名称排序
+	sort.Slice(detailedResources, func(i, j int) bool {
+		if detailedResources[i].ResourceKind != detailedResources[j].ResourceKind {
+			return detailedResources[i].ResourceKind < detailedResources[j].ResourceKind
+		}
+		return detailedResources[i].ResourceName < detailedResources[j].ResourceName
+	})
+
+	response.DetailedResources = detailedResources
+
 	// 转换资源类型统计为响应格式，并按资源类型排序 - 使用合并后的信息
 	var resourceTypes []string
-	for resourceType := range mergedResourceMap {
+	for resourceType := range scheduledResourceMap {
 		resourceTypes = append(resourceTypes, resourceType)
 	}
 	sort.Strings(resourceTypes)
 
 	for _, resourceType := range resourceTypes {
-		// 只有当该资源类型有调度信息时才进行处理
-		if _, exists := scheduledResourceMap[resourceType]; !exists {
-			continue
-		}
-
-		clusterMap := mergedResourceMap[resourceType]
+		clusterMap := scheduledResourceMap[resourceType]
 		typeDist := v1.ResourceTypeDistribution{
 			ResourceType: resourceType,
 			ClusterDist:  []v1.ClusterDistribution{},
@@ -766,10 +957,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		// 对集群名称进行排序，保证展示顺序一致
 		var clusterNames []string
 		for clusterName := range clusterMap {
-			// 只包含有调度记录的集群
-			if _, hasSchedule := scheduledResourceMap[resourceType][clusterName]; hasSchedule {
-				clusterNames = append(clusterNames, clusterName)
-			}
+			clusterNames = append(clusterNames, clusterName)
 		}
 		sort.Strings(clusterNames)
 
@@ -784,102 +972,59 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		response.ResourceDist = append(response.ResourceDist, typeDist)
 	}
 
-	// 创建链接 - 使用合并后的信息，但只包含有调度记录的资源和集群
-	for resourceKind, clusterMap := range mergedResourceLinks {
-		// 只有当该资源类型有调度信息时才处理
-		if _, exists := scheduledResourceMap[resourceKind]; !exists {
-			continue
+	// 修改链接信息以体现资源流向 - 每个具体资源单独显示
+	// 清空之前的链接
+	response.Links = []v1.ScheduleLink{}
+
+	// 每个资源节点列表 - 使用单独节点而不是资源类型分组
+	resourceNodes := []v1.ScheduleNode{}
+
+	// 为每个具体资源创建单独的节点和链接
+	for _, resource := range detailedResources {
+		// 创建资源唯一ID
+		resourceID := fmt.Sprintf("resource-%s-%s", resource.ResourceKind, resource.ResourceName)
+		if resource.Namespace != "" {
+			resourceID = fmt.Sprintf("resource-%s-%s-%s", resource.Namespace, resource.ResourceKind, resource.ResourceName)
 		}
 
-		for clusterName, count := range clusterMap {
-			// 只包含有调度记录的集群
-			if _, hasSchedule := scheduledResourceMap[resourceKind][clusterName]; hasSchedule {
+		// 创建资源节点
+		resourceNode := v1.ScheduleNode{
+			ID:   resourceID,
+			Name: resource.ResourceName,
+			Type: "resource",
+			ResourceInfo: &v1.ResourceNodeInfo{
+				ResourceKind:      resource.ResourceKind,
+				ResourceGroup:     resource.ResourceGroup,
+				Namespace:         resource.Namespace,
+				PropagationPolicy: resource.PropagationPolicy,
+			},
+		}
+
+		resourceNodes = append(resourceNodes, resourceNode)
+
+		// 从控制平面到资源的链接
+		response.Links = append(response.Links, v1.ScheduleLink{
+			Source: "karmada-control-plane",
+			Target: resourceID,
+			Value:  1, // 控制平面到资源的值为1
+			Type:   resource.ResourceKind,
+		})
+
+		// 从资源到各集群的链接
+		for _, dist := range resource.ClusterDist {
+			if dist.ScheduledCount > 0 {
 				response.Links = append(response.Links, v1.ScheduleLink{
-					Source: "karmada-control-plane",
-					Target: clusterName,
-					Value:  count,
-					Type:   resourceKind,
+					Source: resourceID,
+					Target: dist.ClusterName,
+					Value:  dist.ScheduledCount,
+					Type:   resource.ResourceKind,
 				})
 			}
 		}
 	}
 
-	// 添加实际资源分布信息
-	// 这一部分将同时显示调度计划和实际部署情况
-	actualResourceDist := make([]v1.ActualResourceTypeDistribution, 0)
-
-	// 使用与前面相同的资源类型列表，保持一致性
-	for _, resourceType := range resourceTypes {
-		// 只有当该资源类型有调度信息时才进行处理
-		if _, exists := scheduledResourceMap[resourceType]; !exists {
-			continue
-		}
-
-		dist := v1.ActualResourceTypeDistribution{
-			ResourceType:        resourceType,
-			ResourceGroup:       getResourceGroup(resourceType),
-			ClusterDist:         []v1.ActualClusterDistribution{},
-			TotalScheduledCount: 0,
-			TotalActualCount:    0,
-			ResourceNames:       resourceTypeToNameMap[resourceType],
-		}
-
-		// 排序资源名称列表，使显示更加有序
-		sort.Strings(dist.ResourceNames)
-
-		// 合并调度和实际部署信息
-		scheduledMap := scheduledResourceMap[resourceType]
-		actualMap := actualResourceMap[resourceType]
-
-		// 收集所有相关集群
-		clustersSet := make(map[string]bool)
-		for cluster := range scheduledMap {
-			clustersSet[cluster] = true
-		}
-		// 只收集在scheduledMap中有记录的集群
-		for cluster := range actualMap {
-			if _, hasSchedule := scheduledMap[cluster]; hasSchedule {
-				clustersSet[cluster] = true
-			}
-		}
-
-		// 对集群名称进行排序
-		var clusters []string
-		for cluster := range clustersSet {
-			clusters = append(clusters, cluster)
-		}
-		sort.Strings(clusters)
-
-		// 为每个集群创建分布记录
-		for _, clusterName := range clusters {
-			scheduledCount := scheduledMap[clusterName]
-			actualCount := actualMap[clusterName]
-
-			dist.TotalScheduledCount += scheduledCount
-			dist.TotalActualCount += actualCount
-
-			clusterDist := v1.ActualClusterDistribution{
-				ClusterName:    clusterName,
-				ScheduledCount: scheduledCount,
-				ActualCount:    actualCount,
-				Status: v1.ResourceDeploymentStatus{
-					Scheduled:      scheduledCount > 0,
-					Actual:         actualCount > 0,
-					ScheduledCount: scheduledCount,
-					ActualCount:    actualCount,
-				},
-			}
-			dist.ClusterDist = append(dist.ClusterDist, clusterDist)
-		}
-
-		// 只有当至少有一个调度记录或实际部署记录时，才添加到结果中
-		if dist.TotalScheduledCount > 0 || dist.TotalActualCount > 0 {
-			actualResourceDist = append(actualResourceDist, dist)
-		}
-	}
-
-	// 将实际资源分布添加到响应中
-	response.ActualResourceDist = actualResourceDist
+	// 将资源节点添加到响应中
+	response.Nodes = append(response.Nodes, resourceNodes...)
 
 	// 获取传播策略
 	propagationPolicies, err := karmadaClient.PolicyV1alpha1().PropagationPolicies(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
