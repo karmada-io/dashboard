@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { SchedulePreviewResponse, ResourceDetailInfo, ActualClusterDistribution } from '@/services/overview';
-import { Card, Empty, Spin, Table, Badge, Row, Col, Tooltip, Space, Tag, Progress, Alert, Button, Typography, message } from 'antd';
+import { SchedulePreviewResponse } from '@/services/overview';
+import { Card, Table, Badge, Tooltip, Tag, Button, Typography } from 'antd';
 import i18nInstance from '@/utils/i18n';
-import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import insertCss from 'insert-css';
 import dayjs from 'dayjs';
 import { CheckCircleOutlined, WarningOutlined, SyncOutlined } from '@ant-design/icons';
@@ -66,7 +66,6 @@ export interface SchedulePreviewProps {
   lastUpdatedAt?: number;
   onRefresh?: () => void;
   autoRefresh?: boolean;
-  onToggleAutoRefresh?: () => void;
 }
 
 // 定义资源组类型
@@ -144,8 +143,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
   loading, 
   lastUpdatedAt, 
   onRefresh, 
-  autoRefresh = false, 
-  onToggleAutoRefresh 
+  autoRefresh = false
 }) => {
   // 更新类型记录，用于表格过滤
   type ResourceRecord = {
@@ -471,7 +469,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                             render: (clusterDist, record) => (
                               <div style={{ padding: '4px', textAlign: 'center' }}>
                                 <div className="flex flex-wrap gap-1 justify-center">
-                                  {clusterDist.map((cluster: any, index: number) => (
+                                  {clusterDist.map((cluster: any) => (
                                     <Tooltip
                                       key={`${record.key}-cluster-${cluster.clusterName}`}
                                       title={

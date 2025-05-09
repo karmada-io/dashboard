@@ -16,16 +16,15 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin, Statistic, Tag, Table, Tooltip, Space, Typography, Avatar, Empty, Button, Divider } from 'antd';
+import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin, Statistic, Tag, Table, Tooltip, Space, Typography, Avatar, Empty, Button } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
-import { GetOverview, GetNodeSummary, GetSchedulePreview, GetAllClusterResourcesPreview } from '@/services/overview.ts';
+import { GetOverview, GetNodeSummary, GetSchedulePreview } from '@/services/overview.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Icons } from '@/components/icons';
-import { Pie, Column } from '@ant-design/charts';
-import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, QuestionCircleFilled, SyncOutlined } from '@ant-design/icons';
-import { useMemo, useState, useEffect } from 'react';
+import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, QuestionCircleFilled } from '@ant-design/icons';
+import { useState } from 'react';
 import SchedulePreview from '@/components/schedule-preview';
 import insertCss from 'insert-css';
 
@@ -259,10 +258,10 @@ const Overview = () => {
   const { clusterName } = useParams<{ clusterName: string }>();
   const navigate = useNavigate();
   
-  // 添加刷新状态控制
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  // 添加刷新状态控制 - 由于我们不需要改变这个状态，所以直接设为常量
+  const autoRefresh = true;
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['GetOverview'],
     queryFn: async () => {
       const ret = await GetOverview();
@@ -314,16 +313,7 @@ const Overview = () => {
     refetchScheduleData();
   };
 
-  // 处理自动刷新切换
-  const toggleAutoRefresh = () => {
-    setAutoRefresh(!autoRefresh);
-  };
-
-  // 格式化更新时间
-  const formatLastUpdatedTime = () => {
-    if (!dataUpdatedAt) return i18nInstance.t('fe9d3c42a76af06e21a2279e9d2f0fc9', '暂无数据');
-    return dayjs(dataUpdatedAt).format('YYYY-MM-DD HH:mm:ss');
-  };
+  // 以下是我们将需要展示的组件
 
   const { data: clusterData, isLoading: isClusterLoading } = useQuery({
     queryKey: ['GetClusters', clusterName],
@@ -657,12 +647,14 @@ const Overview = () => {
                     dataIndex: 'status',
                     key: 'status',
                     width: 80,
-                    render: (text: string, record: any) => (
-                      <Badge
-                        key={`status-${record.clusterName}-${record.name}`}
-                        status={record.ready ? 'success' : 'error'}
-                        text={record.ready ? '就绪' : '未就绪'}
-                      />
+                    render: (_, record) => (
+                      <div style={{ padding: '8px', textAlign: 'center' }}>
+                        <Badge
+                          key={`status-${record.clusterName}-${record.name}`}
+                          status={record.ready ? 'success' : 'error'}
+                          text={record.ready ? '就绪' : '未就绪'}
+                        />
+                      </div>
                     ),
                   },
                   {
@@ -676,7 +668,7 @@ const Overview = () => {
                     title: i18nInstance.t('42ccb9730b2948a5dda0a431bcb0eadd', 'CPU负载'),
                     key: 'cpu',
                     width: 140,
-                    render: (text: string, record: any) => (
+                    render: (_, record) => (
                       <div>
                         <div className="flex justify-between" style={{ fontSize: '12px' }}>
                           <span>{record.cpuUsage || 0}/{record.cpuCapacity}</span>
@@ -695,7 +687,7 @@ const Overview = () => {
                     title: i18nInstance.t('4da7a9e0a4129fc7c5a53bf938e17a05', '内存负载'),
                     key: 'memory',
                     width: 140,
-                    render: (text: string, record: any) => (
+                    render: (_, record) => (
                       <div>
                         <div className="flex justify-between" style={{ fontSize: '12px' }}>
                           <span>{Math.round((record.memoryUsage || 0) / 1024 / 1024)}GB/{Math.round(record.memoryCapacity / 1024 / 1024)}GB</span>
@@ -714,7 +706,7 @@ const Overview = () => {
                     title: i18nInstance.t('0e438c6062db435ab4647396b19a4dba', 'Pod状态'),
                     key: 'pod',
                     width: 120,
-                    render: (text: string, record: any) => (
+                    render: (_, record) => (
                       <div>
                         <div className="flex justify-between" style={{ fontSize: '12px' }}>
                           <span>{record.podUsage || 0}/{record.podCapacity}</span>
@@ -758,7 +750,6 @@ const Overview = () => {
           lastUpdatedAt={dataUpdatedAt} 
           onRefresh={handleRefreshScheduleData}
           autoRefresh={autoRefresh}
-          onToggleAutoRefresh={toggleAutoRefresh}
         />
       </div>
     );

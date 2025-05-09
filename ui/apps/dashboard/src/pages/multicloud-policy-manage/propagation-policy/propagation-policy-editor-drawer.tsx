@@ -52,13 +52,14 @@ function getTitle(
   }
 }
 
-const workloadKindDescriptions: Record<string, string> = {
-  deployment: 'Deployment 适用于无状态应用的自动化部署和弹性伸缩，支持滚动升级和回滚。',
-  statefulset: 'StatefulSet 适用于有状态服务，支持有序部署、稳定网络标识和持久化存储。',
-  daemonset: 'DaemonSet 确保每个节点上都运行一个 Pod，常用于日志、监控等场景。',
-  cronjob: 'CronJob 用于定时任务，按计划周期性地运行 Job。',
-  job: 'Job 用于一次性任务，确保任务完成指定次数后自动结束。',
-};
+// 以下变量未使用，注释掉
+/* const workloadKindDescriptions: Record<string, string> = {
+  Deployment: '管理无状态应用的控制器',
+  StatefulSet: '管理有状态应用的控制器',
+  DaemonSet: '确保所有节点运行Pod副本的控制器',
+  Job: '运行一次性任务的控制器',
+  CronJob: '基于时间调度的任务控制器',
+};*/
 
 const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
   props,

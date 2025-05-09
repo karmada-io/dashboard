@@ -21,12 +21,10 @@ import {
   Card,
   Statistic,
   Table,
-  TableColumnProps,
   Typography,
   Row,
   Col,
   Divider,
-  Badge,
   Space,
   Progress,
   Tag,
@@ -35,7 +33,6 @@ import {
 import {
   GetWorkloadDetail,
   GetWorkloadEvents,
-  WorkloadEvent,
 } from '@/services/workload.ts';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
@@ -82,33 +79,6 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
     },
     enabled: enableFetch,
   });
-  const columns: TableColumnProps<WorkloadEvent>[] = [
-    {
-      title: i18nInstance.t('383a6d166f8f60e16e726ccc9c483631', '类别'),
-      key: 'type',
-      dataIndex: 'type',
-    },
-    {
-      title: i18nInstance.t('26ca20b161c33362d88eb0ba0bc90751', '来源'),
-      key: 'sourceComponent',
-      dataIndex: 'sourceComponent',
-    },
-    {
-      title: i18nInstance.t('03663386e7d82f847634a6ee9111a32b', '最后检测时间'),
-      key: 'lastSeen',
-      dataIndex: 'lastSeen',
-    },
-    {
-      title: i18nInstance.t('41dfb0bf6167ca035b93caf3e06d6c95', '原因'),
-      key: 'reason',
-      dataIndex: 'reason',
-    },
-    {
-      title: i18nInstance.t('d8c7e04c8e2be23dd3b81a31db6e04f1', '信息'),
-      key: 'message',
-      dataIndex: 'message',
-    },
-  ];
 
   return (
     <Drawer
@@ -235,7 +205,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
                 value={detailData?.pods?.desired || 0}
                 valueStyle={{ color: '#1677ff' }}
               />
-              {detailData?.pods?.desired > 0 && (
+              {detailData?.pods?.desired !== undefined && detailData.pods.desired > 0 && (
                 <Progress
                   percent={100}
                   showInfo={false}
@@ -253,7 +223,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
                 value={detailData?.pods?.current || 0}
                 valueStyle={{ color: '#52c41a' }}
               />
-              {detailData?.pods?.desired > 0 && (
+              {detailData?.pods?.desired !== undefined && detailData.pods.desired > 0 && (
                 <Progress
                   percent={Math.round((detailData?.pods?.current || 0) / (detailData?.pods?.desired || 1) * 100)}
                   showInfo={false}
@@ -271,7 +241,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
                 value={detailData?.pods?.running || 0}
                 valueStyle={{ color: '#13c2c2' }}
               />
-              {detailData?.pods?.desired > 0 && (
+              {detailData?.pods?.desired !== undefined && detailData.pods.desired > 0 && (
                 <Progress
                   percent={Math.round((detailData?.pods?.running || 0) / (detailData?.pods?.desired || 1) * 100)}
                   showInfo={false}
@@ -289,7 +259,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
                 value={detailData?.statusInfo?.available || 0}
                 valueStyle={{ color: '#fa541c' }}
               />
-              {detailData?.pods?.desired > 0 && (
+              {detailData?.pods?.desired !== undefined && detailData.pods.desired > 0 && (
                 <Progress
                   percent={Math.round((detailData?.statusInfo?.available || 0) / (detailData?.pods?.desired || 1) * 100)}
                   showInfo={false}
@@ -397,7 +367,7 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
                   'Evicted': '被驱逐',
                   'FailedMount': '挂载失败'
                 };
-                return reasonMap[text] || text;
+                return reasonMap[text as keyof typeof reasonMap] || text;
               }
             },
             {
