@@ -138,51 +138,51 @@ const WorkloadDetailDrawer: FC<WorkloadDetailDrawerProps> = (props) => {
       >
         <Row gutter={[24, 16]}>
           <Col span={8}>
-            <Statistic
+          <Statistic
               title={<div className="font-medium">{i18nInstance.t('d7ec2d3fea4756bc1642e0f10c180cf5', '名称')}</div>}
               value={detailData?.objectMeta?.name || '-'}
               valueStyle={{ fontSize: '16px', fontWeight: 'normal' }}
-            />
+          />
           </Col>
           <Col span={8}>
-            <Statistic
+          <Statistic
               title={<div className="font-medium">{i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}</div>}
-              value={detailData?.objectMeta?.namespace || '-'}
-            />
+            value={detailData?.objectMeta?.namespace || '-'}
+          />
           </Col>
           <Col span={8}>
-            <Statistic
+          <Statistic
               title={<div className="font-medium">{i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间')}</div>}
-              value={
-                detailData?.objectMeta?.creationTimestamp
-                  ? dayjs(detailData?.objectMeta?.creationTimestamp).format(
+            value={
+              detailData?.objectMeta?.creationTimestamp
+                ? dayjs(detailData?.objectMeta?.creationTimestamp).format(
                       'YYYY-MM-DD HH:mm:ss',
-                    )
-                  : '-'
-              }
-            />
+                  )
+                : '-'
+            }
+          />
           </Col>
           <Col span={8}>
-            <Statistic
+          <Statistic
               title={<div className="font-medium">{i18nInstance.t('4a6341a8bcc68e0b7120dbc89014b6a2', '持续时间')}</div>}
-              value={calculateDuration(detailData?.objectMeta?.creationTimestamp)}
-            />
+            value={calculateDuration(detailData?.objectMeta?.creationTimestamp)}
+          />
           </Col>
           <Col span={16}>
-            <Statistic
-              className={styles['no-value']}
+          <Statistic
+            className={styles['no-value']}
               title={<div className="font-medium">{i18nInstance.t('70e6882e567e3dbc86df3ef2fb2f65e4', '资源UID')}</div>}
-              prefix={
-                <Typography.Text
-                  ellipsis={{
-                    tooltip: detailData?.objectMeta?.uid || '-',
-                  }}
-                  className={'w-[260px]'}
-                >
-                  {detailData?.objectMeta?.uid || '-'}
-                </Typography.Text>
-              }
-            />
+            prefix={
+              <Typography.Text
+                ellipsis={{
+                  tooltip: detailData?.objectMeta?.uid || '-',
+                }}
+                className={'w-[260px]'}
+              >
+                {detailData?.objectMeta?.uid || '-'}
+              </Typography.Text>
+            }
+          />
           </Col>
         </Row>
 

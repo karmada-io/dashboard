@@ -298,237 +298,237 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
       bodyStyle={{ padding: '10px' }}
     >
       {data && (
-        <div style={{ background: '#f9f9f9', borderRadius: '8px', padding: '12px' }}>
-          <div className="resource-dist-table">
-            <Table
-              dataSource={resourceDistData}
-              pagination={false}
-              size="small"
-              rowKey="key"
-              locale={{ emptyText: i18nInstance.t('b8dd9c5f3fe0e69e4a56a5b11a5f4c87', '暂无资源分布数据') }}
-              style={{ background: '#fff', borderRadius: '8px' }}
-              columns={[
-                {
-                  title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型')}</div>,
-                  dataIndex: 'resourceType',
-                  key: 'resourceType',
-                  width: 150,
-                  align: 'center',
-                  filters: Object.entries(colorScheme.resourceGroups).map(([group]) => ({
-                    text: group,
-                    value: group,
-                    key: `filter-${group}`,
-                  })),
-                  onFilter: (value: any, record: ResourceRecord) => record.resourceGroup === value,
-                  render: (text, record) => (
-                    <div 
-                      style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        gap: '4px',
-                        padding: '8px',
-                        borderLeft: `3px solid ${getResourceColor(text)}`,
-                        alignItems: 'center',
-                        textAlign: 'center'
-                      }}
-                    >
-                      <Badge
-                        color={getResourceColor(text)}
-                        text={<span style={{ fontWeight: 'bold', fontSize: '14px' }}>{text}</span>}
-                      />
-                      <Tag 
-                        color={getGroupColor(record.resourceGroup)} 
-                        style={{ fontSize: '12px', margin: 0 }}
-                      >
-                        {record.resourceGroup}
-                      </Tag>
-                    </div>
-                  ),
-                },
-                {
-                  title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('8a6dff9bbefda5a12ade59faacd9851c', '资源名称')}</div>,
-                  key: 'resourceName',
-                  width: 180,
-                  align: 'center',
-                  render: (_, record) => (
-                    <div style={{ 
-                      padding: '8px',
-                      textAlign: 'center'
-                    }}>
-                      {record.resourceName ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                          <Tag 
-                            color="processing"
-                            style={{ 
-                              margin: 0, 
-                              fontSize: '13px',
-                            }}
-                          >
-                            {record.resourceName}
-                          </Tag>
-                          {record.namespace && (
-                            <Tag 
-                              color="default"
-                              style={{ 
-                                margin: 0, 
-                                fontSize: '12px',
-                              }}
-                            >
+                  <div style={{ background: '#f9f9f9', borderRadius: '8px', padding: '12px' }}>
+                    <div className="resource-dist-table">
+                      <Table
+                        dataSource={resourceDistData}
+                        pagination={false}
+                        size="small"
+                        rowKey="key"
+                        locale={{ emptyText: i18nInstance.t('b8dd9c5f3fe0e69e4a56a5b11a5f4c87', '暂无资源分布数据') }}
+                        style={{ background: '#fff', borderRadius: '8px' }}
+                        columns={[
+                          {
+                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型')}</div>,
+                            dataIndex: 'resourceType',
+                            key: 'resourceType',
+                            width: 150,
+                            align: 'center',
+                            filters: Object.entries(colorScheme.resourceGroups).map(([group]) => ({
+                              text: group,
+                              value: group,
+                              key: `filter-${group}`,
+                            })),
+                            onFilter: (value: any, record: ResourceRecord) => record.resourceGroup === value,
+                            render: (text, record) => (
+                              <div 
+                                style={{ 
+                                  display: 'flex', 
+                                  flexDirection: 'column',
+                                  gap: '4px',
+                                  padding: '8px',
+                                  borderLeft: `3px solid ${getResourceColor(text)}`,
+                                  alignItems: 'center',
+                                  textAlign: 'center'
+                                }}
+                              >
+                                <Badge
+                                  color={getResourceColor(text)}
+                                  text={<span style={{ fontWeight: 'bold', fontSize: '14px' }}>{text}</span>}
+                                />
+                                <Tag 
+                                  color={getGroupColor(record.resourceGroup)} 
+                                  style={{ fontSize: '12px', margin: 0 }}
+                                >
+                                  {record.resourceGroup}
+                                </Tag>
+                              </div>
+                            ),
+                          },
+                          {
+                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('8a6dff9bbefda5a12ade59faacd9851c', '资源名称')}</div>,
+                            key: 'resourceName',
+                            width: 180,
+                            align: 'center',
+                            render: (_, record) => (
+                              <div style={{ 
+                                padding: '8px',
+                                textAlign: 'center'
+                              }}>
+                                {record.resourceName ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                                    <Tag 
+                                      color="processing"
+                                      style={{ 
+                                        margin: 0, 
+                                        fontSize: '13px',
+                                      }}
+                                    >
+                                      {record.resourceName}
+                                    </Tag>
+                                    {record.namespace && (
+                                      <Tag 
+                                        color="default"
+                                        style={{ 
+                                          margin: 0, 
+                                          fontSize: '12px',
+                                        }}
+                                      >
                               {i18nInstance.t('8c669a5e9ad11c4c91ba89ccde1e6167', '名称空间')}：{record.namespace}
-                            </Tag>
-                          )}
-                        </div>
-                      ) : (
-                        <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
-                          暂无资源名称
-                        </Typography.Text>
-                      )}
-                    </div>
-                  ),
-                },
-                {
-                  title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('4b2fe09221d4ca90ee2acd2cc38c892a', '传播策略')}</div>,
-                  key: 'propagationPolicy',
-                  width: 180,
-                  align: 'center',
-                  render: (_, record) => (
-                    <div style={{ 
-                      padding: '8px',
-                      textAlign: 'center'
-                    }}>
-                      {record.propagationPolicy ? (
-                        <Tag 
-                          color="purple"
-                          style={{ 
-                            margin: 0, 
-                            fontSize: '13px',
-                          }}
-                        >
-                          {record.propagationPolicy}
-                        </Tag>
-                      ) : (
-                        <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
-                          暂无传播策略
-                        </Typography.Text>
-                      )}
-                    </div>
-                  ),
-                },
-                {
-                  title: <div style={{ textAlign: 'center' }}>
-                    <Tooltip title="左侧数字表示调度计划数量，右侧数字表示实际部署数量">
-                      {i18nInstance.t('c335768f01be88d098cb26097a5ddce7', '计划/部署')}
-                    </Tooltip>
-                  </div>,
-                  key: 'scheduledAndActual',
-                  width: 150,
-                  align: 'center',
-                  sorter: (a: ResourceRecord, b: ResourceRecord) => a.scheduledCount - b.scheduledCount,
-                  render: (_, record) => (
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        background: '#f5f5f5',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        gap: '6px'
-                      }}>
-                        <span style={{ 
-                          fontWeight: 'bold', 
-                          color: '#fff',
-                          backgroundColor: '#1890ff',
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          fontSize: '14px',
-                        }}>
-                          {record.scheduledCount}
-                        </span>
-                        <span style={{ color: '#999', fontSize: '14px' }}>/</span>
-                        <span style={{ 
-                          fontWeight: 'bold', 
-                          color: '#fff',
-                          backgroundColor: record.scheduledCount === record.actualTotalCount 
-                            ? '#52c41a' // 绿色表示一致
-                            : record.scheduledCount < record.actualTotalCount 
-                              ? '#722ed1' // 紫色表示实际多于计划
-                              : '#f5222d', // 红色表示实际少于计划
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          fontSize: '14px',
-                        }}>
-                          {record.actualTotalCount}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                },
-                {
-                  title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('5e2f637c8c3bc68437b8209e6df87ad9', '集群分布')}</div>,
-                  dataIndex: 'clusterDist',
-                  key: 'clusterDist',
-                  align: 'center',
-                  render: (clusterDist, record) => (
-                    <div style={{ padding: '4px', textAlign: 'center' }}>
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        {clusterDist.map((cluster: any, index: number) => (
-                          <Tooltip
-                            key={`${record.key}-cluster-${cluster.clusterName}`}
-                            title={
-                              <div>
-                                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{cluster.clusterName}</div>
-                                <div>调度计划: {cluster.scheduledCount}</div>
-                                <div>实际部署: {cluster.actualCount}</div>
-                                <div>
-                                  差异: 
+                                      </Tag>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+                                    暂无资源名称
+                                  </Typography.Text>
+                                )}
+                              </div>
+                            ),
+                          },
+                          {
+                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('4b2fe09221d4ca90ee2acd2cc38c892a', '传播策略')}</div>,
+                            key: 'propagationPolicy',
+                            width: 180,
+                            align: 'center',
+                            render: (_, record) => (
+                              <div style={{ 
+                                padding: '8px',
+                                textAlign: 'center'
+                              }}>
+                                {record.propagationPolicy ? (
+                                  <Tag 
+                                    color="purple"
+                                    style={{ 
+                                      margin: 0, 
+                                      fontSize: '13px',
+                                    }}
+                                  >
+                                    {record.propagationPolicy}
+                                  </Tag>
+                                ) : (
+                                  <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+                                    暂无传播策略
+                                  </Typography.Text>
+                                )}
+                              </div>
+                            ),
+                          },
+                          {
+                            title: <div style={{ textAlign: 'center' }}>
+                              <Tooltip title="左侧数字表示调度计划数量，右侧数字表示实际部署数量">
+                                {i18nInstance.t('c335768f01be88d098cb26097a5ddce7', '计划/部署')}
+                              </Tooltip>
+                            </div>,
+                            key: 'scheduledAndActual',
+                            width: 150,
+                            align: 'center',
+                            sorter: (a: ResourceRecord, b: ResourceRecord) => a.scheduledCount - b.scheduledCount,
+                            render: (_, record) => (
+                              <div style={{ textAlign: 'center' }}>
+                                <div style={{ 
+                                  display: 'inline-flex', 
+                                  alignItems: 'center', 
+                                  background: '#f5f5f5',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  gap: '6px'
+                                }}>
                                   <span style={{ 
-                                    color: cluster.difference > 0 ? '#52c41a' : 
-                                            cluster.difference < 0 ? '#f5222d' : '#666',
-                                    fontWeight: 'bold',
-                                    marginLeft: '4px'
+                                    fontWeight: 'bold', 
+                                    color: '#fff',
+                                    backgroundColor: '#1890ff',
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                    fontSize: '14px',
                                   }}>
-                                    {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}
+                                    {record.scheduledCount}
+                                  </span>
+                                  <span style={{ color: '#999', fontSize: '14px' }}>/</span>
+                                  <span style={{ 
+                                    fontWeight: 'bold', 
+                                    color: '#fff',
+                                    backgroundColor: record.scheduledCount === record.actualTotalCount 
+                                      ? '#52c41a' // 绿色表示一致
+                                      : record.scheduledCount < record.actualTotalCount 
+                                        ? '#722ed1' // 紫色表示实际多于计划
+                                        : '#f5222d', // 红色表示实际少于计划
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                    fontSize: '14px',
+                                  }}>
+                                    {record.actualTotalCount}
                                   </span>
                                 </div>
                               </div>
-                            }
-                          >
-                            <Tag
-                              style={{ 
-                                margin: '2px',
-                                borderColor: cluster.isConsistent ? '#52c41a' : '#f5222d',
-                                background: cluster.isConsistent ? '#f6ffed' : '#fff2f0',
-                                fontSize: '13px'
-                              }}
-                              icon={cluster.isConsistent ? <CheckCircleOutlined /> : <WarningOutlined />}
-                            >
-                              {cluster.clusterName}
-                              {cluster.weight !== undefined && (
-                                <span style={{ margin: '0 3px', color: '#1890ff', fontWeight: 'bold' }}>
-                                  权重:{cluster.weight}
-                                </span>
-                              )}
-                              <span style={{
-                                color: '#fff',
-                                background: cluster.isConsistent ? '#52c41a' : '#f5222d',
-                                padding: '0 3px',
-                                borderRadius: '10px',
-                                fontSize: '11px',
-                                marginLeft: '2px'
-                              }}>
-                                {cluster.scheduledCount}/{cluster.actualCount}
-                              </span>
-                            </Tag>
-                          </Tooltip>
-                        ))}
-                      </div>
+                            )
+                          },
+                          {
+                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('5e2f637c8c3bc68437b8209e6df87ad9', '集群分布')}</div>,
+                            dataIndex: 'clusterDist',
+                            key: 'clusterDist',
+                            align: 'center',
+                            render: (clusterDist, record) => (
+                              <div style={{ padding: '4px', textAlign: 'center' }}>
+                                <div className="flex flex-wrap gap-1 justify-center">
+                                  {clusterDist.map((cluster: any, index: number) => (
+                                    <Tooltip
+                                      key={`${record.key}-cluster-${cluster.clusterName}`}
+                                      title={
+                                        <div>
+                                          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{cluster.clusterName}</div>
+                                          <div>调度计划: {cluster.scheduledCount}</div>
+                                          <div>实际部署: {cluster.actualCount}</div>
+                                          <div>
+                                            差异: 
+                                            <span style={{ 
+                                              color: cluster.difference > 0 ? '#52c41a' : 
+                                                      cluster.difference < 0 ? '#f5222d' : '#666',
+                                              fontWeight: 'bold',
+                                              marginLeft: '4px'
+                                            }}>
+                                              {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      }
+                                    >
+                                      <Tag
+                                        style={{ 
+                                          margin: '2px',
+                                          borderColor: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                                          background: cluster.isConsistent ? '#f6ffed' : '#fff2f0',
+                                          fontSize: '13px'
+                                        }}
+                                        icon={cluster.isConsistent ? <CheckCircleOutlined /> : <WarningOutlined />}
+                                      >
+                                        {cluster.clusterName}
+                                        {cluster.weight !== undefined && (
+                                          <span style={{ margin: '0 3px', color: '#1890ff', fontWeight: 'bold' }}>
+                                            权重:{cluster.weight}
+                                          </span>
+                                        )}
+                                        <span style={{
+                                          color: '#fff',
+                                          background: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                                          padding: '0 3px',
+                                          borderRadius: '10px',
+                                          fontSize: '11px',
+                                          marginLeft: '2px'
+                                        }}>
+                                          {cluster.scheduledCount}/{cluster.actualCount}
+                                        </span>
+                                      </Tag>
+                                    </Tooltip>
+                                  ))}
+                                </div>
+                              </div>
+                            ),
+                          },
+                        ]}
+                      />
                     </div>
-                  ),
-                },
-              ]}
-            />
-          </div>
-        </div>
+                  </div>
       )}
     </Card>
   );
