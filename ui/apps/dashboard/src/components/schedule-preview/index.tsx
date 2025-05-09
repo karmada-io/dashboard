@@ -33,10 +33,16 @@ insertCss(`
   .ant-table-thead > tr > th {
     background-color: #f0f0f0 !important;
     font-weight: bold;
+    text-align: center !important;
   }
   .ant-table {
     border-radius: 8px;
     overflow: hidden;
+  }
+  
+  /* 强制所有列内容居中 */
+  .ant-table-tbody > tr > td {
+    text-align: center !important;
   }
   
   /* 卡片彩色边框样式 - 简洁版 */
@@ -227,8 +233,11 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
         };
       });
       
+      // 为每个资源生成唯一键，确保多传播策略情况下能正确显示
+      const uniqueKey = `${item.resourceKind}-${item.resourceName}-${item.namespace || ''}-${item.propagationPolicy || ''}`;
+      
       return {
-        key: `${item.resourceKind}-${item.resourceName}`,
+        key: uniqueKey,
         resourceType: item.resourceKind,
         resourceGroup: getResourceGroup(item.resourceKind),
         resourceName: item.resourceName,
@@ -255,6 +264,29 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
   useEffect(() => {
     if (data) {
       console.log('调度数据已加载:', data);
+      
+      // 针对详细资源信息进行调试
+      if (data.detailedResources && data.detailedResources.length > 0) {
+        console.log('详细资源数据:', data.detailedResources);
+        
+        // 检查是否存在多个传播策略应用到同一资源的情况
+        const resourceMap = new Map();
+        data.detailedResources.forEach(resource => {
+          const key = `${resource.resourceKind}-${resource.resourceName}`;
+          if (!resourceMap.has(key)) {
+            resourceMap.set(key, []);
+          }
+          resourceMap.get(key).push(resource);
+        });
+        
+        // 找出应用了多个传播策略的资源
+        const multiPolicyResources = Array.from(resourceMap.entries())
+          .filter(([_, resources]) => resources.length > 1);
+        
+        if (multiPolicyResources.length > 0) {
+          console.log('发现多传播策略资源:', multiPolicyResources);
+        }
+      }
     }
   }, [data]);
 
@@ -325,7 +357,6 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
             size="small"
             tabBarStyle={{ marginBottom: '8px' }}
             className="schedule-preview-tabs"
-            defaultActiveKey="resourceDist"
             items={[
               {
                 key: 'resourceDist',
@@ -449,7 +480,11 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                             ),
                           },
                           {
-                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('c335768f01be88d098cb26097a5ddce7', '计划/部署')}</div>,
+                            title: <div style={{ textAlign: 'center' }}>
+                              <Tooltip title="左侧数字表示调度计划数量，右侧数字表示实际部署数量">
+                                {i18nInstance.t('c335768f01be88d098cb26097a5ddce7', '计划/部署')}
+                              </Tooltip>
+                            </div>,
                             key: 'scheduledAndActual',
                             width: 150,
                             align: 'center',
@@ -503,7 +538,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                 <div className="flex flex-wrap gap-1 justify-center">
                                   {clusterDist.map((cluster: any, index: number) => (
                                     <Tooltip
-                                      key={`cluster-tooltip-${cluster.clusterName}-${index}`}
+                                      key={`${record.key}-cluster-${cluster.clusterName}`}
                                       title={
                                         <div>
                                           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{cluster.clusterName}</div>
@@ -534,7 +569,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                       >
                                         {cluster.clusterName}
                                         {cluster.weight !== undefined && (
-                                          <span style={{ margin: '0 3px', color: '#1890ff' }}>
+                                          <span style={{ margin: '0 3px', color: '#1890ff', fontWeight: 'bold' }}>
                                             权重:{cluster.weight}
                                           </span>
                                         )}
@@ -546,7 +581,7 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
                                           fontSize: '11px',
                                           marginLeft: '2px'
                                         }}>
-                                          {cluster.actualCount}/{cluster.scheduledCount}
+                                          {cluster.scheduledCount}/{cluster.actualCount}
                                         </span>
                                       </Tag>
                                     </Tooltip>

@@ -685,107 +685,128 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 							}
 						}
 
-						// 构建标签选择器来查找属于该Deployment的Pod
-						// 典型的Pod会有app标签或app.kubernetes.io/name标签匹配Deployment名称
-						labelSelectors := []string{
-							fmt.Sprintf("app=%s", deployName),
-							fmt.Sprintf("app.kubernetes.io/name=%s", deployName),
+						// 获取Deployment的Pod selector
+						var podSelector map[string]string
+						selectorObj, found, _ := unstructured.NestedMap(deployment.Object, "spec", "selector", "matchLabels")
+						if found && selectorObj != nil {
+							podSelector = make(map[string]string)
+							for k, v := range selectorObj {
+								if strVal, ok := v.(string); ok {
+									podSelector[k] = strVal
+								}
+							}
+						} else {
+							// 如果没有找到matchLabels，使用默认的app标签
+							podSelector = map[string]string{"app": deployName}
 						}
 
-						// 尝试从deployment中获取标签选择器
-						var matchLabels map[string]interface{}
-
-						// 提取selector.matchLabels
-						deployLabels, _, _ = unstructured.NestedMap(deployment.Object, "spec", "selector", "matchLabels")
-						if deployLabels != nil {
-							matchLabels = deployLabels
-						}
-
+						// 记录原始Deployment的UniqKey，用于后面关联Pod数量
+						deploymentUID := fmt.Sprintf("%s/%s/%s", deployNamespace, resourceKind, deployName)
 						deployPodCount := 0
 
-						// 使用标签选择器尝试获取属于该Deployment的Pod
-						for _, labelSelector := range labelSelectors {
+						// 构建实际的标签选择器字符串
+						labelSelector := ""
+						for key, value := range podSelector {
+							if labelSelector != "" {
+								labelSelector += ","
+							}
+							labelSelector += fmt.Sprintf("%s=%s", key, value)
+						}
+
+						// 只计算匹配标签的Pod
+						if labelSelector != "" {
 							podListOptions := metav1.ListOptions{
 								LabelSelector: labelSelector,
 							}
 
 							// 在Deployment所在的命名空间中查找Pod
 							namespacePodList, err := dynamicClient.Resource(supportedResources["Pod"]).Namespace(deployNamespace).List(ctx, podListOptions)
-							if err != nil {
-								klog.ErrorS(err, "Failed to list pods with selector", "cluster", c.Name, "selector", labelSelector)
-								continue
-							}
-
-							// 统计运行中的Pod
-							for _, pod := range namespacePodList.Items {
-								podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
-								if !found || err != nil {
-									continue
+							if err == nil && namespacePodList != nil {
+								// 获取运行中的Pod数量
+								for _, pod := range namespacePodList.Items {
+									podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
+									if found && err == nil && podStatus == "Running" {
+										deployPodCount++
+									}
 								}
-
-								// 只计算Running状态的Pod
-								if podStatus == "Running" {
-									deployPodCount++
-								}
-							}
-
-							// 如果找到了Pod，则不再继续尝试其他选择器
-							if deployPodCount > 0 {
-								break
+								klog.V(3).Infof("集群[%s] Deployment[%s/%s] 匹配选择器[%s]的Pod数量: %d",
+									c.Name, deployNamespace, deployName, labelSelector, deployPodCount)
+							} else if err != nil {
+								klog.Warningf("获取集群[%s]命名空间[%s]中Pod失败: %v", c.Name, deployNamespace, err)
 							}
 						}
 
-						// 如果通过常见标签选择器没有找到Pod，且我们有matchLabels，尝试直接使用matchLabels
-						if deployPodCount == 0 && matchLabels != nil {
-							// 构建标签选择器字符串
-							labelSelector := ""
-							for key, value := range matchLabels {
-								if strValue, ok := value.(string); ok {
-									if labelSelector != "" {
-										labelSelector += ","
-									}
-									labelSelector += fmt.Sprintf("%s=%s", key, strValue)
-								}
+						// 如果通过标签选择器没找到Pod，尝试使用常见标签模式
+						if deployPodCount == 0 {
+							// 记录找到Pod的选择器，便于调试
+							foundSelector := ""
+							// 尝试其他常见的标签格式
+							commonLabelSelectors := []string{
+								fmt.Sprintf("app=%s", deployName),
+								fmt.Sprintf("app.kubernetes.io/name=%s", deployName),
+								fmt.Sprintf("k8s-app=%s", deployName),
 							}
 
-							if labelSelector != "" {
+							for _, commonSelector := range commonLabelSelectors {
 								podListOptions := metav1.ListOptions{
-									LabelSelector: labelSelector,
+									LabelSelector: commonSelector,
 								}
 
 								namespacePodList, err := dynamicClient.Resource(supportedResources["Pod"]).Namespace(deployNamespace).List(ctx, podListOptions)
 								if err != nil {
-									klog.ErrorS(err, "Failed to list pods with matchLabels", "cluster", c.Name, "selector", labelSelector)
-								} else {
-									// 统计运行中的Pod
-									for _, pod := range namespacePodList.Items {
-										podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
-										if !found || err != nil {
-											continue
-										}
+									continue
+								}
 
-										// 只计算Running状态的Pod
-										if podStatus == "Running" {
-											deployPodCount++
-										}
+								// 统计运行中的Pod
+								commonPodCount := 0
+								for _, pod := range namespacePodList.Items {
+									podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
+									if found && err == nil && podStatus == "Running" {
+										commonPodCount++
 									}
 								}
+
+								// 如果找到了Pod，使用这个计数并退出循环
+								if commonPodCount > 0 {
+									deployPodCount = commonPodCount
+									foundSelector = commonSelector
+									break
+								}
+							}
+
+							if deployPodCount > 0 {
+								klog.V(3).Infof("集群[%s] Deployment[%s/%s] 使用二次尝试选择器[%s]找到Pod数量: %d",
+									c.Name, deployNamespace, deployName, foundSelector, deployPodCount)
+							}
+						}
+
+						// 如果计数仍然为0，可能需要获取Deployment的replicas值作为参考
+						if deployPodCount == 0 {
+							replicas, found, _ := unstructured.NestedInt64(deployment.Object, "spec", "replicas")
+							if found && replicas > 0 {
+								deployPodCount = int(replicas)
+								klog.V(3).Infof("集群[%s] Deployment[%s/%s] 未找到Pod，使用replicas值: %d",
+									c.Name, deployNamespace, deployName, deployPodCount)
 							}
 						}
 
 						// 记录该Deployment的Pod数量
-						klog.V(4).Infof("Cluster %s, Deployment %s/%s has %d running karmada-managed pods",
+						klog.V(3).Infof("最终统计: 集群[%s], Deployment[%s/%s]的运行Pod数: %d",
 							c.Name, deployNamespace, deployName, deployPodCount)
 
-						// 累加Pod数量
+						// 保存精确的Pod计数
+						mu.Lock()
+						if _, ok := actualResourceMap[resourceKind]; !ok {
+							actualResourceMap[resourceKind] = make(map[string]int)
+						}
+						// 存储每个具体Deployment的Pod计数，使用包含命名空间和名称的唯一标识符
+						actualResourceMap[resourceKind][fmt.Sprintf("%s:%s", c.Name, deploymentUID)] = deployPodCount
+						mu.Unlock()
+
+						// 累加Pod数量到总数
 						totalPodCount += deployPodCount
 					}
 
-					// 如果找到了运行中的Pod，使用Pod总数作为实际部署数量
-					if totalPodCount > 0 {
-						klog.Infof("Cluster %s has total %d running pods for all deployments", c.Name, totalPodCount)
-						count = totalPodCount
-					}
 				} else if resourceKind != "Deployment" {
 					// 对于非Deployment资源，检查是否为Karmada管理的资源
 					validatedCount := 0
@@ -899,26 +920,71 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 			continue
 		}
 
-		for clusterName, count := range clusterMap {
-			// 更新所有该类型资源的实际部署计数
-			for _, info := range resourceSchedulingMap[resourceKind] {
-				for i, dist := range info.ClusterDist {
-					if dist.ClusterName == clusterName {
-						// 这里简化处理，将实际数量按比例分配给各个资源
-						// 实际应用中可能需要更精确的匹配
-						actualCount := count / len(resourceSchedulingMap[resourceKind])
-						if actualCount < 1 {
-							actualCount = 1
+		// 遍历所有集群上报的实际Pod计数
+		for clusterResourceKey, count := range clusterMap {
+			// 解析clusterResourceKey，判断是否是具体资源的计数(格式为"集群名:命名空间/类型/名称")
+			parts := strings.Split(clusterResourceKey, ":")
+			if len(parts) == 2 {
+				clusterName := parts[0]
+				resourceKey := parts[1]
+
+				// 从resourceKey中提取资源信息(namespace/kind/name)
+				keyParts := strings.SplitN(resourceKey, "/", 3)
+				if len(keyParts) >= 3 {
+					namespace := keyParts[0]
+					name := keyParts[2]
+
+					// 查找对应的资源信息
+					resourceFound := false
+
+					// 构建查找键
+					lookupKey := fmt.Sprintf("%s/%s/%s", namespace, resourceKind, name)
+					if namespace == "" {
+						lookupKey = fmt.Sprintf("/%s/%s", resourceKind, name)
+					}
+
+					if resourceInfo, exists := resourceSchedulingMap[resourceKind][lookupKey]; exists {
+						// 找到对应资源
+						resourceFound = true
+
+						// 更新集群分布中的实际部署计数
+						clusterFound := false
+						for i, dist := range resourceInfo.ClusterDist {
+							if dist.ClusterName == clusterName {
+								clusterFound = true
+								// 更新实际部署数量
+								dist.ActualCount = count
+								dist.Status.Actual = true
+								dist.Status.ActualCount = count
+								resourceInfo.ClusterDist[i] = dist
+
+								// 记录日志以便调试
+								klog.V(3).Infof("更新资源[%s]在集群[%s]的实际部署数: %d (计划数: %d)",
+									lookupKey, clusterName, count, dist.ScheduledCount)
+								break
+							}
 						}
 
-						dist.ActualCount = actualCount
-						dist.Status.Actual = true
-						dist.Status.ActualCount = actualCount
-						info.ClusterDist[i] = dist
-						info.ActualCount += actualCount
-						break
+						if !clusterFound {
+							klog.V(3).Infof("资源[%s]没有集群[%s]的分布记录，跳过更新", lookupKey, clusterName)
+						}
+
+						// 重新计算资源总实际部署数
+						resourceInfo.ActualCount = 0
+						for _, dist := range resourceInfo.ClusterDist {
+							resourceInfo.ActualCount += dist.ActualCount
+						}
 					}
+
+					if !resourceFound {
+						klog.V(3).Infof("未找到资源记录[%s]，无法更新实际部署数", lookupKey)
+					}
+				} else {
+					klog.V(3).Infof("资源键[%s]格式错误，无法解析", resourceKey)
 				}
+			} else {
+				// 这是集群级别的计数(旧版格式)，不再使用这种简化处理
+				klog.V(3).Infof("跳过旧格式的集群级计数: %s = %d", clusterResourceKey, count)
 			}
 		}
 	}
@@ -1193,8 +1259,6 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 
 	// 实际部署的资源统计
 	actualResourceMap := make(map[string]map[string]int)
-	// 实际部署的资源链接
-	actualResourceLinks := make(map[string]map[string]int)
 
 	// 存储资源类型对应的资源名称
 	resourceTypeToNameMap := make(map[string][]string)
@@ -1442,107 +1506,128 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 							}
 						}
 
-						// 构建标签选择器来查找属于该Deployment的Pod
-						// 典型的Pod会有app标签或app.kubernetes.io/name标签匹配Deployment名称
-						labelSelectors := []string{
-							fmt.Sprintf("app=%s", deployName),
-							fmt.Sprintf("app.kubernetes.io/name=%s", deployName),
+						// 获取Deployment的Pod selector
+						var podSelector map[string]string
+						selectorObj, found, _ := unstructured.NestedMap(deployment.Object, "spec", "selector", "matchLabels")
+						if found && selectorObj != nil {
+							podSelector = make(map[string]string)
+							for k, v := range selectorObj {
+								if strVal, ok := v.(string); ok {
+									podSelector[k] = strVal
+								}
+							}
+						} else {
+							// 如果没有找到matchLabels，使用默认的app标签
+							podSelector = map[string]string{"app": deployName}
 						}
 
-						// 尝试从deployment中获取标签选择器
-						var matchLabels map[string]interface{}
-
-						// 提取selector.matchLabels
-						deployLabels, _, _ = unstructured.NestedMap(deployment.Object, "spec", "selector", "matchLabels")
-						if deployLabels != nil {
-							matchLabels = deployLabels
-						}
-
+						// 记录原始Deployment的UniqKey，用于后面关联Pod数量
+						deploymentUID := fmt.Sprintf("%s/%s/%s", deployNamespace, resourceKind, deployName)
 						deployPodCount := 0
 
-						// 使用标签选择器尝试获取属于该Deployment的Pod
-						for _, labelSelector := range labelSelectors {
+						// 构建实际的标签选择器字符串
+						labelSelector := ""
+						for key, value := range podSelector {
+							if labelSelector != "" {
+								labelSelector += ","
+							}
+							labelSelector += fmt.Sprintf("%s=%s", key, value)
+						}
+
+						// 只计算匹配标签的Pod
+						if labelSelector != "" {
 							podListOptions := metav1.ListOptions{
 								LabelSelector: labelSelector,
 							}
 
 							// 在Deployment所在的命名空间中查找Pod
 							namespacePodList, err := dynamicClient.Resource(supportedResources["Pod"]).Namespace(deployNamespace).List(ctx, podListOptions)
-							if err != nil {
-								klog.ErrorS(err, "Failed to list pods with selector", "cluster", c.Name, "selector", labelSelector)
-								continue
-							}
-
-							// 统计运行中的Pod
-							for _, pod := range namespacePodList.Items {
-								podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
-								if !found || err != nil {
-									continue
+							if err == nil && namespacePodList != nil {
+								// 获取运行中的Pod数量
+								for _, pod := range namespacePodList.Items {
+									podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
+									if found && err == nil && podStatus == "Running" {
+										deployPodCount++
+									}
 								}
-
-								// 只计算Running状态的Pod
-								if podStatus == "Running" {
-									deployPodCount++
-								}
-							}
-
-							// 如果找到了Pod，则不再继续尝试其他选择器
-							if deployPodCount > 0 {
-								break
+								klog.V(3).Infof("集群[%s] Deployment[%s/%s] 匹配选择器[%s]的Pod数量: %d",
+									c.Name, deployNamespace, deployName, labelSelector, deployPodCount)
+							} else if err != nil {
+								klog.Warningf("获取集群[%s]命名空间[%s]中Pod失败: %v", c.Name, deployNamespace, err)
 							}
 						}
 
-						// 如果通过常见标签选择器没有找到Pod，且我们有matchLabels，尝试直接使用matchLabels
-						if deployPodCount == 0 && matchLabels != nil {
-							// 构建标签选择器字符串
-							labelSelector := ""
-							for key, value := range matchLabels {
-								if strValue, ok := value.(string); ok {
-									if labelSelector != "" {
-										labelSelector += ","
-									}
-									labelSelector += fmt.Sprintf("%s=%s", key, strValue)
-								}
+						// 如果通过标签选择器没找到Pod，尝试使用常见标签模式
+						if deployPodCount == 0 {
+							// 记录找到Pod的选择器，便于调试
+							foundSelector := ""
+							// 尝试其他常见的标签格式
+							commonLabelSelectors := []string{
+								fmt.Sprintf("app=%s", deployName),
+								fmt.Sprintf("app.kubernetes.io/name=%s", deployName),
+								fmt.Sprintf("k8s-app=%s", deployName),
 							}
 
-							if labelSelector != "" {
+							for _, commonSelector := range commonLabelSelectors {
 								podListOptions := metav1.ListOptions{
-									LabelSelector: labelSelector,
+									LabelSelector: commonSelector,
 								}
 
 								namespacePodList, err := dynamicClient.Resource(supportedResources["Pod"]).Namespace(deployNamespace).List(ctx, podListOptions)
 								if err != nil {
-									klog.ErrorS(err, "Failed to list pods with matchLabels", "cluster", c.Name, "selector", labelSelector)
-								} else {
-									// 统计运行中的Pod
-									for _, pod := range namespacePodList.Items {
-										podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
-										if !found || err != nil {
-											continue
-										}
+									continue
+								}
 
-										// 只计算Running状态的Pod
-										if podStatus == "Running" {
-											deployPodCount++
-										}
+								// 统计运行中的Pod
+								commonPodCount := 0
+								for _, pod := range namespacePodList.Items {
+									podStatus, found, err := unstructured.NestedString(pod.Object, "status", "phase")
+									if found && err == nil && podStatus == "Running" {
+										commonPodCount++
 									}
 								}
+
+								// 如果找到了Pod，使用这个计数并退出循环
+								if commonPodCount > 0 {
+									deployPodCount = commonPodCount
+									foundSelector = commonSelector
+									break
+								}
+							}
+
+							if deployPodCount > 0 {
+								klog.V(3).Infof("集群[%s] Deployment[%s/%s] 使用二次尝试选择器[%s]找到Pod数量: %d",
+									c.Name, deployNamespace, deployName, foundSelector, deployPodCount)
+							}
+						}
+
+						// 如果计数仍然为0，可能需要获取Deployment的replicas值作为参考
+						if deployPodCount == 0 {
+							replicas, found, _ := unstructured.NestedInt64(deployment.Object, "spec", "replicas")
+							if found && replicas > 0 {
+								deployPodCount = int(replicas)
+								klog.V(3).Infof("集群[%s] Deployment[%s/%s] 未找到Pod，使用replicas值: %d",
+									c.Name, deployNamespace, deployName, deployPodCount)
 							}
 						}
 
 						// 记录该Deployment的Pod数量
-						klog.V(4).Infof("Cluster %s, Deployment %s/%s has %d running karmada-managed pods",
+						klog.V(3).Infof("最终统计: 集群[%s], Deployment[%s/%s]的运行Pod数: %d",
 							c.Name, deployNamespace, deployName, deployPodCount)
 
-						// 累加Pod数量
+						// 保存精确的Pod计数
+						mu.Lock()
+						if _, ok := actualResourceMap[resourceKind]; !ok {
+							actualResourceMap[resourceKind] = make(map[string]int)
+						}
+						// 存储每个具体Deployment的Pod计数，使用包含命名空间和名称的唯一标识符
+						actualResourceMap[resourceKind][fmt.Sprintf("%s:%s", c.Name, deploymentUID)] = deployPodCount
+						mu.Unlock()
+
+						// 累加Pod数量到总数
 						totalPodCount += deployPodCount
 					}
 
-					// 如果找到了运行中的Pod，使用Pod总数作为实际部署数量
-					if totalPodCount > 0 {
-						klog.Infof("Cluster %s has total %d running pods for all deployments", c.Name, totalPodCount)
-						count = totalPodCount
-					}
 				} else if resourceKind != "Deployment" {
 					// 对于非Deployment资源，检查是否为Karmada管理的资源
 					validatedCount := 0
@@ -1638,12 +1723,6 @@ func GetAllClusterResourcesPreview() (*v1.SchedulePreviewResponse, error) {
 						actualResourceMap[resourceKind] = make(map[string]int)
 					}
 					actualResourceMap[resourceKind][c.Name] = count
-
-					// 更新实际资源链接
-					if _, ok := actualResourceLinks[resourceKind]; !ok {
-						actualResourceLinks[resourceKind] = make(map[string]int)
-					}
-					actualResourceLinks[resourceKind][c.Name] = count
 					mu.Unlock()
 				}
 			}
