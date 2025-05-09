@@ -228,6 +228,19 @@ export interface ScheduleSummary {
   totalResourceBinding: number;
 }
 
+export interface ResourceDetailInfo {
+  resourceName: string;
+  resourceKind: string;
+  resourceGroup: string;
+  namespace: string;
+  propagationPolicy: string;
+  weight: number;
+  clusterWeights: Record<string, number>;
+  clusterDist: ActualClusterDistribution[];
+  totalScheduledCount: number;
+  totalActualCount: number;
+}
+
 export interface SchedulePreviewResponse {
   nodes: ScheduleNode[];
   links: ScheduleLink[];
@@ -235,6 +248,8 @@ export interface SchedulePreviewResponse {
   summary: ScheduleSummary;
   // 添加实际资源分布信息字段
   actualResourceDist?: ActualResourceTypeDistribution[];
+  // 添加详细资源信息字段
+  detailedResources?: ResourceDetailInfo[];
 }
 
 // 获取集群调度预览信息
