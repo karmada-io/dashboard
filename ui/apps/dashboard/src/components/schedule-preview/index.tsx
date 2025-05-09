@@ -52,16 +52,6 @@ insertCss(`
     overflow: hidden;
   }
   
-  /* 统计卡片样式 - 更简洁的布局 */
-  .statistic-card-clusters, .statistic-card-policy, .statistic-card-binding {
-    border: none !important;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    background-color: #f8f8f8;
-    height: 70px;
-  }
-  
   /* 资源分布表格样式 - 简洁版 */
   .resource-dist-table {
     border: 1px solid #ddd !important;
@@ -319,40 +309,6 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     >
       {data && (
         <>
-          {/* 统计信息 - 缩小版 */}
-          <Row gutter={16} className="mb-2">
-            <Col span={8} key="cluster-count">
-              <Card bordered={false} className="h-full statistic-card-clusters" styles={{ body: { padding: '10px' } }}>
-                <Statistic 
-                  title={<Text style={{ fontSize: '12px' }}>{i18nInstance.t('87c606f3c5912e85c0d357c9fce5e54f', '集群数量')}</Text>} 
-                  value={data.summary.totalClusters} 
-                  valueStyle={{ color: '#1890ff', fontSize: '18px' }}
-                  style={{ marginBottom: '0' }}
-                />
-              </Card>
-            </Col>
-            <Col span={8} key="propagation-policy">
-              <Card bordered={false} className="h-full statistic-card-policy" styles={{ body: { padding: '10px' } }}>
-                <Statistic 
-                  title={<Text style={{ fontSize: '12px' }}>{i18nInstance.t('3c00dd2d7abfc8f8bf12bf9be6cb49a5', '传播策略')}</Text>} 
-                  value={data.summary.totalPropagationPolicy} 
-                  valueStyle={{ color: colorScheme.resourceGroups.Network.color, fontSize: '18px' }}
-                  style={{ marginBottom: '0' }}
-                />
-              </Card>
-            </Col>
-            <Col span={8} key="resource-binding">
-              <Card bordered={false} className="h-full statistic-card-binding" styles={{ body: { padding: '10px' } }}>
-                <Statistic 
-                  title={<Text style={{ fontSize: '12px' }}>{i18nInstance.t('dfa4c3b0aad87e9e7ba5a0623ec2c3d3', '资源绑定')}</Text>} 
-                  value={data.summary.totalResourceBinding} 
-                  valueStyle={{ color: colorScheme.resourceGroups.Workloads.color, fontSize: '18px' }}
-                  style={{ marginBottom: '0' }}
-                />
-              </Card>
-            </Col>
-          </Row>
-
           <Tabs
             size="small"
             tabBarStyle={{ marginBottom: '8px' }}

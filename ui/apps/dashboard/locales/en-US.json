@@ -214,5 +214,11 @@
   "节点未就绪": "Node Not Ready",
   "被驱逐": "Evicted",
   "挂载失败": "Mount Failed",
-  "暂无调度信息": "No scheduling information"
+  "暂无调度信息": "No scheduling information",
+  "f3a5da7a5dc22b3ee3c1aaa17bc47e8c": "Application Pod Count",
+  "6a73118a4a4d5159cbb889b3b3fbc157": "Application Propagation Policies",
+  "cee0aa74f1af5f41ee7e20044193498f": "Application Override Policies",
+  "44d4e7c3d38eb5e0818174e76cf42241": "Cluster Application Exposures",
+  "f1f64d9fded4a72e82b1e9f8c42c3d60": "Application Policies",
+  "87c606f3c5912e85c0d357c9fce5e54f": "Cluster Count"
 }

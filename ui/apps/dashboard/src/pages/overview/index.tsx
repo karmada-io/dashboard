@@ -103,6 +103,25 @@ insertCss(`
     background-color: #faad14;
   }
   
+  /* 集群数量卡片 */
+  .overview-cluster-count-card {
+    border: 2px solid #1890ff !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  
+  .overview-cluster-count-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #1890ff;
+  }
+  
   /* 节点状态卡片 */
   .overview-node-status-card {
     border: 2px solid #52C41A !important;
@@ -404,7 +423,7 @@ const Overview = () => {
                 {resourcesData.pod.allocated}
               </div>
               <div>
-                <div className="text-xs text-gray-500">{i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8b', '应用服务数量')}</div>
+                <div className="text-xs text-gray-500">{i18nInstance.t('f3a5da7a5dc22b3ee3c1aaa17bc47e8c', '应用程序Pod数量')}</div>
                 <div className="text-sm">{resourcesData.pod.allocated}/{resourcesData.pod.capacity}</div>
               </div>
             </div>
@@ -488,22 +507,22 @@ const Overview = () => {
             <Row gutter={16}>
               <Col span={8}>
                 <Statistic 
-                  title={<div className="text-xs">{i18nInstance.t('6a73118a4a4d5159cbb889b3b3fbc157', '传播策略')}</div>} 
+                  title={<div className="text-xs">{i18nInstance.t('6a73118a4a4d5159cbb889b3b3fbc157', '应用程序传播策略')}</div>} 
                   value={data?.clusterResourceStatus.propagationPolicyNum || 0}
                   valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#1890ff' }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic 
-                  title={<div className="text-xs">{i18nInstance.t('cee0aa74f1af5f41ee7e20044193498f', '覆盖策略')}</div>} 
+                  title={<div className="text-xs">{i18nInstance.t('cee0aa74f1af5f41ee7e20044193498f', '应用程序覆盖策略')}</div>} 
                   value={data?.clusterResourceStatus.overridePolicyNum || 0}
                   valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#13c2c2' }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic 
-                  title={<div className="text-xs">{i18nInstance.t('8c669a5e9ad11c4c91ba89ccde1e6167', '命名空间')}</div>} 
-                  value={data?.clusterResourceStatus.namespaceNum || 0}
+                  title={<div className="text-xs">{i18nInstance.t('87c606f3c5912e85c0d357c9fce5e54f', '集群数量')}</div>} 
+                  value={clusterData?.clusters?.length || 0}
                   valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#722ed1' }}
                 />
               </Col>
@@ -511,22 +530,22 @@ const Overview = () => {
             <Row gutter={16} className="mt-2">
               <Col span={8}>
                 <Statistic 
-                  title={<div className="text-xs">{i18nInstance.t('f1f64d9fded4a72e82b1e9f8c42c3d60', '工作负载')}</div>} 
+                  title={<div className="text-xs">{i18nInstance.t('f1f64d9fded4a72e82b1e9f8c42c3d60', '应用程序策略')}</div>} 
                   value={data?.clusterResourceStatus.workloadNum || 0}
                   valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#ff4d4f' }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic 
-                  title={<div className="text-xs">{i18nInstance.t('44d4e7c3d38eb5e0818174e76cf42241', '服务')}</div>} 
+                  title={<div className="text-xs">{i18nInstance.t('44d4e7c3d38eb5e0818174e76cf42241', '集群应用暴露')}</div>} 
                   value={data?.clusterResourceStatus.serviceNum || 0}
                   valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#faad14' }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic 
-                  title={<div className="text-xs">{i18nInstance.t('c230d78d91375a307f6c2e3e6d435519', '配置')}</div>} 
-                  value={data?.clusterResourceStatus.configNum || 0}
+                  title={<div className="text-xs">{i18nInstance.t('8c669a5e9ad11c4c91ba89ccde1e6167', '命名空间')}</div>} 
+                  value={data?.clusterResourceStatus.namespaceNum || 0}
                   valueStyle={{ fontSize: '20px', fontWeight: 'bold', color: '#52c41a' }}
                 />
               </Col>
@@ -710,6 +729,39 @@ const Overview = () => {
     );
   };
 
+  // 添加一个新的函数来渲染集群数量卡片
+  const renderClusterCount = (clusterCount: number | undefined) => {
+    return (
+      <Spin spinning={isClusterLoading}>
+        <div className="flex flex-col items-center h-full justify-center">
+          <div className="status-value-container">
+            <div 
+              className="status-value-block" 
+              style={{ 
+                backgroundColor: '#1890ff',
+                fontSize: '36px',
+                width: '80px',
+                height: '80px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%'
+              }}
+            >
+              {clusterCount || 0}
+            </div>
+          </div>
+          <div className="text-center mt-2">
+            <div className="text-base font-medium">{i18nInstance.t('87c606f3c5912e85c0d357c9fce5e54f', '集群数量')}</div>
+            <Button type="link" size="small" onClick={() => navigate('/cluster-manage')}>
+              {i18nInstance.t('c1dc33b7b4649e28f142c6e609ee6c9c', '查看所有集群')}
+            </Button>
+          </div>
+        </div>
+      </Spin>
+    );
+  };
+
   return (
     <Panel>
       {!clusterName && (
@@ -738,7 +790,19 @@ const Overview = () => {
             </Card>
           </Col>
           
-          <Col xs={24} md={18}>
+          <Col xs={24} md={6}>
+            <Card title={i18nInstance.t('87c606f3c5912e85c0d357c9fce5e54f', '集群数量')} 
+                  bordered={false} 
+                  className="h-full shadow-sm overview-cluster-count-card"
+                  styles={{ 
+                    body: { padding: '12px' },
+                    title: { fontSize: '15px', fontWeight: 'bold' }
+                  }}>
+              {renderClusterCount(clusterData?.clusters?.length)}
+            </Card>
+          </Col>
+          
+          <Col xs={24} md={12}>
             <Card title={i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '可用节点状态')} 
                   bordered={false} 
                   className="h-full shadow-sm overview-node-status-card"
