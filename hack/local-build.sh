@@ -14,13 +14,23 @@
 
 set -e
 
-REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# 修正REPO_ROOT的计算方式，以支持从任何目录调用脚本
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+if [[ $(basename "$SCRIPT_DIR") == "hack" ]]; then
+  # 如果脚本在hack目录下
+  REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+else
+  # 如果脚本已经在项目根目录
+  REPO_ROOT="$SCRIPT_DIR"
+fi
+
 VERSION=${VERSION:-"latest"}
 REGISTRY=${REGISTRY:-"docker.io/karmada"}
 
 echo "==================== Karmada Dashboard 本地镜像构建 ===================="
 echo "版本: $VERSION"
 echo "镜像仓库: $REGISTRY"
+echo "项目根目录: $REPO_ROOT"
 echo "=================================================================="
 
 # 创建临时构建目录
@@ -35,6 +45,7 @@ echo "1. 构建API镜像"
 
 # 编译API二进制文件
 echo "1.1 编译API二进制文件"
+cd $REPO_ROOT
 make karmada-dashboard-api GOOS=linux
 cp -f $REPO_ROOT/_output/bin/linux/amd64/karmada-dashboard-api $BUILD_DIR/
 
