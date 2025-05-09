@@ -29,26 +29,27 @@ import (
 )
 
 // ClusterOverridePolicyList contains a list of overriders in the karmada control-plane.
+// ClusterOverridePolicyList 包含Karmada控制平面中的覆盖策略列表。
 type ClusterOverridePolicyList struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
-	// Unordered list of clusterOverridePolicies.
+	// 未排序的clusterOverridePolicies列表。
 	ClusterOverridePolicies []ClusterOverridePolicy `json:"clusterOverridePolicies"`
 
-	// List of non-critical errors, that occurred during resource retrieval.
+	// 在资源检索期间发生的非关键错误列表。
 	Errors []error `json:"errors"`
 }
 
-// ClusterOverridePolicy contains information about a single clusterOverridePolicy.
+// ClusterOverridePolicy 包含有关单个集群覆盖策略的信息。
 type ClusterOverridePolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
-	// Override specificed data
+	// 覆盖特定数据
 	ResourceSelectors []v1alpha1.ResourceSelector `json:"resourceSelectors"`
 	OverrideRules     []v1alpha1.RuleWithCluster  `json:"overrideRules"`
 }
 
-// GetClusterOverridePolicyList returns a list of all overiders in the karmada control-plance.
+// GetClusterOverridePolicyList 返回Karmada控制平面中所有覆盖策略的列表。
 func GetClusterOverridePolicyList(client karmadaclientset.Interface, dsQuery *dataselect.DataSelectQuery) (*ClusterOverridePolicyList, error) {
 	clusterOverridePolicies, err := client.PolicyV1alpha1().ClusterOverridePolicies().List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -59,6 +60,7 @@ func GetClusterOverridePolicyList(client karmadaclientset.Interface, dsQuery *da
 	return toClusterOverridePolicyList(clusterOverridePolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
+// toClusterOverridePolicyList 将v1alpha1.ClusterOverridePolicy对象列表转换为ClusterOverridePolicyList对象。
 func toClusterOverridePolicyList(clusterOverridePolicies []v1alpha1.ClusterOverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterOverridePolicyList {
 	overridepolicyList := &ClusterOverridePolicyList{
 		ClusterOverridePolicies: make([]ClusterOverridePolicy, 0),
@@ -76,6 +78,7 @@ func toClusterOverridePolicyList(clusterOverridePolicies []v1alpha1.ClusterOverr
 	return overridepolicyList
 }
 
+// toClusterOverridePolicy 将v1alpha1.ClusterOverridePolicy对象转换为ClusterOverridePolicy对象。
 func toClusterOverridePolicy(overridepolicy *v1alpha1.ClusterOverridePolicy) ClusterOverridePolicy {
 	return ClusterOverridePolicy{
 		ObjectMeta:        types.NewObjectMeta(overridepolicy.ObjectMeta),

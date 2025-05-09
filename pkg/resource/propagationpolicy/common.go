@@ -23,9 +23,11 @@ import (
 )
 
 // PropagationPolicyCell is a wrapper around PropagationPolicy type
+// 用于在dataselect中存储和处理PropagationPolicy对象
 type PropagationPolicyCell v1alpha1.PropagationPolicy
 
 // GetProperty returns the given property of the PropagationPolicy.
+// 获取PropagationPolicy的指定属性
 func (c PropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -42,6 +44,7 @@ func (c PropagationPolicyCell) GetProperty(name dataselect.PropertyName) datasel
 	}
 }
 
+// toCells 将v1alpha1.PropagationPolicy对象列表转换为dataselect.DataCell列表
 func toCells(std []v1alpha1.PropagationPolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -50,6 +53,7 @@ func toCells(std []v1alpha1.PropagationPolicy) []dataselect.DataCell {
 	return cells
 }
 
+// fromCells 将dataselect.DataCell列表转换为v1alpha1.PropagationPolicy对象列表
 func fromCells(cells []dataselect.DataCell) []v1alpha1.PropagationPolicy {
 	std := make([]v1alpha1.PropagationPolicy, len(cells))
 	for i := range std {

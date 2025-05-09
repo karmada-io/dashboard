@@ -28,6 +28,8 @@ import (
 
 // PropagationPolicyDetail is a presentation layer view of Karmada PropagationPolicy resource. This means it is PropagationPolicy plus
 // additional augmented data we can get from other sources.
+// PropagationPolicyDetail 是Karmada PropagationPolicy资源的表示层视图。这意味着它是一个PropagationPolicy加上
+// 其他来源可以获取的附加数据。
 type PropagationPolicyDetail struct {
 	// Extends list item structure.
 	PropagationPolicy `json:",inline"`
@@ -37,6 +39,7 @@ type PropagationPolicyDetail struct {
 }
 
 // GetPropagationPolicyDetail gets propagationpolicy details.
+// GetPropagationPolicyDetail 获取PropagationPolicy的详细信息。
 func GetPropagationPolicyDetail(client karmadaclientset.Interface, namespace, name string) (*PropagationPolicyDetail, error) {
 	propagationpolicyData, err := client.PolicyV1alpha1().PropagationPolicies(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
@@ -52,6 +55,8 @@ func GetPropagationPolicyDetail(client karmadaclientset.Interface, namespace, na
 	return &propagationpolicy, nil
 }
 
+// toPropagationPolicyDetail 将PropagationPolicy对象转换为PropagationPolicyDetail对象。
+// 它将PropagationPolicy对象转换为PropagationPolicyDetail对象，并添加非关键错误。
 func toPropagationPolicyDetail(propagationpolicy *v1alpha1.PropagationPolicy, nonCriticalErrors []error) PropagationPolicyDetail {
 	return PropagationPolicyDetail{
 		PropagationPolicy: toPropagationPolicy(propagationpolicy),

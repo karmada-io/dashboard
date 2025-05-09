@@ -29,6 +29,7 @@ import (
 )
 
 // ClusterPropagationPolicyList contains a list of propagation in the karmada control-plane.
+// 集群传播策略列表包含Karmada控制平面中的传播策略列表。
 type ClusterPropagationPolicyList struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
@@ -39,7 +40,7 @@ type ClusterPropagationPolicyList struct {
 	Errors []error `json:"errors"`
 }
 
-// ClusterPropagationPolicy represents a cluster propagation policy.
+// ClusterPropagationPolicy 表示集群传播策略。
 type ClusterPropagationPolicy struct {
 	ObjectMeta        types.ObjectMeta            `json:"objectMeta"`
 	TypeMeta          types.TypeMeta              `json:"typeMeta"`
@@ -48,7 +49,7 @@ type ClusterPropagationPolicy struct {
 	ResourceSelectors []v1alpha1.ResourceSelector `json:"resourceSelectors"`
 }
 
-// GetClusterPropagationPolicyList returns a list of all propagations in the karmada control-plance.
+// GetClusterPropagationPolicyList 返回Karmada控制平面中所有传播策略的列表。
 func GetClusterPropagationPolicyList(client karmadaclientset.Interface, dsQuery *dataselect.DataSelectQuery) (*ClusterPropagationPolicyList, error) {
 	clusterPropagationPolicies, err := client.PolicyV1alpha1().ClusterPropagationPolicies().List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -59,6 +60,7 @@ func GetClusterPropagationPolicyList(client karmadaclientset.Interface, dsQuery 
 	return toClusterPropagationPolicyList(clusterPropagationPolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
+// toClusterPropagationPolicyList 将v1alpha1.ClusterPropagationPolicy对象列表转换为ClusterPropagationPolicyList对象。
 func toClusterPropagationPolicyList(clusterPropagationPolicies []v1alpha1.ClusterPropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *ClusterPropagationPolicyList {
 	propagationpolicyList := &ClusterPropagationPolicyList{
 		ClusterPropagationPolicies: make([]ClusterPropagationPolicy, 0),
@@ -76,6 +78,7 @@ func toClusterPropagationPolicyList(clusterPropagationPolicies []v1alpha1.Cluste
 	return propagationpolicyList
 }
 
+// toClusterPropagationPolicy 将v1alpha1.ClusterPropagationPolicy对象转换为ClusterPropagationPolicy对象。
 func toClusterPropagationPolicy(propagationpolicy *v1alpha1.ClusterPropagationPolicy) ClusterPropagationPolicy {
 	return ClusterPropagationPolicy{
 		ObjectMeta:      types.NewObjectMeta(propagationpolicy.ObjectMeta),

@@ -28,6 +28,8 @@ import (
 
 // OverridePolicyDetail is a presentation layer view of Karmada OverridePolicy resource. This means it is OverridePolicy plus
 // additional augmented data we can get from other sources.
+// OverridePolicyDetail 是Karmada OverridePolicy资源的表示层视图。这意味着它是一个OverridePolicy加上
+// 其他来源可以获取的附加数据。
 type OverridePolicyDetail struct {
 	// Extends list item structure.
 	OverridePolicy `json:",inline"`
@@ -36,7 +38,7 @@ type OverridePolicyDetail struct {
 	Errors []error `json:"errors"`
 }
 
-// GetOverridePolicyDetail gets Overridepolicy details.
+// GetOverridePolicyDetail 获取OverridePolicy的详细信息。
 func GetOverridePolicyDetail(client karmadaclientset.Interface, namespace, name string) (*OverridePolicyDetail, error) {
 	OverridepolicyData, err := client.PolicyV1alpha1().OverridePolicies(namespace).Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
@@ -52,6 +54,8 @@ func GetOverridePolicyDetail(client karmadaclientset.Interface, namespace, name 
 	return &Overridepolicy, nil
 }
 
+// toOverridePolicyDetail 将OverridePolicy对象转换为OverridePolicyDetail对象。
+// 它将OverridePolicy对象转换为OverridePolicyDetail对象，并添加非关键错误。
 func toOverridePolicyDetail(Overridepolicy *v1alpha1.OverridePolicy, nonCriticalErrors []error) OverridePolicyDetail {
 	return OverridePolicyDetail{
 		OverridePolicy: toOverridePolicy(Overridepolicy),

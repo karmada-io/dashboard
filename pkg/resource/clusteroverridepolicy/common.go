@@ -23,9 +23,10 @@ import (
 )
 
 // ClusterOverridePolicyCell wraps v1alpha1.ClusterOverridePolicy for data selection.
+// ClusterOverridePolicyCell 用于数据选择。
 type ClusterOverridePolicyCell v1alpha1.ClusterOverridePolicy
 
-// GetProperty returns a property of the cluster override policy cell.
+// GetProperty 返回集群覆盖策略单元格的属性。
 func (c ClusterOverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -38,6 +39,7 @@ func (c ClusterOverridePolicyCell) GetProperty(name dataselect.PropertyName) dat
 	}
 }
 
+// toCells 将v1alpha1.ClusterOverridePolicy对象列表转换为dataselect.DataCell列表。
 func toCells(std []v1alpha1.ClusterOverridePolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -46,6 +48,7 @@ func toCells(std []v1alpha1.ClusterOverridePolicy) []dataselect.DataCell {
 	return cells
 }
 
+// fromCells 将dataselect.DataCell列表转换为v1alpha1.ClusterOverridePolicy对象列表。
 func fromCells(cells []dataselect.DataCell) []v1alpha1.ClusterOverridePolicy {
 	std := make([]v1alpha1.ClusterOverridePolicy, len(cells))
 	for i := range std {

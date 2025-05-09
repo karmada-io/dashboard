@@ -31,27 +31,28 @@ import (
 	"github.com/karmada-io/dashboard/pkg/resource/common"
 )
 
-// OverridePolicyList contains a list of propagation in the karmada control-plance.
+// OverridePolicyList contains a list of override policies in the karmada control-plane.
+// OverridePolicyList 包含Karmada控制平面中的覆盖策略列表。
 type OverridePolicyList struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
-	// Unordered list of OverridePolicys.
+	// 未排序的OverridePolicy列表。
 	OverridePolicys []OverridePolicy `json:"overridepolicys"`
 
-	// List of non-critical errors, that occurred during resource retrieval.
+	// 在资源检索期间发生的非关键错误列表。
 	Errors []error `json:"errors"`
 }
 
-// OverridePolicy contains information about a single override.
+// OverridePolicy 包含有关单个覆盖策略的信息。
 type OverridePolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
-	// Override specificed data
+	// 覆盖特定数据
 	ResourceSelectors []v1alpha1.ResourceSelector `json:"resourceSelectors"`
 	OverrideRules     []v1alpha1.RuleWithCluster  `json:"overrideRules"`
 }
 
-// GetOverridePolicyList returns a list of all override policies in the Karmada control-plane.
+// GetOverridePolicyList 返回Karmada控制平面中所有覆盖策略的列表。
 func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*OverridePolicyList, error) {
 	log.Println("Getting list of overridepolicy")
 	overridePolicies, err := client.PolicyV1alpha1().OverridePolicies(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
@@ -63,6 +64,7 @@ func GetOverridePolicyList(client karmadaclientset.Interface, k8sClient kubernet
 	return toOverridePolicyList(k8sClient, overridePolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
+// toOverridePolicyList 将v1alpha1.OverridePolicy对象列表转换为OverridePolicyList对象。
 func toOverridePolicyList(_ kubernetes.Interface, overridepolicies []v1alpha1.OverridePolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *OverridePolicyList {
 	overridepolicyList := &OverridePolicyList{
 		OverridePolicys: make([]OverridePolicy, 0),
@@ -80,6 +82,7 @@ func toOverridePolicyList(_ kubernetes.Interface, overridepolicies []v1alpha1.Ov
 	return overridepolicyList
 }
 
+// toOverridePolicy 将v1alpha1.OverridePolicy对象转换为OverridePolicy对象。
 func toOverridePolicy(overridepolicy *v1alpha1.OverridePolicy) OverridePolicy {
 	return OverridePolicy{
 		ObjectMeta:        types.NewObjectMeta(overridepolicy.ObjectMeta),

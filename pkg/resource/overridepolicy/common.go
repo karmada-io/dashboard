@@ -23,9 +23,10 @@ import (
 )
 
 // OverridePolicyCell represents an OverridePolicy that implements the DataCell interface.
+// OverridePolicyCell 表示一个实现DataCell接口的OverridePolicy。
 type OverridePolicyCell v1alpha1.OverridePolicy
 
-// GetProperty returns a comparable value for a specified property name.
+// GetProperty 返回指定属性名称的可比较值。
 func (c OverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -41,6 +42,7 @@ func (c OverridePolicyCell) GetProperty(name dataselect.PropertyName) dataselect
 	}
 }
 
+// toCells 将v1alpha1.OverridePolicy对象列表转换为dataselect.DataCell列表。
 func toCells(std []v1alpha1.OverridePolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -49,6 +51,7 @@ func toCells(std []v1alpha1.OverridePolicy) []dataselect.DataCell {
 	return cells
 }
 
+// fromCells 将dataselect.DataCell列表转换为v1alpha1.OverridePolicy对象列表。
 func fromCells(cells []dataselect.DataCell) []v1alpha1.OverridePolicy {
 	std := make([]v1alpha1.OverridePolicy, len(cells))
 	for i := range std {

@@ -23,9 +23,10 @@ import (
 )
 
 // ClusterPropagationPolicyCell wraps v1alpha1.ClusterPropagationPolicy for data selection.
+// ClusterPropagationPolicyCell 用于数据选择。
 type ClusterPropagationPolicyCell v1alpha1.ClusterPropagationPolicy
 
-// GetProperty returns a property of the cluster propagation policy cell.
+// GetProperty 返回集群传播策略单元格的属性。
 func (c ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
@@ -38,6 +39,7 @@ func (c ClusterPropagationPolicyCell) GetProperty(name dataselect.PropertyName) 
 	}
 }
 
+// toCells 将v1alpha1.ClusterPropagationPolicy对象列表转换为dataselect.DataCell列表。
 func toCells(std []v1alpha1.ClusterPropagationPolicy) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
@@ -46,6 +48,7 @@ func toCells(std []v1alpha1.ClusterPropagationPolicy) []dataselect.DataCell {
 	return cells
 }
 
+// fromCells 将dataselect.DataCell列表转换为v1alpha1.ClusterPropagationPolicy对象列表。
 func fromCells(cells []dataselect.DataCell) []v1alpha1.ClusterPropagationPolicy {
 	std := make([]v1alpha1.ClusterPropagationPolicy, len(cells))
 	for i := range std {

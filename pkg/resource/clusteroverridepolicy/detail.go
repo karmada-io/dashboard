@@ -27,15 +27,16 @@ import (
 )
 
 // ClusterOverridePolicyDetail contains clusterPropagationPolicy details and non-critical errors.
+// ClusterOverridePolicyDetail 包含集群传播策略的详细信息和非关键错误。
 type ClusterOverridePolicyDetail struct {
-	// Extends list item structure.
+	// 扩展列表项结构。
 	ClusterOverridePolicy `json:",inline"`
 
-	// List of non-critical errors, that occurred during resource retrieval.
+	// 在资源检索期间发生的非关键错误列表。
 	Errors []error `json:"errors"`
 }
 
-// GetClusterOverridePolicyDetail gets clusterPropagationPolicy details.
+// GetClusterOverridePolicyDetail 获取集群传播策略的详细信息。
 func GetClusterOverridePolicyDetail(client karmadaclientset.Interface, name string) (*ClusterOverridePolicyDetail, error) {
 	overridepolicyData, err := client.PolicyV1alpha1().ClusterOverridePolicies().Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
@@ -51,6 +52,8 @@ func GetClusterOverridePolicyDetail(client karmadaclientset.Interface, name stri
 	return &propagationpolicy, nil
 }
 
+// toOverridePolicyDetail 将ClusterOverridePolicy对象转换为ClusterOverridePolicyDetail对象。
+// 它将ClusterOverridePolicy对象转换为ClusterOverridePolicyDetail对象，并添加非关键错误。
 func toOverridePolicyDetail(clusterOverridepolicy *v1alpha1.ClusterOverridePolicy, nonCriticalErrors []error) ClusterOverridePolicyDetail {
 	return ClusterOverridePolicyDetail{
 		ClusterOverridePolicy: toClusterOverridePolicy(clusterOverridepolicy),

@@ -35,27 +35,28 @@ import (
 )
 
 // PropagationPolicyList contains a list of propagation in the karmada control-plance.
+// PropagationPolicyList 包含Karmada控制平面中的传播列表。
 type PropagationPolicyList struct {
 	ListMeta types.ListMeta `json:"listMeta"`
 
-	// Unordered list of PropagationPolicys.
+	// 未排序的PropagationPolicy列表。
 	PropagationPolicys []PropagationPolicy `json:"propagationpolicys"`
 
-	// List of non-critical errors, that occurred during resource retrieval.
+	// 在资源检索期间发生的非关键错误列表。
 	Errors []error `json:"errors"`
 }
 
-// PropagationPolicy contains information about a single propagation.
+// PropagationPolicy 包含有关单个传播的信息。
 type PropagationPolicy struct {
 	ObjectMeta types.ObjectMeta `json:"objectMeta"`
 	TypeMeta   types.TypeMeta   `json:"typeMeta"`
-	// propagation specificed data
+	// 传播特定数据
 	SchedulerName    string                    `json:"schedulerName"`
 	ClusterAffinity  *v1alpha1.ClusterAffinity `json:"clusterAffinity"`
 	RelatedResources []string                  `json:"relatedResources"`
 }
 
-// GetPropagationPolicyList returns a list of all propagations in the karmada control-plance.
+// GetPropagationPolicyList 返回Karmada控制平面中所有传播的列表。
 func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*PropagationPolicyList, error) {
 	log.Println("Getting list of namespaces")
 	propagationpolicies, err := client.PolicyV1alpha1().PropagationPolicies(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
@@ -67,6 +68,7 @@ func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kuber
 	return toPropagationPolicyList(k8sClient, propagationpolicies.Items, nonCriticalErrors, dsQuery), nil
 }
 
+// toPropagationPolicyList 将v1alpha1.PropagationPolicy对象列表转换为PropagationPolicyList对象。
 func toPropagationPolicyList(_ kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *PropagationPolicyList {
 	propagationpolicyList := &PropagationPolicyList{
 		PropagationPolicys: make([]PropagationPolicy, 0),
@@ -101,6 +103,7 @@ func toPropagationPolicyList(_ kubernetes.Interface, propagationpolicies []v1alp
 	return propagationpolicyList
 }
 
+// toPropagationPolicy 将v1alpha1.PropagationPolicy对象转换为PropagationPolicy对象。
 func toPropagationPolicy(propagationpolicy *v1alpha1.PropagationPolicy) PropagationPolicy {
 	return PropagationPolicy{
 		ObjectMeta:      types.NewObjectMeta(propagationpolicy.ObjectMeta),

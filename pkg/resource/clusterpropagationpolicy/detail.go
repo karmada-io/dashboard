@@ -27,6 +27,7 @@ import (
 )
 
 // ClusterPropagationPolicyDetail contains clusterPropagationPolicy details.
+// ClusterPropagationPolicyDetail 包含集群传播策略的详细信息。
 type ClusterPropagationPolicyDetail struct {
 	// Extends list item structure.
 	ClusterPropagationPolicy `json:",inline"`
@@ -35,7 +36,7 @@ type ClusterPropagationPolicyDetail struct {
 	Errors []error `json:"errors"`
 }
 
-// GetClusterPropagationPolicyDetail gets clusterPropagationPolicy details.
+// GetClusterPropagationPolicyDetail 获取集群传播策略的详细信息。
 func GetClusterPropagationPolicyDetail(client karmadaclientset.Interface, name string) (*ClusterPropagationPolicyDetail, error) {
 	propagationpolicyData, err := client.PolicyV1alpha1().ClusterPropagationPolicies().Get(context.TODO(), name, metaV1.GetOptions{})
 	if err != nil {
@@ -51,6 +52,8 @@ func GetClusterPropagationPolicyDetail(client karmadaclientset.Interface, name s
 	return &propagationpolicy, nil
 }
 
+// toPropagationPolicyDetail 将ClusterPropagationPolicy对象转换为ClusterPropagationPolicyDetail对象。
+// 它将ClusterPropagationPolicy对象转换为ClusterPropagationPolicyDetail对象，并添加非关键错误。
 func toPropagationPolicyDetail(clusterPropagationpolicy *v1alpha1.ClusterPropagationPolicy, nonCriticalErrors []error) ClusterPropagationPolicyDetail {
 	return ClusterPropagationPolicyDetail{
 		ClusterPropagationPolicy: toClusterPropagationPolicy(clusterPropagationpolicy),
