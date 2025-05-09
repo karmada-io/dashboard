@@ -150,6 +150,8 @@ type ResourceDetailInfo struct {
 	PropagationPolicy string `json:"propagationPolicy"`
 	// Weight 权重
 	Weight int32 `json:"weight"`
+	// ClusterWeights 集群权重映射
+	ClusterWeights map[string]int32 `json:"clusterWeights,omitempty"`
 	// ClusterDist 集群分布
 	ClusterDist []ActualClusterDistribution `json:"clusterDist"`
 	// TotalScheduledCount 计划总数

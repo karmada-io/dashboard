@@ -138,14 +138,17 @@ func getResourceGroup(kind string) string {
 	return "Others"
 }
 
-// 添加传播策略查找函数
-func findPropagationPolicyForResource(ctx context.Context, karmadaClient karmadaclientset.Interface, namespace, name, kind string) (string, int32, error) {
+// findPropagationPolicyForResource 查找与资源匹配的传播策略
+func findPropagationPolicyForResource(ctx context.Context, karmadaClient karmadaclientset.Interface, namespace, name, kind string) (string, map[string]int32, error) {
 	// 获取所有PropagationPolicy
 	policyList, err := karmadaClient.PolicyV1alpha1().PropagationPolicies(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		klog.ErrorS(err, "Failed to get propagation policies")
-		return "", 0, err
+		return "", nil, err
 	}
+
+	// 初始化集群权重映射
+	clusterWeights := make(map[string]int32)
 
 	// 检查每个策略是否匹配该资源
 	for _, policy := range policyList.Items {
@@ -155,17 +158,21 @@ func findPropagationPolicyForResource(ctx context.Context, karmadaClient karmada
 
 		for _, rs := range policy.Spec.ResourceSelectors {
 			if rs.Kind == kind && (rs.Name == name || rs.Name == "") {
-				// 找到匹配的策略，返回名称和默认权重
-				defaultWeight := int32(1)
+				// 找到匹配的策略，获取集群权重
 				if policy.Spec.Placement.ReplicaScheduling != nil && policy.Spec.Placement.ReplicaScheduling.ReplicaDivisionPreference == policyv1alpha1.ReplicaDivisionPreferenceWeighted {
-					// 如果使用加权调度，则取第一个静态权重
+					// 如果使用加权调度，则获取每个集群的权重
 					if len(policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList) > 0 {
-						staticWeight := policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList[0]
-						defaultWeight = int32(staticWeight.Weight)
-						break
+						for _, staticWeight := range policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList {
+							// ClusterAffinity是一个结构体，需要进一步处理来获取集群名称
+							if staticWeight.TargetCluster.ClusterNames != nil && len(staticWeight.TargetCluster.ClusterNames) > 0 {
+								for _, clusterName := range staticWeight.TargetCluster.ClusterNames {
+									clusterWeights[clusterName] = int32(staticWeight.Weight)
+								}
+							}
+						}
 					}
 				}
-				return policy.Name, defaultWeight, nil
+				return policy.Name, clusterWeights, nil
 			}
 		}
 	}
@@ -174,28 +181,32 @@ func findPropagationPolicyForResource(ctx context.Context, karmadaClient karmada
 	clusterPolicyList, err := karmadaClient.PolicyV1alpha1().ClusterPropagationPolicies().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		klog.ErrorS(err, "Failed to get cluster propagation policies")
-		return "", 0, err
+		return "", nil, err
 	}
 
 	for _, policy := range clusterPolicyList.Items {
 		for _, rs := range policy.Spec.ResourceSelectors {
 			if rs.Kind == kind && (rs.Name == name || rs.Name == "") {
-				// 找到匹配的策略，返回名称和默认权重
-				defaultWeight := int32(1)
+				// 找到匹配的策略，获取集群权重
 				if policy.Spec.Placement.ReplicaScheduling != nil && policy.Spec.Placement.ReplicaScheduling.ReplicaDivisionPreference == policyv1alpha1.ReplicaDivisionPreferenceWeighted {
-					// 如果使用加权调度，则取第一个静态权重
+					// 如果使用加权调度，则获取每个集群的权重
 					if len(policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList) > 0 {
-						staticWeight := policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList[0]
-						defaultWeight = int32(staticWeight.Weight)
-						break
+						for _, staticWeight := range policy.Spec.Placement.ReplicaScheduling.WeightPreference.StaticWeightList {
+							// ClusterAffinity是一个结构体，需要进一步处理来获取集群名称
+							if staticWeight.TargetCluster.ClusterNames != nil && len(staticWeight.TargetCluster.ClusterNames) > 0 {
+								for _, clusterName := range staticWeight.TargetCluster.ClusterNames {
+									clusterWeights[clusterName] = int32(staticWeight.Weight)
+								}
+							}
+						}
 					}
 				}
-				return policy.Name, defaultWeight, nil
+				return policy.Name, clusterWeights, nil
 			}
 		}
 	}
 
-	return "", 0, nil
+	return "", clusterWeights, nil
 }
 
 // 在ActualResourceTypeDistribution结构中添加调度策略信息
@@ -206,8 +217,8 @@ type ResourceSchedulingInfo struct {
 	Namespace string `json:"namespace"`
 	// 调度策略名称
 	PropagationPolicy string `json:"propagationPolicy"`
-	// 调度权重
-	Weight int32 `json:"weight"`
+	// 集群权重映射 (集群名称 -> 权重值)
+	ClusterWeights map[string]int32 `json:"clusterWeights"`
 	// 集群分布情况
 	ClusterDist []v1.ActualClusterDistribution `json:"clusterDist"`
 	// 实际部署总数
@@ -384,7 +395,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		}
 
 		// 查找匹配的传播策略
-		policyName, weight, _ := findPropagationPolicyForResource(ctx, karmadaClient, resourceNamespace, resourceName, resourceKind)
+		policyName, clusterWeights, _ := findPropagationPolicyForResource(ctx, karmadaClient, resourceNamespace, resourceName, resourceKind)
 
 		// 资源唯一标识符
 		resourceKey := fmt.Sprintf("%s/%s/%s", resourceNamespace, resourceKind, resourceName)
@@ -400,7 +411,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 				ResourceName:      resourceName,
 				Namespace:         resourceNamespace,
 				PropagationPolicy: policyName,
-				Weight:            weight,
+				ClusterWeights:    clusterWeights,
 				ClusterDist:       []v1.ActualClusterDistribution{},
 				ActualCount:       0,
 				ScheduledCount:    0,
@@ -410,15 +421,16 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		// 为每个集群绑定记录调度信息
 		for _, cluster := range binding.Spec.Clusters {
 			clusterName := cluster.Name
+			replicaCount := cluster.Replicas
 
 			// 增加资源类型统计
-			scheduledResourceMap[resourceKind][clusterName]++
+			scheduledResourceMap[resourceKind][clusterName] += int(replicaCount)
 
 			// 增加调度计数
 			found := false
 			for i, dist := range resourceSchedulingMap[resourceKind][resourceKey].ClusterDist {
 				if dist.ClusterName == clusterName {
-					dist.ScheduledCount++
+					dist.ScheduledCount += int(replicaCount)
 					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist[i] = dist
 					found = true
 					break
@@ -431,12 +443,12 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist,
 					v1.ActualClusterDistribution{
 						ClusterName:    clusterName,
-						ScheduledCount: 1,
+						ScheduledCount: int(replicaCount),
 						ActualCount:    0,
 						Status: v1.ResourceDeploymentStatus{
 							Scheduled:      true,
 							Actual:         false,
-							ScheduledCount: 1,
+							ScheduledCount: int(replicaCount),
 							ActualCount:    0,
 						},
 					},
@@ -444,7 +456,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 			}
 
 			// 增加总调度计数
-			resourceSchedulingMap[resourceKind][resourceKey].ScheduledCount++
+			resourceSchedulingMap[resourceKind][resourceKey].ScheduledCount += int(replicaCount)
 		}
 	}
 
@@ -463,7 +475,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		}
 
 		// 查找匹配的传播策略
-		policyName, weight, _ := findPropagationPolicyForResource(ctx, karmadaClient, "", resourceName, resourceKind)
+		policyName, clusterWeights, _ := findPropagationPolicyForResource(ctx, karmadaClient, "", resourceName, resourceKind)
 
 		// 资源唯一标识符 (集群级资源无命名空间)
 		resourceKey := fmt.Sprintf("/%s/%s", resourceKind, resourceName)
@@ -479,7 +491,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 				ResourceName:      resourceName,
 				Namespace:         "",
 				PropagationPolicy: policyName,
-				Weight:            weight,
+				ClusterWeights:    clusterWeights,
 				ClusterDist:       []v1.ActualClusterDistribution{},
 				ActualCount:       0,
 				ScheduledCount:    0,
@@ -489,15 +501,16 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 		// 为每个集群绑定记录调度信息
 		for _, cluster := range binding.Spec.Clusters {
 			clusterName := cluster.Name
+			replicaCount := cluster.Replicas
 
 			// 增加资源类型统计
-			scheduledResourceMap[resourceKind][clusterName]++
+			scheduledResourceMap[resourceKind][clusterName] += int(replicaCount)
 
 			// 增加调度计数
 			found := false
 			for i, dist := range resourceSchedulingMap[resourceKind][resourceKey].ClusterDist {
 				if dist.ClusterName == clusterName {
-					dist.ScheduledCount++
+					dist.ScheduledCount += int(replicaCount)
 					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist[i] = dist
 					found = true
 					break
@@ -510,12 +523,12 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 					resourceSchedulingMap[resourceKind][resourceKey].ClusterDist,
 					v1.ActualClusterDistribution{
 						ClusterName:    clusterName,
-						ScheduledCount: 1,
+						ScheduledCount: int(replicaCount),
 						ActualCount:    0,
 						Status: v1.ResourceDeploymentStatus{
 							Scheduled:      true,
 							Actual:         false,
-							ScheduledCount: 1,
+							ScheduledCount: int(replicaCount),
 							ActualCount:    0,
 						},
 					},
@@ -523,7 +536,7 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 			}
 
 			// 增加总调度计数
-			resourceSchedulingMap[resourceKind][resourceKey].ScheduledCount++
+			resourceSchedulingMap[resourceKind][resourceKey].ScheduledCount += int(replicaCount)
 		}
 	}
 
@@ -915,13 +928,29 @@ func GetClusterSchedulePreview() (*v1.SchedulePreviewResponse, error) {
 
 	for resourceKind, resourcesMap := range resourceSchedulingMap {
 		for _, info := range resourcesMap {
+			// 创建集群权重映射
+			clusterWeights := make(map[string]int32)
+
+			// 如果有策略设置的集群权重，优先使用策略的权重
+			if len(info.ClusterWeights) > 0 {
+				clusterWeights = info.ClusterWeights
+			} else {
+				// 否则，使用集群注解中的权重
+				for _, node := range response.Nodes {
+					if node.Type == "member-cluster" && node.SchedulingParams != nil {
+						clusterWeights[node.ID] = node.SchedulingParams.Weight
+					}
+				}
+			}
+
+			// 创建详细资源信息
 			detailedResource := v1.ResourceDetailInfo{
 				ResourceName:        info.ResourceName,
 				ResourceKind:        resourceKind,
 				ResourceGroup:       getResourceGroup(resourceKind),
 				Namespace:           info.Namespace,
 				PropagationPolicy:   info.PropagationPolicy,
-				Weight:              info.Weight,
+				ClusterWeights:      clusterWeights, // 添加集群权重映射
 				ClusterDist:         info.ClusterDist,
 				TotalScheduledCount: info.ScheduledCount,
 				TotalActualCount:    info.ActualCount,
