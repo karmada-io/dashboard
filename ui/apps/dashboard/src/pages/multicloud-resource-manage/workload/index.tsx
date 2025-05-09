@@ -129,6 +129,14 @@ const WorkloadPage = () => {
       ),
     },
     {
+      title: i18nInstance.t('期望Pod副本数量', '应用服务Pod部署数量'),
+      key: 'desiredReplicas',
+      width: 150,
+      render: (_, r) => {
+        return r.pods?.desired || '-';
+      },
+    },
+    {
       title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619', '分发策略'),
       key: 'propagationPolicies',
       render: (_, r) => {
