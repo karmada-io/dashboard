@@ -121,3 +121,17 @@ cd ui
 pnpm run dashboard:dev
 ```
 然后用浏览器打开`http://localhost:5173/`，如果您能看到dashboard的概览页面，说明一切正常，现在开始开发吧。
+
+## 开发构建项目脚本命令
+
+后端构建命令
+
+```bash
+cd /root/dashboard && make karmada-dashboard-api  && ./_output/bin/linux/amd64/karmada-dashboard-api --karmada-kubeconfig=/root/.kube/karmada.config --karmada-context=karmada-apiserver --kubeconfig=/root/.kube/karmada.config --context=karmada-host
+```
+
+前端构建命令
+
+```bash
+cd ui && pnpm run dashboard:dev
+```
