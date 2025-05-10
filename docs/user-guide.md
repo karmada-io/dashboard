@@ -8,7 +8,6 @@ sudo sysctl -w fs.inotify.max_user_instances=2099999999
 sudo sysctl -w fs.inotify.max_queued_events=2099999999
 ```
 
-
 ## Create Cluster For Test
 Once the system environment is set up, you can proceed with installing the test cluster. The test cluster consists of a control plane and three member clusters. The control plane will have the karmada control plane installed, while the member clusters include two push mode member clusters and one pull mode member cluster.
 The architecture of the test cluster is as follows:
