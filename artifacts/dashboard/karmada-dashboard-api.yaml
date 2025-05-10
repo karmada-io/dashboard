@@ -32,7 +32,7 @@ spec:
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
           name: karmada-dashboard-api
-          image: karmada/karmada-dashboard-api:main
+          image: registry.example.com/karmada/karmada-dashboard-api:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: GIN_MODE

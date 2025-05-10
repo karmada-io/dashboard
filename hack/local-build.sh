@@ -117,3 +117,4 @@ echo "API 镜像: $REGISTRY/karmada-dashboard-api:$VERSION"
 echo "Web 镜像: $REGISTRY/karmada-dashboard-web:$VERSION"
 echo "使用 docker images 命令查看已构建的镜像"
 echo "=================================================" 
+
