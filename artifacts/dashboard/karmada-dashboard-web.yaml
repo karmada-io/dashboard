@@ -29,6 +29,7 @@ spec:
             - --bind-address=0.0.0.0
             - --dashboard-config-path=/config/dashboard-config.yaml
           name: karmada-dashboard-web
+          # 更改镜像
           image: registry.example.com/karmada/karmada-dashboard-web:latest
           imagePullPolicy: IfNotPresent
           env:
