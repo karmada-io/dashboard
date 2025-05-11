@@ -86,7 +86,9 @@ const WorkloadPage = () => {
     name: '',
   });
   const [showModal, toggleShowModal] = useToggle(false);
-  const [showWizardModal, toggleShowWizardModal] = useToggle(false);
+  const [showWizardModal, setShowWizardModal] = useState(false);
+  // 创建模式选择 - 向导模式或YAML模式
+  const [useWizard, setUseWizard] = useState(true);
   const [editorState, setEditorState] = useState<{
     mode: 'create' | 'edit';
     content: string;
@@ -231,6 +233,47 @@ const WorkloadPage = () => {
     },
   ];
   const { message: messageApi } = App.useApp();
+
+  // 处理工作负载创建按钮点击
+  const handleAddWorkload = () => {
+    if (useWizard) {
+      // 使用向导模式
+      setShowWizardModal(true);
+    } else {
+      // 使用YAML编辑器模式
+      setEditorState({
+        mode: 'create',
+        content: '',
+      });
+      toggleShowModal(true);
+    }
+  };
+
+  // 刷新工作负载列表
+  const refreshWorkloadList = async () => {
+    await refetch();
+  };
+
+  // 处理从API响应中提取工作负载列表
+  const getWorkloadItems = () => {
+    if (!data) return [];
+    
+    // 根据工作负载类型提取对应的数据
+    switch(filter.kind) {
+      case WorkloadKind.Deployment:
+        return data.deployments || [];
+      case WorkloadKind.Statefulset:
+        return data.statefulSets || [];
+      case WorkloadKind.Daemonset:
+        return data.daemonSets || [];
+      case WorkloadKind.Job:
+      case WorkloadKind.Cronjob:
+        return data.jobs || [];
+      default:
+        return data.items || [];
+    }
+  };
+
   return (
     <Panel>
       <Alert message="工作负载用于统一管理和调度多集群中的 Deployment、StatefulSet、DaemonSet 等工作负载。" type="info" showIcon style={{ marginBottom: 16 }} />
@@ -264,15 +307,15 @@ const WorkloadPage = () => {
                 value: WorkloadKind.Deployment,
               },
               {
-                label: 'Statefulset',
+                label: 'StatefulSet',
                 value: WorkloadKind.Statefulset,
               },
               {
-                label: 'Daemonset',
+                label: 'DaemonSet',
                 value: WorkloadKind.Daemonset,
               },
               {
-                label: 'Cronjob',
+                label: 'CronJob',
                 value: WorkloadKind.Cronjob,
               },
               {
@@ -282,43 +325,40 @@ const WorkloadPage = () => {
             ]}
           />
         </div>
-        <Space>
+        <div className="flex space-x-2">
+          <Select
+            options={[
+              { label: '使用向导创建', value: true },
+              { label: '使用YAML创建', value: false }
+            ]}
+            value={useWizard}
+            style={{ width: 140 }}
+            onChange={(value) => setUseWizard(value)}
+          />
           <Button
-            type={'primary'}
+            type="primary"
+            className={'flex flex-row items-center'}
             icon={<Icons.add width={16} height={16} />}
-            className="flex flex-row items-center"
-            onClick={() => {
-              toggleShowWizardModal(true);
-            }}
+            onClick={handleAddWorkload}
           >
-            {i18nInstance.t('快速创建', '快速创建')}
+            {i18nInstance.t('新增工作负载', '新增工作负载')}
           </Button>
-          <Button
-            type={'default'}
-            icon={<Icons.pdf width={16} height={16} />}
-            className="flex flex-row items-center"
-            onClick={() => {
-              toggleShowModal(true);
-            }}
-          >
-            {i18nInstance.t('yaml创建', 'yaml创建')}
-          </Button>
-        </Space>
+        </div>
       </div>
       <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
         {workloadKindDescriptions[String(filter.kind).toLowerCase()]}
       </div>
       <div className={'flex flex-row space-x-4 mb-4'}>
         <h3 className={'leading-[32px]'}>
-          {i18nInstance.t('280c56077360c204e536eb770495bc5f', '命名空间')}：
+          {i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}
         </h3>
         <Select
           options={nsOptions}
           className={'min-w-[200px]'}
-          value={filter.selectedWorkSpace}
           loading={isNsDataLoading}
-          showSearch
           allowClear
+          showSearch
+          value={filter.selectedWorkSpace}
           onChange={(v) => {
             setFilter({
               ...filter,
@@ -327,11 +367,6 @@ const WorkloadPage = () => {
           }}
         />
         <Input.Search
-          placeholder={i18nInstance.t(
-            'cfaff3e369b9bd51504feb59bf0972a0',
-            '按命名空间搜索',
-          )}
-          className={'w-[300px]'}
           onPressEnter={(e) => {
             const input = e.currentTarget.value;
             setFilter({
@@ -339,88 +374,69 @@ const WorkloadPage = () => {
               searchText: input,
             });
           }}
+          placeholder={i18nInstance.t(
+            'cfaff3e369b9bd51504feb59bf0972a0',
+            '按命名空间搜索',
+          )}
+          className={'w-[300px]'}
         />
       </div>
       <Table
-        rowKey={(r: DeploymentWorkload) =>
-          `${r.objectMeta.namespace}-${r.objectMeta.name}` || ''
-        }
         columns={columns}
-        loading={isLoading}
-        dataSource={
-          data
-            ? data.deployments ||
-              data.statefulSets ||
-              data.daemonSets ||
-              data.jobs ||
-              data.items
-            : []
+        rowKey={(record) =>
+          `${record.typeMeta.kind}.${record.objectMeta.namespace}.${record.objectMeta.name}`
         }
+        loading={isLoading}
+        dataSource={getWorkloadItems()}
+        pagination={{
+          current: 1,
+          defaultPageSize: 10,
+          total: data?.listMeta?.totalItems || 0,
+          showSizeChanger: true,
+        }}
       />
-
+      <WorkloadDetailDrawer
+        {...drawerData}
+        onClose={() => {
+          setDrawerData({
+            ...drawerData,
+            open: false,
+          });
+        }}
+      />
+      {/* YAML编辑器模态框 */}
       <NewWorkloadEditorModal
         mode={editorState.mode}
         workloadContent={editorState.content}
         open={showModal}
-        kind={filter.kind}
         onOk={async (ret) => {
-          const msg =
-            editorState.mode === 'edit'
-              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0', '修改')
-              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增');
           if (ret.code === 200) {
             await messageApi.success(
-              `${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}${msg}${i18nInstance.t('330363dfc524cff2488f2ebde0500896', '成功')}`,
+              editorState.mode === 'edit'
+                ? i18nInstance.t('55aa6366c0d09a392d8acf54c4c4b837', '更新成功')
+                : i18nInstance.t('04a691b377c91da599d5b4b62b0cb114', '创建成功'),
             );
             toggleShowModal(false);
             resetEditorState();
-            await refetch();
-          } else {
-            await messageApi.error(
-              `工作负载${msg}${i18nInstance.t('acd5cb847a4aff235c9a01ddeb6f9770', '失败')}`,
-            );
+            // invalidate react query
+            await refreshWorkloadList();
           }
         }}
         onCancel={() => {
-          resetEditorState();
           toggleShowModal(false);
+          resetEditorState();
         }}
+        kind={filter.kind}
       />
-
+      {/* 工作负载向导模态框 */}
       <NewWorkloadWizardModal
         open={showWizardModal}
+        onCancel={() => setShowWizardModal(false)}
+        onOk={async () => {
+          await messageApi.success(i18nInstance.t('创建成功', '创建成功'));
+          await refreshWorkloadList();
+        }}
         kind={filter.kind}
-        onOk={async (ret) => {
-          if (ret.code === 200) {
-            await messageApi.success(
-              `${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}${i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增')}${i18nInstance.t('330363dfc524cff2488f2ebde0500896', '成功')}`,
-            );
-            toggleShowWizardModal(false);
-            await refetch();
-          } else {
-            await messageApi.error(
-              `工作负载${i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增')}${i18nInstance.t('acd5cb847a4aff235c9a01ddeb6f9770', '失败')}`,
-            );
-          }
-        }}
-        onCancel={() => {
-          toggleShowWizardModal(false);
-        }}
-      />
-
-      <WorkloadDetailDrawer
-        open={drawerData.open}
-        kind={drawerData.kind}
-        name={drawerData.name}
-        namespace={drawerData.namespace}
-        onClose={() => {
-          setDrawerData({
-            open: false,
-            kind: WorkloadKind.Unknown,
-            namespace: '',
-            name: '',
-          });
-        }}
       />
     </Panel>
   );

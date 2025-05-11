@@ -28,6 +28,8 @@ import IngressTable from '@/pages/multicloud-resource-manage/service/components/
 import useNamespace from '@/hooks/use-namespace.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { DeleteResource } from '@/services/unstructured.ts';
+import NewServiceWizardModal from './components/new-service-wizard-modal';
+
 const ServicePage = () => {
   const [filter, setFilter] = useState<{
     selectedWorkSpace: string;
@@ -49,6 +51,11 @@ const ServicePage = () => {
     content: '',
   });
   const [showModal, toggleShowModal] = useToggle(false);
+  // 新增服务向导模态框状态
+  const [showWizardModal, setShowWizardModal] = useState(false);
+  // 编辑器模式
+  const [useWizard, setUseWizard] = useState(true);
+
   const resetEditorState = useCallback(() => {
     setEditorState({
       mode: 'create',
@@ -58,9 +65,37 @@ const ServicePage = () => {
   const { message: messageApi } = App.useApp();
   const queryClient = useQueryClient();
   const serviceKindDescriptions: Record<string, string> = {
-    service: 'Service 用于集群内外部服务的统一暴露与访问，支持负载均衡和服务发现。',
+    service: '服务 (Service) 用于集群内外部服务的统一暴露与访问，支持负载均衡和服务发现。',
     ingress: 'Ingress 用于 HTTP/HTTPS 路由和七层流量管理，实现外部流量接入集群服务。',
   };
+
+  // 刷新服务列表
+  const refreshServiceList = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [
+        filter.kind === ServiceKind.Service
+          ? 'GetServices'
+          : 'GetIngress',
+      ],
+      exact: false,
+    });
+  };
+
+  // 处理点击新增服务按钮
+  const handleAddService = () => {
+    if (useWizard) {
+      // 使用向导模式 - 根据当前选择的服务类型决定创建什么服务
+      setShowWizardModal(true);
+    } else {
+      // 使用编辑器模式
+      setEditorState({
+        mode: 'create',
+        content: '',
+      });
+      toggleShowModal(true);
+    }
+  };
+
   return (
     <Panel>
       <Alert message="服务管理用于跨集群服务的统一发布、暴露与治理。" type="info" showIcon style={{ marginBottom: 16 }} />
@@ -99,16 +134,27 @@ const ServicePage = () => {
             }}
           />
         </div>
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            toggleShowModal(true);
-          }}
-        >
-          {i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')}
-        </Button>
+        <div className="flex space-x-2">
+          <Select
+            options={[
+              { label: '使用向导创建', value: true },
+              { label: '使用YAML创建', value: false }
+            ]}
+            value={useWizard}
+            style={{ width: 140 }}
+            onChange={(value) => setUseWizard(value)}
+          />
+          <Button
+            type={'primary'}
+            icon={<Icons.add width={16} height={16} />}
+            className="flex flex-row items-center"
+            onClick={handleAddService}
+          >
+            {filter.kind === ServiceKind.Service 
+              ? i18nInstance.t('新增服务', '新增服务')
+              : i18nInstance.t('新增Ingress', '新增Ingress')}
+          </Button>
+        </div>
       </div>
       <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
         {serviceKindDescriptions[String(filter.kind).toLowerCase()]}
@@ -228,10 +274,12 @@ const ServicePage = () => {
         />
       )}
 
+      {/* YAML编辑器模态框 */}
       <ServiceEditorModal
         mode={editorState.mode}
         open={showModal}
         serviceContent={editorState.content}
+        kind={filter.kind}
         onOk={async (ret) => {
           if (ret.code === 200) {
             await messageApi.success(
@@ -245,31 +293,21 @@ const ServicePage = () => {
             toggleShowModal(false);
             resetEditorState();
             // invalidate react query
-            await queryClient.invalidateQueries({
-              queryKey: [
-                filter.kind === ServiceKind.Service
-                  ? 'GetServices'
-                  : 'GetIngress',
-                filter.selectedWorkSpace,
-                filter.searchText,
-              ],
-            });
-          } else {
-            await messageApi.error(
-              editorState.mode === 'edit'
-                ? i18nInstance.t('930442e2f423436f9db3d8e91f648e93', '更新失败')
-                : i18nInstance.t(
-                    'a889286a51f3adab3cfb6913f2b0ac2e',
-                    '创建失败',
-                  ),
-            );
+            await refreshServiceList();
           }
         }}
         onCancel={() => {
-          resetEditorState();
           toggleShowModal(false);
+          resetEditorState();
         }}
-        kind={filter.kind}
+      />
+
+      {/* 服务向导模态框 */}
+      <NewServiceWizardModal
+        visible={showWizardModal}
+        onClose={() => setShowWizardModal(false)}
+        onSuccess={refreshServiceList}
+        serviceType={filter.kind === ServiceKind.Service ? 'Service' : 'Ingress'}
       />
     </Panel>
   );
