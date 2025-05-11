@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import i18nInstance from '@/utils/i18n';
-import { Button, Input, Segmented, Select } from 'antd';
+import { Button, Input, Segmented, Select, Space } from 'antd';
 import { Icons } from '@/components/icons';
 import { FC } from 'react';
 import { FilterState } from '../types';
@@ -30,6 +30,8 @@ interface QueryFilterProps {
     value: string;
   }[];
   isNsDataLoading: boolean;
+  useWizard: boolean;
+  setUseWizard: (useWizard: boolean) => void;
 }
 
 const configKindDescriptions: Record<string, string> = {
@@ -38,7 +40,7 @@ const configKindDescriptions: Record<string, string> = {
 };
 
 const QueryFilter: FC<QueryFilterProps> = (props) => {
-  const { filter, setFilter, onNewConfig, nsOptions, isNsDataLoading } = props;
+  const { filter, setFilter, onNewConfig, nsOptions, isNsDataLoading, useWizard, setUseWizard } = props;
   return (
     <>
       <div className={'flex flex-row justify-between mb-4'}>
@@ -75,16 +77,27 @@ const QueryFilter: FC<QueryFilterProps> = (props) => {
             ]}
           />
         </div>
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={onNewConfig}
-        >
-          {filter.kind === ConfigKind.ConfigMap
-            ? i18nInstance.t('80e2ca37eabd710ead8581de48a54fed', '新增配置')
-            : i18nInstance.t('12f9985489b76f8cd0775f5757b293d4', '新增秘钥')}
-        </Button>
+        <div className="flex space-x-2">
+          <Select
+            options={[
+              { label: '使用向导创建', value: true },
+              { label: '使用YAML创建', value: false }
+            ]}
+            value={useWizard}
+            style={{ width: 140 }}
+            onChange={(value) => setUseWizard(value)}
+          />
+          <Button
+            type={'primary'}
+            icon={<Icons.add width={16} height={16} />}
+            className="flex flex-row items-center"
+            onClick={onNewConfig}
+          >
+            {filter.kind === ConfigKind.ConfigMap
+              ? i18nInstance.t('80e2ca37eabd710ead8581de48a54fed', '新增配置')
+              : i18nInstance.t('12f9985489b76f8cd0775f5757b293d4', '新增秘钥')}
+          </Button>
+        </div>
       </div>
       <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
         {configKindDescriptions[String(filter.kind).toLowerCase()]}

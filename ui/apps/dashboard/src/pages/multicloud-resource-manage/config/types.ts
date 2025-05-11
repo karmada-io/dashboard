@@ -27,3 +27,24 @@ export interface EditorState {
   mode: 'create' | 'edit' | 'read';
   content: string;
 }
+
+// 向导模式状态
+export interface WizardState {
+  show: boolean;
+  kind: ConfigKind;
+}
+
+// 配置数据字段映射
+export interface ConfigData {
+  name: string;
+  namespace: string;
+  labels?: Record<string, string>;
+  annotations?: Record<string, string>;
+  data: Record<string, string>;
+}
+
+// 键值对类型
+export interface KeyValuePair {
+  key: string;
+  value: string;
+}

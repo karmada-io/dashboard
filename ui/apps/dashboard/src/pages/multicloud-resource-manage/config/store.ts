@@ -16,11 +16,13 @@ limitations under the License.
 
 import { create } from 'zustand';
 import { ConfigKind } from '@/services/base.ts';
-import { FilterState, EditorState } from './types.ts';
+import { FilterState, EditorState, WizardState } from './types.ts';
 
 type State = {
   filter: FilterState;
   editor: EditorState;
+  wizard: WizardState;
+  useWizard: boolean; // 是否使用向导模式
 };
 
 type Actions = {
@@ -29,6 +31,9 @@ type Actions = {
   editConfig: (config: string) => void;
   hideEditor: () => void;
   createConfig: () => void;
+  showWizard: () => void;
+  hideWizard: () => void;
+  setUseWizard: (useWizard: boolean) => void;
 };
 
 export type Store = State & Actions;
@@ -44,6 +49,12 @@ export const useStore = create<Store>((set) => ({
     mode: 'create',
     content: '',
   },
+  wizard: {
+    show: false,
+    kind: ConfigKind.ConfigMap,
+  },
+  useWizard: true, // 默认使用向导模式
+  
   setFilter: (k: Partial<FilterState>) => {
     set((state) => {
       const f = state.filter;
@@ -51,6 +62,10 @@ export const useStore = create<Store>((set) => ({
         filter: {
           ...f,
           ...k,
+        },
+        wizard: {
+          ...state.wizard,
+          kind: k.kind || state.wizard.kind,
         },
       };
     });
@@ -83,12 +98,43 @@ export const useStore = create<Store>((set) => ({
     });
   },
   createConfig: () => {
-    set({
-      editor: {
-        show: true,
-        mode: 'create',
-        content: '',
-      },
+    set((state) => {
+      // 根据当前模式选择打开编辑器或向导
+      if (state.useWizard) {
+        return {
+          wizard: {
+            show: true,
+            kind: state.filter.kind,
+          }
+        };
+      } else {
+        return {
+          editor: {
+            show: true,
+            mode: 'create',
+            content: '',
+          }
+        };
+      }
     });
+  },
+  showWizard: () => {
+    set((state) => ({
+      wizard: {
+        show: true,
+        kind: state.filter.kind,
+      }
+    }));
+  },
+  hideWizard: () => {
+    set({
+      wizard: {
+        show: false,
+        kind: ConfigKind.ConfigMap,
+      }
+    });
+  },
+  setUseWizard: (useWizard: boolean) => {
+    set({ useWizard });
   },
 }));

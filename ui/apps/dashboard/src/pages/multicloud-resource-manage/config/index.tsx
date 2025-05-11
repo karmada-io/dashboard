@@ -27,32 +27,55 @@ import { message, Alert } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
+import NewConfigWizardModal from './components/new-config-wizard-modal';
+
 const ConfigPage = () => {
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
   const filter = useStore((state) => state.filter);
-  const { setFilter } = useStore((state) => {
+  const editor = useStore((state) => state.editor);
+  const wizard = useStore((state) => state.wizard);
+  const useWizard = useStore((state) => state.useWizard);
+  
+  const { 
+    setFilter, 
+    editConfig, 
+    viewConfig, 
+    createConfig, 
+    hideEditor, 
+    hideWizard, 
+    setUseWizard 
+  } = useStore((state) => {
     return {
       setFilter: state.setFilter,
+      editConfig: state.editConfig,
+      viewConfig: state.viewConfig,
+      createConfig: state.createConfig,
+      hideEditor: state.hideEditor,
+      hideWizard: state.hideWizard,
+      setUseWizard: state.setUseWizard
     };
   });
-  const editor = useStore((state) => state.editor);
-  const { editConfig, viewConfig, createConfig, hideEditor } = useStore(
-    (state) => {
-      return {
-        editConfig: state.editConfig,
-        viewConfig: state.viewConfig,
-        createConfig: state.createConfig,
-        hideEditor: state.hideEditor,
-      };
-    },
-  );
+  
   const queryClient = useQueryClient();
   const [messageApi, messageContextHolder] = message.useMessage();
   const configKindDescriptions: Record<string, string> = {
     configmap: 'ConfigMap 用于存储非敏感的配置信息，支持多集群分发和集中管理。',
     secret: 'Secret 用于存储敏感数据（如密码、密钥），安全分发到多集群，保障数据安全。',
   };
+  
+  // 刷新配置列表
+  const refreshConfigList = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [
+        filter.kind === ConfigKind.ConfigMap
+          ? 'GetConfigMaps'
+          : 'GetSecrets',
+      ],
+      exact: false,
+    });
+  };
+  
   return (
     <Panel>
       <Alert message="配置管理用于多集群下 ConfigMap、Secret 等配置的集中管理与分发。" type="info" showIcon style={{ marginBottom: 16 }} />
@@ -64,10 +87,9 @@ const ConfigPage = () => {
         onNewConfig={createConfig}
         nsOptions={nsOptions}
         isNsDataLoading={isNsDataLoading}
+        useWizard={useWizard}
+        setUseWizard={setUseWizard}
       />
-      <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
-        {configKindDescriptions[String(filter.kind).toLowerCase()]}
-      </div>
 
       {filter.kind === ConfigKind.ConfigMap && (
         <ConfigMapTable
@@ -142,6 +164,7 @@ const ConfigPage = () => {
         />
       )}
 
+      {/* YAML编辑器模态框 */}
       <ConfigEditorModal
         mode={editor.mode}
         workloadContent={editor.content}
@@ -161,12 +184,7 @@ const ConfigPage = () => {
               `${msg}${i18nInstance.t('a6d38572262cb1b1238d449b4098f002', '配置成功')}`,
             );
             hideEditor();
-            if (editor.mode === 'create') {
-              await queryClient.invalidateQueries({
-                queryKey: ['GetConfigMaps'],
-                exact: false,
-              });
-            }
+            await refreshConfigList();
           } else {
             await messageApi.error(
               `${msg}${i18nInstance.t('03d3b00687bbab3e9a7e1bd3aeeaa0a4', '配置失败')}`,
@@ -175,6 +193,15 @@ const ConfigPage = () => {
         }}
         onCancel={hideEditor}
       />
+      
+      {/* 配置向导模态框 */}
+      <NewConfigWizardModal
+        visible={wizard.show}
+        onClose={hideWizard}
+        onSuccess={refreshConfigList}
+        configType={wizard.kind}
+      />
+      
       {messageContextHolder}
     </Panel>
   );
