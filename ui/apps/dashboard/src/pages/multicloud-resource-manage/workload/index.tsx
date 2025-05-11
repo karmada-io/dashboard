@@ -36,6 +36,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { DeleteResource, GetResource } from '@/services/unstructured.ts';
 import NewWorkloadEditorModal from './new-workload-editor-modal.tsx';
+import NewWorkloadWizardModal from './new-workload-wizard-modal/index.tsx';
 import WorkloadDetailDrawer, {
   WorkloadDetailDrawerProps,
 } from './workload-detail-drawer.tsx';
@@ -85,6 +86,7 @@ const WorkloadPage = () => {
     name: '',
   });
   const [showModal, toggleShowModal] = useToggle(false);
+  const [showWizardModal, toggleShowWizardModal] = useToggle(false);
   const [editorState, setEditorState] = useState<{
     mode: 'create' | 'edit';
     content: string;
@@ -280,16 +282,28 @@ const WorkloadPage = () => {
             ]}
           />
         </div>
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            toggleShowModal(true);
-          }}
-        >
-          {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0', '新增工作负载')}
-        </Button>
+        <Space>
+          <Button
+            type={'primary'}
+            icon={<Icons.add width={16} height={16} />}
+            className="flex flex-row items-center"
+            onClick={() => {
+              toggleShowWizardModal(true);
+            }}
+          >
+            {i18nInstance.t('快速创建', '快速创建')}
+          </Button>
+          <Button
+            type={'default'}
+            icon={<Icons.pdf width={16} height={16} />}
+            className="flex flex-row items-center"
+            onClick={() => {
+              toggleShowModal(true);
+            }}
+          >
+            {i18nInstance.t('yaml创建', 'yaml创建')}
+          </Button>
+        </Space>
       </div>
       <div style={{ marginBottom: 16, fontSize: 15, color: '#555' }}>
         {workloadKindDescriptions[String(filter.kind).toLowerCase()]}
@@ -370,6 +384,27 @@ const WorkloadPage = () => {
         onCancel={() => {
           resetEditorState();
           toggleShowModal(false);
+        }}
+      />
+
+      <NewWorkloadWizardModal
+        open={showWizardModal}
+        kind={filter.kind}
+        onOk={async (ret) => {
+          if (ret.code === 200) {
+            await messageApi.success(
+              `${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}${i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增')}${i18nInstance.t('330363dfc524cff2488f2ebde0500896', '成功')}`,
+            );
+            toggleShowWizardModal(false);
+            await refetch();
+          } else {
+            await messageApi.error(
+              `工作负载${i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增')}${i18nInstance.t('acd5cb847a4aff235c9a01ddeb6f9770', '失败')}`,
+            );
+          }
+        }}
+        onCancel={() => {
+          toggleShowWizardModal(false);
         }}
       />
 
