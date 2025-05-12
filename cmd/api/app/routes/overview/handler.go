@@ -20,6 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	"github.com/karmada-io/dashboard/cmd/api/app/routes/overview/topology"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 )
@@ -73,4 +74,7 @@ func init() {
 	r.GET("/overview/schedule", HandleGetSchedulePreview)
 	// 添加所有集群资源预览接口路由
 	r.GET("/overview/all-resources", HandleGetAllClusterResourcesPreview)
+
+	// 注册拓扑图相关路由
+	topology.RegisterRoutes(r)
 }
