@@ -31,6 +31,21 @@ export const karmadaClient = axios.create({
   baseURL,
 });
 
+// 添加请求拦截器，为GET请求添加时间戳参数，避免缓存
+karmadaClient.interceptors.request.use((config) => {
+  // 只处理GET请求
+  if (config.method?.toLowerCase() === 'get') {
+    // 添加时间戳参数
+    config.params = {
+      ...config.params,
+      _t: new Date().getTime() // 添加时间戳
+    };
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 export interface IResponse<Data = {}> {
   code: number;
   message: string;

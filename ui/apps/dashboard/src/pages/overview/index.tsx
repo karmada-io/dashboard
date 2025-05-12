@@ -299,18 +299,39 @@ const Overview = () => {
   const { data: scheduleData, isLoading: isScheduleLoading, refetch: refetchScheduleData, dataUpdatedAt } = useQuery({
     queryKey: ['GetSchedulePreview'],
     queryFn: async () => {
-      const ret = await GetSchedulePreview(); // 现在后端已修改，只返回Karmada调度的资源
-      return ret.data;
+      console.log('正在获取调度预览数据，时间戳:', new Date().toISOString());
+      try {
+        const ret = await GetSchedulePreview();
+        console.log('成功获取调度预览数据');
+        return ret.data;
+      } catch (error) {
+        console.error('获取调度预览数据失败:', error);
+        throw error;
+      }
     },
     // 仅在全局概览页面且自动刷新启用时获取
     enabled: !clusterName,
     // 根据autoRefresh状态决定是否启用自动刷新
     refetchInterval: autoRefresh ? REFRESH_INTERVAL : false,
+    // 设置refetchOnWindowFocus为true，确保窗口获得焦点时刷新数据
+    refetchOnWindowFocus: true,
+    // 设置不要重用缓存数据，保证每次刷新都从服务器获取最新数据
+    staleTime: 0,
+    // 禁用缓存，确保每次都是新请求
+    cacheTime: 0,
+    // 设置重试策略
+    retry: 1,
   });
 
   // 处理手动刷新
   const handleRefreshScheduleData = () => {
-    refetchScheduleData();
+    console.log('手动刷新调度数据，时间戳:', new Date().toISOString());
+    // 使用设置强制选项来确保不使用缓存
+    refetchScheduleData({ cancelRefetch: true }).then(() => {
+      console.log('调度数据已成功刷新');
+    }).catch(error => {
+      console.error('刷新调度数据出错:', error);
+    });
   };
 
   // 以下是我们将需要展示的组件

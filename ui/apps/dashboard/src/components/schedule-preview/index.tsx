@@ -284,8 +284,14 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
             {onRefresh && (
               <Button
                 type="text"
-                icon={<SyncOutlined />}
-                onClick={onRefresh}
+                icon={<SyncOutlined spin={loading} />}
+                onClick={() => {
+                  console.log('组件内刷新按钮被点击');
+                  if (onRefresh) {
+                    onRefresh();
+                  }
+                }}
+                disabled={loading}
                 style={{ marginRight: '0px' }}
                 title={i18nInstance.t('20b9ec5834c2c149bfa27fe33ef4d745', '刷新')}
               />
