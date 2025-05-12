@@ -1,31 +1,13 @@
-/*
-Copyright 2024 The Karmada Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, Spin, Empty, Checkbox, Space, Button, Tooltip, Tag, Badge, Typography } from 'antd';
 import { ReloadOutlined, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import i18nInstance from '@/utils/i18n';
 import { useQuery } from '@tanstack/react-query';
-// 导入G6库，如果CDN加载失败可以使用此导入
 import * as G6 from '@antv/g6';
 import './styles.css';
 
 const { Text } = Typography;
 
-// 定义拓扑图数据类型
 interface TopologyNode {
   id: string;
   name: string;
@@ -77,8 +59,8 @@ interface TopologyResponse {
   code: number;
   message: string;
   data: {
-    data?: TopologyData; // 添加可能的嵌套数据结构
-  } & TopologyData; // 同时保留直接访问的能力
+    data?: TopologyData;
+  } & TopologyData;
 }
 
 interface ClusterTopologyProps {
@@ -90,7 +72,7 @@ interface ClusterTopologyProps {
 
 const ClusterTopology: React.FC<ClusterTopologyProps> = ({
   clusterName,
-  height = 600,
+  height = 700,
   autoRefresh = true,
   refreshInterval = 30000,
 }) => {
@@ -102,7 +84,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 获取拓扑图数据
   const { data, isLoading, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['GetTopology', clusterName, showResources, showNodes, showPods],
     queryFn: async () => {
@@ -135,7 +116,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     refetchOnWindowFocus: true,
   });
 
-  // 检查G6是否已加载
   const checkG6Loaded = () => {
     if (typeof window === 'undefined' || (typeof window.G6 === 'undefined' && typeof G6 === 'undefined')) {
       console.error('G6 is not loaded');
@@ -145,7 +125,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     return true;
   };
 
-  // 初始化图表
   useEffect(() => {
     if (!containerRef.current || !checkG6Loaded()) return;
     
@@ -162,16 +141,13 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
       const width = container.clientWidth || 800;
       const graphHeight = isFullscreen ? window.innerHeight - 150 : height;
 
-      // 创建图表实例
       const G6Instance = window.G6 || G6;
       
-      // 注册自定义节点，显示更多信息
       G6Instance.registerNode('cluster-node', {
         draw(cfg: any, group: any) {
           const { id, label, style = {}, originData = {} } = cfg;
           const { fill, stroke } = style;
           
-          // 绘制主圆形，减小节点尺寸
           const keyShape = group.addShape('circle', {
             attrs: {
               x: 0,
@@ -179,52 +155,50 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
               r: cfg.size / 2,
               fill,
               stroke,
-              lineWidth: 1.5, // 减小线宽
+              lineWidth: 1.5,
               cursor: 'pointer',
               shadowColor: stroke,
-              shadowBlur: 3, // 减小阴影
+              shadowBlur: 3,
               shadowOffsetX: 0,
               shadowOffsetY: 0,
             },
             name: 'node-keyShape',
           });
           
-          // 添加标签，调整位置
           group.addShape('text', {
             attrs: {
               text: label,
               x: 0,
-              y: cfg.size / 2 + 10, // 调整标签位置，增加与节点的距离
+              y: cfg.size / 2 + 15,
               textAlign: 'center',
               textBaseline: 'top',
               fill: '#333',
-              fontSize: 11, // 减小字体
+              fontSize: 14,
               fontWeight: 500,
               cursor: 'pointer',
               background: {
                 fill: '#fff',
-                padding: [2, 4, 2, 4],
+                padding: [2, 5, 2, 5],
                 radius: 2,
               },
             },
             name: 'node-label',
           });
           
-          // 添加类型标签，调整位置和大小
           if (originData.type) {
             group.addShape('text', {
               attrs: {
                 text: originData.type,
                 x: 0,
-                y: -cfg.size / 2 - 6, // 调整位置，增加与节点的距离
+                y: -cfg.size / 2 - 8,
                 textAlign: 'center',
                 textBaseline: 'bottom',
                 fill: '#666',
-                fontSize: 9, // 减小字体
+                fontSize: 12,
                 cursor: 'pointer',
                 background: {
                   fill: 'rgba(255,255,255,0.8)',
-                  padding: [1, 2, 1, 2],
+                  padding: [2, 4, 2, 4],
                   radius: 2,
                 },
               },
@@ -232,14 +206,13 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             });
           }
           
-          // 添加状态标记，减小尺寸
           if (originData.status) {
             const statusColor = originData.status === 'ready' ? '#52c41a' : '#ff4d4f';
             group.addShape('circle', {
               attrs: {
-                x: cfg.size / 2 - 4, // 调整位置
-                y: -cfg.size / 2 + 4,
-                r: 3, // 减小尺寸
+                x: cfg.size / 2 - 5,
+                y: -cfg.size / 2 + 5,
+                r: 4,
                 fill: statusColor,
                 cursor: 'pointer',
               },
@@ -254,13 +227,11 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
           const { label, style = {} } = cfg;
           const keyShape = node.get('keyShape');
           
-          // 更新主形状样式
           keyShape.attr({
             fill: style.fill,
             stroke: style.stroke,
           });
           
-          // 更新标签
           const textShape = group.find((element: any) => element.get('name') === 'node-label');
           if (textShape) {
             textShape.attr({
@@ -270,7 +241,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         },
       });
       
-      // 注册提示框
       const tooltip = new G6Instance.Tooltip({
         itemTypes: ['node'],
         getContent: (e: any) => {
@@ -284,7 +254,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
               <div><strong>状态:</strong> ${originData.status || '未知'}</div>
           `;
           
-          // 添加资源信息
           if (originData.resources) {
             const { cpu, memory, pods } = originData.resources;
             content += '<div class="g6-tooltip-section"><strong>资源使用情况:</strong></div>';
@@ -302,7 +271,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             }
           }
           
-          // 添加标签信息
           if (originData.labels && Object.keys(originData.labels).length > 0) {
             content += '<div class="g6-tooltip-section"><strong>标签:</strong></div>';
             Object.entries(originData.labels).forEach(([key, value]) => {
@@ -322,7 +290,7 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         width,
         height: graphHeight,
         fitView: true,
-        fitViewPadding: 80, // 增加边距
+        fitViewPadding: 100,
         animate: true,
         modes: {
           default: [
@@ -339,20 +307,26 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             'click-select',
           ],
         },
+        // 布局大小配置
         layout: {
-          type: 'dagre', // 使用层次布局
-          rankdir: 'LR', // 从左到右布局
-          align: 'UL', // 左上对齐
-          nodesep: 100, // 节点间距
-          ranksep: 150, // 层级间距
-          controlPoints: true, // 控制点
-          nodeSize: 60, // 节点大小
-          preventOverlap: true, // 防止重叠
-          // 布局结束后再次优化位置
+          type: 'dagre',
+          rankdir: 'LR',
+          align: 'UL',
+          // 节点间距
+          nodesep: 20,
+          // 层间距
+          ranksep: 60,
+          // 控制点
+          controlPoints: true,
+          // 节点大小
+          nodeSize: 80,
+          // 防止节点重叠
+          preventOverlap: true,
+          // 布局结束后的回调
           onLayoutEnd: () => {
             if (graph && !graph.destroyed) {
               setTimeout(() => {
-                graph.fitView(60);
+                graph.fitView(80);
                 graph.fitCenter();
               }, 200);
             }
@@ -360,43 +334,43 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         },
         defaultNode: {
           type: 'cluster-node',
-          size: 30, // 默认节点尺寸
+          size: 50,
           style: {
             fill: '#e6f7ff',
             stroke: '#1890ff',
-            lineWidth: 1.5, // 减小线宽
+            lineWidth: 2,
             shadowColor: '#1890ff',
-            shadowBlur: 5, // 减小阴影
+            shadowBlur: 5,
             shadowOffsetX: 0,
             shadowOffsetY: 0,
           },
           labelCfg: {
             position: 'bottom',
-            offset: 8, // 减小标签偏移
+            offset: 12,
             style: {
               fill: '#000',
-              fontSize: 11, // 减小字体
+              fontSize: 14,
               fontWeight: 500,
             },
           },
         },
         defaultEdge: {
-          type: 'line', // 使用直线，而不是折线
+          type: 'line',
           style: {
             stroke: '#91d5ff',
-            lineWidth: 1.5,
-            opacity: 0.7,
+            lineWidth: 2,
+            opacity: 0.8,
             endArrow: {
-              path: 'M 0,0 L 6,3 L 6,-3 Z',
+              path: 'M 0,0 L 8,4 L 8,-4 Z',
               fill: '#91d5ff',
             },
-            radius: 10, // 拐角弧度
+            radius: 10,
           },
           labelCfg: {
             autoRotate: true,
             style: {
               fill: '#666',
-              fontSize: 10,
+              fontSize: 12,
               background: {
                 fill: '#fff',
                 padding: [2, 4],
@@ -429,7 +403,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         plugins: [tooltip],
       });
 
-      // 注册节点交互行为
       graph.on('node:mouseenter', (evt: { item: any }) => {
         const { item } = evt;
         graph.setItemState(item, 'hover', true);
@@ -451,10 +424,8 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         });
       });
 
-      // 修改节点拖拽后的行为
       graph.on('node:dragend', (evt: any) => {
         const { item } = evt;
-        // 高亮与当前节点相连的边
         const edges = item.getEdges();
         edges.forEach((edge: any) => {
           graph.setItemState(edge, 'active', true);
@@ -462,18 +433,13 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             graph.setItemState(edge, 'active', false);
           }, 1000);
         });
-        
-        // 不再随机调整相关节点位置，避免重影
       });
 
-      // 保存图表实例
       graphRef.current = graph;
       
-      // 如果已有数据，立即渲染
       if (data?.data) {
         updateGraphData(data.data);
       } else {
-        // 否则渲染一个简单的提示
         renderEmptyGraph();
       }
 
@@ -492,7 +458,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     };
   }, [height, isFullscreen]);
 
-  // 渲染空图表
   const renderEmptyGraph = () => {
     if (!graphRef.current) return;
     
@@ -507,7 +472,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     graphRef.current.render();
   };
 
-  // 处理节点颜色
   const getNodeColor = (node: any) => {
     switch (node.type) {
       case 'control-plane':
@@ -529,35 +493,30 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     }
   };
 
-  // 处理节点大小
   const getNodeSize = (node: any) => {
     switch (node.type) {
-      case 'control-plane': return 50; // 控制平面节点
-      case 'cluster': return 40; // 集群节点
-      case 'node': return 30; // 普通节点
-      case 'pod': return 20; // Pod节点
-      default: return 30;
+      case 'control-plane': return 80;
+      case 'cluster': return 70;
+      case 'node': return 60;
+      case 'pod': return 40;
+      default: return 50;
     }
   };
 
-  // 更新图表数据
   const updateGraphData = (topologyData: any) => {
     if (!graphRef.current || !topologyData) return;
     
     try {
       console.log('更新拓扑图数据:', topologyData);
       
-      // 处理嵌套的数据结构
       const graphData = topologyData.data || topologyData;
       
-      // 确保数据结构正确
       if (!Array.isArray(graphData.nodes) || !Array.isArray(graphData.edges)) {
         console.error('拓扑图数据结构不正确:', topologyData);
         setError('拓扑图数据结构不正确');
         return;
       }
       
-      // 按类型分组节点
       const nodeGroups: Record<string, any[]> = {
         'control-plane': [],
         'cluster': [],
@@ -575,10 +534,8 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         }
       });
       
-      // 准备节点数据
       const nodes: any[] = [];
       
-      // 处理控制平面节点 - 放在左侧
       nodeGroups['control-plane'].forEach((node: any) => {
         const colors = getNodeColor(node);
         nodes.push({
@@ -590,13 +547,11 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             stroke: colors.stroke,
             lineWidth: 1.5,
           },
-          // 设置层级，用于dagre布局
           depth: 0,
           originData: node,
         });
       });
       
-      // 处理集群节点 - 放在中间
       nodeGroups['cluster'].forEach((node: any, i: number) => {
         const colors = getNodeColor(node);
         nodes.push({
@@ -608,13 +563,11 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             stroke: colors.stroke,
             lineWidth: 1.5,
           },
-          // 设置层级，用于dagre布局
           depth: 1,
           originData: node,
         });
       });
       
-      // 处理节点 - 放在右侧
       nodeGroups['node'].forEach((node: any, i: number) => {
         const colors = getNodeColor(node);
         nodes.push({
@@ -626,16 +579,13 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             stroke: colors.stroke,
             lineWidth: 1.5,
           },
-          // 设置层级，用于dagre布局
           depth: 2,
           originData: node,
         });
       });
       
-      // 处理Pod节点
       nodeGroups['pod'].forEach((node: any, i: number) => {
         const colors = getNodeColor(node);
-        // 查找Pod所属的节点
         const parentEdge = graphData.edges.find((edge: any) => edge.target === node.id);
         const parentDepth = parentEdge ? 
           nodes.find((n: any) => n.id === parentEdge.source)?.depth || 2 : 
@@ -650,13 +600,11 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             stroke: colors.stroke,
             lineWidth: 1.5,
           },
-          // 设置层级，比父节点深一级
           depth: parentDepth + 1,
           originData: node,
         });
       });
       
-      // 处理其他节点
       nodeGroups['other'].forEach((node: any) => {
         const colors = getNodeColor(node);
         nodes.push({
@@ -673,7 +621,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         });
       });
       
-      // 准备边数据
       const edges = graphData.edges.map((edge: any) => {
         const isControlEdge = edge.type === 'control';
         return {
@@ -681,17 +628,15 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
           source: edge.source,
           target: edge.target,
           label: edge.value > 1 ? `${edge.value}` : '',
-          type: 'line', // 使用直线类型
+          type: 'line',
           style: {
             stroke: isControlEdge ? '#1890ff' : '#52c41a',
-            lineWidth: isControlEdge ? 1.5 : 1,
-            opacity: 0.7,
-            // 添加箭头
+            lineWidth: isControlEdge ? 2 : 1.5,
+            opacity: 0.8,
             endArrow: {
-              path: 'M 0,0 L 6,3 L 6,-3 Z',
+              path: 'M 0,0 L 8,4 L 8,-4 Z',
               fill: isControlEdge ? '#1890ff' : '#52c41a',
             },
-            // 添加边的动画效果
             lineDash: isControlEdge ? [0] : [5, 5],
             animation: isControlEdge ? undefined : {
               repeat: true,
@@ -703,19 +648,15 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         };
       });
       
-      // 更新图表数据
       graphRef.current.data({
         nodes,
         edges,
       });
       
-      // 渲染图表
       graphRef.current.render();
       
-      // 自动适应视图，增加边距
       setTimeout(() => {
-        graphRef.current.fitView(60);
-        // 额外调整视图，确保所有节点可见
+        graphRef.current.fitView(80);
         setTimeout(() => {
           graphRef.current.fitCenter();
         }, 100);
@@ -728,21 +669,19 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     }
   };
 
-  // 监听数据变化，更新图表
   useEffect(() => {
     if (data?.data) {
       updateGraphData(data.data);
     }
   }, [data]);
 
-  // 切换全屏模式
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
     setTimeout(() => {
       if (graphRef.current && containerRef.current) {
         graphRef.current.changeSize(
           containerRef.current.clientWidth,
-          !isFullscreen ? window.innerHeight - 120 : height // 调整全屏模式下的高度
+          !isFullscreen ? window.innerHeight - 120 : height
         );
         graphRef.current.fitView(60);
         graphRef.current.fitCenter();
@@ -750,11 +689,9 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     }, 100);
   };
 
-  // 渲染拓扑图统计信息
   const renderTopologySummary = () => {
     if (!data?.data) return null;
     
-    // 处理嵌套的数据结构
     const graphData = data.data.data || data.data;
     if (!graphData.summary) return null;
 
@@ -790,7 +727,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
     );
   };
 
-  // 渲染拓扑图控制面板
   const renderTopologyControls = () => {
     return (
       <div className="topology-controls">
@@ -873,11 +809,10 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
   );
 };
 
-// 为了全局访问G6
 declare global {
   interface Window {
     G6: any;
   }
 }
 
-export default ClusterTopology; 
+export default ClusterTopology;
