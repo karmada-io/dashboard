@@ -336,9 +336,9 @@ const WorkloadPage = () => {
             onChange={(value) => setUseWizard(value)}
           />
           <Button
-            type="primary"
-            className={'flex flex-row items-center'}
+            type={'primary'}
             icon={<Icons.add width={16} height={16} />}
+            className="flex flex-row items-center"
             onClick={handleAddWorkload}
           >
             {i18nInstance.t('新增工作负载', '新增工作负载')}
@@ -432,9 +432,15 @@ const WorkloadPage = () => {
       <NewWorkloadWizardModal
         open={showWizardModal}
         onCancel={() => setShowWizardModal(false)}
-        onOk={async () => {
-          await messageApi.success(i18nInstance.t('创建成功', '创建成功'));
-          await refreshWorkloadList();
+        onOk={async (ret) => {
+          if (ret && ret.code === 200) {
+            await messageApi.success(i18nInstance.t('创建成功', '创建成功'));
+            setShowWizardModal(false);
+            await refreshWorkloadList();
+          } else {
+            await messageApi.error(i18nInstance.t('创建失败', '创建失败') + ': ' + (ret?.message || '未知错误'));
+            console.error('创建工作负载失败:', ret);
+          }
         }}
         kind={filter.kind}
       />

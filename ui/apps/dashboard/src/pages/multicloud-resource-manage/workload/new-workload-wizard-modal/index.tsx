@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 import i18nInstance from '@/utils/i18n';
-import { FC } from 'react';
-import { Modal } from 'antd';
+import { FC, useState } from 'react';
+import { Modal, message } from 'antd';
 import { IResponse, WorkloadKind } from '@/services/base.ts';
 import DeploymentForm from './deployment';
 import StatefulsetForm from './statefulset';
@@ -37,22 +37,43 @@ export interface NewWorkloadWizardModalProps {
  */
 const NewWorkloadWizardModal: FC<NewWorkloadWizardModalProps> = (props) => {
   const { open, onOk, onCancel, kind } = props;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 处理表单确认
+  const handleFormOk = async (ret: IResponse<any>) => {
+    try {
+      setIsSubmitting(true);
+      console.log('向导创建工作负载结果:', ret);
+      await onOk(ret);
+    } catch (error) {
+      console.error('工作负载创建异常:', error);
+      message.error('创建失败: ' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 处理表单取消
+  const handleFormCancel = async () => {
+    if (isSubmitting) return; // 如果正在提交，不允许取消
+    await onCancel();
+  };
 
   // 根据工作负载类型渲染不同的表单组件
   const renderForm = () => {
     switch (kind) {
       case WorkloadKind.Deployment:
-        return <DeploymentForm onOk={onOk} onCancel={onCancel} />;
+        return <DeploymentForm onOk={handleFormOk} onCancel={handleFormCancel} />;
       case WorkloadKind.Statefulset:
-        return <StatefulsetForm onOk={onOk} onCancel={onCancel} />;
+        return <StatefulsetForm onOk={handleFormOk} onCancel={handleFormCancel} />;
       case WorkloadKind.Daemonset:
-        return <DaemonsetForm onOk={onOk} onCancel={onCancel} />;
+        return <DaemonsetForm onOk={handleFormOk} onCancel={handleFormCancel} />;
       case WorkloadKind.Job:
-        return <JobForm onOk={onOk} onCancel={onCancel} />;
+        return <JobForm onOk={handleFormOk} onCancel={handleFormCancel} />;
       case WorkloadKind.Cronjob:
-        return <CronjobForm onOk={onOk} onCancel={onCancel} />;
+        return <CronjobForm onOk={handleFormOk} onCancel={handleFormCancel} />;
       default:
-        return <DeploymentForm onOk={onOk} onCancel={onCancel} />;
+        return <DeploymentForm onOk={handleFormOk} onCancel={handleFormCancel} />;
     }
   };
 
@@ -63,7 +84,8 @@ const NewWorkloadWizardModal: FC<NewWorkloadWizardModalProps> = (props) => {
       width={750}
       footer={null} // 在各子组件中自行管理按钮
       destroyOnClose={true}
-      onCancel={onCancel}
+      onCancel={handleFormCancel}
+      maskClosable={!isSubmitting} // 提交中不允许通过点击遮罩关闭
     >
       {renderForm()}
     </Modal>

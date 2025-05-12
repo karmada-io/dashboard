@@ -59,21 +59,39 @@ const BaseForm: FC<BaseFormProps> = (props) => {
             <Form.Item 
               name="name" 
               label={i18nInstance.t('名称', '名称')}
-              rules={[{ required: true, message: '请输入名称' }]}
+              rules={[{ required: true, message: '请填写工作负载名称' }]}
+              validateTrigger={['onChange', 'onBlur']}
             >
-              <Input placeholder="请输入工作负载名称" />
+              <Input 
+                placeholder="请输入工作负载名称" 
+                id="workload-name"
+                onChange={(e) => {
+                  console.log('名称字段变化:', e.target.value);
+                }}
+              />
             </Form.Item>
             
             <Form.Item 
               name="namespace" 
               label={i18nInstance.t('命名空间', '命名空间')}
               rules={[{ required: true, message: '请选择命名空间' }]}
+              validateTrigger={['onChange', 'onBlur']}
             >
               <Select 
                 options={nsOptions} 
                 loading={isNsDataLoading}
                 showSearch 
                 placeholder="请选择命名空间"
+                id="workload-namespace"
+                onChange={(value) => {
+                  console.log('命名空间变化:', value);
+                  // 主动设置表单字段值，确保它被正确记录
+                  form.setFieldsValue({ namespace: value });
+                }}
+                filterOption={(input, option) => 
+                  (option?.title ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                defaultValue={defaultValues.namespace || 'default'}
               />
             </Form.Item>
             
@@ -389,13 +407,13 @@ const BaseForm: FC<BaseFormProps> = (props) => {
 
   // 处理标签和注释
   const parseKeyValuePairs = (input: string) => {
-    if (!input || input.trim() === '') return {};
+    if (!input || typeof input !== 'string') return {};
     
     const pairs = input.split(',');
     const result: Record<string, string> = {};
     
     pairs.forEach(pair => {
-      const [key, value] = pair.split('=').map(item => item.trim());
+      const [key, value] = pair.split('=').map(item => item ? item.trim() : '');
       if (key && value) {
         result[key] = value;
       }
@@ -406,11 +424,11 @@ const BaseForm: FC<BaseFormProps> = (props) => {
 
   // 处理环境变量
   const parseEnvVars = (input: string) => {
-    if (!input || input.trim() === '') return [];
+    if (!input || typeof input !== 'string') return [];
     
     const pairs = input.split(',');
     return pairs.map(pair => {
-      const [name, value] = pair.split('=').map(item => item.trim());
+      const [name, value] = pair.split('=').map(item => item ? item.trim() : '');
       return { name, value };
     }).filter(item => item.name && item.value);
   };
@@ -419,7 +437,55 @@ const BaseForm: FC<BaseFormProps> = (props) => {
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      const values = await form.validateFields();
+      
+      // 触发表单验证前先获取所有值并打印出来
+      const allValues = form.getFieldsValue(true);
+      console.log("表单所有值(不通过验证):", allValues);
+      
+      // 如果表单值为空对象或未定义，显示错误
+      if (!allValues || Object.keys(allValues).length === 0) {
+        message.error("表单数据为空，无法提交");
+        console.error("表单数据为空:", allValues);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // 手动验证必填字段
+      const workloadName = form.getFieldValue('name');
+      const workloadNamespace = form.getFieldValue('namespace');
+      
+      console.log("手动获取关键字段:", { name: workloadName, namespace: workloadNamespace });
+      
+      // 检查必填字段
+      if (!workloadName || (typeof workloadName === 'string' && workloadName.trim() === '')) {
+        message.error("工作负载名称不能为空");
+        form.validateFields(['name']);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (!workloadNamespace || (typeof workloadNamespace === 'string' && workloadNamespace.trim() === '')) {
+        message.error("命名空间不能为空");
+        form.validateFields(['namespace']);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // 确保手动验证通过后再调用表单整体验证
+      // 获取表单值并进行验证
+      const values = await form.validateFields()
+        .catch(errors => {
+          console.error("表单验证错误:", errors);
+          message.error("表单验证失败，请检查必填字段");
+          setIsSubmitting(false);
+          throw errors;
+        });
+      
+      console.log("表单验证通过，提交的数据:", values);
+      
+      // 确保我们有所有表单数据，而不仅仅是验证后的部分
+      const allFormValues = form.getFieldsValue(true);
+      const mergedValues = { ...allFormValues, ...values };
       
       // 获取对应模板
       const template = workloadTemplates.find(t => t.type.toLowerCase() === templateType.toLowerCase());
@@ -430,45 +496,130 @@ const BaseForm: FC<BaseFormProps> = (props) => {
       }
 
       // 处理标签和注释
-      const labels = parseKeyValuePairs(values.labels || '');
-      const annotations = parseKeyValuePairs(values.annotations || '');
+      const labels = typeof mergedValues.labels === 'string' ? parseKeyValuePairs(mergedValues.labels) : (mergedValues.labels || {});
+      const annotations = typeof mergedValues.annotations === 'string' ? parseKeyValuePairs(mergedValues.annotations) : (mergedValues.annotations || {});
       
       // 处理环境变量
-      const envVars = parseEnvVars(values.envVars || '');
+      let envVars = mergedValues.envVars;
+      if (typeof mergedValues.envVars === 'string') {
+        envVars = parseEnvVars(mergedValues.envVars);
+      } else if (!Array.isArray(mergedValues.envVars)) {
+        envVars = [];
+      }
+      
+      console.log('处理表单值:', {
+        原始name: mergedValues.name,
+        原始namespace: mergedValues.namespace,
+        原始labels: mergedValues.labels,
+        处理后labels: labels,
+        原始envVars: mergedValues.envVars,
+        处理后envVars: envVars
+      });
       
       // 合并处理后的值
       const processedValues = {
-        ...values,
+        ...defaultValues, // 先使用默认值作为基础
+        ...mergedValues, // 然后使用表单输入的值覆盖
+        name: mergedValues.name ? mergedValues.name.trim() : '',
+        namespace: mergedValues.namespace || 'default',
         labels,
         annotations,
         envVars,
+        image: mergedValues.image || 'nginx:latest', // 确保image字段存在
       };
       
       // 生成YAML
       const yamlObject = generateYaml(processedValues, template);
       
       if (!yamlObject) {
+        message.error('生成YAML失败');
         setIsSubmitting(false);
         return;
       }
 
-      const kind = _.get(yamlObject, 'kind');
-      const namespace = _.get(yamlObject, 'metadata.namespace');
-      const name = _.get(yamlObject, 'metadata.name');
+      // 确保YAML对象包含必要的容器信息
+      if (yamlObject.spec?.template?.spec?.containers && 
+          yamlObject.spec.template.spec.containers.length > 0) {
+        const container = yamlObject.spec.template.spec.containers[0];
+        if (!container.image) {
+          container.image = processedValues.image || 'nginx:latest';
+        }
+      }
 
+      // 获取资源类型和名称
+      const kind = yamlObject.kind || templateType;
+      const namespace = yamlObject.metadata?.namespace || processedValues.namespace || workloadNamespace;
+      const name = yamlObject.metadata?.name || processedValues.name || workloadName;
+
+      if (!kind) {
+        message.error('资源类型不能为空');
+        console.error('资源类型不能为空');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (!name) {
+        message.error('工作负载名称不能为空');
+        console.error('工作负载名称不能为空');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (!namespace) {
+        message.error('命名空间不能为空');
+        console.error('命名空间不能为空');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('准备创建工作负载:', { kind, name, namespace, content: yamlObject });
+      
+      // 在调用API之前确保metadata字段存在且包含必要信息
+      if (!yamlObject.metadata) {
+        yamlObject.metadata = {};
+      }
+      yamlObject.metadata.name = name || '';
+      yamlObject.metadata.namespace = namespace || 'default';
+      
+      // 确保API参数完整
+      const apiParams = {
+        kind: kind || 'Deployment',
+        name: name || '',
+        namespace: namespace || 'default',
+        content: yamlObject
+      };
+      
+      console.log('最终API参数:', apiParams);
+      
+      // 最后验证关键字段
+      if (!apiParams.content.spec?.template?.spec?.containers?.[0]?.image) {
+        console.error('容器镜像字段缺失，尝试修复');
+        // 尝试修复缺失的镜像字段
+        if (!apiParams.content.spec) apiParams.content.spec = {};
+        if (!apiParams.content.spec.template) apiParams.content.spec.template = {};
+        if (!apiParams.content.spec.template.spec) apiParams.content.spec.template.spec = {};
+        if (!apiParams.content.spec.template.spec.containers) apiParams.content.spec.template.spec.containers = [{}];
+        apiParams.content.spec.template.spec.containers[0].image = processedValues.image || 'nginx:latest';
+      }
+      
+      // 打印最终YAML内容
+      console.log('最终提交的YAML内容:', JSON.stringify(apiParams.content, null, 2));
+      
       // 创建资源
-      const ret = await CreateResource({
-        kind,
-        name,
-        namespace,
-        content: yamlObject,
-      });
+      const ret = await CreateResource(apiParams);
 
-      await onOk(ret);
-      form.resetFields();
-      setIsSubmitting(false);
+      if (ret.code === 200) {
+        // 不在这里显示成功消息，改为在父组件中统一处理
+        await onOk(ret);
+        form.resetFields();
+      } else {
+        message.error(`创建失败: ${ret.message || '未知错误'}`);
+        console.error('创建失败:', ret);
+      }
     } catch (error) {
-      console.error('表单验证失败', error);
+      console.error('表单验证或提交失败', error);
+      message.error('创建失败: ' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -506,12 +657,24 @@ const BaseForm: FC<BaseFormProps> = (props) => {
             </Button>
           )}
           {currentStep < steps.length - 1 ? (
-            <Button type="primary" onClick={() => setCurrentStep(currentStep + 1)}>
+            <Button type="primary" onClick={() => {
+              form.validateFields()
+                .then(() => {
+                  setCurrentStep(currentStep + 1);
+                })
+                .catch((error) => {
+                  console.error('表单验证失败:', error);
+                });
+            }}>
               {i18nInstance.t('下一步', '下一步')}
             </Button>
           ) : (
-            <Button type="primary" onClick={handleSubmit} loading={isSubmitting}>
-              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
+            <Button type="primary" onClick={() => {
+              console.log('当前表单值:', form.getFieldsValue());
+              // 使用form.submit()触发表单提交
+              form.submit();
+            }} loading={isSubmitting}>
+              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '创建')}
             </Button>
           )}
         </Space>
@@ -524,6 +687,10 @@ const BaseForm: FC<BaseFormProps> = (props) => {
       form={form}
       layout="vertical"
       initialValues={defaultValues}
+      onValuesChange={(changedValues, allValues) => {
+        console.log('表单值变化:', { 变化的字段: changedValues, 所有字段: allValues });
+      }}
+      onFinish={handleSubmit}
     >
       {renderSteps()}
       {renderContent()}
