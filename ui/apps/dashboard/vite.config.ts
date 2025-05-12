@@ -52,7 +52,9 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     resolve: {
-      alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+      alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') },
+        { find: '@packages/terminal', replacement: path.resolve(__dirname, '../../packages/terminal/src') }
+      ],
     },
     server: {
       proxy: {

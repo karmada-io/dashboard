@@ -14,11 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-declare module 'sockjs-client/dist/sockjs' {
-  //import SockJS from '@types/sockjs-client';
-  export default SockJS;
-  export = SockJS;
-  export as namespace SockJS;
+package terminalsetup
+
+import (
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+)
+
+
+
+// Init initializes the terminal routes
+func Init() {
+	r := router.V1()
+	r.GET("/terminal", TriggerTerminal)
 }
-declare module '@karmada/xterm-addon-zmodem';
-declare module '@karmada/xterm-addon-overlay';
+
+

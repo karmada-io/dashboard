@@ -14,11 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-declare module 'sockjs-client/dist/sockjs' {
-  //import SockJS from '@types/sockjs-client';
-  export default SockJS;
-  export = SockJS;
-  export as namespace SockJS;
+package terminalsetup
+
+import (
+    "github.com/gin-gonic/gin"
+)
+
+
+// V1 returns a new router instance for version 1 of the API
+func V1() *gin.RouterGroup {
+    r := gin.Default() // Initialize a new Gin router
+    return r.Group("/api/v1") // This sets the base path for the group
 }
-declare module '@karmada/xterm-addon-zmodem';
-declare module '@karmada/xterm-addon-overlay';
+
