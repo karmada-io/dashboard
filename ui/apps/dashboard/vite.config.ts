@@ -41,6 +41,17 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     base: process.env.NODE_ENV === 'development' ? '' : '/static',
+    // ─── ADD THIS SECTION ──────────────────────────────────
+    define: {
+      // make `global` in your code point at `window` in the browser
+      global: 'window'
+    },
+    optimizeDeps: {
+      // ensure Vite pre-bundles the SockJS client
+      include: ['sockjs-client'],
+    },
+    // ────────────────────────────────────────────────────────    
+
     plugins: [
       banner(license) as Plugin,
       react(),
@@ -58,9 +69,15 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
+
+        '/api/v1/terminal/ws': {
+          target: 'http://localhost:8000', // Your backend WebSocket server
+          ws: true, // Enable WebSocket proxying
+        },
         '^/api/v1.*': {
           target: 'http://localhost:8000',
           changeOrigin: true,
+          ws: true,
           headers: {
             // cookie: env.VITE_COOKIES,
             // Authorization: `Bearer ${env.VITE_TOKEN}`

@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//import SockJS from 'sockjs-client/dist/sockjs';
-import SockJS from 'sockjs-client';
+import SockJS from 'sockjs-client/dist/sockjs';
 import BaseTerminal from './base.ts';
 import { BaseTerminalOptions } from './typing';
 import { getDebugger } from './utils.ts';

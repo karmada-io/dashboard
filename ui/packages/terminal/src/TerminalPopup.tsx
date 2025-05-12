@@ -1,25 +1,9 @@
-/*
-Copyright 2024 The Karmada Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 import React, { useEffect, useRef } from 'react';
-//import { Terminal } from '@xterm/xterm';
-import '@xterm/xterm/css/xterm.css';// Import xterm styles
-//import { FitAddon } from '@xterm/addon-fit';
-import BaseTerminal from './base.ts';
+import '@xterm/xterm/css/xterm.css';
+//import BaseTerminal from './base.ts';
 import { BaseTerminalOptions } from './typing';
 import TtydTerminal from './ttyd';
+import SockJS from 'sockjs-client';
 
 interface TerminalPopupProps {
   isOpen: boolean;
@@ -28,91 +12,98 @@ interface TerminalPopupProps {
 
 const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const terminalInstanceRef = useRef<BaseTerminal | null>(null);
   const ttydTerminalRef = useRef<TtydTerminal | null>(null);
 
   useEffect(() => {
-    if (isOpen && containerRef.current) {
-      // Define your terminal options:
-     // Make an API call to trigger the terminal setup
-     fetch('/api/v1/terminal')
-     .then(response => {
-       if (!response.ok) {
-         throw new Error('Failed to trigger terminal');
-       }
-       return response.json();
-     })
-     .then(data => {
-       console.log('Terminal triggered:', data);
-       // Proceed with initializing the terminal UI
-     })
-     .catch(error => {
-       console.error('Error triggering terminal:', error);
-     });      
-      const terminalOptions: BaseTerminalOptions = {
-        // Options for xterm.js instance
-        xtermOptions: {
-          cursorBlink: true,
-          scrollback: 1000,
-          fontSize: 14,
-          rows: 24,
-          cols: 80,
-          theme: {
-            background: '#1e1e1e',
-            foreground: '#ffffff'
+    if (!isOpen || !containerRef.current) return;
+    let sock: any = null;  
+  
+    // 1) get auth token
+    fetch('/api/v1/auth/token')
+      .then(r => {
+        if (!r.ok) throw new Error('no token');
+        return r.json();
+      })
+      .then((t: { token: string }) =>
+        // 2) create + inject
+        fetch('/api/v1/terminal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${t.token}`,
           },
-        },
-        // Client-specific options such as renderer type
-        clientOptions: {
-          rendererType: "webgl",
-          disableLeaveAlert: false,
-          disableResizeOverlay: false,
-          enableZmodem: false,
-          enableSixel: false,
-          enableTrzsz: false,
-          trzszDragInitTimeout: 5000, // Example timeout value
-          isWindows: false,         // Set this based on the OS
-          unicodeVersion: "11"      // Unicode version as a string
-        },
-      };
+        })
+      )
+      .then(r => {
+        if (!r.ok) throw new Error('terminal create failed');
+        return r.json();
+      })
+      .then((wrapper: {
+        code: number;
+        message: string;
+        data: { podName: string; namespace: string; container: string; sessionID: string; wsURL: string };
+      }) => {
+        // 3) Destructure the returned data
+        const { wsURL, sessionID, podName, namespace, container } = wrapper.data;
 
+        // 4) Use wsURL directly to establish SockJS connection
+        const sock = new SockJS(wsURL); 
+        //const sock = new SockJS('http://localhost:5173/api/v1/terminal/ws')  // Using wsURL directly from the response
 
-      // Define the Ttyd-specific options for the WebSocket connection
-      const ttydOptions = {
-        wsUrl: 'ws://localhost:7681/ws', // Adjust with your ttyd endpoint
-        tokenUrl: 'https://karmada-apiserver.karmada-system.svc.cluster.local:5443', // Adjust with your token API endpoint
-        flowControl: {
-          limit: 10000,
-          highWater: 50,
-          lowWater: 10,
-        },
-      };      
+        sock.onopen = () => 
+          console.log('SockJS OPEN');
+          sock.send(JSON.stringify({ op: 'bind', sessionId: sessionID }));  // Bind the session to SockJS
+        
 
+        sock.onmessage = e => console.log('FROM pod →', e.data);
+        // 4) Terminal options
+        const terminalOptions: BaseTerminalOptions = {
+          xtermOptions: {
+            cursorBlink: true,
+            scrollback: 1000,
+            fontSize: 14,
+            rows: 24,
+            cols: 80,
+            theme: {
+              background: '#1e1e1e',
+              foreground: '#ffffff'
+            },
+          },
+          clientOptions: {
+            rendererType: "webgl",
+            disableLeaveAlert: false,
+            disableResizeOverlay: false,
+            enableZmodem: false,
+            enableSixel: false,
+            enableTrzsz: false,
+            trzszDragInitTimeout: 5000,
+            isWindows: false,
+            unicodeVersion: "11"
+          },
+        };
 
-      // Create a new TtydTerminal instance
-      ttydTerminalRef.current = new TtydTerminal(terminalOptions, ttydOptions);
+        // 5) Initialize and connect your TtydTerminal
+        ttydTerminalRef.current = new TtydTerminal(terminalOptions, {
+          sock,                // <-- pass your SockJS instance here
+          tokenUrl: '/api/v1/auth/token',  
+          flowControl: { limit: 10000, highWater: 50, lowWater: 10 },
+        });
+        ttydTerminalRef.current.open(containerRef.current!);
+        ttydTerminalRef.current.attachOnDataListener(d => console.log('User typed:', d));
+        ttydTerminalRef.current.connect();
+      })
+      .catch(err => console.error('Error setting up terminal:', err));
 
-      // Open the terminal on the container element
-      ttydTerminalRef.current.open(containerRef.current);
-
-      // Optionally, attach an onData listener if you want to monitor input
-      ttydTerminalRef.current.attachOnDataListener((data: string) => {
-        console.log('User typed:', data);
-        // Note: TtydTerminal.sendData internally sends data via WebSocket
-      });
-
-
-      // Connect to the ttyd backend via WebSocket
-      ttydTerminalRef.current.connect();      
-
-      // Optionally, you can add more configuration or event listeners here
-
-      return () => {
-        // Dispose of the terminal when the component unmounts or is closed
-        terminalInstanceRef.current?.dispose();
-        terminalInstanceRef.current = null;
-      };
-    }
+    return () => {
+      ttydTerminalRef.current?.dispose();
+      ttydTerminalRef.current = null;
+      //if (sock) sock.close(); 
+      //sock.onclose   = () => console.log('SockJS CLOSED');
+      if (sock) {
+        sock.close();  // Close the WebSocket connection properly
+        sock.onclose = () => console.log('SockJS CLOSED');
+      }
+    };
   }, [isOpen]);
 
   return (
@@ -132,10 +123,7 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({ isOpen, onClose }
       <div
         ref={containerRef}
         tabIndex={0}
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
+        style={{ width: '100%', height: '100%' }}
       />
       <button
         onClick={onClose}

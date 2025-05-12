@@ -20,6 +20,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/karmada-io/dashboard/pkg/environment"
+
+	//terminalsetup "github.com/karmada-io/dashboard/cmd/terminalsetup"
 )
 
 var (
@@ -36,6 +38,7 @@ func init() {
 	router = gin.Default()
 	_ = router.SetTrustedProxies(nil)
 	v1 = router.Group("/api/v1")
+	//terminalsetup.Init()
 	member = v1.Group("/member/:clustername")
 	member.Use(EnsureMemberClusterMiddleware())
 

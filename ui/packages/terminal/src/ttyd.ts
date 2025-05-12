@@ -21,13 +21,18 @@ import { BaseTerminalOptions, ClientOptions } from './typing';
 //import ZmodemAddon from '@karmada/xterm-addon-zmodem';
 import OverlayAddon from '@karmada/xterm-addon-overlay';
 import ZmodemAddon from '@karmada/xterm-addon-zmodem';
+import SockJS from 'sockjs-client';
 
 export type Preferences = ITerminalOptions & ClientOptions;
 
 const log = getDebugger('TtydTerminal');
 
-interface TtydTerminalOptions {
-  wsUrl: string;
+export type SockJSSession = InstanceType<typeof SockJS>;
+
+// 2) extend the options interface
+export interface TtydTerminalOptions {
+  wsUrl?: string;           // fallback raw‑WebSocket URL
+  sock?: SockJSSession;     // ← add this line
   tokenUrl: string;
   flowControl: FlowControl;
 }
@@ -210,18 +215,26 @@ class TtydTerminal extends BaseTerminal {
       addEventListener(window, 'beforeunload', this.onWindowUnload),
     );
   };
+// src/ttyd.ts
+public connect = () => {
+  // Prefer SockJS if available
+  if (this.ttydTerminalOptions.sock) {
+    // SockJSSession doesn’t implement WebSocket, so cast:
+    this.socket = this.ttydTerminalOptions.sock as unknown as WebSocket;
+  } else {
+    // Fallback to native WebSocket
+    this.socket = new WebSocket(this.ttydTerminalOptions.wsUrl!, ['tty']);
+  }
 
-  public connect = () => {
-    this.socket = new WebSocket(this.ttydTerminalOptions.wsUrl, ['tty']);
-    const { socket, register } = this;
-    socket.binaryType = 'arraybuffer';
-    register(
-      addEventListener(socket, 'open', this.onSocketOpen),
-      addEventListener(socket, 'message', this.onSocketData as EventListener),
-      addEventListener(socket, 'close', this.onSocketClose as EventListener),
-      addEventListener(socket, 'error', () => (this.doReconnect = false)),
-    );
-  };
+  const { socket, register } = this;
+  socket.binaryType = 'arraybuffer';
+  register(
+    addEventListener(socket, 'open', this.onSocketOpen),
+    addEventListener(socket, 'message', this.onSocketData as EventListener),
+    addEventListener(socket, 'close', this.onSocketClose as EventListener),
+    addEventListener(socket, 'error', () => (this.doReconnect = false)),
+  );
+};
 
   private onSocketOpen = () => {
     const { terminal, socket, textEncoder } = this;

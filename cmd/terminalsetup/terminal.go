@@ -19,6 +19,7 @@ package terminalsetup
 
 import (
 	//"archive/tar"
+	//"net/http"
 	"bytes"
 	"context"
 	"fmt"
@@ -270,45 +271,10 @@ func ExecIntoPodWithInput(
     return nil
 }
 
-func createTTYDNodePortService(ctx context.Context, clientset kubernetes.Interface, podName string) (*corev1.Service, error) {
-	svc := &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      podName + "-svc",
-			Namespace: "karmada-system",
-			Labels:    map[string]string{"app": "dashboard-ttyd"},
-		},
-		Spec: corev1.ServiceSpec{
-			Type: corev1.ServiceTypeNodePort,
-			Selector: map[string]string{
-				// Assuming the Pod has this label — or set your own here
-				//"app": "dashboard-ttyd",
-				"pod-name": podName,
-			},
-			Ports: []corev1.ServicePort{
-				{
-					Name:       "ws",
-					Port:       7681,
-					TargetPort: intstr.FromInt(7681),
-					//NodePort:   30081, // optional:  omit for random
-					Protocol:   corev1.ProtocolTCP,
-				},
-			},
-		},
-	}
-
-	createdSvc, err := clientset.CoreV1().Services("karmada-system").Create(ctx, svc, metav1.CreateOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create NodePort Service: %w", err)
-	}
-
-	fmt.Printf("✅ NodePort Service %s created\n", createdSvc.Name)
-	return createdSvc, nil
-}
 
 
 
 
-// TriggerTerminal handles the HTTP request to set up a ttyd pod and inject kubeconfig.
 // TriggerTerminal handles the HTTP request to set up a ttyd pod and inject kubeconfig.
 func TriggerTerminal(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -322,7 +288,7 @@ func TriggerTerminal(c *gin.Context) {
 		return
 	}
 
-	// then get the clientset
+	// get the clientset
 	k8sClient := client.InClusterClient()
 	if k8sClient == nil {
 		common.Fail(c, fmt.Errorf("failed to initialize Kubernetes client"))
@@ -336,8 +302,12 @@ func TriggerTerminal(c *gin.Context) {
 		return
 	}
 
+    // Get pod details
+	//podName := pod.Name
+	//namespace := pod.Namespace
 	// container name from the Pod spec
 	containerName := pod.Spec.Containers[0].Name
+
 
 
 
@@ -363,25 +333,42 @@ func TriggerTerminal(c *gin.Context) {
 		kubecfgBytes,
 	); err != nil {
 		common.Fail(c, fmt.Errorf("inject kubeconfig failed: %w", err))
-		return
+		return     
 	}
 
-    // 2) Expose the Pod via a NodePort Service
-    svc, err := createTTYDNodePortService(ctx, k8sClient, pod.Name)
-    if err != nil {
-        common.Fail(c, fmt.Errorf("failed to create service: %w", err))
-        return
+    // Generate a unique session ID (you can use UUID or timestamp)
+	sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
+    podInfoStore[sessionID] = CustomSession{
+        Namespace: pod.Namespace,
+        PodName:   pod.Name,
+        Container: pod.Spec.Containers[0].Name,
     }
+	c.JSON(200, gin.H{
+		"wsURL": fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
+		"sessionID": sessionID,
+		//"wsURL": fmt.Sprintf("ws://localhost:5173/api/v1/terminal/ws/%s", sessionID),  // Ensure this points to the backend's port
+		"data": gin.H{
+			"podName":   pod.Name,
+			"namespace": pod.Namespace,
+			"container": pod.Spec.Containers[0].Name,
+			//"sessionID": sessionID,
+		},
+	})
+	
 
-    // 3) Read the port Kubernetes assigned
-    port := svc.Spec.Ports[0].NodePort
 
-    // 4) Send back a single JSON payload with podName & port
-    common.Success(c, map[string]string{
-        "podName": pod.Name,
-        "port":    fmt.Sprint(port),
-    })
+	// 4) Return only the podName — no port needed
+	/*c.JSON(http.StatusOK, gin.H{
+	"code":    0,
+	"message": "terminal ready",
+	"data": gin.H{
+		"sessionID": sessionID,
+        "podName":   pod.Name,
+        "namespace": pod.Namespace,
+        "container": pod.Spec.Containers[0].Name,
+	  },
+    })*/
 
-	// 8) All done—return the Pod name so the frontend can open a socket
-	//common.Success(c, map[string]string{"podName": pod.Name})
+
+
 }
