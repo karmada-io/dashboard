@@ -23,6 +23,7 @@ import { GetOverview, GetSchedulePreview } from '@/services/overview.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import SchedulePreview from '@/components/schedule-preview';
+import ClusterTopology from '@/components/cluster-topology';
 import insertCss from 'insert-css';
 
 const { Text } = Typography;
@@ -584,6 +585,19 @@ const Overview = () => {
     );
   };
 
+  // 渲染拓扑图组件
+  const renderTopologySection = () => {
+    return (
+      <div className="mb-4">
+        <ClusterTopology 
+          height={600}
+          autoRefresh={autoRefresh}
+          refreshInterval={REFRESH_INTERVAL}
+        />
+      </div>
+    );
+  };
+
   return (
     <Panel>
       {!clusterName && (
@@ -596,6 +610,7 @@ const Overview = () => {
       {!clusterName && (
         <div>
           {renderSchedulePreview()}
+          {renderTopologySection()}
         </div>
       )}
     </Panel>

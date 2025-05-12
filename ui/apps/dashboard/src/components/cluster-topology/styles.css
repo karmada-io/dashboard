@@ -1,0 +1,213 @@
+.cluster-topology {
+  position: relative;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.cluster-topology.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: #fff;
+  margin: 0;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+}
+
+.topology-container {
+  width: 100%;
+  min-height: 600px;
+  height: 600px;
+  background-color: #fafafa;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  position: relative;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.01) 1px, transparent 1px);
+  background-size: 15px 15px;
+  background-position: center center;
+}
+
+.cluster-topology.fullscreen .topology-container {
+  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
+}
+
+.topology-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topology-last-updated {
+  font-size: 12px;
+  color: #999;
+}
+
+.topology-summary {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+/* G6 提示框样式 */
+.g6-tooltip {
+  border: 1px solid #e9e9e9;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #545454;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 10px;
+  box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+  width: 250px;
+  max-width: 320px;
+  z-index: 10;
+}
+
+.g6-tooltip-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #333;
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 5px;
+}
+
+.g6-tooltip-content {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.g6-tooltip-section {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.g6-tooltip-label {
+  display: inline-block;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  padding: 2px 4px;
+  margin: 2px 4px 2px 0;
+  font-size: 11px;
+}
+
+/* 节点状态样式 */
+.node-status-ready {
+  fill: #52c41a;
+}
+
+.node-status-not-ready {
+  fill: #ff4d4f;
+}
+
+/* 自定义节点样式 */
+.node-label {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-size: 12px;
+  fill: #333;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.node-type {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-size: 10px;
+  fill: #666;
+  pointer-events: none;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0% {
+    stroke-width: 1.5;
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-width: 2;
+    stroke-opacity: 0.8;
+  }
+  100% {
+    stroke-width: 1.5;
+    stroke-opacity: 1;
+  }
+}
+
+.edge-active {
+  animation: pulse 2s infinite;
+}
+
+/* 节点拖拽时的样式 */
+.node-dragging {
+  cursor: move;
+  opacity: 0.8;
+}
+
+/* 节点悬停样式 */
+.node-hover {
+  filter: brightness(1.1);
+  transition: all 0.3s;
+}
+
+/* 边的样式 */
+.edge-hover {
+  stroke-width: 2px !important;
+  opacity: 1 !important;
+  transition: all 0.3s;
+}
+
+/* 加载状态 */
+.topology-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+  .topology-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .topology-last-updated {
+    margin-top: 8px;
+  }
+  
+  .topology-container {
+    min-height: 450px;
+    height: 450px;
+  }
+}
+
+/* 边样式 */
+.edge-label {
+  fill: #666;
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  background: #fff;
+  padding: 2px 4px;
+  border-radius: 2px;
+} 

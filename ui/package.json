@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@ant-design/graphs": "^2.0.5",
+    "@antv/g6": "4.8.23",
     "dayjs": "^1.11.11",
     "insert-css": "^2.0.0"
   },
