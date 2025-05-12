@@ -14,5 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { default as useNamespace } from './use-namespace';
-export { default as useTagNum } from './use-tag-num';
+import useNamespace from './use-namespace';
+import useTagNum from './use-tag-num';
+import useCluster from './use-cluster';
+
+export {
+  useNamespace,
+  useTagNum,
+  useCluster
+};

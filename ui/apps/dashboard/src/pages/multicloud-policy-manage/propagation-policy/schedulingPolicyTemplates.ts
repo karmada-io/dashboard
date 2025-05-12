@@ -63,9 +63,13 @@ spec:
       replicaDivisionPreference: Weighted
       weightPreference:
         staticWeightList:
-          - targetCluster: member1
+          - targetCluster:
+              clusterNames:
+                - member1
             weight: 1
-          - targetCluster: member2
+          - targetCluster:
+              clusterNames:
+                - member2
             weight: 2
     spreadConstraint:
       - spreadByField: cluster

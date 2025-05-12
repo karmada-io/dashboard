@@ -41,6 +41,7 @@ import {
 import PropagationPolicyEditorDrawer, {
   PropagationPolicyEditorDrawerProps,
 } from './propagation-policy-editor-drawer';
+import NewPropagationPolicyWizardModal from './new-propagation-policy-wizard-modal';
 import { stringify } from 'yaml';
 import { GetResource } from '@/services/unstructured.ts';
 import { useDebounce } from '@uidotdev/usehooks';
@@ -93,6 +94,8 @@ const PropagationPolicyManage = () => {
     namespace: '',
     propagationContent: '',
   });
+  const [showWizardModal, setShowWizardModal] = useState(false);
+  const [useWizard, setUseWizard] = useState(true);
   const columns = [
     filter.policyScope === PolicyScope.Namespace && {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
@@ -256,6 +259,17 @@ const PropagationPolicyManage = () => {
     });
   }
 
+  const handleAddPolicy = () => {
+    if (useWizard) {
+      setShowWizardModal(true);
+    } else {
+      setEditorDrawerData({
+        open: true,
+        mode: 'create',
+      });
+    }
+  };
+
   return (
     <Panel>
       <Segmented
@@ -328,17 +342,21 @@ const PropagationPolicyManage = () => {
             }}
           />
         </div>
-        <div>
+        <div className="flex space-x-2">
+          <Select
+            options={[
+              { label: '使用向导创建', value: true },
+              { label: '使用YAML创建', value: false }
+            ]}
+            value={useWizard}
+            style={{ width: 140 }}
+            onChange={(value) => setUseWizard(value)}
+          />
           <Button
             type={'primary'}
             icon={<Icons.add width={16} height={16} />}
             className="flex flex-row items-center"
-            onClick={() => {
-              setEditorDrawerData({
-                open: true,
-                mode: 'create',
-              });
-            }}
+            onClick={handleAddPolicy}
           >
             {filter.policyScope === PolicyScope.Namespace
               ? i18nInstance.t(
@@ -401,6 +419,25 @@ const PropagationPolicyManage = () => {
             );
           }
         }}
+      />
+
+      <NewPropagationPolicyWizardModal
+        open={showWizardModal}
+        onCancel={() => setShowWizardModal(false)}
+        onCreate={async (ret) => {
+          if (ret.code === 200) {
+            await messageApi.success(
+              `${i18nInstance.t('8233550b23ab7acc2a9c3b2623c371dd', '新增调度策略成功')}`,
+            );
+            setShowWizardModal(false);
+            await refetch();
+          } else {
+            await messageApi.error(
+              `${i18nInstance.t('40eae6f51d50abb0f0132d7638682093', '新增调度策略失败')}`,
+            );
+          }
+        }}
+        policyScope={filter.policyScope}
       />
 
       {messageContextHolder}
