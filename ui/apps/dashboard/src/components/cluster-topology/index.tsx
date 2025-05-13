@@ -143,33 +143,164 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
 
       const G6Instance = window.G6 || G6;
       
-      G6Instance.registerNode('cluster-node', {
+      // 注册自定义节点
+      G6Instance.registerNode('icon-node', {
         draw(cfg: any, group: any) {
           const { id, label, style = {}, originData = {} } = cfg;
-          const { fill, stroke } = style;
+          const nodeType = originData.type || 'cluster';
+          const size = cfg.size || 40;
           
+          // 创建一个背景圆形
           const keyShape = group.addShape('circle', {
             attrs: {
               x: 0,
               y: 0,
-              r: cfg.size / 2,
-              fill,
-              stroke,
-              lineWidth: 1.5,
+              r: size / 2,
+              fill: nodeType === 'control-plane' ? '#e6f7ff' : 
+                    nodeType === 'cluster' ? '#f6ffed' : 
+                    nodeType === 'node' ? '#e6fffb' : 
+                    nodeType === 'pod' ? '#f9f0ff' : '#f0f0f0',
+              stroke: nodeType === 'control-plane' ? '#1890ff' : 
+                      nodeType === 'cluster' ? '#52c41a' : 
+                      nodeType === 'node' ? '#13c2c2' : 
+                      nodeType === 'pod' ? '#722ed1' : '#d9d9d9',
+              lineWidth: 2,
               cursor: 'pointer',
-              shadowColor: stroke,
-              shadowBlur: 3,
-              shadowOffsetX: 0,
-              shadowOffsetY: 0,
+              shadowColor: nodeType === 'control-plane' ? '#1890ff' : 
+                          nodeType === 'cluster' ? '#52c41a' : 
+                          nodeType === 'node' ? '#13c2c2' : 
+                          nodeType === 'pod' ? '#722ed1' : '#d9d9d9',
+              shadowBlur: 5,
             },
             name: 'node-keyShape',
           });
           
+          // 根据节点类型添加不同的图形
+          if (nodeType === 'control-plane') {
+            // 控制平面图标 - 服务器样式
+            group.addShape('rect', {
+              attrs: {
+                x: -size / 4,
+                y: -size / 6,
+                width: size / 2,
+                height: size / 3,
+                fill: '#1890ff',
+                radius: 2,
+              },
+              name: 'node-icon-part1',
+            });
+            
+            group.addShape('rect', {
+              attrs: {
+                x: -size / 3,
+                y: -size / 4,
+                width: size * 2/3,
+                height: size / 2,
+                fill: 'transparent',
+                stroke: '#1890ff',
+                lineWidth: 2,
+                radius: 3,
+              },
+              name: 'node-icon-part2',
+            });
+          } else if (nodeType === 'cluster') {
+            // 集群图标 - 同心圆
+            group.addShape('circle', {
+              attrs: {
+                x: 0,
+                y: 0,
+                r: size / 4,
+                fill: '#52c41a',
+                opacity: 0.2,
+                stroke: '#52c41a',
+              },
+              name: 'node-icon-part1',
+            });
+            
+            group.addShape('circle', {
+              attrs: {
+                x: 0,
+                y: 0,
+                r: size / 6,
+                fill: '#52c41a',
+              },
+              name: 'node-icon-part2',
+            });
+          } else if (nodeType === 'node') {
+            // 节点图标 - 服务器
+            group.addShape('rect', {
+              attrs: {
+                x: -size / 3,
+                y: -size / 4,
+                width: size * 2/3,
+                height: size / 2,
+                fill: '#e6fffb',
+                stroke: '#13c2c2',
+                lineWidth: 1.5,
+                radius: 2,
+              },
+              name: 'node-icon-part1',
+            });
+            
+            group.addShape('circle', {
+              attrs: {
+                x: -size / 6,
+                y: 0,
+                r: size / 12,
+                fill: '#13c2c2',
+              },
+              name: 'node-icon-part2',
+            });
+            
+            group.addShape('circle', {
+              attrs: {
+                x: size / 6,
+                y: 0,
+                r: size / 12,
+                fill: '#13c2c2',
+              },
+              name: 'node-icon-part3',
+            });
+          } else if (nodeType === 'pod') {
+            // Pod图标 - 六边形
+            const hexagonPath = [
+              ['M', 0, -size / 3],
+              ['L', size / 3, -size / 6],
+              ['L', size / 3, size / 6],
+              ['L', 0, size / 3],
+              ['L', -size / 3, size / 6],
+              ['L', -size / 3, -size / 6],
+              ['Z']
+            ].map(point => point.join(' ')).join(' ');
+            
+            group.addShape('path', {
+              attrs: {
+                path: hexagonPath,
+                fill: '#f9f0ff',
+                stroke: '#722ed1',
+                lineWidth: 1.5,
+              },
+              name: 'node-icon-part1',
+            });
+            
+            group.addShape('circle', {
+              attrs: {
+                x: 0,
+                y: 0,
+                r: size / 8,
+                fill: '#722ed1',
+                opacity: 0.5,
+              },
+              name: 'node-icon-part2',
+            });
+          }
+          
+          // 添加节点标签
           group.addShape('text', {
             attrs: {
               text: label,
               x: 0,
-              y: cfg.size / 2 + 15,
+              y: size / 2 + 15,
               textAlign: 'center',
               textBaseline: 'top',
               fill: '#333',
@@ -185,12 +316,13 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             name: 'node-label',
           });
           
+          // 添加节点类型标签
           if (originData.type) {
             group.addShape('text', {
               attrs: {
                 text: originData.type,
                 x: 0,
-                y: -cfg.size / 2 - 8,
+                y: -size / 2 - 8,
                 textAlign: 'center',
                 textBaseline: 'bottom',
                 fill: '#666',
@@ -206,12 +338,13 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             });
           }
           
+          // 添加状态指示器
           if (originData.status) {
             const statusColor = originData.status === 'ready' ? '#52c41a' : '#ff4d4f';
             group.addShape('circle', {
               attrs: {
-                x: cfg.size / 2 - 5,
-                y: -cfg.size / 2 + 5,
+                x: size / 2 - 5,
+                y: -size / 2 + 5,
                 r: 4,
                 fill: statusColor,
                 cursor: 'pointer',
@@ -225,12 +358,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
         update(cfg: any, node: any) {
           const group = node.getContainer();
           const { label, style = {} } = cfg;
-          const keyShape = node.get('keyShape');
-          
-          keyShape.attr({
-            fill: style.fill,
-            stroke: style.stroke,
-          });
           
           const textShape = group.find((element: any) => element.get('name') === 'node-label');
           if (textShape) {
@@ -333,7 +460,7 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
           },
         },
         defaultNode: {
-          type: 'cluster-node',
+          type: 'icon-node',
           size: 50,
           style: {
             fill: '#e6f7ff',
@@ -537,55 +664,39 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
       const nodes: any[] = [];
       
       nodeGroups['control-plane'].forEach((node: any) => {
-        const colors = getNodeColor(node);
         nodes.push({
           id: node.id,
           label: node.name,
           size: getNodeSize(node),
-          style: {
-            fill: colors.fill,
-            stroke: colors.stroke,
-            lineWidth: 1.5,
-          },
+          type: 'icon-node',
           depth: 0,
           originData: node,
         });
       });
       
       nodeGroups['cluster'].forEach((node: any, i: number) => {
-        const colors = getNodeColor(node);
         nodes.push({
           id: node.id,
           label: node.name,
           size: getNodeSize(node),
-          style: {
-            fill: colors.fill,
-            stroke: colors.stroke,
-            lineWidth: 1.5,
-          },
+          type: 'icon-node',
           depth: 1,
           originData: node,
         });
       });
       
       nodeGroups['node'].forEach((node: any, i: number) => {
-        const colors = getNodeColor(node);
         nodes.push({
           id: node.id,
           label: node.name,
           size: getNodeSize(node),
-          style: {
-            fill: colors.fill,
-            stroke: colors.stroke,
-            lineWidth: 1.5,
-          },
+          type: 'icon-node',
           depth: 2,
           originData: node,
         });
       });
       
       nodeGroups['pod'].forEach((node: any, i: number) => {
-        const colors = getNodeColor(node);
         const parentEdge = graphData.edges.find((edge: any) => edge.target === node.id);
         const parentDepth = parentEdge ? 
           nodes.find((n: any) => n.id === parentEdge.source)?.depth || 2 : 
@@ -595,27 +706,18 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
           id: node.id,
           label: node.name,
           size: getNodeSize(node),
-          style: {
-            fill: colors.fill,
-            stroke: colors.stroke,
-            lineWidth: 1.5,
-          },
+          type: 'icon-node',
           depth: parentDepth + 1,
           originData: node,
         });
       });
       
       nodeGroups['other'].forEach((node: any) => {
-        const colors = getNodeColor(node);
         nodes.push({
           id: node.id,
           label: node.name,
           size: getNodeSize(node),
-          style: {
-            fill: colors.fill,
-            stroke: colors.stroke,
-            lineWidth: 1.5,
-          },
+          type: 'icon-node',
           depth: 3,
           originData: node,
         });
