@@ -1,6 +1,7 @@
 # Karmada-dashboard
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/kubernetes/dashboard/blob/master/LICENSE)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HappyLadySauce/dashboard)
 
 Karmada Dashboard是Karmada的通用型基于Web的控制面板，Karmada是一个多集群管理项目。
 ![image](docs/images/readme-dashboard-cn.png)
