@@ -43,6 +43,7 @@ import (
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 	"k8s.io/apimachinery/pkg/types"
+	"github.com/emicklei/go-restful/v3"
 
 )
 
@@ -337,12 +338,14 @@ func TriggerTerminal(c *gin.Context) {
 	}
 
     // Generate a unique session ID (you can use UUID or timestamp)
-	sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
+	/*sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
     podInfoStore[sessionID] = CustomSession{
         Namespace: pod.Namespace,
         PodName:   pod.Name,
         Container: pod.Spec.Containers[0].Name,
-    }
+    }*/
+    sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
+
 	c.JSON(200, gin.H{
 		"wsURL": fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
 		"sessionID": sessionID,
@@ -354,8 +357,8 @@ func TriggerTerminal(c *gin.Context) {
 			//"sessionID": sessionID,
 		},
 	})
-	
-
+	restfulRequest := restful.NewRequest(c.Request)
+	go WaitForTerminal(k8sClient, restCfg, restfulRequest, sessionID) 
 
 	// 4) Return only the podName — no port needed
 	/*c.JSON(http.StatusOK, gin.H{

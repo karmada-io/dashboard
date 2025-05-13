@@ -17,191 +17,342 @@ limitations under the License.
 package terminalsetup
 
 import (
-    "encoding/json"
-    //"fmt"
-    "net/http"
-    //"strings"
-    //"sync"
-    //"context"
-    //"io"
-    //"os"
 
-
-    sj "gopkg.in/igm/sockjs-go.v2/sockjs"
     "github.com/gin-gonic/gin"
-    //corev1 "k8s.io/api/core/v1"
-    //"k8s.io/client-go/tools/remotecommand"
-    //scheme "k8s.io/client-go/kubernetes/scheme"
-    //"github.com/google/uuid"
+
 
     "github.com/karmada-io/dashboard/pkg/client"
     "github.com/karmada-io/dashboard/cmd/api/app/router"
-    "github.com/gin-contrib/cors"
-    //metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-    //"k8s.io/client-go/rest"
-    //"k8s.io/apimachinery/pkg/apis/meta/v1"
-    //"k8s.io/client-go/kubernetes/scheme"
-    //"k8s.io/client-go/util/wait"
-    //"k8s.io/client-go/util/retry"
-    //"k8s.io/client-go/kubernetes"
-    //"k8s.io/client-go/tools/clientcmd"
-    
-    
+	"context"
+	"crypto/rand"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"sync"
+	"time"
+
+	"github.com/emicklei/go-restful/v3"
+	"gopkg.in/igm/sockjs-go.v2/sockjs"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/remotecommand"
+	"k8s.io/klog/v2"
+	//"k8s.io/dashboard/api/pkg/args"
 )
 
-// jsonMustMarshal builds a TermMessage envelope and returns it as a string
-/*func jsonMustMarshal(op, msg string) string {
-    m := TermMessage{Op: op, Msg: msg}
-    b, _ := json.Marshal(m)
-    return string(b)
-}
-func CORSMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+const END_OF_TRANSMISSION = "\u0004"
 
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-
-        c.Next()
-    }
-}*/
-
-// CustomSession holds information about each terminal session
-type CustomSession struct {
-	Namespace string
-	PodName   string
-	Container string
+// PtyHandler is what remotecommand expects from a pty
+type PtyHandler interface {
+	io.Reader
+	io.Writer
+	remotecommand.TerminalSizeQueue
 }
 
-// TerminalSession stores session info for terminal streaming
+// TerminalSession implements PtyHandler (using a SockJS connection)
 type TerminalSession struct {
-	sess          sj.Session
-	bound         chan struct{}
-	sockJSSession sj.Session
+	id            string
+	bound         chan error
+	sockJSSession sockjs.Session
+	sizeChan      chan remotecommand.TerminalSize
 }
 
-var podInfoStore = make(map[string]CustomSession)
-var terminalSessions = make(map[string]TerminalSession)
-
-// SockJSSessionWriter wraps SockJS session and implements io.Writer
-type SockJSSessionWriter struct {
-	sess sj.Session
+// TerminalMessage is the messaging protocol between ShellController and TerminalSession.
+//
+// OP      DIRECTION  FIELD(S) USED  DESCRIPTION
+// ---------------------------------------------------------------------
+// bind    fe->be     SessionID      Id sent back from TerminalResponse
+// stdin   fe->be     Data           Keystrokes/paste buffer
+// resize  fe->be     Rows, Cols     New terminal size
+// stdout  be->fe     Data           Output from the process
+// toast   be->fe     Data           OOB message to be shown to the user
+type TerminalMessage struct {
+	Op, Data, SessionID string
+	Rows, Cols          uint16
 }
 
-// Write implements io.Writer for SockJSSessionWriter
-func (w *SockJSSessionWriter) Write(p []byte) (n int, err error) {
-	// Send data through SockJS session
-	if err := w.sess.Send(string(p)); err != nil {
+// Next handles pty->process resize events
+// Called in a loop from remotecommand as long as the process is running
+func (t TerminalSession) Next() *remotecommand.TerminalSize {
+	size := <-t.sizeChan
+	if size.Height == 0 && size.Width == 0 {
+		return nil
+	}
+	return &size
+}
+
+// Read handles pty->process messages (stdin, resize)
+// Called in a loop from remotecommand as long as the process is running
+func (t TerminalSession) Read(p []byte) (int, error) {
+	m, err := t.sockJSSession.Recv()
+	if err != nil {
+		// Send terminated signal to process to avoid resource leak
+		return copy(p, END_OF_TRANSMISSION), err
+	}
+
+	var msg TerminalMessage
+	if err := json.Unmarshal([]byte(m), &msg); err != nil {
+		return copy(p, END_OF_TRANSMISSION), err
+	}
+
+	switch msg.Op {
+	case "stdin":
+		return copy(p, msg.Data), nil
+	case "resize":
+		t.sizeChan <- remotecommand.TerminalSize{Width: msg.Cols, Height: msg.Rows}
+		return 0, nil
+	default:
+		return copy(p, END_OF_TRANSMISSION), fmt.Errorf("unknown message type '%s'", msg.Op)
+	}
+}
+
+// Write handles process->pty stdout
+// Called from remotecommand whenever there is any output
+func (t TerminalSession) Write(p []byte) (int, error) {
+	msg, err := json.Marshal(TerminalMessage{
+		Op:   "stdout",
+		Data: string(p),
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	if err = t.sockJSSession.Send(string(msg)); err != nil {
 		return 0, err
 	}
 	return len(p), nil
 }
 
-// openStream opens a stream to the pod for executing commands
-/*func openStream(restCfg *rest.Config, clientset kubernetes.Interface, namespace, podName, containerName string) (remotecommand.StreamOptions, error) {
-	req := clientset.CoreV1().
-		RESTClient().
-		Post().
+// Toast can be used to send the user any OOB messages
+// hterm puts these in the center of the terminal
+func (t TerminalSession) Toast(p string) error {
+	msg, err := json.Marshal(TerminalMessage{
+		Op:   "toast",
+		Data: p,
+	})
+	if err != nil {
+		return err
+	}
+
+	if err = t.sockJSSession.Send(string(msg)); err != nil {
+		return err
+	}
+	return nil
+}
+
+// SessionMap stores a map of all TerminalSession objects and a lock to avoid concurrent conflict
+type SessionMap struct {
+	Sessions map[string]TerminalSession
+	Lock     sync.RWMutex
+}
+
+// Get return a given terminalSession by sessionId
+func (sm *SessionMap) Get(sessionId string) TerminalSession {
+	sm.Lock.RLock()
+	defer sm.Lock.RUnlock()
+	return sm.Sessions[sessionId]
+}
+
+// Set store a TerminalSession to SessionMap
+func (sm *SessionMap) Set(sessionId string, session TerminalSession) {
+	sm.Lock.Lock()
+	defer sm.Lock.Unlock()
+	sm.Sessions[sessionId] = session
+}
+
+// Close shuts down the SockJS connection and sends the status code and reason to the client
+// Can happen if the process exits or if there is an error starting up the process
+// For now the status code is unused and reason is shown to the user (unless "")
+func (sm *SessionMap) Close(sessionId string, status uint32, reason string) {
+	sm.Lock.Lock()
+	defer sm.Lock.Unlock()
+	ses := sm.Sessions[sessionId]
+	err := ses.sockJSSession.Close(status, reason)
+	if err != nil {
+		klog.Error(err)
+	}
+	close(ses.sizeChan)
+	delete(sm.Sessions, sessionId)
+}
+
+var terminalSessions = SessionMap{Sessions: make(map[string]TerminalSession)}
+
+// handleTerminalSession is Called by net/http for any new /api/sockjs connections
+func handleTerminalSession(session sockjs.Session) {
+    var (
+        buf             string
+        err             error
+        msg             TerminalMessage
+        terminalSession TerminalSession
+    )
+
+    // Initialize the bound channel before using it
+    terminalSession = TerminalSession{
+        bound: make(chan error),  // Initialize the channel
+    }
+
+    if buf, err = session.Recv(); err != nil {
+        klog.Errorf("handleTerminalSession: can't Recv: %v", err)
+        return
+    }
+
+    if err = json.Unmarshal([]byte(buf), &msg); err != nil {
+        klog.Errorf("handleTerminalSession: can't UnMarshal (%v): %s", err, buf)
+        return
+    }
+
+    if msg.Op != "bind" {
+        klog.V(2).Infof("handleTerminalSession: expected 'bind' message, got: %s", buf)
+        return
+    }
+
+    // Fetch the terminal session using the session ID from the map
+    terminalSession = terminalSessions.Get(msg.SessionID)
+
+    // Ensure that the terminal session exists
+    if terminalSession.id == "" {
+        klog.V(2).Infof("handleTerminalSession: can't find session '%s'", msg.SessionID)
+        return
+    }
+
+    // If the session was found, ensure that the 'bound' channel is initialized
+    if terminalSession.bound == nil {
+        terminalSession.bound = make(chan error)  // Ensure the bound channel is initialized
+    }
+
+    // Update the terminal session with the new SockJS session
+    terminalSession.sockJSSession = session
+
+    // Store the updated terminal session in the map
+    terminalSessions.Set(msg.SessionID, terminalSession)
+
+    // Signal that the terminal session is bound
+    terminalSession.bound <- nil
+}
+
+// CreateAttachHandler is called from main for /api/sockjs
+/*func CreateAttachHandler(path string) http.Handler {
+	return sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
+}*/
+
+// CreateAttachHandler creates the SockJS handler and wraps it as a gin.HandlerFunc
+func CreateAttachHandler(path string) gin.HandlerFunc {
+    // Return a gin.HandlerFunc that wraps the http.Handler returned by sockjs.NewHandler
+    return func(c *gin.Context) {
+        sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
+        sockjsHandler.ServeHTTP(c.Writer, c.Request) // Wraps the http.Handler to gin's context
+    }
+}
+
+
+// startProcess is called by handleAttach
+// Executed cmd in the container specified in request and connects it up with the ptyHandler (a session)
+func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, request *restful.Request, cmd []string, ptyHandler PtyHandler) error {
+	namespace := request.PathParameter("namespace")
+	podName := request.PathParameter("pod")
+	containerName := request.PathParameter("container")
+
+	req := k8sClient.CoreV1().RESTClient().Post().
 		Resource("pods").
 		Name(podName).
 		Namespace(namespace).
-		SubResource("exec").
-		Param("stdin", "true").
-		Param("stdout", "true").
-		Param("stderr", "true").
-		Param("tty", "true").
-		Param("container", containerName)
+		SubResource("exec")
 
-	executor, err := remotecommand.NewSPDYExecutor(restCfg, "POST", req.URL())
+	req.VersionedParams(&v1.PodExecOptions{
+		Container: containerName,
+		Command:   cmd,
+		Stdin:     true,
+		Stdout:    true,
+		Stderr:    true,
+		TTY:       true,
+	}, scheme.ParameterCodec)
+
+	exec, err := remotecommand.NewSPDYExecutor(cfg, "POST", req.URL())
 	if err != nil {
-		return remotecommand.StreamOptions{}, err
+		return err
 	}
 
-	streamOptions := remotecommand.StreamOptions{
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-	}
-
-	return streamOptions, nil
-}*/
-
-// StartTerminalStream connects to the pod and streams data
-/*func StartTerminalStream(meta CustomSession, sess sj.Session) {
-	// Initialize the stream to the pod (exec to the pod)
-	streamOptions, err := openStream(restCfg, k8sClient, meta.Namespace, meta.PodName, meta.Container)
+	err = exec.StreamWithContext(context.Background(), remotecommand.StreamOptions{
+		Stdin:             ptyHandler,
+		Stdout:            ptyHandler,
+		Stderr:            ptyHandler,
+		TerminalSizeQueue: ptyHandler,
+		Tty:               true,
+	})
 	if err != nil {
-		sess.Send("ERROR: failed to open exec stream")
-		return
+		return err
 	}
 
-	// Create a custom writer for SockJS session
-	sockJSWriter := &SockJSSessionWriter{sess: sess}
+	return nil
+}
 
-	// Stream data from Pod to SockJS (stdout)
-	go func() {
-		io.Copy(sockJSWriter, streamOptions.Stdout) // Write to SockJS from Pod stdout
-	}()
+// genTerminalSessionId generates a random session ID string. The format is not really interesting.
+// This ID is used to identify the session when the client opens the SockJS connection.
+// Not the same as the SockJS session id! We can't use that as that is generated
+// on the client side and we don't have it yet at this point.
+func genTerminalSessionId() (string, error) {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	id := make([]byte, hex.EncodedLen(len(bytes)))
+	hex.Encode(id, bytes)
+	return string(id), nil
+}
 
-	// Stream data from SockJS to Pod (stdin)
-	go func() {
-		for {
-			msg, err := sess.Recv() // Receive stdin from SockJS
-			if err != nil {
-				return
-			}
-			io.WriteString(streamOptions.Stdin, msg+"\n") // Write stdin data to Pod
+// isValidShell checks if the shell is an allowed one
+func isValidShell(validShells []string, shell string) bool {
+	for _, validShell := range validShells {
+		if validShell == shell {
+			return true
 		}
-	}()
-}*/
+	}
+	return false
+}
 
-// sockHandler handles SockJS communication from frontend
-func sockHandler(sess sj.Session) {
-	raw, err := sess.Recv() // Receive bind message from frontend
-	if err != nil {
-		sess.Send("ERROR: failed to read initial message")
+// WaitForTerminal is called from apihandler.handleAttach as a goroutine
+// Waits for the SockJS connection to be opened by the client the session to be bound in handleTerminalSession
+func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *restful.Request, sessionId string) {
+	shell := request.QueryParameter("shell")
+
+	select {
+	case <-terminalSessions.Get(sessionId).bound:
+		close(terminalSessions.Get(sessionId).bound)
+
+		var err error
+		validShells := []string{"bash", "sh", "powershell", "cmd"}
+
+		if isValidShell(validShells, shell) {
+			cmd := []string{shell}
+			err = startProcess(k8sClient, cfg, request, cmd, terminalSessions.Get(sessionId))
+		} else {
+			// No shell given or it was not valid: try some shells until one succeeds or all fail
+			// FIXME: if the first shell fails then the first keyboard event is lost
+			for _, testShell := range validShells {
+				cmd := []string{testShell}
+				if err = startProcess(k8sClient, cfg, request, cmd, terminalSessions.Get(sessionId)); err == nil {
+					break
+				}
+			}
+		}
+
+		if err != nil {
+			terminalSessions.Close(sessionId, 2, err.Error())
+			return
+		}
+
+		terminalSessions.Close(sessionId, 1, "Process exited")
+
+	case <-time.After(10 * time.Second):
+		// Close chan and delete session when sockjs connection was timeout
+		close(terminalSessions.Get(sessionId).bound)
+		delete(terminalSessions.Sessions, sessionId)
 		return
 	}
-
-	var bind struct {
-		Op        string `json:"op"`
-		SessionID string `json:"sessionId"`
-	}
-
-	err = json.Unmarshal([]byte(raw), &bind) // Convert raw string to []byte before unmarshalling
-	if err != nil {
-		sess.Send("ERROR: failed to parse bind message")
-		return
-	}
-
-	// Validate the bind message
-	if bind.Op != "bind" {
-		sess.Send("ERROR: first operation must be 'bind'")
-		return
-	}
-
-	// Fetch Pod info using the sessionID
-	/*meta, ok := podInfoStore[bind.SessionID]
-	if !ok {
-		sess.Send(fmt.Sprintf("ERROR: unknown session %s", bind.SessionID))
-		return
-	}*/
-
-	// Bind the session and initialize terminal stream
-	terminalSessions[bind.SessionID] = TerminalSession{
-		sockJSSession: sess,
-		bound:         make(chan struct{}),
-	}
-
-	close(terminalSessions[bind.SessionID].bound) // Signal that session is bound
-
-	// Start terminal stream to the Pod
-	//StartTerminalStream(meta, sess) // This connects the backend to the pod
 }
 
 // GetToken retrieves the authorization token for the terminal
@@ -210,22 +361,13 @@ func GetToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": rawToken})
 }
 
-/*func Init(r *gin.RouterGroup) {
-    r.Use(cors.Default())
-
-    r.POST("/terminal", TriggerTerminal)
-    r.GET("/auth/token", GetToken)
-
-    ws := sj.NewHandler("/terminal/ws", sj.DefaultOptions, sockHandler)
-    r.Any("/terminal/ws/*any", gin.WrapH(ws))
-}*/
 
 
 
 func Init() {
     r := router.V1()
     //r.Use(CORSMiddleware())
-    r.Use(cors.Default())
+    //r.Use(cors.Default())
     // trigger pod creation
     r.POST("/terminal", TriggerTerminal)
 
@@ -233,10 +375,7 @@ func Init() {
     r.GET("/auth/token", GetToken)
 
 
-	ws := sj.NewHandler("/terminal/ws", sj.DefaultOptions, sockHandler)
-
-	// ☑️  accept *every* method (GET, POST, OPTIONS) and every sub-path
-	r.Any("/terminal/ws/*rest", gin.WrapH(ws))
+	r.GET("/sockjs", CreateAttachHandler("/sockjs"))
 	
 }
 
