@@ -36,8 +36,8 @@ const NamespaceScopedForm: FC<NamespaceScopedFormProps> = (props) => {
   const defaultValues = {
     name: '',
     namespace: 'default',
-    resourceKind: 'Deployment',
-    resourceApiVersion: 'apps/v1',
+    resourceKind: 'Service',
+    resourceApiVersion: 'v1',
     resourceName: '',
     clusterNames: [],
     replicaSchedulingType: 'Duplicated',
@@ -65,8 +65,8 @@ const NamespaceScopedForm: FC<NamespaceScopedFormProps> = (props) => {
       yamlObj.spec.resourceSelectors = yamlObj.spec.resourceSelectors || [{}];
       
       const resourceSelector = {
-        apiVersion: values.resourceApiVersion || 'apps/v1',
-        kind: values.resourceKind || 'Deployment'
+        apiVersion: values.resourceApiVersion || 'v1',
+        kind: values.resourceKind || 'Service'
       };
       
       if (values.resourceName) {

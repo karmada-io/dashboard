@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import { FC, ReactNode, useState, ReactElement } from 'react';
-import { Button, Form, Input, InputNumber, Select, Space, Steps, message, Radio, Typography } from 'antd';
+import { App, Button, Form, Input, InputNumber, Select, Space, Steps, message, Radio, Typography } from 'antd';
 import { parse } from 'yaml';
 import _ from 'lodash';
 import { CreateResource } from '@/services/unstructured';
@@ -46,6 +46,7 @@ const ServiceBaseForm: FC<ServiceBaseFormProps> = (props) => {
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { message } = App.useApp();
 
   // 构建步骤数组
   const buildSteps = () => {
@@ -190,7 +191,6 @@ const ServiceBaseForm: FC<ServiceBaseFormProps> = (props) => {
                           style={{ width: 120, marginBottom: 0 }}
                         >
                           <Select
-                            defaultValue="TCP"
                             style={{ width: '100%' }}
                             options={[
                               { label: 'TCP', value: 'TCP' },
@@ -305,44 +305,140 @@ const ServiceBaseForm: FC<ServiceBaseFormProps> = (props) => {
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      const values = await form.validateFields();
+      
+      // 获取所有表单值，不经过验证
+      const allFormValues = form.getFieldsValue(true);
+      console.log("表单所有值(不通过验证):", allFormValues);
+      
+      // 手动验证关键字段
+      const serviceName = form.getFieldValue('name');
+      const serviceNamespace = form.getFieldValue('namespace');
+      
+      console.log("手动获取关键字段:", { name: serviceName, namespace: serviceNamespace });
+      
+      // 检查必填字段
+      if (!serviceName || (typeof serviceName === 'string' && serviceName.trim() === '')) {
+        console.error("服务名称不能为空");
+        form.validateFields(['name']);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (!serviceNamespace || (typeof serviceNamespace === 'string' && serviceNamespace.trim() === '')) {
+        console.error("命名空间不能为空");
+        form.validateFields(['namespace']);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // 验证所有字段
+      const values = await form.validateFields()
+        .catch(errors => {
+          console.error("表单验证错误:", errors);
+          setIsSubmitting(false);
+          throw errors;
+        });
+      
+      console.log("表单验证通过，提交的数据:", values);
+      
+      // 确保我们有所有表单数据
+      const mergedValues = { ...allFormValues, ...values };
       
       // 处理标签和注释
-      const labels = parseKeyValuePairs(values.labels || '');
-      const annotations = parseKeyValuePairs(values.annotations || '');
+      const labels = parseKeyValuePairs(mergedValues.labels || '');
+      const annotations = parseKeyValuePairs(mergedValues.annotations || '');
+      
+      console.log('处理表单值:', {
+        原始name: mergedValues.name,
+        原始namespace: mergedValues.namespace,
+        原始labels: mergedValues.labels,
+        处理后labels: labels
+      });
       
       // 合并处理后的值
       const processedValues = {
-        ...values,
+        ...defaultValues, // 先使用默认值作为基础
+        ...mergedValues, // 然后使用表单输入的值覆盖
+        name: mergedValues.name ? mergedValues.name.trim() : '',
+        namespace: mergedValues.namespace || 'default',
         labels,
-        annotations,
+        annotations
       };
       
       // 生成YAML
       const yamlObject = generateYaml(processedValues);
       
       if (!yamlObject) {
+        console.error('生成YAML失败');
+        message.error(i18nInstance.t('生成YAML失败', '生成YAML失败'));
         setIsSubmitting(false);
         return;
       }
 
-      const kind = _.get(yamlObject, 'kind');
-      const namespace = _.get(yamlObject, 'metadata.namespace');
-      const name = _.get(yamlObject, 'metadata.name');
+      console.log('生成的YAML对象:', yamlObject);
 
-      // 创建资源
-      const ret = await CreateResource({
+      // 获取资源类型和名称
+      const kind = yamlObject.kind || serviceType;
+      const namespace = yamlObject.metadata?.namespace || processedValues.namespace || 'default';
+      const name = yamlObject.metadata?.name || processedValues.name || '';
+
+      if (!kind) {
+        console.error('资源类型不能为空');
+        message.error(i18nInstance.t('资源类型不能为空', '资源类型不能为空'));
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (!name) {
+        console.error('服务名称不能为空');
+        message.error(i18nInstance.t('服务名称不能为空', '服务名称不能为空'));
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (!namespace) {
+        console.error('命名空间不能为空');
+        message.error(i18nInstance.t('命名空间不能为空', '命名空间不能为空'));
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('准备创建服务:', { kind, name, namespace, content: yamlObject });
+      
+      // 在调用API之前确保metadata字段存在且包含必要信息
+      if (!yamlObject.metadata) {
+        yamlObject.metadata = {};
+      }
+      yamlObject.metadata.name = name;
+      yamlObject.metadata.namespace = namespace;
+      
+      // 确保API参数完整
+      const apiParams = {
         kind,
         name,
         namespace,
-        content: yamlObject,
-      });
+        content: yamlObject
+      };
+      
+      console.log('最终API参数:', apiParams);
+      
+      // 创建资源
+      const ret = await CreateResource(apiParams);
 
-      await onOk(ret);
-      form.resetFields();
+      console.log('API返回结果:', ret);
+
+      if (ret.code === 200) {
+        message.success(i18nInstance.t('创建成功', '创建成功'));
+        await onOk(ret);
+        form.resetFields();
+      } else {
+        console.error('创建失败:', ret);
+        message.error(i18nInstance.t('创建失败', '创建失败') + ': ' + (ret.message || '未知错误'));
+      }
       setIsSubmitting(false);
-    } catch (error) {
-      console.error('表单验证失败', error);
+    } catch (error: any) {
+      console.error('表单验证或提交失败', error);
+      message.error(i18nInstance.t('提交失败', '提交失败') + ': ' + (error.message || '未知错误'));
       setIsSubmitting(false);
     }
   };
@@ -372,7 +468,7 @@ const ServiceBaseForm: FC<ServiceBaseFormProps> = (props) => {
       <div style={{ marginTop: 16, textAlign: 'right' }}>
         <Space>
           <Button onClick={onCancel}>
-            {i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
+            {i18nInstance.t('取消', '取消')}
           </Button>
           {currentStep > 0 && (
             <Button onClick={() => setCurrentStep(currentStep - 1)}>
@@ -385,7 +481,7 @@ const ServiceBaseForm: FC<ServiceBaseFormProps> = (props) => {
             </Button>
           ) : (
             <Button type="primary" onClick={handleSubmit} loading={isSubmitting}>
-              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
+              {i18nInstance.t('确定', '确定')}
             </Button>
           )}
         </Space>

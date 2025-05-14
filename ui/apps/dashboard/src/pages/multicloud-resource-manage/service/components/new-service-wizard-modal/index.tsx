@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import { FC } from 'react';
-import { Modal, message } from 'antd';
+import { App, Modal } from 'antd';
 import ServiceForm from './service';
 import IngressForm from './ingress';
 import { IResponse } from '@/services/base.ts';
@@ -33,6 +33,7 @@ interface NewServiceWizardModalProps {
  */
 const NewServiceWizardModal: FC<NewServiceWizardModalProps> = (props) => {
   const { visible, onClose, onSuccess, serviceType = 'Service' } = props;
+  const { message } = App.useApp();
 
   // 处理成功结果
   const handleSuccess = async (ret: IResponse<any>) => {
@@ -41,7 +42,7 @@ const NewServiceWizardModal: FC<NewServiceWizardModalProps> = (props) => {
       onClose();
       onSuccess && onSuccess();
     } else {
-      message.error(ret.msg || i18nInstance.t('创建失败', '创建失败'));
+      message.error(ret.message || i18nInstance.t('创建失败', '创建失败'));
     }
   };
 

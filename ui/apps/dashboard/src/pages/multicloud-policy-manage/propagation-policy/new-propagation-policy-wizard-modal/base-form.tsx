@@ -108,14 +108,84 @@ const BaseForm: FC<BaseFormProps> = (props) => {
             >
               <Select
                 options={[
-                  { label: 'Deployment', value: 'Deployment' },
-                  { label: 'StatefulSet', value: 'StatefulSet' },
-                  { label: 'DaemonSet', value: 'DaemonSet' },
-                  { label: 'Service', value: 'Service' },
-                  { label: 'ConfigMap', value: 'ConfigMap' },
-                  { label: 'Secret', value: 'Secret' },
+                  { 
+                    label: i18nInstance.t('常用资源', '常用资源'), 
+                    options: [
+                      { label: 'Deployment', value: 'Deployment' },
+                      { label: 'Service', value: 'Service' },
+                      { label: 'ConfigMap', value: 'ConfigMap' },
+                      { label: 'Secret', value: 'Secret' },
+                      { label: 'Ingress', value: 'Ingress' },
+                    ] 
+                  },
+                  { 
+                    label: i18nInstance.t('工作负载', '工作负载'), 
+                    options: [
+                      { label: 'Deployment', value: 'Deployment' },
+                      { label: 'StatefulSet', value: 'StatefulSet' },
+                      { label: 'DaemonSet', value: 'DaemonSet' },
+                      { label: 'ReplicaSet', value: 'ReplicaSet' },
+                      { label: 'Job', value: 'Job' },
+                      { label: 'CronJob', value: 'CronJob' },
+                    ] 
+                  },
+                  { 
+                    label: i18nInstance.t('网络', '网络'), 
+                    options: [
+                      { label: 'Service', value: 'Service' },
+                      { label: 'Ingress', value: 'Ingress' },
+                      { label: 'NetworkPolicy', value: 'NetworkPolicy' },
+                    ] 
+                  },
+                  { 
+                    label: i18nInstance.t('存储', '存储'), 
+                    options: [
+                      { label: 'PersistentVolumeClaim', value: 'PersistentVolumeClaim' },
+                      { label: 'StorageClass', value: 'StorageClass' },
+                    ] 
+                  },
+                  { 
+                    label: i18nInstance.t('配置', '配置'), 
+                    options: [
+                      { label: 'ConfigMap', value: 'ConfigMap' },
+                      { label: 'Secret', value: 'Secret' },
+                    ] 
+                  },
                 ]}
                 placeholder="请选择资源类型"
+                onChange={(value) => {
+                  // 根据资源类型设置对应的API版本
+                  switch(value) {
+                    case 'Service':
+                    case 'ConfigMap':
+                    case 'Secret':
+                    case 'PersistentVolumeClaim':
+                    case 'Namespace':
+                    case 'Node':
+                      form.setFieldsValue({ resourceApiVersion: 'v1' });
+                      break;
+                    case 'Deployment':
+                    case 'StatefulSet':
+                    case 'DaemonSet':
+                    case 'ReplicaSet':
+                      form.setFieldsValue({ resourceApiVersion: 'apps/v1' });
+                      break;
+                    case 'Ingress':
+                    case 'NetworkPolicy':
+                      form.setFieldsValue({ resourceApiVersion: 'networking.k8s.io/v1' });
+                      break;
+                    case 'Job':
+                    case 'CronJob':
+                      form.setFieldsValue({ resourceApiVersion: 'batch/v1' });
+                      break;
+                    case 'StorageClass':
+                      form.setFieldsValue({ resourceApiVersion: 'storage.k8s.io/v1' });
+                      break;
+                    default:
+                      // 保留现有值
+                      break;
+                  }
+                }}
               />
             </Form.Item>
             
@@ -123,15 +193,15 @@ const BaseForm: FC<BaseFormProps> = (props) => {
               name="resourceApiVersion" 
               label={i18nInstance.t('API版本', 'API版本')}
               rules={[{ required: true, message: '请填写API版本' }]}
-              initialValue="apps/v1"
+              tooltip="不同资源类型对应不同的API版本，如Service为v1，Deployment为apps/v1"
             >
-              <Input placeholder="例如: apps/v1" />
+              <Input placeholder="例如: apps/v1, v1, networking.k8s.io/v1" />
             </Form.Item>
             
             <Form.Item 
               name="resourceName" 
               label={i18nInstance.t('资源名称', '资源名称')}
-              tooltip="如果不指定，将匹配所有指定类型的资源"
+              tooltip="如果不指定名称，将匹配所有指定类型的资源"
             >
               <Input placeholder="可选，不填则匹配所有指定类型的资源" />
             </Form.Item>

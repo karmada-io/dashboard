@@ -11,9 +11,9 @@ metadata:
   namespace: default              # 策略作用的命名空间
 spec:
   resourceSelectors:              # 需要调度的资源选择器
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: example-deployment
+    - apiVersion: v1
+      kind: Service
+      name: example-service
   placement:
     clusterAffinity:              # 集群亲和性，指定目标集群
       clusterNames:

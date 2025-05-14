@@ -130,6 +130,10 @@ pnpm run dashboard:dev
 cd /root/dashboard && make karmada-dashboard-api  && ./_output/bin/linux/amd64/karmada-dashboard-api --karmada-kubeconfig=/root/.kube/karmada.config --karmada-context=karmada-apiserver --kubeconfig=/root/.kube/karmada.config --context=karmada-host
 ```
 
+```bash
+make karmada-dashboard-api  && ./_output/bin/linux/amd64/karmada-dashboard-api --karmada-kubeconfig=/root/.kube/karmada.config --karmada-context=karmada-apiserver --kubeconfig=/root/.kube/config --context=default
+```
+
 前端构建命令
 
 ```bash
