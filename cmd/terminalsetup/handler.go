@@ -235,21 +235,27 @@ func handleTerminalSession(session sockjs.Session) {
 	return sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
 }*/
 
-// CreateAttachHandler creates the SockJS handler and wraps it as a gin.HandlerFunc
-func CreateAttachHandler(path string) gin.HandlerFunc {
-	// Return a gin.HandlerFunc that wraps the http.Handler returned by sockjs.NewHandler
-	sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
-	return func(c *gin.Context) {
-		sockjsHandler.ServeHTTP(c.Writer, c.Request) // Wraps the http.Handler to gin's context
-	}
+// // CreateAttachHandler creates the SockJS handler and wraps it as a gin.HandlerFunc
+//
+//	func CreateAttachHandler(path string) gin.HandlerFunc {
+//		// Return a gin.HandlerFunc that wraps the http.Handler returned by sockjs.NewHandler
+//		sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
+//		return func(c *gin.Context) {
+//			sockjsHandler.ServeHTTP(c.Writer, c.Request) // Wraps the http.Handler to gin's context
+//		}
+//	}
+//
+// CreateAttachHandler is called from main for /api/sockjs
+func CreateAttachHandler(path string) http.Handler {
+	return sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
 }
 
 // startProcess is called by handleAttach
 // Executed cmd in the container specified in request and connects it up with the ptyHandler (a session)
-func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, request *gin.Context, cmd []string, ptyHandler PtyHandler) error {
-	namespace := request.Param("namespace")
-	podName := request.Param("pod")
-	containerName := request.Param("container")
+func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, terminalInfo TerminalInfo, cmd []string, ptyHandler PtyHandler) error {
+	namespace := terminalInfo.Namespace
+	podName := terminalInfo.PodName
+	containerName := terminalInfo.ContainerName
 
 	req := k8sClient.CoreV1().RESTClient().Post().
 		Resource("pods").
@@ -311,8 +317,8 @@ func isValidShell(validShells []string, shell string) bool {
 
 // WaitForTerminal is called from apihandler.handleAttach as a goroutine
 // Waits for the SockJS connection to be opened by the client the session to be bound in handleTerminalSession
-func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *gin.Context, sessionId string) {
-	shell := request.Query("shell")
+func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, terminalInfo TerminalInfo, sessionId string) {
+	shell := terminalInfo.Shell
 
 	select {
 	case <-terminalSessions.Get(sessionId).bound:
@@ -323,13 +329,13 @@ func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *
 
 		if isValidShell(validShells, shell) {
 			cmd := []string{shell}
-			err = startProcess(k8sClient, cfg, request, cmd, terminalSessions.Get(sessionId))
+			err = startProcess(k8sClient, cfg, terminalInfo, cmd, terminalSessions.Get(sessionId))
 		} else {
 			// No shell given or it was not valid: try some shells until one succeeds or all fail
 			// FIXME: if the first shell fails then the first keyboard event is lost
 			for _, testShell := range validShells {
 				cmd := []string{testShell}
-				if err = startProcess(k8sClient, cfg, request, cmd, terminalSessions.Get(sessionId)); err == nil {
+				if err = startProcess(k8sClient, cfg, terminalInfo, cmd, terminalSessions.Get(sessionId)); err == nil {
 					break
 				}
 			}
@@ -342,7 +348,7 @@ func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *
 
 		terminalSessions.Close(sessionId, 1, "Process exited")
 
-	case <-time.After(1000 * time.Second):
+	case <-time.After(20 * time.Minute):
 		// Close chan and delete session when sockjs connection was timeout
 		if terminalSessions.Get(sessionId).bound != nil {
 			close(terminalSessions.Get(sessionId).bound)
@@ -366,10 +372,10 @@ func Init() {
 	r.POST("/terminal", TriggerTerminal)
 
 	// auth token (unchanged)
-	r.GET("/auth/token", GetToken)
+	//r.GET("/auth/token", GetToken)
 
-	r.GET("/sockjs", CreateAttachHandler("/sockjs"))
+	//r.GET("/sockjs", CreateAttachHandler("/sockjs"))
 
+	r.Any("/terminal/sockjs/*w", gin.WrapH(CreateAttachHandler("/api/v1/terminal/sockjs")))
 	r.GET("/terminal/pod/:namespace/:pod/shell/:container", handleExecShell)
-	r.Any("/terminal/sockjs/*w", CreateAttachHandler("/api/v1/terminal/sockjs"))
 }

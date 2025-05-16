@@ -278,18 +278,6 @@ func ExecIntoPodWithInput(
 
 // TriggerTerminal handles the HTTP request to set up a ttyd pod and inject kubeconfig.
 func TriggerTerminal(c *gin.Context) {
-	c.JSON(200, gin.H{
-		//"wsURL":     fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
-		//"sessionID": sessionID,
-		//"wsURL": fmt.Sprintf("ws://localhost:5173/api/v1/terminal/ws/%s", sessionID),  // Ensure this points to the backend's port
-		"data": gin.H{
-			"podName":   "karmada-ttyd-admin",
-			"namespace": "karmada-system",
-			"container": "karmada-ttyd-admin",
-			//"sessionID": sessionID,
-		},
-	})
-	return
 
 	ctx := c.Request.Context()
 	user, _, err := auth.GetCurrentUser(c)
@@ -417,6 +405,13 @@ func handleExecShell(c *gin.Context) {
 	//restfulRequest := restful.NewRequest(c.Request)
 	//go WaitForTerminal(client.InClusterClient(), cfg, restfulRequest, sessionID)
 	// !!! here we cannot use restful.NewRequest because it will not work with gin context
-	go WaitForTerminal(client.InClusterClient(), cfg, c, sessionID)
+
+	info := TerminalInfo{
+		Shell:         c.Query("shell"),
+		Namespace:     c.Param("namespace"),
+		PodName:       c.Param("pod"),
+		ContainerName: c.Param("container"),
+	}
+	go WaitForTerminal(client.InClusterClient(), cfg, info, sessionID)
 	common.Success(c, TerminalResponse{ID: sessionID})
 }
