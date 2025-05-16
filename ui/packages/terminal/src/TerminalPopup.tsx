@@ -37,21 +37,20 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({
       //     },
       //   })
       // )
-      .then((r) => {
-        if (!r.ok) throw new Error('terminal create failed');
-        return r.json();
-      })
+      // .then((r) => {
+      //   if (!r.ok) throw new Error('terminal create failed');
+      //   return r.json();
+      // })
       .then(
         (r: {
           data: { podName: string; namespace: string; container: string };
           sessionID: string;
           wsURL: string;
         }) => {
-          const {
-            podName = 'karmada-ttyd-admin',
-            namespace = 'karmada-system',
-            container = 'karmada-ttyd-admin',
-          } = r.data;
+          const podName = 'karmada-ttyd-admin';
+          const namespace = 'karmada-system';
+          const container = 'karmada-ttyd-admin';
+
           const tpl =
             '/api/v1/terminal/pod/{{namespace}}/{{pod}}/shell/{{container}}';
           const replacedUrl = tpl
@@ -76,8 +75,10 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({
         const sock = new SockJS(`/api/v1/terminal/sockjs?${sessionID}`);
         //const sock = new SockJS('http://localhost:5173/api/v1/terminal/ws')  // Using wsURL directly from the response
 
-        sock.onopen = () => console.log('SockJS OPEN');
-        sock.send(JSON.stringify({ op: 'bind', sessionId: sessionID })); // Bind the session to SockJS
+        sock.onopen = () => {
+          console.log('SockJS OPEN');
+          sock.send(JSON.stringify({ op: 'bind', sessionId: sessionID })); // Bind the session to SockJS
+        };
 
         sock.onmessage = (e) => console.log('FROM pod →', e.data);
         // 4) Terminal options
