@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 package terminalsetup
 
 import (
@@ -31,23 +30,20 @@ import (
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
 
+	"github.com/emicklei/go-restful/v3"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/remotecommand"
 	scheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/tools/remotecommand"
 	"k8s.io/utils/pointer"
-	"k8s.io/apimachinery/pkg/types"
-	"github.com/emicklei/go-restful/v3"
-
 )
-
-
 
 // waitForPodReady polls until the Pod is Running and Ready, or times out.
 func waitForPodReady(
@@ -83,12 +79,12 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: "ttyd-",
 			Namespace:    "karmada-system",
-			Labels:       map[string]string{"app": "dashboard-ttyd",},
+			Labels:       map[string]string{"app": "dashboard-ttyd"},
 		},
 		Spec: corev1.PodSpec{
 			SecurityContext: &corev1.PodSecurityContext{
-                FSGroup: pointer.Int64Ptr(0),
-            },
+				FSGroup: pointer.Int64Ptr(0),
+			},
 			ServiceAccountName: "default",
 			DNSPolicy:          corev1.DNSClusterFirst,
 			EnableServiceLinks: pointer.BoolPtr(true),
@@ -117,11 +113,11 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1
 					Name:            "ttyd",
 					Image:           "docker.io/sayem4604/ttyd:latest",
 					ImagePullPolicy: corev1.PullIfNotPresent,
-                //  ◀️ Set this per‑container
-                SecurityContext: &corev1.SecurityContext{
-                    RunAsUser:  pointer.Int64Ptr(0),
-                    RunAsGroup: pointer.Int64Ptr(0),
-                },
+					//  ◀️ Set this per‑container
+					SecurityContext: &corev1.SecurityContext{
+						RunAsUser:  pointer.Int64Ptr(0),
+						RunAsGroup: pointer.Int64Ptr(0),
+					},
 
 					Ports: []corev1.ContainerPort{
 						{ContainerPort: 7681, Name: "tcp", Protocol: corev1.ProtocolTCP},
@@ -153,8 +149,8 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1
 							ReadOnly:  true,
 						},
 						{
-							Name:      "kubeconfig-dir",       // mount the EmptyDir volume
-							MountPath: "/home/ttyd/.kube",    // into the .kube dir
+							Name:      "kubeconfig-dir",   // mount the EmptyDir volume
+							MountPath: "/home/ttyd/.kube", // into the .kube dir
 						},
 					},
 				},
@@ -168,14 +164,13 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1
 		return nil, fmt.Errorf("failed to create ttyd Pod: %w", err)
 	}
 
-
-    // ✅ Merge-patch just the label (no race on resourceVersion)
-    patch := []byte(fmt.Sprintf(`{"metadata":{"labels":{"pod-name":"%s"}}}`, created.Name))
-    if _, err := clientset.CoreV1().
-        Pods(created.Namespace).
-        Patch(ctx, created.Name, types.MergePatchType, patch, metav1.PatchOptions{}); err != nil {
-        return nil, fmt.Errorf("failed to patch pod with pod-name: %w", err)
-    }
+	// ✅ Merge-patch just the label (no race on resourceVersion)
+	patch := []byte(fmt.Sprintf(`{"metadata":{"labels":{"pod-name":"%s"}}}`, created.Name))
+	if _, err := clientset.CoreV1().
+		Pods(created.Namespace).
+		Patch(ctx, created.Name, types.MergePatchType, patch, metav1.PatchOptions{}); err != nil {
+		return nil, fmt.Errorf("failed to patch pod with pod-name: %w", err)
+	}
 
 	// Wait for Pod to be ready
 	fmt.Println("Waiting for Pod to become Ready...")
@@ -186,9 +181,6 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1
 	return created, nil
 }
 
-
-
-
 // GenerateKubeConfig builds an in-memory kubeconfig with the provided token.
 func GenerateKubeConfig(token string) ([]byte, error) {
 	cfg := clientcmdapi.Config{
@@ -196,8 +188,8 @@ func GenerateKubeConfig(token string) ([]byte, error) {
 		Kind:       "Config",
 		Clusters: map[string]*clientcmdapi.Cluster{
 			"karmada-apiserver": {
-				Server:                   "https://karmada-apiserver.karmada-system.svc.cluster.local:5443",
-				InsecureSkipTLSVerify:    true,
+				Server:                "https://karmada-apiserver.karmada-system.svc.cluster.local:5443",
+				InsecureSkipTLSVerify: true,
 			},
 		},
 		AuthInfos: map[string]*clientcmdapi.AuthInfo{
@@ -219,62 +211,58 @@ func GenerateKubeConfig(token string) ([]byte, error) {
 }
 
 func ExecIntoPodWithInput(
-    ctx context.Context,
-    restCfg *rest.Config,
-    clientset kubernetes.Interface,
-    namespace, podName, containerName string,
-    command []string,
-    stdinData []byte,
+	ctx context.Context,
+	restCfg *rest.Config,
+	clientset kubernetes.Interface,
+	namespace, podName, containerName string,
+	command []string,
+	stdinData []byte,
 ) error {
-    req := clientset.CoreV1().
-        RESTClient().
-        Post().
-        Resource("pods").
-        Name(podName).
-        Namespace(namespace).
-        SubResource("exec").
-        VersionedParams(
-            &corev1.PodExecOptions{
-                Container: containerName,
-                Command:   command,
-                Stdin:     len(stdinData) > 0,
-                Stdout:    true,
-                Stderr:    true,
-                TTY:       false,
-            },
-            scheme.ParameterCodec,
-        )
+	req := clientset.CoreV1().
+		RESTClient().
+		Post().
+		Resource("pods").
+		Name(podName).
+		Namespace(namespace).
+		SubResource("exec").
+		VersionedParams(
+			&corev1.PodExecOptions{
+				Container: containerName,
+				Command:   command,
+				Stdin:     len(stdinData) > 0,
+				Stdout:    true,
+				Stderr:    true,
+				TTY:       false,
+			},
+			scheme.ParameterCodec,
+		)
 
-    executor, err := remotecommand.NewSPDYExecutor(restCfg, "POST", req.URL())
-    if err != nil {
-        return fmt.Errorf("failed to init executor: %w", err)
-    }
+	executor, err := remotecommand.NewSPDYExecutor(restCfg, "POST", req.URL())
+	if err != nil {
+		return fmt.Errorf("failed to init executor: %w", err)
+	}
 
-    var stdoutBuf, stderrBuf bytes.Buffer
-    execCtx, cancel := context.WithTimeout(ctx, 90*time.Second)
-    defer cancel()
+	var stdoutBuf, stderrBuf bytes.Buffer
+	execCtx, cancel := context.WithTimeout(ctx, 90*time.Second)
+	defer cancel()
 
-    err = executor.StreamWithContext(execCtx, remotecommand.StreamOptions{
-        Stdin:  bytes.NewReader(stdinData),
-        Stdout: &stdoutBuf,
-        Stderr: &stderrBuf,
-        Tty:    false,
-    })
+	err = executor.StreamWithContext(execCtx, remotecommand.StreamOptions{
+		Stdin:  bytes.NewReader(stdinData),
+		Stdout: &stdoutBuf,
+		Stderr: &stderrBuf,
+		Tty:    false,
+	})
 
-    if err != nil {
-        return fmt.Errorf("exec failed: %w\nSTDOUT:\n%s\nSTDERR:\n%s", err, stdoutBuf.String(), stderrBuf.String())
-    }
+	if err != nil {
+		return fmt.Errorf("exec failed: %w\nSTDOUT:\n%s\nSTDERR:\n%s", err, stdoutBuf.String(), stderrBuf.String())
+	}
 
-    if stderrBuf.Len() > 0 {
-        fmt.Printf("⚠️ stderr during exec: %s\n", stderrBuf.String())
-    }
+	if stderrBuf.Len() > 0 {
+		fmt.Printf("⚠️ stderr during exec: %s\n", stderrBuf.String())
+	}
 
-    return nil
+	return nil
 }
-
-
-
-
 
 // TriggerTerminal handles the HTTP request to set up a ttyd pod and inject kubeconfig.
 func TriggerTerminal(c *gin.Context) {
@@ -283,7 +271,7 @@ func TriggerTerminal(c *gin.Context) {
 	// 1) Grab Kubernetes REST config and clientset from your shared pkg
 	//restCfg, _, err := client.GetKubeConfig()
 	// Load whichever config InitKubeConfig() set up (in‑cluster or local kubeconfig)
-    restCfg, _, err := client.GetKubeConfig()
+	restCfg, _, err := client.GetKubeConfig()
 	if err != nil {
 		common.Fail(c, fmt.Errorf("failed to load kube config: %w", err))
 		return
@@ -303,14 +291,11 @@ func TriggerTerminal(c *gin.Context) {
 		return
 	}
 
-    // Get pod details
+	// Get pod details
 	//podName := pod.Name
 	//namespace := pod.Namespace
 	// container name from the Pod spec
 	containerName := pod.Spec.Containers[0].Name
-
-
-
 
 	// Extract the user Bearer token from the request
 	auth := c.GetHeader("Authorization")
@@ -334,20 +319,20 @@ func TriggerTerminal(c *gin.Context) {
 		kubecfgBytes,
 	); err != nil {
 		common.Fail(c, fmt.Errorf("inject kubeconfig failed: %w", err))
-		return     
+		return
 	}
 
-    // Generate a unique session ID (you can use UUID or timestamp)
+	// Generate a unique session ID (you can use UUID or timestamp)
 	/*sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
-    podInfoStore[sessionID] = CustomSession{
-        Namespace: pod.Namespace,
-        PodName:   pod.Name,
-        Container: pod.Spec.Containers[0].Name,
-    }*/
-    sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
+	  podInfoStore[sessionID] = CustomSession{
+	      Namespace: pod.Namespace,
+	      PodName:   pod.Name,
+	      Container: pod.Spec.Containers[0].Name,
+	  }*/
+	sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
 
 	c.JSON(200, gin.H{
-		"wsURL": fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
+		"wsURL":     fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
 		"sessionID": sessionID,
 		//"wsURL": fmt.Sprintf("ws://localhost:5173/api/v1/terminal/ws/%s", sessionID),  // Ensure this points to the backend's port
 		"data": gin.H{
@@ -358,20 +343,18 @@ func TriggerTerminal(c *gin.Context) {
 		},
 	})
 	restfulRequest := restful.NewRequest(c.Request)
-	go WaitForTerminal(k8sClient, restCfg, restfulRequest, sessionID) 
+	go WaitForTerminal(k8sClient, restCfg, restfulRequest, sessionID)
 
 	// 4) Return only the podName — no port needed
 	/*c.JSON(http.StatusOK, gin.H{
-	"code":    0,
-	"message": "terminal ready",
-	"data": gin.H{
-		"sessionID": sessionID,
-        "podName":   pod.Name,
-        "namespace": pod.Namespace,
-        "container": pod.Spec.Containers[0].Name,
-	  },
-    })*/
-
-
+		"code":    0,
+		"message": "terminal ready",
+		"data": gin.H{
+			"sessionID": sessionID,
+	        "podName":   pod.Name,
+	        "namespace": pod.Namespace,
+	        "container": pod.Spec.Containers[0].Name,
+		  },
+	    })*/
 
 }

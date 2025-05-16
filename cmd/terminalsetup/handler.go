@@ -17,12 +17,10 @@ limitations under the License.
 package terminalsetup
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	"github.com/karmada-io/dashboard/pkg/client"
 
-    "github.com/gin-gonic/gin"
-
-
-    "github.com/karmada-io/dashboard/pkg/client"
-    "github.com/karmada-io/dashboard/cmd/api/app/router"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
@@ -183,55 +181,55 @@ var terminalSessions = SessionMap{Sessions: make(map[string]TerminalSession)}
 
 // handleTerminalSession is Called by net/http for any new /api/sockjs connections
 func handleTerminalSession(session sockjs.Session) {
-    var (
-        buf             string
-        err             error
-        msg             TerminalMessage
-        terminalSession TerminalSession
-    )
+	var (
+		buf             string
+		err             error
+		msg             TerminalMessage
+		terminalSession TerminalSession
+	)
 
-    // Initialize the bound channel before using it
-    terminalSession = TerminalSession{
-        bound: make(chan error),  // Initialize the channel
-    }
+	// Initialize the bound channel before using it
+	terminalSession = TerminalSession{
+		bound: make(chan error), // Initialize the channel
+	}
 
-    if buf, err = session.Recv(); err != nil {
-        klog.Errorf("handleTerminalSession: can't Recv: %v", err)
-        return
-    }
+	if buf, err = session.Recv(); err != nil {
+		klog.Errorf("handleTerminalSession: can't Recv: %v", err)
+		return
+	}
 
-    if err = json.Unmarshal([]byte(buf), &msg); err != nil {
-        klog.Errorf("handleTerminalSession: can't UnMarshal (%v): %s", err, buf)
-        return
-    }
+	if err = json.Unmarshal([]byte(buf), &msg); err != nil {
+		klog.Errorf("handleTerminalSession: can't UnMarshal (%v): %s", err, buf)
+		return
+	}
 
-    if msg.Op != "bind" {
-        klog.V(2).Infof("handleTerminalSession: expected 'bind' message, got: %s", buf)
-        return
-    }
+	if msg.Op != "bind" {
+		klog.V(2).Infof("handleTerminalSession: expected 'bind' message, got: %s", buf)
+		return
+	}
 
-    // Fetch the terminal session using the session ID from the map
-    terminalSession = terminalSessions.Get(msg.SessionID)
+	// Fetch the terminal session using the session ID from the map
+	terminalSession = terminalSessions.Get(msg.SessionID)
 
-    // Ensure that the terminal session exists
-    if terminalSession.id == "" {
-        klog.V(2).Infof("handleTerminalSession: can't find session '%s'", msg.SessionID)
-        return
-    }
+	// Ensure that the terminal session exists
+	if terminalSession.id == "" {
+		klog.V(2).Infof("handleTerminalSession: can't find session '%s'", msg.SessionID)
+		return
+	}
 
-    // If the session was found, ensure that the 'bound' channel is initialized
-    if terminalSession.bound == nil {
-        terminalSession.bound = make(chan error)  // Ensure the bound channel is initialized
-    }
+	// If the session was found, ensure that the 'bound' channel is initialized
+	if terminalSession.bound == nil {
+		terminalSession.bound = make(chan error) // Ensure the bound channel is initialized
+	}
 
-    // Update the terminal session with the new SockJS session
-    terminalSession.sockJSSession = session
+	// Update the terminal session with the new SockJS session
+	terminalSession.sockJSSession = session
 
-    // Store the updated terminal session in the map
-    terminalSessions.Set(msg.SessionID, terminalSession)
+	// Store the updated terminal session in the map
+	terminalSessions.Set(msg.SessionID, terminalSession)
 
-    // Signal that the terminal session is bound
-    terminalSession.bound <- nil
+	// Signal that the terminal session is bound
+	terminalSession.bound <- nil
 }
 
 // CreateAttachHandler is called from main for /api/sockjs
@@ -241,13 +239,12 @@ func handleTerminalSession(session sockjs.Session) {
 
 // CreateAttachHandler creates the SockJS handler and wraps it as a gin.HandlerFunc
 func CreateAttachHandler(path string) gin.HandlerFunc {
-    // Return a gin.HandlerFunc that wraps the http.Handler returned by sockjs.NewHandler
-    return func(c *gin.Context) {
-        sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
-        sockjsHandler.ServeHTTP(c.Writer, c.Request) // Wraps the http.Handler to gin's context
-    }
+	// Return a gin.HandlerFunc that wraps the http.Handler returned by sockjs.NewHandler
+	return func(c *gin.Context) {
+		sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
+		sockjsHandler.ServeHTTP(c.Writer, c.Request) // Wraps the http.Handler to gin's context
+	}
 }
-
 
 // startProcess is called by handleAttach
 // Executed cmd in the container specified in request and connects it up with the ptyHandler (a session)
@@ -255,7 +252,6 @@ func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, request *res
 	namespace := request.PathParameter("namespace")
 	podName := request.PathParameter("pod")
 	containerName := request.PathParameter("container")
-
 	req := k8sClient.CoreV1().RESTClient().Post().
 		Resource("pods").
 		Name(podName).
@@ -361,24 +357,16 @@ func GetToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": rawToken})
 }
 
-
-
-
 func Init() {
-    r := router.V1()
-    //r.Use(CORSMiddleware())
-    //r.Use(cors.Default())
-    // trigger pod creation
-    r.POST("/terminal", TriggerTerminal)
+	r := router.V1()
+	//r.Use(CORSMiddleware())
+	//r.Use(cors.Default())
+	// trigger pod creation
+	r.POST("/terminal", TriggerTerminal)
 
-    // auth token (unchanged)
-    r.GET("/auth/token", GetToken)
-
+	// auth token (unchanged)
+	r.GET("/auth/token", GetToken)
 
 	r.GET("/sockjs", CreateAttachHandler("/sockjs"))
-	
+
 }
-
-
-
-
