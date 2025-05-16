@@ -8,7 +8,6 @@ import { BaseTerminalOptions } from './typing';
 // [!!0516] for the purpose of simplification, end-developer don't need to maintain the
 // websocket connection manually, we can maintain the connection and the corresponding
 // callback function internal
-// import SockJS from 'sockjs-client';
 import ContainerTerminal from './container';
 
 interface TerminalPopupProps {
@@ -20,6 +19,7 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({
   isOpen,
   onClose,
 }) => {
+  const token = localStorage.getItem('token') || '';
   const containerRef = useRef<HTMLDivElement | null>(null);
   const containerTerminalRef = useRef<ContainerTerminal | null>(null);
 
@@ -33,10 +33,16 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({
       // 1) create(only if the terminal pod not exist) + inject
       const terminalResp = await fetch('/api/v1/terminal', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       const terminalData = await terminalResp.json();
       console.log(terminalData.data);
       const { namespace, podName, container } = terminalData.data;
+      // const podName = 'karmada-ttyd-admin';
+      // const namespace = 'karmada-system';
+      // const container = 'karmada-ttyd-admin';
       // 2) Terminal options
       const terminalOptions: BaseTerminalOptions = {
         xtermOptions: {
@@ -192,8 +198,8 @@ const AdvancedTerminalPopup: React.FC<TerminalPopupProps> = ({
     // .catch((err) => console.error('Error setting up terminal:', err));
 
     return () => {
-      containerTerminalRef.current?.dispose();
-      containerTerminalRef.current = null;
+      // containerTerminalRef.current?.dispose();
+      // containerTerminalRef.current = null;
       //if (sock) sock.close();
       //sock.onclose   = () => console.log('SockJS CLOSED');
       // if (sock) {
