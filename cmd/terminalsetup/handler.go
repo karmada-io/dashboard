@@ -371,4 +371,6 @@ func Init() {
 
 	r.GET("/sockjs", CreateAttachHandler("/sockjs"))
 
+	r.GET("/terminal/pod/:namespace/:pod/shell/:container", handleExecShell)
+	r.Any("/terminal/sockjs/*w", CreateAttachHandler("/api/v1/terminal/sockjs"))
 }
