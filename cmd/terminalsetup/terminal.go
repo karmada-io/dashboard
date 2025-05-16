@@ -22,8 +22,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	//"io"
+	"github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
+	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"strings"
+
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -73,12 +75,18 @@ func waitForPodReady(
 	)
 }
 
-func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1.Pod, error) {
+func createTTYdPod(ctx context.Context, clientset kubernetes.Interface, user *v1.User) (*corev1.Pod, error) {
+	userName := user.Name
+	if userName == "" {
+		userName = "default"
+	}
+	podName := fmt.Sprintf("dashboard-tty-%s", userName)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: "ttyd-",
-			Namespace:    "karmada-system",
-			Labels:       map[string]string{"app": "dashboard-ttyd"},
+			// GenerateName: "ttyd-",
+			Name:      podName,
+			Namespace: "karmada-system",
+			Labels:    map[string]string{"app": "dashboard-ttyd"},
 		},
 		Spec: corev1.PodSpec{
 			SecurityContext: &corev1.PodSecurityContext{
@@ -156,6 +164,11 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface) (*corev1
 			},
 			RestartPolicy: corev1.RestartPolicyAlways,
 		},
+	}
+
+	getResp, err := clientset.CoreV1().Pods(pod.Namespace).Get(ctx, podName, metav1.GetOptions{})
+	if err == nil {
+		return getResp, nil
 	}
 
 	created, err := clientset.CoreV1().Pods(pod.Namespace).Create(ctx, pod, metav1.CreateOptions{})
@@ -265,7 +278,25 @@ func ExecIntoPodWithInput(
 
 // TriggerTerminal handles the HTTP request to set up a ttyd pod and inject kubeconfig.
 func TriggerTerminal(c *gin.Context) {
+	c.JSON(200, gin.H{
+		//"wsURL":     fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
+		//"sessionID": sessionID,
+		//"wsURL": fmt.Sprintf("ws://localhost:5173/api/v1/terminal/ws/%s", sessionID),  // Ensure this points to the backend's port
+		"data": gin.H{
+			"podName":   "karmada-ttyd-admin",
+			"namespace": "karmada-system",
+			"container": "karmada-ttyd-admin",
+			//"sessionID": sessionID,
+		},
+	})
+	return
+
 	ctx := c.Request.Context()
+	user, _, err := auth.GetCurrentUser(c)
+	if err != nil {
+		common.Fail(c, fmt.Errorf("failed to getCurrent login user"))
+		return
+	}
 
 	// 1) Grab Kubernetes REST config and clientset from your shared pkg
 	//restCfg, _, err := client.GetKubeConfig()
@@ -284,7 +315,9 @@ func TriggerTerminal(c *gin.Context) {
 	}
 
 	// 2) Create the ttyd Pod
-	pod, err := createTTYdPod(ctx, k8sClient)
+	// [!!0516] we should create pod by username, if ttyd pod for user already exist,
+	// we can just skip the process of creating pod.
+	pod, err := createTTYdPod(ctx, k8sClient, user)
 	if err != nil {
 		common.Fail(c, fmt.Errorf("create ttyd pod failed: %w", err))
 		return
@@ -328,11 +361,11 @@ func TriggerTerminal(c *gin.Context) {
 	      PodName:   pod.Name,
 	      Container: pod.Spec.Containers[0].Name,
 	  }*/
-	sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
+	//sessionID := fmt.Sprintf("%s-%s", pod.Name, pod.Namespace)
 
 	c.JSON(200, gin.H{
-		"wsURL":     fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
-		"sessionID": sessionID,
+		//"wsURL":     fmt.Sprintf("http://localhost:5173/api/v1/terminal/ws/%s", sessionID),
+		//"sessionID": sessionID,
 		//"wsURL": fmt.Sprintf("ws://localhost:5173/api/v1/terminal/ws/%s", sessionID),  // Ensure this points to the backend's port
 		"data": gin.H{
 			"podName":   pod.Name,
@@ -343,7 +376,8 @@ func TriggerTerminal(c *gin.Context) {
 	})
 	//restfulRequest := restful.NewRequest(c.Request)
 	//go WaitForTerminal(k8sClient, restCfg, restfulRequest, sessionID)
-	go WaitForTerminal(k8sClient, restCfg, c, sessionID)
+	// [!!0516] here we don't need to wait for terminal start
+	//go WaitForTerminal(k8sClient, restCfg, c, sessionID)
 
 	// 4) Return only the podName — no port needed
 	/*c.JSON(http.StatusOK, gin.H{
