@@ -44,13 +44,13 @@ export default defineConfig(({ mode }) => {
     // ─── ADD THIS SECTION ──────────────────────────────────
     define: {
       // make `global` in your code point at `window` in the browser
-      global: 'window'
+      global: 'window',
     },
     optimizeDeps: {
       // ensure Vite pre-bundles the SockJS client
       include: ['sockjs-client'],
     },
-    // ────────────────────────────────────────────────────────    
+    // ────────────────────────────────────────────────────────
 
     plugins: [
       banner(license) as Plugin,
@@ -63,21 +63,25 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     resolve: {
-      alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') },
-        { find: '@packages/terminal', replacement: path.resolve(__dirname, '../../packages/terminal/src') }
+      alias: [
+        { find: '@', replacement: path.resolve(__dirname, 'src') },
+        {
+          find: '@packages/terminal',
+          replacement: path.resolve(__dirname, '../../packages/terminal/src'),
+        },
       ],
     },
     server: {
       proxy: {
-
-        '/api/v1/terminal/ws': {
-          target: 'http://localhost:8000', // Your backend WebSocket server
-          ws: true, // Enable WebSocket proxying
+        '^/api/v1/terminal/sockjs*': {
+          target: 'ws://localhost:8000',
+          changeOrigin: false,
+          secure: false,
+          ws: true,
         },
         '^/api/v1.*': {
           target: 'http://localhost:8000',
           changeOrigin: true,
-          ws: true,
           headers: {
             // cookie: env.VITE_COOKIES,
             // Authorization: `Bearer ${env.VITE_TOKEN}`

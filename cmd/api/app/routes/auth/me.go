@@ -19,6 +19,7 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -31,6 +32,10 @@ import (
 const (
 	tokenServiceAccountKey = "serviceaccount"
 )
+
+func GetCurrentUser(c *gin.Context) (*v1.User, int, error) {
+	return me(c.Request)
+}
 
 func me(request *http.Request) (*v1.User, int, error) {
 	karmadaClient, err := client.GetKarmadaClientFromRequest(request)
