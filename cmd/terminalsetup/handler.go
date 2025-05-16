@@ -17,21 +17,19 @@ limitations under the License.
 package terminalsetup
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
-	"github.com/karmada-io/dashboard/pkg/client"
-
 	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	"github.com/karmada-io/dashboard/pkg/client"
 	"io"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/emicklei/go-restful/v3"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -189,9 +187,9 @@ func handleTerminalSession(session sockjs.Session) {
 	)
 
 	// Initialize the bound channel before using it
-	terminalSession = TerminalSession{
-		bound: make(chan error), // Initialize the channel
-	}
+	//terminalSession = TerminalSession{
+	//	bound: make(chan error), // Initialize the channel
+	//}
 
 	if buf, err = session.Recv(); err != nil {
 		klog.Errorf("handleTerminalSession: can't Recv: %v", err)
@@ -218,9 +216,9 @@ func handleTerminalSession(session sockjs.Session) {
 	}
 
 	// If the session was found, ensure that the 'bound' channel is initialized
-	if terminalSession.bound == nil {
-		terminalSession.bound = make(chan error) // Ensure the bound channel is initialized
-	}
+	//if terminalSession.bound == nil {
+	//	terminalSession.bound = make(chan error) // Ensure the bound channel is initialized
+	//}
 
 	// Update the terminal session with the new SockJS session
 	terminalSession.sockJSSession = session
@@ -240,18 +238,19 @@ func handleTerminalSession(session sockjs.Session) {
 // CreateAttachHandler creates the SockJS handler and wraps it as a gin.HandlerFunc
 func CreateAttachHandler(path string) gin.HandlerFunc {
 	// Return a gin.HandlerFunc that wraps the http.Handler returned by sockjs.NewHandler
+	sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
 	return func(c *gin.Context) {
-		sockjsHandler := sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
 		sockjsHandler.ServeHTTP(c.Writer, c.Request) // Wraps the http.Handler to gin's context
 	}
 }
 
 // startProcess is called by handleAttach
 // Executed cmd in the container specified in request and connects it up with the ptyHandler (a session)
-func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, request *restful.Request, cmd []string, ptyHandler PtyHandler) error {
-	namespace := request.PathParameter("namespace")
-	podName := request.PathParameter("pod")
-	containerName := request.PathParameter("container")
+func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, request *gin.Context, cmd []string, ptyHandler PtyHandler) error {
+	namespace := request.Param("namespace")
+	podName := request.Param("pod")
+	containerName := request.Param("container")
+
 	req := k8sClient.CoreV1().RESTClient().Post().
 		Resource("pods").
 		Name(podName).
@@ -312,8 +311,8 @@ func isValidShell(validShells []string, shell string) bool {
 
 // WaitForTerminal is called from apihandler.handleAttach as a goroutine
 // Waits for the SockJS connection to be opened by the client the session to be bound in handleTerminalSession
-func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *restful.Request, sessionId string) {
-	shell := request.QueryParameter("shell")
+func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *gin.Context, sessionId string) {
+	shell := request.Query("shell")
 
 	select {
 	case <-terminalSessions.Get(sessionId).bound:

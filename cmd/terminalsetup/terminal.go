@@ -30,7 +30,6 @@ import (
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
 
-	"github.com/emicklei/go-restful/v3"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -342,8 +341,9 @@ func TriggerTerminal(c *gin.Context) {
 			//"sessionID": sessionID,
 		},
 	})
-	restfulRequest := restful.NewRequest(c.Request)
-	go WaitForTerminal(k8sClient, restCfg, restfulRequest, sessionID)
+	//restfulRequest := restful.NewRequest(c.Request)
+	//go WaitForTerminal(k8sClient, restCfg, restfulRequest, sessionID)
+	go WaitForTerminal(k8sClient, restCfg, c, sessionID)
 
 	// 4) Return only the podName — no port needed
 	/*c.JSON(http.StatusOK, gin.H{
@@ -380,6 +380,9 @@ func handleExecShell(c *gin.Context) {
 		bound:    make(chan error),
 		sizeChan: make(chan remotecommand.TerminalSize),
 	})
-	go WaitForTerminal(client.InClusterClient(), cfg, restful.NewRequest(c.Request), sessionID)
+	//restfulRequest := restful.NewRequest(c.Request)
+	//go WaitForTerminal(client.InClusterClient(), cfg, restfulRequest, sessionID)
+	// !!! here we cannot use restful.NewRequest because it will not work with gin context
+	go WaitForTerminal(client.InClusterClient(), cfg, c, sessionID)
 	common.Success(c, TerminalResponse{ID: sessionID})
 }
