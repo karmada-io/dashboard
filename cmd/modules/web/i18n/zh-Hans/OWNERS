@@ -1,0 +1,11 @@
+reviewers:
+  - chenrui333
+  - zehuaiWANG
+  - helight
+
+approvers:
+  - hwdef
+  - tanjunchen
+
+labels:
+- language/zh

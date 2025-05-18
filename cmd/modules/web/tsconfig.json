@@ -1,0 +1,37 @@
+{
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false
+  },
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@api/*": [
+        "typings/*"
+      ],
+      "@common/*": [
+        "common/*"
+      ],
+      "@environments/*": [
+        "environments/*"
+      ]
+    },
+    "outDir": ".tmp/out-tsc",
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "module": "ES2022",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "useDefineForClassFields": false
+  }
+}

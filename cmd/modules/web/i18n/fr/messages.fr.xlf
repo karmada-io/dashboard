@@ -1,0 +1,2657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="1000282742611934867" datatype="html">
+        <source>Create from file</source>
+        <target>Créer depuis un fichier</target>
+      </trans-unit>
+      <trans-unit id="1014173530798491135" datatype="html">
+        <source>Default namespace</source>
+        <target>Espace de noms par défault</target>
+      </trans-unit>
+      <trans-unit id="1021548113296205274" datatype="html">
+        <source>Logs from</source>
+        <target>Journaux de</target>
+      </trans-unit>
+      <trans-unit id="1027767960138955738" datatype="html">
+        <source>Namespace fallback list</source>
+        <target>Liste des espaces de noms de secours</target>
+      </trans-unit>
+      <trans-unit id="1045499538393271132" datatype="html">
+        <source>Auto-refresh (every <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> s.)</source>
+        <target>Actualisation automatique (toutes les <x id="INTERPOLATION" equiv-text="{{refreshInterval}}"/> s.)</target>
+      </trans-unit>
+      <trans-unit id="8432216995899653457" datatype="html">
+        <source> Resource Information </source>
+        <target state="new">Informations sur la ressource</target>
+      </trans-unit>
+      <trans-unit id="8718382285899364471" datatype="html">
+        <source> Ingress Class Name </source>
+        <target state="new">Nom de classe Ingress</target>
+      </trans-unit>
+      <trans-unit id="1088363522225058238" datatype="html">
+        <source>Number of pods</source>
+        <target>Nombre de pods</target>
+      </trans-unit>
+      <trans-unit id="1106543845307638308" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> is not unique </source>
+        <target><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> n&apos;est pas unique </target>
+      </trans-unit>
+      <trans-unit id="1119419133766787743" datatype="html">
+        <source>Go to namespace</source>
+        <target>Aller à l&apos;espace de noms</target>
+      </trans-unit>
+      <trans-unit id="4924861949788063991" datatype="html">
+        <source> Preparing file to download... </source>
+        <target state="new">Préparation du fichier à télécharger...</target>
+      </trans-unit>
+      <trans-unit id="1134765132854526890" datatype="html">
+        <source>Service Name </source>
+        <target>Nom du service </target>
+      </trans-unit>
+      <trans-unit id="1138159535667068803" datatype="html">
+        <source>Memory requirement (MiB)</source>
+        <target>Exigence mémoire (MiB)</target>
+      </trans-unit>
+      <trans-unit id="1081449338282272492" datatype="html">
+        <source> Role Reference </source>
+        <target state="new">Référence de rôle</target>
+      </trans-unit>
+      <trans-unit id="3739563693237424930" datatype="html">
+        <source> Endpoints </source>
+        <target state="new">Terminaisons</target>
+      </trans-unit>
+      <trans-unit id="1183601349925746054" datatype="html">
+        <source>Parameter</source>
+        <target>Paramètre</target>
+      </trans-unit>
+      <trans-unit id="358602755220707349" datatype="html">
+        <source> Read Only Filesystem </source>
+        <target state="new">Système de fichiers en lecture seule</target>
+      </trans-unit>
+      <trans-unit id="5379315794961283458" datatype="html">
+        <source> Partition </source>
+        <target state="new">Partition</target>
+      </trans-unit>
+      <trans-unit id="1236604279860679031" datatype="html">
+        <source>Restart</source>
+        <target>Redémarrage</target>
+      </trans-unit>
+      <trans-unit id="1243984730371237241" datatype="html">
+        <source>Cluster Role Bindings </source>
+        <target>Liaisons de rôle de cluster </target>
+      </trans-unit>
+      <trans-unit id="4790676956408140544" datatype="html">
+        <source> Edit Namespace List </source>
+        <target state="new">Modifier la liste des espaces de noms</target>
+      </trans-unit>
+      <trans-unit id="3575195599076017488" datatype="html">
+        <source> New Replica Set </source>
+        <target state="new">Nouveau Replica Set</target>
+      </trans-unit>
+      <trans-unit id="1292699022746959928" datatype="html">
+        <source>Non-resource URL</source>
+        <target>URL non-ressource</target>
+      </trans-unit>
+      <trans-unit id="1321877744367304738" datatype="html">
+        <source>Image: </source>
+        <target state="new">Image: </target>
+      </trans-unit>
+      <trans-unit id="1948326579168027509" datatype="html">
+        <source> Mount Option(s) </source>
+        <target state="new">Option(s) de montage</target>
+      </trans-unit>
+      <trans-unit id="1341665337915148247" datatype="html">
+        <source>Cron Jobs</source>
+        <target>Cron Jobs</target>
+      </trans-unit>
+      <trans-unit id="4202631729170935049" datatype="html">
+        <source> Init images </source>
+        <target state="new">Images d&apos;Init</target>
+      </trans-unit>
+      <trans-unit id="1366161163946896063" datatype="html">
+        <source>Ingresses</source>
+        <target>Ingresses</target>
+      </trans-unit>
+      <trans-unit id="1421956494366769351" datatype="html">
+        <source>Daemon Sets </source>
+        <target>Daemon Sets </target>
+      </trans-unit>
+      <trans-unit id="5322928759008357043" datatype="html">
+        <source> Revision history limit </source>
+        <target state="new">Limite d&apos;historiques de révision</target>
+      </trans-unit>
+      <trans-unit id="1440494756566469853" datatype="html">
+        <source>Labels limit</source>
+        <target>Limite de labels</target>
+      </trans-unit>
+      <trans-unit id="1473017346308176259" datatype="html">
+        <source>Services </source>
+        <target>Services </target>
+      </trans-unit>
+      <trans-unit id="6644711618579682653" datatype="html">
+        <source> Volume Name </source>
+        <target state="new">Nom de volume</target>
+      </trans-unit>
+      <trans-unit id="1514917009530977431" datatype="html">
+        <source>Hides all access denied warnings in the notification panel.</source>
+        <target>Cache tous les avertissements d&apos;accès interdit dans le panneau de notifications.</target>
+      </trans-unit>
+      <trans-unit id="1519954996184640001" datatype="html">
+        <source>Error</source>
+        <target>Erreur</target>
+      </trans-unit>
+      <trans-unit id="1547349004541912871" datatype="html">
+        <source>Expand card</source>
+        <target>Développer la carte</target>
+      </trans-unit>
+      <trans-unit id="1557022594772514553" datatype="html">
+        <source>Mount Path</source>
+        <target>Chemin de montage</target>
+      </trans-unit>
+      <trans-unit id="1560900945095719942" datatype="html">
+        <source>CPU requirement (cores)</source>
+        <target>Exigence CPU (coeurs)</target>
+      </trans-unit>
+      <trans-unit id="1575304063225693008" datatype="html">
+        <source>TLS Secret </source>
+        <target>Secret TLS </target>
+      </trans-unit>
+      <trans-unit id="1607777136670400298" datatype="html">
+        <source>Image Pull Secret</source>
+        <target>Pull Secret pour l&apos;image</target>
+      </trans-unit>
+      <trans-unit id="1622528103709985950" datatype="html">
+        <source> Local settings are stored in the browser cookies, so they are not synchronized between multiple devices. Changes are applied automatically on every change. </source>
+        <target>Les paramètres locaux sont stockés dans les cookies du navigateur, ils ne sont donc pas synchronisés entre plusieurs appareils. Les modifications sont appliquées automatiquement à chaque modification. </target>
+      </trans-unit>
+      <trans-unit id="826139858915012735" datatype="html">
+        <source> Volume Attributes </source>
+        <target state="new">Attributs de volume</target>
+      </trans-unit>
+      <trans-unit id="1636259016604132537" datatype="html">
+        <source> Select YAML or JSON file specifying the resources to deploy to the namespace specified in the file. </source>
+        <target>Sélectionnez un fichier YAML ou JSON spécifiant les ressources à déployer dans l&apos;espace de noms spécifié dans le fichier. </target>
+      </trans-unit>
+      <trans-unit id="1678478837387802521" datatype="html">
+        <source>You do not have required permissions to access this resource.</source>
+        <target>Vous n&apos;avez pas les permissions nécessaires pour accéder à cette ressource.</target>
+      </trans-unit>
+      <trans-unit id="9158113520637954278" datatype="html">
+        <source> Reclaim policy </source>
+        <target state="new">Politique de recyclage</target>
+      </trans-unit>
+      <trans-unit id="1695738375031661256" datatype="html">
+        <source>Cluster name appears in the browser window title if it is set.</source>
+        <target>Le nom du cluster apparaît dans la barre de titre du navigateur s&apos;il est défini.</target>
+      </trans-unit>
+      <trans-unit id="1707219526222951180" datatype="html">
+        <source>Stateful Sets </source>
+        <target>Stateful Sets </target>
+      </trans-unit>
+      <trans-unit id="1726363342938046830" datatype="html">
+        <source>About</source>
+        <target>À propos</target>
+      </trans-unit>
+      <trans-unit id="1730144297199101193" datatype="html">
+        <source>Custom Resource Definitions</source>
+        <target>Définitions de ressources personnalisées</target>
+      </trans-unit>
+      <trans-unit id="173892283989120146" datatype="html">
+        <source>External Endpoints</source>
+        <target>Terminaisons externes</target>
+      </trans-unit>
+      <trans-unit id="1748150374925445786" datatype="html">
+        <source>Storage Class</source>
+        <target>Classe de stockage</target>
+      </trans-unit>
+      <trans-unit id="1761780531172486555" datatype="html">
+        <source>Available: </source>
+        <target state="new">Disponibles: </target>
+      </trans-unit>
+      <trans-unit id="1763461605200938061" datatype="html">
+        <source>Desired replicas</source>
+        <target>Répliques désirées</target>
+      </trans-unit>
+      <trans-unit id="1766424618785981510" datatype="html">
+        <source>Edit resource</source>
+        <target>Éditer la ressource</target>
+      </trans-unit>
+      <trans-unit id="8527472045454909617" datatype="html">
+        <source> Rolling update strategy </source>
+        <target state="new">Stratégie de Rolling update</target>
+      </trans-unit>
+      <trans-unit id="1781490455950079869" datatype="html">
+        <source><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#10\uFFFD&quot;"/>Community<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#10\uFFFD&quot;"/></source>
+        <target><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#10\uFFFD&quot;"/>Community<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#10\uFFFD&quot;"/></target>
+      </trans-unit>
+      <trans-unit id="1791198005341902530" datatype="html">
+        <source> Deploy </source>
+        <target>Déployer </target>
+      </trans-unit>
+      <trans-unit id="1813894172148248223" datatype="html">
+        <source>Ingress Classes </source>
+        <target>Classes Ingress </target>
+      </trans-unit>
+      <trans-unit id="1828068287723658160" datatype="html">
+        <source>Failed: </source>
+        <target state="new">Échoués: </target>
+      </trans-unit>
+      <trans-unit id="1832995043073719610" datatype="html">
+        <source>A secret with the specified name will be added to the cluster in the namespace.</source>
+        <target>Un secret ayant le nom spécifié sera ajouté au cluster dans l&apos;espace de nom.</target>
+      </trans-unit>
+      <trans-unit id="1850293262697508820" datatype="html">
+        <source>Revision history limit: </source>
+        <target state="new">Limite d&apos;historiques de révision: </target>
+      </trans-unit>
+      <trans-unit id="1853314835104660335" datatype="html">
+        <source>The new namespace will be added to the cluster.</source>
+        <target>Le nouvel espace de nom sera rajouté au cluster.</target>
+      </trans-unit>
+      <trans-unit id="1861657886309326" datatype="html">
+        <source>Events </source>
+        <target>Evènements </target>
+      </trans-unit>
+      <trans-unit id="1365124843061373195" datatype="html">
+        <source> Min ready seconds </source>
+        <target state="new">Secondes minimales prêt</target>
+      </trans-unit>
+      <trans-unit id="7615200044380578202" datatype="html">
+        <source> Categories </source>
+        <target state="new">Catégories</target>
+      </trans-unit>
+      <trans-unit id="1911298252045423500" datatype="html">
+        <source>Create from input</source>
+        <target>Créer en ligne</target>
+      </trans-unit>
+      <trans-unit id="192564361606898066" datatype="html">
+        <source>API Groups</source>
+        <target>Groupes d&apos;API</target>
+      </trans-unit>
+      <trans-unit id="1946523853590147981" datatype="html">
+        <source> The description will be added as an annotation to the Deployment and displayed in the application&apos;s details. </source>
+        <target>La description sera rajoutée comme annotation au déploiement et ajoutée dans les détails de l&apos;application. </target>
+      </trans-unit>
+      <trans-unit id="3639083393563809058" datatype="html">
+        <source> Volume ID </source>
+        <target state="new">ID Volume</target>
+      </trans-unit>
+      <trans-unit id="2459314090642082770" datatype="html">
+        <source> Machine ID </source>
+        <target state="new">ID de la machine</target>
+      </trans-unit>
+      <trans-unit id="2004327614711496973" datatype="html">
+        <source> Memory requirement must be given as a valid number. </source>
+        <target>L&apos;exigence mémoire doit être un nombre valide. </target>
+      </trans-unit>
+      <trans-unit id="7558116223792582160" datatype="html">
+        <source> Exec Commands </source>
+        <target state="new">Commandes d&apos;exécution</target>
+      </trans-unit>
+      <trans-unit id="2046668453758144264" datatype="html">
+        <source>Add namespaces...</source>
+        <target>Ajouter des espaces de noms...</target>
+      </trans-unit>
+      <trans-unit id="2052571393783036025" datatype="html">
+        <source>The specified image could require a pull secret credential if it is private. You may choose an existing secret or create a new one.</source>
+        <target>L&apos;image spécifiée peut nécessiter un pull secret si elle est privée. Vous pouvez choisir un secret existant ou en créer un nouveau.</target>
+      </trans-unit>
+      <trans-unit id="2054443489193005989" datatype="html">
+        <source>Environment variables available for use in the container. Values can reference other variables using $(VAR_NAME) syntax.</source>
+        <target>Variables d&apos;environnement disponibles dans le conteneur. Les valeurs peuvent référencer d&apos;autres variables en utilisant la syntaxe $(NOM_VARIABLE).</target>
+      </trans-unit>
+      <trans-unit id="2079136285643456368" datatype="html">
+        <source><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#16\uFFFD&quot;"/>Slack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#16\uFFFD&quot;"/></source>
+        <target><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#16\uFFFD&quot;"/>Slack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#16\uFFFD&quot;"/></target>
+      </trans-unit>
+      <trans-unit id="4860547712861504472" datatype="html">
+        <source> Conditions </source>
+        <target state="new">Conditions</target>
+      </trans-unit>
+      <trans-unit id="683199173889799093" datatype="html">
+        <source> iSCSI target lun number </source>
+        <target state="new">Numéro LUN cible iSCSI</target>
+      </trans-unit>
+      <trans-unit id="2083766050425503902" datatype="html">
+        <source> Application name must start with a lowercase letter and contain only lowercase letters, numbers, and &apos;-&apos; between words. </source>
+        <target>Le nom de l&apos;application doit commencer avec une lettre minuscule et contenir uniquement des lettres minuscules, des nombres, et des &apos;-&apos; entre les mots. </target>
+      </trans-unit>
+      <trans-unit id="2104548579314351919" datatype="html">
+        <source>Secrets </source>
+        <target>Secrets </target>
+      </trans-unit>
+      <trans-unit id="2122768143452494504" datatype="html">
+        <source>Unsupported graph type <x id="PH" equiv-text="this.graphType"/>.</source>
+        <target>Type de graphique non pris en charge <x id="PH" equiv-text="this.graphType"/>.</target>
+      </trans-unit>
+      <trans-unit id="2127150478980536520" datatype="html">
+        <source>Max Replicas</source>
+        <target>Nombre de répliques maximum</target>
+      </trans-unit>
+      <trans-unit id="2129795788862685212" datatype="html">
+        <source>A Deployment will be created to maintain the desired number of pods across your cluster.</source>
+        <target>Un déploiement sera créé pour maintenir le nombre désiré de pods dans votre cluster.</target>
+      </trans-unit>
+      <trans-unit id="2131524838680811873" datatype="html">
+        <source> You can <x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#6\uFFFD&quot;"/>deploy a containerized app<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#7\uFFFD]&quot;"/>, select other namespace or <x id="START_LINK_1" equiv-text="&quot;\uFFFD#7\uFFFD&quot;"/>check the Dashboard Docs <x id="START_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD#8\uFFFD&quot;"/>open_in_new<x id="CLOSE_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD/#8\uFFFD&quot;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#7\uFFFD]&quot;"/> to learn more. </source>
+        <target>Vous pouvez <x id="START_LINK" ctype="x-a" equiv-text="&lt;a&gt;"/>déployer une application conteneurisée<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, sélectionner un autre espace de noms ou <x id="START_LINK_1" ctype="x-a" equiv-text="&lt;a&gt;"/>suivre le tour du tableau de bord <x id="START_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;mat-icon&gt;"/>open_in_new<x id="CLOSE_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;/mat-icon&gt;"/> <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> pour en savoir plus. </target>
+      </trans-unit>
+      <trans-unit id="2132886845235480834" datatype="html">
+        <source>Resource type</source>
+        <target>Type de la ressource</target>
+      </trans-unit>
+      <trans-unit id="6006850454962953788" datatype="html">
+        <source> Seccomp Profile Type </source>
+        <target state="new">Type de profil Seccomp</target>
+      </trans-unit>
+      <trans-unit id="217048540478746172" datatype="html">
+        <source> Target port must be an integer. </source>
+        <target>Le port cible doit être un entier. </target>
+      </trans-unit>
+      <trans-unit id="2176659033176029418" datatype="html">
+        <source>Key</source>
+        <target>Clé</target>
+      </trans-unit>
+      <trans-unit id="21860712120581731" datatype="html">
+        <source>Updated: </source>
+        <target state="new">Mis à jour: </target>
+      </trans-unit>
+      <trans-unit id="2218082343053095278" datatype="html">
+        <source>Service</source>
+        <target>Service</target>
+      </trans-unit>
+      <trans-unit id="4335281277764237619" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> © <x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/> The Kubernetes Authors </source>
+        <target state="new"> Kubernetes Dashboard v<x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> © <x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/> The Kubernetes Authors </target>
+      </trans-unit>
+      <trans-unit id="2235593604907350097" datatype="html">
+        <source>Resource Names</source>
+        <target>Noms de ressource</target>
+      </trans-unit>
+      <trans-unit id="2244223685971816410" datatype="html">
+        <source>Logged in with auth header </source>
+        <target>Connecté avec l&apos;en-tête d&apos;authentification </target>
+      </trans-unit>
+      <trans-unit id="2250922476634643797" datatype="html">
+        <source>Parameters</source>
+        <target>Paramètres</target>
+      </trans-unit>
+      <trans-unit id="2262782149902277587" datatype="html">
+        <source>key</source>
+        <target>clé</target>
+      </trans-unit>
+      <trans-unit id="2267321858631815522" datatype="html">
+        <source>Inactive Jobs</source>
+        <target>Jobs inactifs</target>
+      </trans-unit>
+      <trans-unit id="709124445415376270" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> bytes </source>
+        <target state="new"><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> octets</target>
+      </trans-unit>
+      <trans-unit id="3057224553801465622" datatype="html">
+        <source> QoS Class </source>
+        <target state="new">Classe QoS</target>
+      </trans-unit>
+      <trans-unit id="2304348476142864790" datatype="html">
+        <source>Persistent Volume Claims </source>
+        <target>Persistent Volume Claims </target>
+      </trans-unit>
+      <trans-unit id="968989501106636445" datatype="html">
+        <source> Seccomp Localhost Profile </source>
+        <target state="new">Profil d&apos;hôte local de Seccomp</target>
+      </trans-unit>
+      <trans-unit id="2317196056953748991" datatype="html">
+        <source>Old Replica Sets</source>
+        <target>Anciens Replica Sets</target>
+      </trans-unit>
+      <trans-unit id="2320200316076079587" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD#5\uFFFD|\uFFFD#8\uFFFD]&quot;"/>Are you sure you want to delete <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD#6\uFFFD|\uFFFD#2:1\uFFFD]&quot;"/><x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#2:1\uFFFD]&quot;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD/#5\uFFFD|\uFFFD/#1:1\uFFFD\uFFFD/*7:1\uFFFD|\uFFFD/#8\uFFFD]&quot;"/><x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&quot;\uFFFD*7:1\uFFFD\uFFFD#1:1\uFFFD&quot;"/>  in namespace <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD#6\uFFFD|\uFFFD#2:1\uFFFD]&quot;"/><x id="INTERPOLATION_2" equiv-text="&quot;\uFFFD0:1\uFFFD&quot;"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#2:1\uFFFD]&quot;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD/#5\uFFFD|\uFFFD/#1:1\uFFFD\uFFFD/*7:1\uFFFD|\uFFFD/#8\uFFFD]&quot;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD#5\uFFFD|\uFFFD#8\uFFFD]&quot;"/>?<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD/#5\uFFFD|\uFFFD/#1:1\uFFFD\uFFFD/*7:1\uFFFD|\uFFFD/#8\uFFFD]&quot;"/></source>
+        <target state="new"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Êtes-vous sûr de vouloir supprimer <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/><x id="INTERPOLATION_1" equiv-text="{{data.objectMeta.name}}"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/> de genre <x id="INTERPOLATION" equiv-text="{{data.displayName}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> <x id="START_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;span&gt;"/> de l&apos;espace de nom <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/><x id="INTERPOLATION_2" equiv-text="{{data.objectMeta.namespace}}"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/> <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>&amp;nbsp;?<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> </target>
+      </trans-unit>
+      <trans-unit id="2335697433764621013" datatype="html">
+        <source>Memory limits (bytes)</source>
+        <target>Limites mémoire (octets)</target>
+      </trans-unit>
+      <trans-unit id="8686495004015695740" datatype="html">
+        <source> Delete a resource </source>
+        <target state="new">Supprimer une ressource</target>
+      </trans-unit>
+      <trans-unit id="5247817575145637200" datatype="html">
+        <source> Resource Requests </source>
+        <target state="new">Demandes de ressources</target>
+      </trans-unit>
+      <trans-unit id="2380939390102386148" datatype="html">
+        <source>
+          <x id="ICU" equiv-text="i18n_81" xid="2986806881378584169"/>
+        </source>
+        <target>
+          <x id="ICU" equiv-text="{isMoreOptionsEnabled(), select, 1 {...} other {...}}"/>
+        </target>
+      </trans-unit>
+      <trans-unit id="2397234605876541174" datatype="html">
+        <source>Image Pull Secrets</source>
+        <target>Secrets d&apos;extraction d&apos;images</target>
+      </trans-unit>
+      <trans-unit id="2411065404041685586" datatype="html">
+        <source>Path Type </source>
+        <target>Type de chemin </target>
+      </trans-unit>
+      <trans-unit id="2802370169411411144" datatype="html">
+        <source> Settings have changed since last reload </source>
+        <target state="new">Les paramètres ont été modifiés depuis le dernier chargement</target>
+      </trans-unit>
+      <trans-unit id="2446117790692479672" datatype="html">
+        <source>Resources</source>
+        <target>Ressources</target>
+      </trans-unit>
+      <trans-unit id="6439489752706752429" datatype="html">
+        <source> Operating system </source>
+        <target state="new">Système d&apos;exploitation</target>
+      </trans-unit>
+      <trans-unit id="2614607010577950577" datatype="html">
+        <source>Overview</source>
+        <target>Aperçu</target>
+      </trans-unit>
+      <trans-unit id="2620018130971633920" datatype="html">
+        <source>Memory Usage (bytes)</source>
+        <target>Utilisation mémoire (octets)</target>
+      </trans-unit>
+      <trans-unit id="5357248861406585490" datatype="html">
+        <source> Add Namespace </source>
+        <target state="new">Ajouter un espace de noms</target>
+      </trans-unit>
+      <trans-unit id="2640307640152196302" datatype="html">
+        <source>Delete now (sets delete grace period to 1 second instead of the default, which is usually 30 seconds)</source>
+        <target state="new">Supprimer immédiatement (Défini la période de grâce de suppression à 1 seconde au lieu de la valeur par défaut, habituellement de 30 secondes)</target>
+      </trans-unit>
+      <trans-unit id="4005179947355875165" datatype="html">
+        <source> Persistent disk name </source>
+        <target state="new">Nom du disque persistant</target>
+      </trans-unit>
+      <trans-unit id="2671324669903200051" datatype="html">
+        <source>All namespaces</source>
+        <target>Tous les espaces de noms</target>
+      </trans-unit>
+      <trans-unit id="2671339909368348918" datatype="html">
+        <source>Host links are external links that will be open in a new tab.</source>
+        <target>Les liens hôtes sont des liens externes qui seront ouverts dans un nouvel onglet.</target>
+      </trans-unit>
+      <trans-unit id="2733722431826186016" datatype="html">
+        <source>Storage Classes </source>
+        <target>Classes de stockage </target>
+      </trans-unit>
+      <trans-unit id="1907282194427875955" datatype="html">
+        <source> Selected namespace is different than namespace of currently selected resource. </source>
+        <target state="new">L&apos;espace de noms sélectionné est différent de l&apos;espace de noms de la ressource actuellement sélectionnée.</target>
+      </trans-unit>
+      <trans-unit id="2776781342795162475" datatype="html">
+        <source>Namespaces let you partition resources into logically named groups.</source>
+        <target>Les espaces de noms vous permettent de distribuer vos ressources dans des groupes logiques nommés.</target>
+      </trans-unit>
+      <trans-unit id="2782107425695587228" datatype="html">
+        <source>Pending: <x id="PH" equiv-text="&apos;&apos;"/></source>
+        <target state="new">En attente: <x id="PH" equiv-text="status.pending"/></target>
+      </trans-unit>
+      <trans-unit id="8096554128118112010" datatype="html">
+        <source> Concurrency policy </source>
+        <target state="new">Politique de concurrence</target>
+      </trans-unit>
+      <trans-unit id="8187105718525979257" datatype="html">
+        <source> Termination Grace Period (Seconds) </source>
+        <target state="new">Période de grâce de résiliation (secondes)</target>
+      </trans-unit>
+      <trans-unit id="8056023144164880134" datatype="html">
+        <source> Label Selector </source>
+        <target state="new">Sélecteur d&apos;étiquettes</target>
+      </trans-unit>
+      <trans-unit id="2803293796008679153" datatype="html">
+        <source>Ingress Classes</source>
+        <target>Classes Ingress</target>
+      </trans-unit>
+      <trans-unit id="8708028741679746582" datatype="html">
+        <source> Parallelism </source>
+        <target state="new">Parallélisme</target>
+      </trans-unit>
+      <trans-unit id="2826581353496868063" datatype="html">
+        <source>Language</source>
+        <target>Langue</target>
+      </trans-unit>
+      <trans-unit id="2833767909565048391" datatype="html">
+        <source> Do you want to stay on current page and change namespace from <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD#7\uFFFD|\uFFFD#8\uFFFD]&quot;"/><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD/#7\uFFFD|\uFFFD/#8\uFFFD]&quot;"/> to <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD#7\uFFFD|\uFFFD#8\uFFFD]&quot;"/><x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD/#7\uFFFD|\uFFFD/#8\uFFFD]&quot;"/>? </source>
+        <target>Désirez-vous rester sur la page en cours et modifier l&apos;espace de nom de <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/><x id="INTERPOLATION" equiv-text="{{namespace}}"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/> à <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/><x id="INTERPOLATION_1" equiv-text="{{newNamespace}}"/><x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/> ? </target>
+      </trans-unit>
+      <trans-unit id="284876663522831141" datatype="html">
+        <source>Source Type</source>
+        <target>Type de source</target>
+      </trans-unit>
+      <trans-unit id="2862835290520488117" datatype="html">
+        <source>Unavailable: </source>
+        <target state="new">Non disponible: </target>
+      </trans-unit>
+      <trans-unit id="8039048364879076166" datatype="html">
+        <source> File System Type </source>
+        <target state="new">Type de système de fichiers</target>
+      </trans-unit>
+      <trans-unit id="2914974644465021764" datatype="html">
+        <source>Sub-object</source>
+        <target>Sous-objet</target>
+      </trans-unit>
+      <trans-unit id="2933331719200534418" datatype="html">
+        <source><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#7\uFFFD&quot;"/>Documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#7\uFFFD&quot;"/></source>
+        <target><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#7\uFFFD&quot;"/>Documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#7\uFFFD&quot;"/></target>
+      </trans-unit>
+      <trans-unit id="2944102521023817891" datatype="html">
+        <source>Cluster</source>
+        <target>Cluster</target>
+      </trans-unit>
+      <trans-unit id="2946624699882754313" datatype="html">
+        <source>Show all</source>
+        <target>Voir plus</target>
+      </trans-unit>
+      <trans-unit id="2968503433962940653" datatype="html">
+        <source>Last transition time</source>
+        <target>Dernière transition</target>
+      </trans-unit>
+      <trans-unit id="2986806881378584169" datatype="html">
+        <source>{VAR_SELECT, select, true {Hide advanced options} other {Show advanced options}}</source>
+        <target>{VAR_SELECT, select, true {Cacher les options avancées} other {Afficher les options avancées}}</target>
+      </trans-unit>
+      <trans-unit id="2987268586260348582" datatype="html">
+        <source>Total: </source>
+        <target state="new">Total: </target>
+      </trans-unit>
+      <trans-unit id="3000799346062046358" datatype="html">
+        <source>Suffix &apos;<x id="PH" equiv-text="suffix"/>&apos; not recognized.</source>
+        <target>Suffixe &apos;<x id="PH" equiv-text="suffix"/>&apos; non reconnu.</target>
+      </trans-unit>
+      <trans-unit id="3012870639723698090" datatype="html">
+        <source> Port must be greater than 0. </source>
+        <target>Le port doit être supérieur à 0. </target>
+      </trans-unit>
+      <trans-unit id="3026305820283888836" datatype="html">
+        <source>Reclaim Policy</source>
+        <target>Politique de recyclage</target>
+      </trans-unit>
+      <trans-unit id="3037001602563649018" datatype="html">
+        <source> Name must be alphanumeric and may contain dashes. </source>
+        <target>Le nom doit être alphanumérique et peut contenir des tirets. </target>
+      </trans-unit>
+      <trans-unit id="3068261068429094032" datatype="html">
+        <source>Max unavailable: </source>
+        <target state="new">Maximum indisponibles: </target>
+      </trans-unit>
+      <trans-unit id="3094294427304814088" datatype="html">
+        <source>Strategy: </source>
+        <target state="new">Stratégie: </target>
+      </trans-unit>
+      <trans-unit id="3117139905742018214" datatype="html">
+        <source>Close notifications panel</source>
+        <target>Fermer le panneau de notifications</target>
+      </trans-unit>
+      <trans-unit id="31200575933930123" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> <x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/> will be triggered.</source>
+        <target><x id="INTERPOLATION" equiv-text="{{data.displayName}}"/> <x id="INTERPOLATION_1" equiv-text="{{data.objectMeta.name}}"/> sera déclenché.</target>
+      </trans-unit>
+      <trans-unit id="3139808086382723160" datatype="html">
+        <source>Number of seconds between every auto-refresh of every resource. Set 0 to disable.</source>
+        <target>Nombre de secondes entre chaque actualisation automatique de chaque ressource. Mettre à 0 pour désactiver.</target>
+      </trans-unit>
+      <trans-unit id="3145624232792843463" datatype="html">
+        <source>You can specify minimum CPU and memory requirements for the container.</source>
+        <target>Vous pouvez indiquer des exigences minimales pour le CPU et la mémoire pour le conteneur.</target>
+      </trans-unit>
+      <trans-unit id="3147371091697922238" datatype="html">
+        <source>Reference</source>
+        <target>Référence</target>
+      </trans-unit>
+      <trans-unit id="315761510234903605" datatype="html">
+        <source>Exec into pod</source>
+        <target>Exécuter dans le pod</target>
+      </trans-unit>
+      <trans-unit id="3175667526023915046" datatype="html">
+        <source> Label Value must not exceed 253 characters. </source>
+        <target>La valeur de l&apos;étiquette ne doit pas excéder 253 caractères. </target>
+      </trans-unit>
+      <trans-unit id="3193976279273491157" datatype="html">
+        <source>Actions</source>
+        <target>Actions</target>
+      </trans-unit>
+      <trans-unit id="2261628299215331435" datatype="html">
+        <source> Proc Mount </source>
+        <target state="new">Proc Mount</target>
+      </trans-unit>
+      <trans-unit id="3208716248295885865" datatype="html">
+        <source>List of namespaces that should be presented to user without namespace list privileges.</source>
+        <target>Liste des espaces de noms qui doivent être présentés à l&apos;utilisateur qui n&apos;a pas les privilèges de la liste des espaces de noms.</target>
+      </trans-unit>
+      <trans-unit id="6990564555478044369" datatype="html">
+        <source> Resource Quotas </source>
+        <target state="new">Quotas de ressources</target>
+      </trans-unit>
+      <trans-unit id="3229595422546554334" datatype="html">
+        <source>Jobs</source>
+        <target>Jobs</target>
+      </trans-unit>
+      <trans-unit id="5486304737368254412" datatype="html">
+        <source> Max unavailable </source>
+        <target state="new">Maximum indisponibles</target>
+      </trans-unit>
+      <trans-unit id="3283019513707383139" datatype="html">
+        <source> Hosts <x id="START_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD#2\uFFFD&quot;"/>open_in_new<x id="CLOSE_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD/#2\uFFFD&quot;"/></source>
+        <target>Hôtes <x id="START_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&lt;mat-icon class=&quot;external-link-icon kd-clickable&quot; i18n-matTooltip matTooltip=&quot;Les liens hôtes sont des liens externes qui s&apos;ouvrent dans un nouvel onglet.&quot;&gt;"/>open_in_new<x id="CLOSE_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&lt;/mat-icon&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="3294686077659093992" datatype="html">
+        <source>Namespace</source>
+        <target>Espace de noms</target>
+      </trans-unit>
+      <trans-unit id="3298085247516944059" datatype="html">
+        <source>Resource auto-refresh time interval</source>
+        <target>Intervalle d&apos;actualisation automatique des ressources</target>
+      </trans-unit>
+      <trans-unit id="8296538888762890291" datatype="html">
+        <source> Accepted Names </source>
+        <target state="new">Noms acceptés</target>
+      </trans-unit>
+      <trans-unit id="7296509424613101209" datatype="html">
+        <source> Run as User </source>
+        <target state="new">Exécuter en tant qu&apos;utilisateur</target>
+      </trans-unit>
+      <trans-unit id="3323415564519831786" datatype="html">
+        <source> Name is required. </source>
+        <target>Le nom est requis. </target>
+      </trans-unit>
+      <trans-unit id="3348508131663910333" datatype="html">
+        <source>Source Name</source>
+        <target>Nom de la source</target>
+      </trans-unit>
+      <trans-unit id="3354985892672468892" datatype="html">
+        <source> Label value must be alphanumeric separated by &apos;.&apos; , &apos;-&apos; or &apos;_&apos;. </source>
+        <target>La valeur de l&apos;étiquette doit être alphanumérique séparé par &apos;.&apos; , &apos;-&apos; ou &apos;_&apos;. </target>
+      </trans-unit>
+      <trans-unit id="3368378053177904137" datatype="html">
+        <source> Learn more <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD#5\uFFFD&quot;"/>open_in_new<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD/#5\uFFFD&quot;"/></source>
+        <target>En savoir plus <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/> open_in_new <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="3368378053177904137" datatype="html">
+        <source>Learn more <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD#15\uFFFD&quot;"/>open_in_new<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD/#15\uFFFD&quot;"/></source>
+        <target>En savoir plus <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/> open_in_new <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="3368378053177904137" datatype="html">
+        <source>Learn more <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD#64\uFFFD&quot;"/>open_in_new<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD/#64\uFFFD&quot;"/></source>
+        <target>En savoir plus <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/> open_in_new <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="3368378053177904137" datatype="html">
+        <source>Learn more <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD#5\uFFFD&quot;"/>open_in_new<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD/#5\uFFFD&quot;"/></source>
+        <target>En savoir plus <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/> open_in_new <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="3368378053177904137" datatype="html">
+        <source> Learn more <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD#5\uFFFD&quot;"/>open_in_new<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;\uFFFD/#5\uFFFD&quot;"/></source>
+        <target>En savoir plus <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/> open_in_new <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="3370944056293075657" datatype="html">
+        <source> Name must be up to <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> characters long. </source>
+        <target>Le nom ne doit pas dépasser <x id="INTERPOLATION" equiv-text="{{secretNameMaxLength}}"/> caractères. </target>
+      </trans-unit>
+      <trans-unit id="3370944056293075657" datatype="html">
+        <source> Name must be up to <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> characters long. </source>
+        <target>Le nom ne doit pas dépasser <x id="INTERPOLATION" equiv-text="{{secretNameMaxLength}}"/> caractères. </target>
+      </trans-unit>
+      <trans-unit id="3375720161310377589" datatype="html">
+        <source>value</source>
+        <target>valeur</target>
+      </trans-unit>
+      <trans-unit id="3381412717703555378" datatype="html">
+        <source>Object</source>
+        <target>Objet</target>
+      </trans-unit>
+      <trans-unit id="3394717374488548686" datatype="html">
+        <source>Config Maps</source>
+        <target>Config Maps</target>
+      </trans-unit>
+      <trans-unit id="3413133151717525161" datatype="html">
+        <source>Min Replicas</source>
+        <target>Nombre de répliques minimum</target>
+      </trans-unit>
+      <trans-unit id="3415340061451880090" datatype="html">
+        <source>Remove all notifications</source>
+        <target>Supprimer toutes les notifications</target>
+      </trans-unit>
+      <trans-unit id="1907629278678113690" datatype="html">
+        <source> Container runtime version </source>
+        <target state="new">Version du runtime de conteneurs</target>
+      </trans-unit>
+      <trans-unit id="3426643717372750272" datatype="html">
+        <source>Service Port </source>
+        <target>Port du service</target>
+      </trans-unit>
+      <trans-unit id="3463375855672784957" datatype="html">
+        <source>Cluster Role Bindings</source>
+        <target>Liaisons de rôle de cluster</target>
+      </trans-unit>
+      <trans-unit id="3482104516399089245" datatype="html">
+        <source>Active Jobs</source>
+        <target>Jobs actifs</target>
+      </trans-unit>
+      <trans-unit id="3501167321553405640" datatype="html">
+        <source>CPU requests (cores)</source>
+        <target>Requêtes CPU (coeurs)</target>
+      </trans-unit>
+      <trans-unit id="1318864603446723350" datatype="html">
+        <source> Failure Threshold </source>
+        <target state="new">Seuil de défaillance</target>
+      </trans-unit>
+      <trans-unit id="225840186184277396" datatype="html">
+        <source> Volume Handle </source>
+        <target state="new">Volume Handle</target>
+      </trans-unit>
+      <trans-unit id="83032651082543395" datatype="html">
+        <source> Windows GMSA Credential Spec Name </source>
+        <target state="new">Nom de spécification des informations d&apos;identification Windows GMSA</target>
+      </trans-unit>
+      <trans-unit id="3517550046701184661" datatype="html">
+        <source>Show less</source>
+        <target>Voir moins</target>
+      </trans-unit>
+      <trans-unit id="3529792493382301280" datatype="html">
+        <source>Run as privileged</source>
+        <target>Exécuter en mode privilégié</target>
+      </trans-unit>
+      <trans-unit id="3534088723520522114" datatype="html">
+        <source> Variable name must be a valid C identifier. </source>
+        <target>Le nom de variable doit être un identifiant C valide. </target>
+      </trans-unit>
+      <trans-unit id="7493868697410114420" datatype="html">
+        <source> Local settings </source>
+        <target state="new">Paramètres locaux</target>
+      </trans-unit>
+      <trans-unit id="3551329346991932579" datatype="html">
+        <source> Protocol is required. </source>
+        <target>Le protocole est requis. </target>
+      </trans-unit>
+      <trans-unit id="3569677708978335155" datatype="html">
+        <source>Desired: </source>
+        <target state="new">Désirés: </target>
+      </trans-unit>
+      <trans-unit id="7562635850848330707" datatype="html">
+        <source> Session Affinity </source>
+        <target state="new">Affinité de session</target>
+      </trans-unit>
+      <trans-unit id="3588315191655475025" datatype="html">
+        <source> Container image is required </source>
+        <target>L&apos;image du conteneur est requise </target>
+      </trans-unit>
+      <trans-unit id="3609669829589519658" datatype="html">
+        <source> CPU requirement must be given as a valid number. </source>
+        <target>L&apos;exigence CPU doit être un nombre valide. </target>
+      </trans-unit>
+      <trans-unit id="6172383046759827946" datatype="html">
+        <source> Service Port Number </source>
+        <target state="new">Numéro de port de service</target>
+      </trans-unit>
+      <trans-unit id="3663367271392398931" datatype="html">
+        <source>unset</source>
+        <target>non défini</target>
+      </trans-unit>
+      <trans-unit id="8681607357908937000" datatype="html">
+        <source> Resource Limits </source>
+        <target state="new">Limites de ressources</target>
+      </trans-unit>
+      <trans-unit id="3758898250164236993" datatype="html">
+        <source>This action is equivalent to: </source>
+        <target>Cette action équivaut à: </target>
+      </trans-unit>
+      <trans-unit id="376256424703415146" datatype="html">
+        <source>Change the language of the dashboard</source>
+        <target>Changer la langue du tableau de bord</target>
+      </trans-unit>
+      <trans-unit id="3783562484965706612" datatype="html">
+        <source>Protocol</source>
+        <target>Protocole</target>
+      </trans-unit>
+      <trans-unit id="6821569701824668930" datatype="html">
+        <source> Init containers </source>
+        <target state="new">Init containers</target>
+      </trans-unit>
+      <trans-unit id="3796390051357100906" datatype="html">
+        <source>Exec</source>
+        <target>Exécuter</target>
+      </trans-unit>
+      <trans-unit id="3798186563647127215" datatype="html">
+        <source>Open notifications panel</source>
+        <target>Ouvrir le panneau des notifications</target>
+      </trans-unit>
+      <trans-unit id="3802938417948102465" datatype="html">
+        <source>Replica Sets</source>
+        <target>Replica Sets</target>
+      </trans-unit>
+      <trans-unit id="3840571521050129557" datatype="html">
+        <source>An &apos;app&apos; label with this value will be added to the Deployment and Service that get deployed.</source>
+        <target>Une étiquette &apos;app&apos; avec cette valeur sera ajoutée au déploiement et au service qui seront déployés.</target>
+      </trans-unit>
+      <trans-unit id="3844914972911579334" datatype="html">
+        <source> Number of pods must be a positive integer </source>
+        <target>Le nombre de pods doit être un entier positif </target>
+      </trans-unit>
+      <trans-unit id="3847048283826460449" datatype="html">
+        <source>Run command arguments</source>
+        <target>Arguments de la commande à exécuter</target>
+      </trans-unit>
+      <trans-unit id="3856193213296741054" datatype="html">
+        <source>Last Seen</source>
+        <target>Dernière vue</target>
+      </trans-unit>
+      <trans-unit id="3910914001392684259" datatype="html">
+        <source> Port must be an integer. </source>
+        <target>Le port doit être un entier. </target>
+      </trans-unit>
+      <trans-unit id="3911411545389266400" datatype="html">
+        <source>Choose YAML or JSON file</source>
+        <target>Sélectionnez un fichier YAML ou JSON</target>
+      </trans-unit>
+      <trans-unit id="4399723122506773449" datatype="html">
+        <source> Available </source>
+        <target state="new">Disponibles</target>
+      </trans-unit>
+      <trans-unit id="3971614543116674506" datatype="html">
+        <source>Node</source>
+        <target>Noeud</target>
+      </trans-unit>
+      <trans-unit id="400776614514525117" datatype="html">
+        <source>Schedule: </source>
+        <target state="new">Planning: </target>
+      </trans-unit>
+      <trans-unit id="7537767239484641354" datatype="html">
+        <source> Arguments </source>
+        <target state="new">Arguments</target>
+      </trans-unit>
+      <trans-unit id="4052052481087794292" datatype="html">
+        <source>Role Bindings </source>
+        <target>Liaisons de rôle </target>
+      </trans-unit>
+      <trans-unit id="7129984966740251696" datatype="html">
+        <source> Config and Storage </source>
+        <target state="new">Configuration et Stockage</target>
+      </trans-unit>
+      <trans-unit id="9221238177046112274" datatype="html">
+        <source> Probe Period (Seconds) </source>
+        <target state="new">Probe Period (secondes)</target>
+      </trans-unit>
+      <trans-unit id="4083589482228710450" datatype="html">
+        <source>Scale resource</source>
+        <target>Mettre à l&apos;échelle la ressource</target>
+      </trans-unit>
+      <trans-unit id="4105691782196566273" datatype="html">
+        <source> Port must be less than 65536. </source>
+        <target>Le port doit être inférieur à 65536. </target>
+      </trans-unit>
+      <trans-unit id="714388357956850761" datatype="html">
+        <source> Readiness Probe </source>
+        <target state="new">Readiness Probe</target>
+      </trans-unit>
+      <trans-unit id="4114469166359843365" datatype="html">
+        <source>CPU limits (cores)</source>
+        <target>Limites CPU (coeurs)</target>
+      </trans-unit>
+      <trans-unit id="414887388288176527" datatype="html">
+        <source>Images</source>
+        <target>Images</target>
+      </trans-unit>
+      <trans-unit id="4207916966377787111" datatype="html">
+        <source>Created</source>
+        <target>Date de création</target>
+      </trans-unit>
+      <trans-unit id="4216509171965074904" datatype="html">
+        <source>Namespace that should be selected by default after logging in.</source>
+        <target>Espace de noms qui doit être sélectionné par défaut après la connexion.</target>
+      </trans-unit>
+      <trans-unit id="4216678889012737533" datatype="html">
+        <source> Deployment or service with this name already exists within namespace. </source>
+        <target>Un déploiement ou un service ayant ce nom existe déjà dans l&apos;espace de noms. </target>
+      </trans-unit>
+      <trans-unit id="913836171809330770" datatype="html">
+        <source> Storage class </source>
+        <target state="new">Classe de stockage</target>
+      </trans-unit>
+      <trans-unit id="4230227443728227002" datatype="html">
+        <source>Role Bindings</source>
+        <target>Liaisons de rôle</target>
+      </trans-unit>
+      <trans-unit id="4285755342959217630" datatype="html">
+        <source>Pin resource</source>
+        <target>Epingler la ressource</target>
+      </trans-unit>
+      <trans-unit id="4287392502726135197" datatype="html">
+        <source>Config Maps </source>
+        <target>Config Maps </target>
+      </trans-unit>
+      <trans-unit id="4288379540371209568" datatype="html">
+        <source> Create a new namespace... </source>
+        <target>Créer un nouvel espace de noms... </target>
+      </trans-unit>
+      <trans-unit id="4296726543175330378" datatype="html">
+        <source> Enter YAML or JSON content specifying the resources to create to the currently selected namespace. </source>
+        <target>Entrez un contenu YAML ou JSON spécifiant les ressources à créer dans l&apos;espace de noms sélectionné. </target>
+      </trans-unit>
+      <trans-unit id="43228639508046926" datatype="html">
+        <source>Completions: </source>
+        <target state="new">Achevés: </target>
+      </trans-unit>
+      <trans-unit id="4342607865016428668" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD#5\uFFFD|\uFFFD#8\uFFFD]&quot;"/><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD#6\uFFFD|\uFFFD#2:1\uFFFD]&quot;"/><x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/> <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#2:1\uFFFD]&quot;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD/#5\uFFFD|\uFFFD/#1:1\uFFFD\uFFFD/*7:1\uFFFD|\uFFFD/#8\uFFFD]&quot;"/><x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&quot;\uFFFD*7:1\uFFFD\uFFFD#1:1\uFFFD&quot;"/> in namespace <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD#6\uFFFD|\uFFFD#2:1\uFFFD]&quot;"/><x id="INTERPOLATION_2" equiv-text="&quot;\uFFFD0:1\uFFFD&quot;"/> <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#2:1\uFFFD]&quot;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD/#5\uFFFD|\uFFFD/#1:1\uFFFD\uFFFD/*7:1\uFFFD|\uFFFD/#8\uFFFD]&quot;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD#5\uFFFD|\uFFFD#8\uFFFD]&quot;"/>will be restarted.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&quot;[\uFFFD/#5\uFFFD|\uFFFD/#1:1\uFFFD\uFFFD/*7:1\uFFFD|\uFFFD/#8\uFFFD]&quot;"/></source>
+        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/><x id="INTERPOLATION" equiv-text="{{data.displayName}}"/> <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/><x id="INTERPOLATION_1" equiv-text="{{data.objectMeta.name}}"/> <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;data.objectMeta.namespace&quot;&gt;"/> dans l&apos;espace de noms <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/><x id="INTERPOLATION_2" equiv-text="{{data.objectMeta.namespace}}"/> <x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>sera redémarré.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="6610543661547234529" datatype="html">
+        <source> Starting deadline seconds </source>
+        <target state="new">Temps limite de démarrage</target>
+      </trans-unit>
+      <trans-unit id="434404492084234684" datatype="html">
+        <source>Volume</source>
+        <target>Volume</target>
+      </trans-unit>
+      <trans-unit id="4439126314764642092" datatype="html">
+        <source>Memory requests (bytes)</source>
+        <target>Requêtes mémoire (octets)</target>
+      </trans-unit>
+      <trans-unit id="444174825108794574" datatype="html">
+        <source>Create new resource</source>
+        <target>Créer une nouvelle ressource</target>
+      </trans-unit>
+      <trans-unit id="4467323362722952678" datatype="html">
+        <source>Unknown</source>
+        <target>Inconnu</target>
+      </trans-unit>
+      <trans-unit id="4475093671158329161" datatype="html">
+        <source>Pin</source>
+        <target>Épingler</target>
+      </trans-unit>
+      <trans-unit id="4482184335435539588" datatype="html">
+        <source>This action is equivalent to:</source>
+        <target>Cette action est équivalente à:</target>
+      </trans-unit>
+      <trans-unit id="4482298116905997082" datatype="html">
+        <source>Age: </source>
+        <target state="new">Âge: </target>
+      </trans-unit>
+      <trans-unit id="4039719374513219491" datatype="html">
+        <source> Edit a resource </source>
+        <target state="new">Éditer une ressource</target>
+      </trans-unit>
+      <trans-unit id="4499651527836994743" datatype="html">
+        <source>Roles </source>
+        <target>Rôles </target>
+      </trans-unit>
+      <trans-unit id="4558539712487554281" datatype="html">
+        <source>Do you want to save them anyways?</source>
+        <target>Voulez-vous tout de même les sauvegarder ?</target>
+      </trans-unit>
+      <trans-unit id="2373891009609362730" datatype="html">
+        <source> Access modes </source>
+        <target state="new">Modes d&apos;accès</target>
+      </trans-unit>
+      <trans-unit id="4575431999029130927" datatype="html">
+        <source>Default request</source>
+        <target>Requête par défaut</target>
+      </trans-unit>
+      <trans-unit id="4580988005648117665" datatype="html">
+        <source>Search</source>
+        <target>Recherche</target>
+      </trans-unit>
+      <trans-unit id="4586389992185582526" datatype="html">
+        <source>Actual replicas</source>
+        <target>Répliques actuelles</target>
+      </trans-unit>
+      <trans-unit id="4588386421413885519" datatype="html">
+        <source>Secrets</source>
+        <target>Secrets</target>
+      </trans-unit>
+      <trans-unit id="4588432762946433765" datatype="html">
+        <source>Kind: </source>
+        <target state="new">Genre: </target>
+      </trans-unit>
+      <trans-unit id="4613805182430195952" datatype="html">
+        <source>Namespaces </source>
+        <target>Espaces de noms </target>
+      </trans-unit>
+      <trans-unit id="465183468069102061" datatype="html">
+        <source>Claim</source>
+        <target>Demande</target>
+      </trans-unit>
+      <trans-unit id="1851825740267015159" datatype="html">
+        <source> iSCSI Qualified Name </source>
+        <target state="new">Nom qualifié iSCSI</target>
+      </trans-unit>
+      <trans-unit id="4686783485484478974" datatype="html">
+        <source>Parallelism: </source>
+        <target state="new">Parallélisme: </target>
+      </trans-unit>
+      <trans-unit id="7751708431356942281" datatype="html">
+        <source> Environment variables </source>
+        <target state="new">Variables d&apos;environnement</target>
+      </trans-unit>
+      <trans-unit id="4740026766388750543" datatype="html">
+        <source>Cluster Roles </source>
+        <target>Rôles de cluster </target>
+      </trans-unit>
+      <trans-unit id="4749936818577754995" datatype="html">
+        <source>Delete resource</source>
+        <target>Supprimer la ressource</target>
+      </trans-unit>
+      <trans-unit id="3192064686378185385" datatype="html">
+        <source> Architecture </source>
+        <target state="new">Architecture</target>
+      </trans-unit>
+      <trans-unit id="4773463022110715023" datatype="html">
+        <source> Enter YAML or JSON content specifying the resources to create to the namespace specified in the file. </source>
+        <target>Entrez un contenu YAML ou JSON spécifiant les ressources à créer dans l&apos;espace de noms spécifié dans le contenu. </target>
+      </trans-unit>
+      <trans-unit id="4775550080689015987" datatype="html">
+        <source>Reason</source>
+        <target>Motif</target>
+      </trans-unit>
+      <trans-unit id="4804785061014590286" datatype="html">
+        <source>Logs</source>
+        <target>Journaux</target>
+      </trans-unit>
+      <trans-unit id="4902817035128594900" datatype="html">
+        <source>Description</source>
+        <target>Description</target>
+      </trans-unit>
+      <trans-unit id="4930506384627295710" datatype="html">
+        <source>Settings</source>
+        <target>Paramètres</target>
+      </trans-unit>
+      <trans-unit id="8379779735405194623" datatype="html">
+        <source> Controlled by </source>
+        <target state="new">Contrôlé par</target>
+      </trans-unit>
+      <trans-unit id="2977197217402908514" datatype="html">
+        <source> SE Linux Role </source>
+        <target state="new">Rôle SELinux</target>
+      </trans-unit>
+      <trans-unit id="4981765412875094921" datatype="html">
+        <source>Trigger resource</source>
+        <target>Déclencher la ressource</target>
+      </trans-unit>
+      <trans-unit id="1913475751060945920" datatype="html">
+        <source> Workload Status </source>
+        <target state="new">Statut des charges de travail</target>
+      </trans-unit>
+      <trans-unit id="5055611162892898285" datatype="html">
+        <source>Access Modes</source>
+        <target>Modes d&apos;accès</target>
+      </trans-unit>
+      <trans-unit id="4096802826679220605" datatype="html">
+        <source> SE Linux Level </source>
+        <target state="new">Niveau SELinux</target>
+      </trans-unit>
+      <trans-unit id="5103064776441485656" datatype="html">
+        <source>Running: </source>
+        <target state="new">En fonctionnement: </target>
+      </trans-unit>
+      <trans-unit id="3971872627504454934" datatype="html">
+        <source> Memory capacity </source>
+        <target state="new">Capacité mémoire</target>
+      </trans-unit>
+      <trans-unit id="1817108501937284867" datatype="html">
+        <source> HTTP Healthcheck URI </source>
+        <target state="new">URI de vérification de l&apos;état HTTP</target>
+      </trans-unit>
+      <trans-unit id="5156388212535235462" datatype="html">
+        <source> Environment Variables </source>
+        <target>Variables d&apos;environnement </target>
+      </trans-unit>
+      <trans-unit id="5593559015323293592" datatype="html">
+        <source> Addresses </source>
+        <target state="new">Adresses</target>
+      </trans-unit>
+      <trans-unit id="5175014003399520919" datatype="html">
+        <source>Pods </source>
+        <target>Pods </target>
+      </trans-unit>
+      <trans-unit id="1788882133182474939" datatype="html">
+        <source> Waiting for more data to display chart... </source>
+        <target state="new">En attente de plus de données pour afficher le graphique... </target>
+      </trans-unit>
+      <trans-unit id="5257636795023365764" datatype="html">
+        <source> Upload </source>
+        <target>Télécharger </target>
+      </trans-unit>
+      <trans-unit id="5278726417886231851" datatype="html">
+        <source>IP: </source>
+        <target state="new">IP: </target>
+      </trans-unit>
+      <trans-unit id="528589796437229259" datatype="html">
+        <source> Memory requirement must be given as a positive number. </source>
+        <target>L&apos;exigence mémoire doit être un nombre positif. </target>
+      </trans-unit>
+      <trans-unit id="1967113972469122007" datatype="html">
+        <source> CPU capacity </source>
+        <target state="new">Capacité processeur</target>
+      </trans-unit>
+      <trans-unit id="5322465913003356908" datatype="html">
+        <source>Search for <x id="PH" equiv-text="this._activatedRoute.snapshot.queryParams[SEARCH_QUERY_STATE_PARAM]"/></source>
+        <target>Recherchez <x id="PH" equiv-text="this._activatedRoute.snapshot.queryParams[SEARCH_QUERY_STATE_PARAM]"/></target>
+      </trans-unit>
+      <trans-unit id="5333782621798086225" datatype="html">
+        <source>Cron Jobs </source>
+        <target>Cron Jobs </target>
+      </trans-unit>
+      <trans-unit id="5352570882809799670" datatype="html">
+        <source>Size: <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> B</source>
+        <target>Taille : <x id="INTERPOLATION" equiv-text="{{loaded | kdMemory}}"/> o</target>
+      </trans-unit>
+      <trans-unit id="5371126920581174501" datatype="html">
+        <source>Choose color theme of the dashboard</source>
+        <target>Choisissez le thème de couleur du tableau de bord</target>
+      </trans-unit>
+      <trans-unit id="5382206657406454291" datatype="html">
+        <source>Filter objects by name</source>
+        <target>Filtrer les objets par nom</target>
+      </trans-unit>
+      <trans-unit id="5433782699501161466" datatype="html">
+        <source>Schedule</source>
+        <target>Planning</target>
+      </trans-unit>
+      <trans-unit id="8953481905444819623" datatype="html">
+        <source> Allow Privilege Escalation </source>
+        <target state="new">Autoriser l&apos;élévation des privilèges</target>
+      </trans-unit>
+      <trans-unit id="546766753072101168" datatype="html">
+        <source>Labels</source>
+        <target>Étiquettes</target>
+      </trans-unit>
+      <trans-unit id="2087650193453824772" datatype="html">
+        <source> Resource information </source>
+        <target state="new">Informations sur la ressource</target>
+      </trans-unit>
+      <trans-unit id="5509177505397229412" datatype="html">
+        <source> Target port must be less than 65536. </source>
+        <target>Le port cible doit être inférieur à 65536. </target>
+      </trans-unit>
+      <trans-unit id="5519023941949331063" datatype="html">
+        <source>Invert colors</source>
+        <target>Inverser les couleurs</target>
+      </trans-unit>
+      <trans-unit id="5582481471184188809" datatype="html">
+        <source>Horizontal Pod Autoscaler</source>
+        <target>Horizontal Pod Autoscaler</target>
+      </trans-unit>
+      <trans-unit id="5596215605725734238" datatype="html">
+        <source> Data is required. </source>
+        <target>Les données sont requises. </target>
+      </trans-unit>
+      <trans-unit id="5603542439272909460" datatype="html">
+        <source>Processes in privileged containers are equivalent to processes running as root on the host.</source>
+        <target>Les processus dans des conteneurs privilégiés sont équivalents à des processus s&apos;exécutant en root sur l&apos;hôte.</target>
+      </trans-unit>
+      <trans-unit id="5607669932062416162" datatype="html">
+        <source>Default</source>
+        <target>Défaut</target>
+      </trans-unit>
+      <trans-unit id="5608319401828876510" datatype="html">
+        <source>Deployments </source>
+        <target>Déploiements </target>
+      </trans-unit>
+      <trans-unit id="5611592591303869712" datatype="html">
+        <source>Status</source>
+        <target>Statut</target>
+      </trans-unit>
+      <trans-unit id="7930256300495436890" datatype="html">
+        <source> Egress Rules </source>
+        <target state="new">Règles Egress</target>
+      </trans-unit>
+      <trans-unit id="1843485762889304902" datatype="html">
+        <source> Unavailable </source>
+        <target state="new">Non disponibles</target>
+      </trans-unit>
+      <trans-unit id="5674286808255988565" datatype="html">
+        <source>Create</source>
+        <target>Créer</target>
+      </trans-unit>
+      <trans-unit id="2131524838680811873" datatype="html">
+        <source> You can <x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#6\uFFFD&quot;"/>deploy a containerized app<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#7\uFFFD]&quot;"/>, select other namespace or <x id="START_LINK_1" equiv-text="&quot;\uFFFD#7\uFFFD&quot;"/>check the Dashboard Docs <x id="START_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD#8\uFFFD&quot;"/>open_in_new<x id="CLOSE_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD/#8\uFFFD&quot;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;[\uFFFD/#6\uFFFD|\uFFFD/#7\uFFFD]&quot;"/> to learn more. </source>
+        <target>Vous pouvez <x id="START_LINK" ctype="x-a" equiv-text="&lt;a&gt;"/>déployer une application conteneurisée<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, sélectionner un autre espace de noms ou <x id="START_LINK_1" ctype="x-a" equiv-text="&lt;a&gt;"/>suivre le tour du tableau de bord <x id="START_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;mat-icon&gt;"/>open_in_new<x id="CLOSE_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;/mat-icon&gt;"/> <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> pour en savoir plus. </target>
+      </trans-unit>
+      <trans-unit id="5693993471751761333" datatype="html">
+        <source> Create a new secret... </source>
+        <target>Créer un nouveau secret... </target>
+      </trans-unit>
+      <trans-unit id="5729418620241283277" datatype="html">
+        <source>Events</source>
+        <target>Événements</target>
+      </trans-unit>
+      <trans-unit id="57403663622654391" datatype="html">
+        <source>Storage</source>
+        <target>Stockage</target>
+      </trans-unit>
+      <trans-unit id="5748395236355383695" datatype="html">
+        <source>Suspend</source>
+        <target>Suspendu</target>
+      </trans-unit>
+      <trans-unit id="577038887888857351" datatype="html">
+        <source> Add </source>
+        <target>Ajouter </target>
+      </trans-unit>
+      <trans-unit id="5793766132158032827" datatype="html">
+        <source>No namespaces selected</source>
+        <target>Aucun espace de noms sélectionné</target>
+      </trans-unit>
+      <trans-unit id="5799011743297017810" datatype="html">
+        <source>Select namespace...</source>
+        <target>Sélectionnez un espace...</target>
+      </trans-unit>
+      <trans-unit id="5813540454109761631" datatype="html">
+        <source>Ingresses </source>
+        <target>Ingresses </target>
+      </trans-unit>
+      <trans-unit id="5818955156850908956" datatype="html">
+        <source>Secret name</source>
+        <target>Nom du secret</target>
+      </trans-unit>
+      <trans-unit id="5848501149784858236" datatype="html">
+        <source>Shell</source>
+        <target>Shell</target>
+      </trans-unit>
+      <trans-unit id="5872784688797301737" datatype="html">
+        <source>Optionally, an internal or external Service can be defined to map an incoming Port to a target Port seen by the container.</source>
+        <target>Éventuellement, un Service interne ou externe peut être défini pour mapper un port entrant à un port cible vu par le conteneur.</target>
+      </trans-unit>
+      <trans-unit id="4511900365608801729" datatype="html">
+        <source> Target World Wide Names </source>
+        <target state="new">Target World Wide Names</target>
+      </trans-unit>
+      <trans-unit id="5102897140288394090" datatype="html">
+        <source> Target portal </source>
+        <target state="new">Target portal</target>
+      </trans-unit>
+      <trans-unit id="3991256341445850716" datatype="html">
+        <source> Filesystem Group Change Policy </source>
+        <target state="new">Politique de changement de groupe de système de fichiers</target>
+      </trans-unit>
+      <trans-unit id="5925034162028212293" datatype="html">
+        <source>Jobs </source>
+        <target>Jobs </target>
+      </trans-unit>
+      <trans-unit id="5937630659228234115" datatype="html">
+        <source>Service </source>
+        <target>Service </target>
+      </trans-unit>
+      <trans-unit id="5943454400955467108" datatype="html">
+        <source>
+          <x id="START_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;\uFFFD#9\uFFFD&quot;"/>
+          <x id="CLOSE_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;\uFFFD/#9\uFFFD&quot;"/>
+        </source>
+        <target>
+          <x id="START_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;\uFFFD#9\uFFFD&quot;"/>
+          <x id="CLOSE_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;\uFFFD/#9\uFFFD&quot;"/>
+        </target>
+      </trans-unit>
+      <trans-unit id="2737842181120837161" datatype="html">
+        <source> Liveness Probe </source>
+        <target state="new">Liveness Probe</target>
+      </trans-unit>
+      <trans-unit id="192551442404974057" datatype="html">
+        <source> Exit Code </source>
+        <target state="new">Code de sortie</target>
+      </trans-unit>
+      <trans-unit id="2880955510042384641" datatype="html">
+        <source> Supplemental Groups </source>
+        <target state="new">Groupes supplémentaires</target>
+      </trans-unit>
+      <trans-unit id="6008724430266446705" datatype="html">
+        <source>Minimize card</source>
+        <target>Minimiser la carte</target>
+      </trans-unit>
+      <trans-unit id="1100494527237439076" datatype="html">
+        <source> Create a new image pull secret </source>
+        <target state="new">Créer un nouveau pull secret pour l&apos;image</target>
+      </trans-unit>
+      <trans-unit id="6390881799109478972" datatype="html">
+        <source> Policy Types </source>
+        <target state="new">Types de politique</target>
+      </trans-unit>
+      <trans-unit id="7482370214885331167" datatype="html">
+        <source> Windows Run as User </source>
+        <target state="new">Exécuter Windows en tant qu&apos;utilisateur</target>
+      </trans-unit>
+      <trans-unit id="6046016632304545069" datatype="html">
+        <source>Show timestamps</source>
+        <target>Voir les horodatages</target>
+      </trans-unit>
+      <trans-unit id="6048882868784276224" datatype="html">
+        <source>Namespace name</source>
+        <target>Nom de l&apos;espace de noms</target>
+      </trans-unit>
+      <trans-unit id="607655052894272917" datatype="html">
+        <source>Path </source>
+        <target>Chemin </target>
+      </trans-unit>
+      <trans-unit id="7968042558044894864" datatype="html">
+        <source> Create a new namespace </source>
+        <target state="new">Créer un nouvel espace de noms</target>
+      </trans-unit>
+      <trans-unit id="6112370555453604229" datatype="html">
+        <source>Unpin resource</source>
+        <target>Détacher la ressource</target>
+      </trans-unit>
+      <trans-unit id="6117946241126833991" datatype="html">
+        <source>Port</source>
+        <target>Port</target>
+      </trans-unit>
+      <trans-unit id="4222947342972727454" datatype="html">
+        <source> Dropped Capabilities </source>
+        <target state="new">Capacités supprimées</target>
+      </trans-unit>
+      <trans-unit id="7022606734047909743" datatype="html">
+        <source> Subresources </source>
+        <target state="new">Sous-ressources</target>
+      </trans-unit>
+      <trans-unit id="6142861985741036386" datatype="html">
+        <source>Succeeded: <x id="PH" equiv-text="&apos;&apos;"/></source>
+        <target state="new">Réussi: <x id="PH" equiv-text="status.succeeded"/></target>
+      </trans-unit>
+      <trans-unit id="940093336423648340" datatype="html">
+        <source> Horizontal Pod Autoscalers </source>
+        <target state="new">Horizontal Pod Autoscalers</target>
+      </trans-unit>
+      <trans-unit id="6163370502260387661" datatype="html">
+        <source> Invalid protocol. </source>
+        <target>Protocole invalide. </target>
+      </trans-unit>
+      <trans-unit id="6194056995548896650" datatype="html">
+        <source>The new secret will be added to the cluster</source>
+        <target>Le nouveau secret sera rajouté au cluster</target>
+      </trans-unit>
+      <trans-unit id="6239075439253810960" datatype="html">
+        <source>Pending: </source>
+        <target state="new">En attente: </target>
+      </trans-unit>
+      <trans-unit id="6283035888557195281" datatype="html">
+        <source>Cluster </source>
+        <target>Cluster </target>
+      </trans-unit>
+      <trans-unit id="6284431271548714587" datatype="html">
+        <source>Suspend: </source>
+        <target state="new">Suspendu: </target>
+      </trans-unit>
+      <trans-unit id="6806823213465044212" datatype="html">
+        <source> Security Context </source>
+        <target state="new">Contexte de sécurité</target>
+      </trans-unit>
+      <trans-unit id="4711685737794135513" datatype="html">
+        <source> TCP Socket </source>
+        <target state="new">Socket TCP</target>
+      </trans-unit>
+      <trans-unit id="6407858727320871864" datatype="html">
+        <source>Persistent Volumes</source>
+        <target>Volumes persistants</target>
+      </trans-unit>
+      <trans-unit id="1465387288448550388" datatype="html">
+        <source> System information </source>
+        <target state="new">Informations sur le système</target>
+      </trans-unit>
+      <trans-unit id="642253290448532904" datatype="html">
+        <source>Min ready seconds: </source>
+        <target state="new">Secondes minimales prêt: </target>
+      </trans-unit>
+      <trans-unit id="6423210280939340786" datatype="html">
+        <source>Ready</source>
+        <target>Prêt</target>
+      </trans-unit>
+      <trans-unit id="693759392966464524" datatype="html">
+        <source> HTTP Headers </source>
+        <target state="new">En-têtes HTTP</target>
+      </trans-unit>
+      <trans-unit id="6448155059518842389" datatype="html">
+        <source>Sub Path</source>
+        <target>Sous-chemin</target>
+      </trans-unit>
+      <trans-unit id="6462224380417375328" datatype="html">
+        <source>Service Accounts </source>
+        <target>Comptes de service </target>
+      </trans-unit>
+      <trans-unit id="6478267560860767436" datatype="html">
+        <source>Memory capacity (bytes)</source>
+        <target>Capacité mémoire (octets)</target>
+      </trans-unit>
+      <trans-unit id="6447957635846832676" datatype="html">
+        <source> kubelet version </source>
+        <target state="new">Version de kubelet</target>
+      </trans-unit>
+      <trans-unit id="6494596911805287915" datatype="html">
+        <source>Items: </source>
+        <target state="new">Éléments: </target>
+      </trans-unit>
+      <trans-unit id="6501135579599829770" datatype="html">
+        <source>Network Policies</source>
+        <target>Politiques réseau</target>
+      </trans-unit>
+      <trans-unit id="6555318547274416232" datatype="html">
+        <source>Value</source>
+        <target>Valeur</target>
+      </trans-unit>
+      <trans-unit id="656108017672590950" datatype="html">
+        <source>API Group</source>
+        <target>API Group</target>
+      </trans-unit>
+      <trans-unit id="6588659171333501682" datatype="html">
+        <source>By default, your containers run the selected image&apos;s default entrypoint command. You can use the command options to override the default.</source>
+        <target>Par défaut, vos conteneurs exécutent la commande entrypoint par défaut de l&apos;image. Vous pouvez utiliser les options pour outrepasser le comportement par défaut.</target>
+      </trans-unit>
+      <trans-unit id="6595420178679632820" datatype="html">
+        <source>Ports (Name, Port, Protocol)</source>
+        <target>Ports (Nom, Port, Protocole)</target>
+      </trans-unit>
+      <trans-unit id="6596586911518775971" datatype="html">
+        <source> Target port cannot be empty. </source>
+        <target>Le port cible ne peut pas être vide. </target>
+      </trans-unit>
+      <trans-unit id="6599752784987327249" datatype="html">
+        <source>Kind</source>
+        <target>Genre</target>
+      </trans-unit>
+      <trans-unit id="6641024648411549335" datatype="html">
+        <source>Host</source>
+        <target>Hôte</target>
+      </trans-unit>
+      <trans-unit id="5856344624628294543" datatype="html">
+        <source> Lun number </source>
+        <target state="new">Numéro LUN</target>
+      </trans-unit>
+      <trans-unit id="6526668260967903510" datatype="html">
+        <source> Pod Selector </source>
+        <target state="new">Sélecteur de pod</target>
+      </trans-unit>
+      <trans-unit id="6663783128602596673" datatype="html">
+        <source> Sign in </source>
+        <target>Connexion </target>
+      </trans-unit>
+      <trans-unit id="5877133547695221922" datatype="html">
+        <source> List Kind </source>
+        <target state="new">Type de liste</target>
+      </trans-unit>
+      <trans-unit id="6698453480643190511" datatype="html">
+        <source>Run command</source>
+        <target>Commande à exécuter</target>
+      </trans-unit>
+      <trans-unit id="6753642863059953692" datatype="html">
+        <source> Port cannot be empty. </source>
+        <target>Le port ne peut pas être vide. </target>
+      </trans-unit>
+      <trans-unit id="6762504134540024018" datatype="html">
+        <source>Quantity</source>
+        <target>Quantité</target>
+      </trans-unit>
+      <trans-unit id="677624622393809855" datatype="html">
+        <source>Logged in with token </source>
+        <target>Connecté avec un jeton </target>
+      </trans-unit>
+      <trans-unit id="4321192920276838721" datatype="html">
+        <source> Completions </source>
+        <target state="new">Achevés</target>
+      </trans-unit>
+      <trans-unit id="6796979646083613705" datatype="html">
+        <source>View logs</source>
+        <target>Voir les journaux</target>
+      </trans-unit>
+      <trans-unit id="8555987399740746973" datatype="html">
+        <source> Provider ID </source>
+        <target state="new">ID du fournisseur</target>
+      </trans-unit>
+      <trans-unit id="6565531850668000842" datatype="html">
+        <source> Kernel version </source>
+        <target state="new">Version du noyau</target>
+      </trans-unit>
+      <trans-unit id="6852503341223458730" datatype="html">
+        <source>Persistent Volumes </source>
+        <target>Volumes persistants </target>
+      </trans-unit>
+      <trans-unit id="6869304038391725752" datatype="html">
+        <source>Containers</source>
+        <target>Conteneurs</target>
+      </trans-unit>
+      <trans-unit id="686980668228952182" datatype="html">
+        <source>Workloads </source>
+        <target>Charges de travail </target>
+      </trans-unit>
+      <trans-unit id="6870709634537724397" datatype="html">
+        <source>Container image</source>
+        <target>Image du conteneur</target>
+      </trans-unit>
+      <trans-unit id="1671515089471924316" datatype="html">
+        <source> SE Linux User </source>
+        <target state="new">Utilisateur SELinux</target>
+      </trans-unit>
+      <trans-unit id="688793765047273389" datatype="html">
+        <source>Served</source>
+        <target>Servie</target>
+      </trans-unit>
+      <trans-unit id="6915193719482636823" datatype="html">
+        <source>Name: </source>
+        <target state="new">Nom: </target>
+      </trans-unit>
+      <trans-unit id="650508661617996769" datatype="html">
+        <source> Scale a resource </source>
+        <target state="new">Mettre à l&apos;échelle une ressource</target>
+      </trans-unit>
+      <trans-unit id="6945090506337625182" datatype="html">
+        <source>Resource name</source>
+        <target>Nom de la ressource</target>
+      </trans-unit>
+      <trans-unit id="695074596983358387" datatype="html">
+        <source> Application name is required. </source>
+        <target>Le nom de l&apos;application est requis. </target>
+      </trans-unit>
+      <trans-unit id="6959497441009812685" datatype="html">
+        <source>Full Name</source>
+        <target>Nom complet</target>
+      </trans-unit>
+      <trans-unit id="6968498786255952392" datatype="html">
+        <source>Target port</source>
+        <target>Port cible</target>
+      </trans-unit>
+      <trans-unit id="6984509752476604600" datatype="html">
+        <source>Cluster IP</source>
+        <target>IP cluster</target>
+      </trans-unit>
+      <trans-unit id="5783430125613392283" datatype="html">
+        <source> There is nothing to display here </source>
+        <target state="new">Il n&apos;y a rien à afficher ici</target>
+      </trans-unit>
+      <trans-unit id="2378376082438529009" datatype="html">
+        <source> Initial Delay (Seconds) </source>
+        <target state="new">Délai initial (secondes)</target>
+      </trans-unit>
+      <trans-unit id="8294279432915008658" datatype="html">
+        <source> Short Names </source>
+        <target state="new">Noms abrégés</target>
+      </trans-unit>
+      <trans-unit id="7060498773332878646" datatype="html">
+        <source>Namespaces</source>
+        <target>Espaces de noms</target>
+      </trans-unit>
+      <trans-unit id="7067682400045977596" datatype="html">
+        <source>Internal Endpoints</source>
+        <target>Terminaisons internes</target>
+      </trans-unit>
+      <trans-unit id="7076883018082745028" datatype="html">
+        <source> Label key name must be alphanumeric separated by &apos;-&apos;, &apos;_&apos; or &apos;.&apos;, optionally prefixed by a DNS subdomain and &apos;/&apos;. </source>
+        <target>Le nom de la clé de l&apos;étiquette doit être alphanumérique séparé par &apos;-&apos;, &apos;_&apos; ou &apos;.&apos;, optionnellement préfixé par un sous-domaine DNS et &apos;/&apos;. </target>
+      </trans-unit>
+      <trans-unit id="7103588127254721505" datatype="html">
+        <source>Theme</source>
+        <target>Thème</target>
+      </trans-unit>
+      <trans-unit id="4801818354593078957" datatype="html">
+        <source> Logs from <x id="START_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;\uFFFD#2\uFFFD&quot;"/><x id="CLOSE_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;[\uFFFD/#2\uFFFD|\uFFFD/#3\uFFFD]&quot;"/> to <x id="START_TAG_KD_DATE_1" ctype="x-kd_date_1" equiv-text="&quot;\uFFFD#3\uFFFD&quot;"/><x id="CLOSE_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&quot;[\uFFFD/#2\uFFFD|\uFFFD/#3\uFFFD]&quot;"/></source>
+        <target state="new">Journaux de <x id="START_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&lt;kd-date [date]=&quot;podLogs?.info.fromDate&quot; format=&quot;short&quot;&gt;"/><x id="CLOSE_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&lt;/kd-date&gt;"/> à <x id="START_TAG_KD_DATE_1" ctype="x-kd_date_1" equiv-text="&lt;kd-date [date]=&quot;podLogs?.info.toDate&quot; format=&quot;short&quot;&gt;"/><x id="CLOSE_TAG_KD_DATE" ctype="x-kd_date" equiv-text="&lt;/kd-date&gt;"/> UTC </target>
+      </trans-unit>
+      <trans-unit id="7136018875175606726" datatype="html">
+        <source>in</source>
+        <target>dans</target>
+      </trans-unit>
+      <trans-unit id="7143579180750436311" datatype="html">
+        <source>Services</source>
+        <target>Services</target>
+      </trans-unit>
+      <trans-unit id="2049187012568985882" datatype="html">
+        <source> Pods capacity </source>
+        <target state="new">Capacité des pods</target>
+      </trans-unit>
+      <trans-unit id="7151380045834635500" datatype="html">
+        <source>Max number of items that can be displayed on every list view.</source>
+        <target>Nombre maximal d&apos;éléments pouvant être affichés dans chaque vue de liste.</target>
+      </trans-unit>
+      <trans-unit id="3609254143159345790" datatype="html">
+        <source> Unschedulable </source>
+        <target state="new">Non programmable</target>
+      </trans-unit>
+      <trans-unit id="7194375808015467595" datatype="html">
+        <source>Max surge: </source>
+        <target state="new">Augmentation maximum: </target>
+      </trans-unit>
+      <trans-unit id="7194477224906924674" datatype="html">
+        <source><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#13\uFFFD&quot;"/>Feedback<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#13\uFFFD&quot;"/></source>
+        <target><x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#13\uFFFD&quot;"/>Commentaires<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#13\uFFFD&quot;"/></target>
+      </trans-unit>
+      <trans-unit id="4064570823222169007" datatype="html">
+        <source> Success Threshold </source>
+        <target state="new">Seuil de réussite</target>
+      </trans-unit>
+      <trans-unit id="7198836215060144081" datatype="html">
+        <source>Host </source>
+        <target>Hôte </target>
+      </trans-unit>
+      <trans-unit id="7204408227432067199" datatype="html">
+        <source>Restarts</source>
+        <target>Redémarrages</target>
+      </trans-unit>
+      <trans-unit id="7206849842963127297" datatype="html">
+        <source>Custom Resource Definitions </source>
+        <target>Custom Resource Definitions </target>
+      </trans-unit>
+      <trans-unit id="7207867066492367466" datatype="html">
+        <source>Settings </source>
+        <target>Paramètres </target>
+      </trans-unit>
+      <trans-unit id="728108318392658678" datatype="html">
+        <source> Shell in <x id="START_TAG_MAT_SELECT" ctype="x-mat_select" equiv-text="&quot;\uFFFD*3:1\uFFFD\uFFFD#1:1\uFFFD&quot;"/><x id="START_TAG_MAT_OPTION" ctype="x-mat_option" equiv-text="&quot;\uFFFD*2:2\uFFFD\uFFFD#1:2\uFFFD&quot;"/> <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0:2\uFFFD&quot;"/> <x id="CLOSE_TAG_MAT_OPTION" ctype="x-mat_option" equiv-text="&quot;\uFFFD/#1:2\uFFFD\uFFFD/*2:2\uFFFD&quot;"/><x id="CLOSE_TAG_MAT_SELECT" ctype="x-mat_select" equiv-text="&quot;\uFFFD/#1:1\uFFFD\uFFFD/*3:1\uFFFD&quot;"/> in <x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> </source>
+        <target>Shell dans <x id="START_TAG_MAT-SELECT" ctype="x-mat-select" equiv-text="&lt;mat-select&gt;"/> <x id="START_TAG_MAT-OPTION" ctype="x-mat-option" equiv-text="&lt;mat-option&gt;"/> <x id="INTERPOLATION" equiv-text="{{ item }}"/> <x id="CLOSE_TAG_MAT-OPTION" ctype="x-mat-option" equiv-text="&lt;/mat-option&gt;"/> <x id="CLOSE_TAG_MAT-SELECT" ctype="x-mat-select" equiv-text="&lt;/mat-select&gt;"/> dans <x id="INTERPOLATION_1" equiv-text="{{ podName }}"/> </target>
+      </trans-unit>
+      <trans-unit id="7281870845577621674" datatype="html">
+        <source>Init Containers</source>
+        <target>Conteneurs d&apos;initilisation</target>
+      </trans-unit>
+      <trans-unit id="7298863100332850221" datatype="html">
+        <source>There is no data to display.</source>
+        <target>Il n&apos;y a pas de données à afficher.</target>
+      </trans-unit>
+      <trans-unit id="7330483736355831593" datatype="html">
+        <source>Config and Storage </source>
+        <target>Configuration et stockage </target>
+      </trans-unit>
+      <trans-unit id="5574924254196653521" datatype="html">
+        <source> Privileged </source>
+        <target state="new">Privilégié</target>
+      </trans-unit>
+      <trans-unit id="7409958205893937925" datatype="html">
+        <source>Active Jobs: </source>
+        <target state="new">Jobs actifs: </target>
+      </trans-unit>
+      <trans-unit id="7425524211157837406" datatype="html">
+        <source>Unpin</source>
+        <target>Détacher</target>
+      </trans-unit>
+      <trans-unit id="7446822750532518350" datatype="html">
+        <source>Network Policies </source>
+        <target>Politiques réseau </target>
+      </trans-unit>
+      <trans-unit id="7153934571163381970" datatype="html">
+        <source> Filesystem type </source>
+        <target state="new">Type de système de fichiers</target>
+      </trans-unit>
+      <trans-unit id="7494553487547465000" datatype="html">
+        <source>Logs auto-refresh time interval</source>
+        <target>Intervalle d&apos;actualisation automatique des journaux</target>
+      </trans-unit>
+      <trans-unit id="4422377286667589368" datatype="html">
+        <source> kube-proxy version </source>
+        <target state="new">Version de kube-proxy</target>
+      </trans-unit>
+      <trans-unit id="6705143606357626997" datatype="html">
+        <source> Run as Non-Root </source>
+        <target state="new">Exécuter en tant que non root</target>
+      </trans-unit>
+      <trans-unit id="982064408404132640" datatype="html">
+        <source> SE Linux Type </source>
+        <target state="new">Type SELinux</target>
+      </trans-unit>
+      <trans-unit id="7541092997061001831" datatype="html">
+        <source> Setting high number of pods may cause performance issues of the cluster and Dashboard UI. </source>
+        <target>Définir un grand nombre de pods peut entaîner des problèmes de performance du cluster et de l&apos;UI tableau de bord. </target>
+      </trans-unit>
+      <trans-unit id="7022029523420977040" datatype="html">
+        <source> Kubernetes Dashboard </source>
+        <target state="new">Tableau de bord Kubernetes</target>
+      </trans-unit>
+      <trans-unit id="7546647490531252189" datatype="html">
+        <source>Namespace: </source>
+        <target state="new">Espace de noms: </target>
+      </trans-unit>
+      <trans-unit id="7571663901157580742" datatype="html">
+        <source>NAMESPACES</source>
+        <target>ESPACES DE NOMS</target>
+      </trans-unit>
+      <trans-unit id="761105739794565336" datatype="html">
+        <source>Pods: </source>
+        <target state="new">Pods: </target>
+      </trans-unit>
+      <trans-unit id="7227937182888754574" datatype="html">
+        <source> Default Backend </source>
+        <target state="new">Backend par défaut</target>
+      </trans-unit>
+      <trans-unit id="7624297849860603812" datatype="html">
+        <source>Specify the data for your secret to hold. The value is the Base64 encoded content of a .dockercfg file.</source>
+        <target>Spécifie les données que le secret va contenir. La valeur est le contenu encodé en Base64 du fichier .dockercfg.</target>
+      </trans-unit>
+      <trans-unit id="765635835361713756" datatype="html">
+        <source> Preview </source>
+        <target>Aperçu </target>
+      </trans-unit>
+      <trans-unit id="1293084960403366485" datatype="html">
+        <source> Cancel </source>
+        <target state="new">Annuler </target>
+      </trans-unit>
+      <trans-unit id="7680153547364305148" datatype="html">
+        <source>Disable access denied notification</source>
+        <target>Désactiver les notifications d&apos;accès interdit</target>
+      </trans-unit>
+      <trans-unit id="7682253854615514679" datatype="html">
+        <source>Nodes </source>
+        <target>Nœuds </target>
+      </trans-unit>
+      <trans-unit id="5520910227196067389" datatype="html">
+        <source> Windows GMSA Credential Spec </source>
+        <target state="new">Spécification des informations d&apos;identification Windows GMSA</target>
+      </trans-unit>
+      <trans-unit id="7705450268368320451" datatype="html">
+        <source>Endpoint links are external links that will be open in a new tab.</source>
+        <target>Les liens de point de terminaison sont des liens externes qui seront ouverts dans un nouvel onglet.</target>
+      </trans-unit>
+      <trans-unit id="7709318275445309520" datatype="html">
+        <source>Last probe time</source>
+        <target>Dernière sonde</target>
+      </trans-unit>
+      <trans-unit id="41792884382367356" datatype="html">
+        <source> Secret reference name </source>
+        <target state="new">Nom de référence secret</target>
+      </trans-unit>
+      <trans-unit id="4757040522970884629" datatype="html">
+        <source> Dataset name </source>
+        <target state="new">Nom du jeu de données</target>
+      </trans-unit>
+      <trans-unit id="7747200628816231618" datatype="html">
+        <source> Label Key name should not exceed 63 characters. </source>
+        <target>Le nom de la clé de l&apos;étiquette ne doit pas excéder 63 caractères. </target>
+      </trans-unit>
+      <trans-unit id="7332440051142263449" datatype="html">
+        <source> Run as Group </source>
+        <target state="new">Exécuter comme groupe</target>
+      </trans-unit>
+      <trans-unit id="5981989902731508745" datatype="html">
+        <source> Pods status </source>
+        <target state="new">Statut des pods</target>
+      </trans-unit>
+      <trans-unit id="7806177791059234860" datatype="html">
+        <source>Global settings are stored in config map, so all of them are applied for every instance of the app.</source>
+        <target>Les paramètres globaux sont stockés dans la carte de configuration, de sorte qu&apos;ils sont tous appliqués pour chaque instance de l&apos;application.</target>
+      </trans-unit>
+      <trans-unit id="7819314041543176992" datatype="html">
+        <source>Close</source>
+        <target>Fermer</target>
+      </trans-unit>
+      <trans-unit id="5161614376835678773" datatype="html">
+        <source> No resources found in the selected namespace. </source>
+        <target state="new">Aucune ressource trouvée dans l&apos;espace de noms sélectionné.</target>
+      </trans-unit>
+      <trans-unit id="7825570888384392250" datatype="html">
+        <source>Capacity</source>
+        <target>Capacité</target>
+      </trans-unit>
+      <trans-unit id="7846239389723666576" datatype="html">
+        <source> Data must be Base64 encoded. </source>
+        <target>Les données doivent être encodées en Base64. </target>
+      </trans-unit>
+      <trans-unit id="7873445996550708978" datatype="html">
+        <source>Running: <x id="PH" equiv-text="&apos;&apos;"/></source>
+        <target state="new">En cours d&apos;exécution: <x id="PH" equiv-text="status.running"/></target>
+      </trans-unit>
+      <trans-unit id="7875452846514729865" datatype="html">
+        <source>CPU capacity (cores)</source>
+        <target>Capacité processeur (cœurs)</target>
+      </trans-unit>
+      <trans-unit id="788903633413068121" datatype="html">
+        <source>Service Accounts</source>
+        <target>Comptes de service</target>
+      </trans-unit>
+      <trans-unit id="7920227693577024356" datatype="html">
+        <source>Workloads</source>
+        <target>Charges de travail</target>
+      </trans-unit>
+      <trans-unit id="7941428823403788384" datatype="html">
+        <source> Create </source>
+        <target>Créer </target>
+      </trans-unit>
+      <trans-unit id="795890916060309463" datatype="html">
+        <source>Roles</source>
+        <target>Rôles</target>
+      </trans-unit>
+      <trans-unit id="8000125105974293495" datatype="html">
+        <source>Provide a namespace name that should be added to the namespace fallback list</source>
+        <target>Fournissez un nom d&apos;espace de noms qui doit être ajouté à la liste de secours des espaces de noms</target>
+      </trans-unit>
+      <trans-unit id="9215888483202224942" datatype="html">
+        <source> Filesystem Group </source>
+        <target state="new">Groupe de systèmes de fichiers</target>
+      </trans-unit>
+      <trans-unit id="8019538712284963816" datatype="html">
+        <source>Replication Controllers</source>
+        <target>Contrôleurs de réplication</target>
+      </trans-unit>
+      <trans-unit id="8030904345187828957" datatype="html">
+        <source>Remove namespaces from the list and confirm to save the changes.</source>
+        <target>Supprimez les espaces de noms de la liste et confirmez pour enregistrer les modifications.</target>
+      </trans-unit>
+      <trans-unit id="8046568214089535613" datatype="html">
+        <source>Persistent Volume Claims</source>
+        <target>Demandes de volume persistant</target>
+      </trans-unit>
+      <trans-unit id="8066608938393600549" datatype="html">
+        <source>Message</source>
+        <target>Message</target>
+      </trans-unit>
+      <trans-unit id="8107673552387655091" datatype="html">
+        <source>Max number of labels that are displayed by default on most views.</source>
+        <target>Nombre maximum d&apos;étiquettes affichées par défaut sur la plupart des vues.</target>
+      </trans-unit>
+      <trans-unit id="8108958927167803950" datatype="html">
+        <source>Cluster name</source>
+        <target>Nom du cluster</target>
+      </trans-unit>
+      <trans-unit id="8137040815577930934" datatype="html">
+        <source>Deployments</source>
+        <target>Déploiements</target>
+      </trans-unit>
+      <trans-unit id="8143338885270189438" datatype="html">
+        <source>App name</source>
+        <target>Nom de l&apos;application</target>
+      </trans-unit>
+      <trans-unit id="8191394826517378292" datatype="html">
+        <source> Last schedule </source>
+        <target state="new">Dernière exécution</target>
+      </trans-unit>
+      <trans-unit id="5895821396856981064" datatype="html">
+        <source> System UUID </source>
+        <target state="new">UUID du système</target>
+      </trans-unit>
+      <trans-unit id="8146913170965682434" datatype="html">
+        <source>Config And Storage</source>
+        <target>Configuration et stockage</target>
+      </trans-unit>
+      <trans-unit id="8175189185819474284" datatype="html">
+        <source> Container image is invalid: <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> </source>
+        <target>L&apos;image du conteneur n&apos;est pas valide : <x id="INTERPOLATION" equiv-text="{{containerImage.errors?.validImageReference}}"/> </target>
+      </trans-unit>
+      <trans-unit id="8177873832400820695" datatype="html">
+        <source>Count</source>
+        <target>Compte</target>
+      </trans-unit>
+      <trans-unit id="8193431940379462508" datatype="html">
+        <source>Replication Controllers </source>
+        <target>Replication Controllers </target>
+      </trans-unit>
+      <trans-unit id="8204176479746810612" datatype="html">
+        <source>Active</source>
+        <target>Actif</target>
+      </trans-unit>
+      <trans-unit id="8227705634340359069" datatype="html">
+        <source>CPU Usage (cores)</source>
+        <target>Utilisation CPU (coeurs)</target>
+      </trans-unit>
+      <trans-unit id="8233283878317847963" datatype="html">
+        <source>Environment variable</source>
+        <target>Variable d&apos;environnement</target>
+      </trans-unit>
+      <trans-unit id="1957380833667165487" datatype="html">
+        <source> Restart a resource </source>
+        <target state="new">Redémarrer une ressource</target>
+      </trans-unit>
+      <trans-unit id="4133031559995911697" datatype="html">
+        <source> Max surge </source>
+        <target state="new">Augmentation maximum</target>
+      </trans-unit>
+      <trans-unit id="3081389147517206202" datatype="html">
+        <source> Annotations </source>
+        <target state="new">Annotations</target>
+      </trans-unit>
+      <trans-unit id="8299215096475112763" datatype="html">
+        <source>First Seen</source>
+        <target>Première vue</target>
+      </trans-unit>
+      <trans-unit id="8304859734312332443" datatype="html">
+        <source>Forbidden (403)</source>
+        <target>Interdit (403)</target>
+      </trans-unit>
+      <trans-unit id="8323422358213440128" datatype="html">
+        <source>
+          <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/>
+        </source>
+        <target>
+          <x id="INTERPOLATION" equiv-text="{{getDisplayName(resource)}}"/>
+        </target>
+      </trans-unit>
+      <trans-unit id="8337788905474874574" datatype="html">
+        <source>Suspended: <x id="PH" equiv-text="status.failed"/></source>
+        <target>Suspendu: <x id="PH" equiv-text="status.failed"/></target>
+      </trans-unit>
+      <trans-unit id="8384742917026482252" datatype="html">
+        <source>Phase</source>
+        <target>Phase</target>
+      </trans-unit>
+      <trans-unit id="4939872549890028779" datatype="html">
+        <source> Namespace conflict </source>
+        <target state="new">Conflit d&apos;espace de nom</target>
+      </trans-unit>
+      <trans-unit id="8394382410283043922" datatype="html">
+        <source>Controller</source>
+        <target>Contrôleur</target>
+      </trans-unit>
+      <trans-unit id="8433565378732329468" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> <x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/> will be updated to reflect the desired replicas count.</source>
+        <target><x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> <x id="INTERPOLATION_1" equiv-text="&quot;\uFFFD1\uFFFD&quot;"/> sera mis à jour pour refléter le nombre de répliques souhaitées.</target>
+      </trans-unit>
+      <trans-unit id="2912107960899863277" datatype="html">
+        <source> Download logs file </source>
+        <target state="new">Télécharger les fichiers journaux</target>
+      </trans-unit>
+      <trans-unit id="8444287437490086299" datatype="html">
+        <source> Endpoints <x id="START_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD#2\uFFFD&quot;"/>open_in_new<x id="CLOSE_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&quot;\uFFFD/#2\uFFFD&quot;"/></source>
+        <target>Points de terminaison <x id="START_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&lt;mat-icon class=&quot;external-link-icon kd-clickable&quot; i18n-matTooltip matTooltip=&quot;Les liens de point de terminaison sont des liens externes qui seront ouverts dans un nouvel onglet.&quot;&gt;"/>open_in_new<x id="CLOSE_TAG_MAT_ICON" ctype="x-mat_icon" equiv-text="&lt;/mat-icon&gt;"/></target>
+      </trans-unit>
+      <trans-unit id="8451232601628619325" datatype="html">
+        <source>Create from form</source>
+        <target>Créer depuis un formulaire</target>
+      </trans-unit>
+      <trans-unit id="3111444431100441275" datatype="html">
+        <source> Ingress Rules </source>
+        <target state="new">Règles Ingress</target>
+      </trans-unit>
+      <trans-unit id="8497130004540015213" datatype="html">
+        <source>Pods</source>
+        <target>Pods</target>
+      </trans-unit>
+      <trans-unit id="8503490437651973860" datatype="html">
+        <source>Stateful Sets</source>
+        <target>Stateful Sets</target>
+      </trans-unit>
+      <trans-unit id="8542934565724912440" datatype="html">
+        <source> Prefix is not a valid DNS subdomain prefix (eg. my-domain.com). </source>
+        <target>Le préfixe n&apos;est pas un préfixe de sous-domaine DNS valide (par ex. mon-domaine.com). </target>
+      </trans-unit>
+      <trans-unit id="8677653466943398856" datatype="html">
+        <source> File is ready to download! </source>
+        <target state="new">Le fichier est prêt à être téléchargé !</target>
+      </trans-unit>
+      <trans-unit id="858785118348238543" datatype="html">
+        <source>Succeeded: </source>
+        <target state="new">Réussis: </target>
+      </trans-unit>
+      <trans-unit id="8601511221316154701" datatype="html">
+        <source>Download logs</source>
+        <target>Télécharger les journaux</target>
+      </trans-unit>
+      <trans-unit id="9174203797218671563" datatype="html">
+        <source> Startup Probe </source>
+        <target state="new">Startup Probe</target>
+      </trans-unit>
+      <trans-unit id="4481453898930455845" datatype="html">
+        <source> Service Name </source>
+        <target state="new">Nom de service</target>
+      </trans-unit>
+      <trans-unit id="8606840907501114553" datatype="html">
+        <source>Namespaced</source>
+        <target>Relatif à un espace de nom</target>
+      </trans-unit>
+      <trans-unit id="235524549685805426" datatype="html">
+        <source> Preview Deployment </source>
+        <target state="new">Aperçu du déploiement</target>
+      </trans-unit>
+      <trans-unit id="8623978917681527907" datatype="html">
+        <source>Group</source>
+        <target>Groupe</target>
+      </trans-unit>
+      <trans-unit id="864882670483831190" datatype="html">
+        <source> There are no notifications </source>
+        <target>Il n&apos;y a pas de notification </target>
+      </trans-unit>
+      <trans-unit id="8650499415827640724" datatype="html">
+        <source>Type</source>
+        <target>Type</target>
+      </trans-unit>
+      <trans-unit id="1719014382402369638" datatype="html">
+        <source> Global settings </source>
+        <target state="new">Paramètres globaux</target>
+      </trans-unit>
+      <trans-unit id="8709634555851394609" datatype="html">
+        <source>Last Schedule</source>
+        <target>Dernière exécution</target>
+      </trans-unit>
+      <trans-unit id="8711123012783083234" datatype="html">
+        <source>A namespace with the specified name will be added to the cluster.</source>
+        <target>Un espace de noms ayant le nom spécifié sera ajouté au cluster.</target>
+      </trans-unit>
+      <trans-unit id="8712863007933324556" datatype="html">
+        <source>The specified labels will be applied to the created Deployment, Service (if any) and Pods. Common labels include release, environment, tier, partition and track.</source>
+        <target>Les étiquettes spécifiées seront appliqués au Déploiement, au Service (le cas échéant) et aux Pods créés. Des étiquettes courantes sont release, environment, tier, partition et track.</target>
+      </trans-unit>
+      <trans-unit id="8713955401469120119" datatype="html">
+        <source> Select YAML or JSON file specifying the resources to deploy to the currently selected namespace. </source>
+        <target>Sélectionnez un fichier YAML ou JSON file spécifiant les ressources à déployer dans l&apos;espace de noms sélectionné. </target>
+      </trans-unit>
+      <trans-unit id="8716879065476971568" datatype="html">
+        <source>Status: </source>
+        <target state="new">Statut: </target>
+      </trans-unit>
+      <trans-unit id="8764790219135296178" datatype="html">
+        <source> Target port must be greater than 0. </source>
+        <target>Le port cible doit être supérieur à 0. </target>
+      </trans-unit>
+      <trans-unit id="8773342478342887379" datatype="html">
+        <source>Nodes</source>
+        <target>Noeuds</target>
+      </trans-unit>
+      <trans-unit id="8790013339766634216" datatype="html">
+        <source>Read Only</source>
+        <target>Lecture seule</target>
+      </trans-unit>
+      <trans-unit id="242724235478395573" datatype="html">
+        <source> Started At </source>
+        <target state="new">Commencé à</target>
+      </trans-unit>
+      <trans-unit id="8825668517883103754" datatype="html">
+        <source>Cluster Roles</source>
+        <target>Rôles de cluster</target>
+      </trans-unit>
+      <trans-unit id="8829497237648100098" datatype="html">
+        <source>Filter</source>
+        <target>Filtrer</target>
+      </trans-unit>
+      <trans-unit id="5137142771636397486" datatype="html">
+        <source> No resources found. </source>
+        <target state="new">Aucune ressource trouvée.</target>
+      </trans-unit>
+      <trans-unit id="8859359379943639539" datatype="html">
+        <source>Replica Sets </source>
+        <target>Replica Sets </target>
+      </trans-unit>
+      <trans-unit id="8881985514674911381" datatype="html">
+        <source>Verbs</source>
+        <target>Verbes</target>
+      </trans-unit>
+      <trans-unit id="8918818541808624034" datatype="html">
+        <source>Show previous logs</source>
+        <target>Voir les journaux précédents</target>
+      </trans-unit>
+      <trans-unit id="8926664967847390286" datatype="html">
+        <source>Reduce font size</source>
+        <target>Réduire les caractères</target>
+      </trans-unit>
+      <trans-unit id="2461333462236418043" datatype="html">
+        <source> Allocation </source>
+        <target state="new">Allocation</target>
+      </trans-unit>
+      <trans-unit id="8939587804990976924" datatype="html">
+        <source>Items per page</source>
+        <target>Éléments par page</target>
+      </trans-unit>
+      <trans-unit id="8953033926734869941" datatype="html">
+        <source>Name</source>
+        <target>Nom</target>
+      </trans-unit>
+      <trans-unit id="8971403803665717398" datatype="html">
+        <source> Number of pods is required </source>
+        <target>Le nombre de pods est requis </target>
+      </trans-unit>
+      <trans-unit id="1560145840172937431" datatype="html">
+        <source> Added Capabilities </source>
+        <target state="new">Capacités supplémentaires</target>
+      </trans-unit>
+      <trans-unit id="4516429772840668541" datatype="html">
+        <source> Trigger a <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/> </source>
+        <target state="new">Déclencher un <x id="INTERPOLATION" equiv-text="{{data.displayName}}"/></target>
+      </trans-unit>
+      <trans-unit id="9044448882574381355" datatype="html">
+        <source> CPU requirement must be given as a positive number. </source>
+        <target>L&apos;exigence CPU doit être un nombre positif. </target>
+      </trans-unit>
+      <trans-unit id="9045596623183360040" datatype="html">
+        <source>Enter the URL of a public image on any registry, or a private image hosted on Docker Hub or Google Container Registry.</source>
+        <target>Saisissez l&apos;URL d&apos;une image publique d&apos;un quelconque registre ou une image privée hébergée dans Docker Hub ou Google Container Registry.</target>
+      </trans-unit>
+      <trans-unit id="1054179199288670347" datatype="html">
+        <source> Service Port Name </source>
+        <target state="new">Nom du port de service</target>
+      </trans-unit>
+      <trans-unit id="90589545897682607" datatype="html">
+        <source>Number of seconds between every auto-refresh of logs.</source>
+        <target>Nombre de secondes entre chaque actualisation automatique des journaux.</target>
+      </trans-unit>
+      <trans-unit id="9077681768250049031" datatype="html">
+        <source> Name must follow the DNS domain name syntax (e.g. new.image-pull.secret). </source>
+        <target>Le nom doit suivre la syntaxe d&apos;un nom de domaine DNS (par ex. new.image-pull.secret). </target>
+      </trans-unit>
+      <trans-unit id="5470688330093323211" datatype="html">
+        <source> Service Account </source>
+        <target state="new">Compte de service</target>
+      </trans-unit>
+      <trans-unit id="3388656838363508295" datatype="html">
+        <source> Timeout (Seconds) </source>
+        <target state="new">Délai d&apos;attente (secondes)</target>
+      </trans-unit>
+      <trans-unit id="9155608366859514313" datatype="html">
+        <source>Source</source>
+        <target>Source</target>
+      </trans-unit>
+      <trans-unit id="9169828761871989299" datatype="html">
+        <source> Prefix should not exceed 253 characters. </source>
+        <target>Le préfixe ne doit pas excéder 253 caractères. </target>
+      </trans-unit>
+      <trans-unit id="9182918211699394982" datatype="html">
+        <source>Failed: <x id="PH" equiv-text="&apos;&apos;"/></source>
+        <target state="new">Echec: <x id="PH" equiv-text="status.failed"/></target>
+      </trans-unit>
+      <trans-unit id="2851593975347923435" datatype="html">
+        <source> Read only </source>
+        <target state="new">Lecture seule</target>
+      </trans-unit>
+      <trans-unit id="942673842903775268" datatype="html">
+        <source>Daemon Sets</source>
+        <target>Daemon Sets</target>
+      </trans-unit>
+      <trans-unit id="960921869392057255" datatype="html">
+        <source>Storage Classes</source>
+        <target>Classes de stockage</target>
+      </trans-unit>
+      <trans-unit id="97066167691656299" datatype="html">
+        <source>Provisioner</source>
+        <target>Approvisionneur</target>
+      </trans-unit>
+      <trans-unit id="279917385815280643" datatype="html">
+        <source>Bearer token</source>
+        <target state="new">Bearer token</target>
+      </trans-unit>
+      <trans-unit id="1238329720473375504" datatype="html">
+        <source>You can generate token for service account with: </source>
+        <target state="new">You can generate token for service account with: </target>
+      </trans-unit>
+      <trans-unit id="5911975001974379688" datatype="html">
+        <source> To find out more on how to configure and use bearer tokens, please refer to the <x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#20\uFFFD&quot;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#20\uFFFD&quot;"/>. </source>
+        <target state="new"> To find out more on how to configure and use bearer tokens, please refer to the <x id="START_LINK" ctype="x-a" equiv-text="&quot;\uFFFD#20\uFFFD&quot;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&quot;\uFFFD/#20\uFFFD&quot;"/>. </target>
+      </trans-unit>
+      <trans-unit id="3209433866980480523" datatype="html">
+        <source> Sign out </source>
+        <target state="new"> Sign out </target>
+      </trans-unit>
+      <trans-unit id="4861926948802653243" datatype="html">
+        <source> Yes </source>
+        <target state="new"> Yes </target>
+      </trans-unit>
+      <trans-unit id="3603720768157919481" datatype="html">
+        <source> No </source>
+        <target state="new"> No </target>
+      </trans-unit>
+      <trans-unit id="3620188369327429839" datatype="html">
+        <source> Save </source>
+        <target state="new"> Save </target>
+      </trans-unit>
+      <trans-unit id="6992582657488330431" datatype="html">
+        <source> Reload </source>
+        <target state="new"> Reload </target>
+      </trans-unit>
+      <trans-unit id="801262465601924408" datatype="html">
+        <source> Abort </source>
+        <target state="new"> Abort </target>
+      </trans-unit>
+      <trans-unit id="5547981558491672240" datatype="html">
+        <source> Close </source>
+        <target state="new"> Close </target>
+      </trans-unit>
+      <trans-unit id="5377078063439833222" datatype="html">
+        <source> Edit </source>
+        <target state="new"> Edit </target>
+      </trans-unit>
+      <trans-unit id="2172902003676402663" datatype="html">
+        <source> Refresh </source>
+        <target state="new"> Refresh </target>
+      </trans-unit>
+      <trans-unit id="6660925946511264619" datatype="html">
+        <source> Delete </source>
+        <target state="new"> Delete </target>
+      </trans-unit>
+      <trans-unit id="2330577642930707695" datatype="html">
+        <source> Cancel </source>
+        <target state="new"> Cancel </target>
+      </trans-unit>
+      <trans-unit id="2592690450389009216" datatype="html">
+        <source> Update </source>
+        <target state="new"> Update </target>
+      </trans-unit>
+      <trans-unit id="6096531998816402984" datatype="html">
+        <source> Restart </source>
+        <target state="new"> Restart </target>
+      </trans-unit>
+      <trans-unit id="6102980706073008651" datatype="html">
+        <source> Scale </source>
+        <target state="new"> Scale </target>
+      </trans-unit>
+      <trans-unit id="8425620343514116260" datatype="html">
+        <source> Trigger </source>
+        <target state="new"> Trigger </target>
+      </trans-unit>
+      <trans-unit id="950338657895578107" datatype="html">
+        <source> Image </source>
+        <target state="new"> Image </target>
+      </trans-unit>
+      <trans-unit id="4282587102956396340" datatype="html">
+        <source> Status </source>
+        <target state="new"> Status </target>
+      </trans-unit>
+      <trans-unit id="7215759904460573154" datatype="html">
+        <source> Ready </source>
+        <target state="new"> Ready </target>
+      </trans-unit>
+      <trans-unit id="3766870604830670208" datatype="html">
+        <source> Started </source>
+        <target state="new"> Started </target>
+      </trans-unit>
+      <trans-unit id="3586649753550722407" datatype="html">
+        <source> Reason </source>
+        <target state="new"> Reason </target>
+      </trans-unit>
+      <trans-unit id="3181866262913879267" datatype="html">
+        <source> Message </source>
+        <target state="new"> Message </target>
+      </trans-unit>
+      <trans-unit id="745072128935432222" datatype="html">
+        <source> Signal </source>
+        <target state="new"> Signal </target>
+      </trans-unit>
+      <trans-unit id="4272600624627368576" datatype="html">
+        <source> Commands </source>
+        <target state="new"> Commands </target>
+      </trans-unit>
+      <trans-unit id="1605722877027082425" datatype="html">
+        <source> Mounts </source>
+        <target state="new"> Mounts </target>
+      </trans-unit>
+      <trans-unit id="8778616811237742446" datatype="html">
+        <source> Name </source>
+        <target state="new"> Name </target>
+      </trans-unit>
+      <trans-unit id="6750960770194343214" datatype="html">
+        <source> Kind </source>
+        <target state="new"> Kind </target>
+      </trans-unit>
+      <trans-unit id="7933581193609500526" datatype="html">
+        <source> Pods </source>
+        <target state="new"> Pods </target>
+      </trans-unit>
+      <trans-unit id="5030518860435159082" datatype="html">
+        <source> Age </source>
+        <target state="new"> Age </target>
+      </trans-unit>
+      <trans-unit id="1763705795920808112" datatype="html">
+        <source> Labels </source>
+        <target state="new"> Labels </target>
+      </trans-unit>
+      <trans-unit id="5911744317051508152" datatype="html">
+        <source> Images </source>
+        <target state="new"> Images </target>
+      </trans-unit>
+      <trans-unit id="4978898910152922146" datatype="html">
+        <source> Ingresses </source>
+        <target state="new"> Ingresses </target>
+      </trans-unit>
+      <trans-unit id="2067623164770526649" datatype="html">
+        <source> Rules </source>
+        <target state="new"> Rules </target>
+      </trans-unit>
+      <trans-unit id="4770199518844597200" datatype="html">
+        <source> Metadata </source>
+        <target state="new"> Metadata </target>
+      </trans-unit>
+      <trans-unit id="2109901555991228295" datatype="html">
+        <source> Created </source>
+        <target state="new"> Created </target>
+      </trans-unit>
+      <trans-unit id="6831529980408957700" datatype="html">
+        <source> Namespace </source>
+        <target state="new"> Namespace </target>
+      </trans-unit>
+      <trans-unit id="385929808293609662" datatype="html">
+        <source> UID </source>
+        <target state="new"> UID </target>
+      </trans-unit>
+      <trans-unit id="5301385890486113516" datatype="html">
+        <source> Desired </source>
+        <target state="new"> Desired </target>
+      </trans-unit>
+      <trans-unit id="4375422447353471629" datatype="html">
+        <source> Running </source>
+        <target state="new"> Running </target>
+      </trans-unit>
+      <trans-unit id="2607180894778686427" datatype="html">
+        <source> Succeeded </source>
+        <target state="new"> Succeeded </target>
+      </trans-unit>
+      <trans-unit id="3458528087553681046" datatype="html">
+        <source> Pending </source>
+        <target state="new"> Pending </target>
+      </trans-unit>
+      <trans-unit id="5880976784144496378" datatype="html">
+        <source> Failed </source>
+        <target state="new"> Failed </target>
+      </trans-unit>
+      <trans-unit id="2650107251802711433" datatype="html">
+        <source> Cluster Role Bindings </source>
+        <target state="new"> Cluster Role Bindings </target>
+      </trans-unit>
+      <trans-unit id="4762465415007246389" datatype="html">
+        <source> Cluster Roles </source>
+        <target state="new"> Cluster Roles </target>
+      </trans-unit>
+      <trans-unit id="8755227732968905897" datatype="html">
+        <source> Config Maps </source>
+        <target state="new"> Config Maps </target>
+      </trans-unit>
+      <trans-unit id="33818909049840895" datatype="html">
+        <source> Custom Resource Definitions </source>
+        <target state="new"> Custom Resource Definitions </target>
+      </trans-unit>
+      <trans-unit id="5256575863067794867" datatype="html">
+        <source> Objects </source>
+        <target state="new"> Objects </target>
+      </trans-unit>
+      <trans-unit id="5259740794430737809" datatype="html">
+        <source> Cron Jobs </source>
+        <target state="new"> Cron Jobs </target>
+      </trans-unit>
+      <trans-unit id="7100670144895877851" datatype="html">
+        <source> Daemon Sets </source>
+        <target state="new"> Daemon Sets </target>
+      </trans-unit>
+      <trans-unit id="8176835239236146567" datatype="html">
+        <source> Versions </source>
+        <target state="new"> Versions </target>
+      </trans-unit>
+      <trans-unit id="7435061610486266714" datatype="html">
+        <source> Events </source>
+        <target state="new"> Events </target>
+      </trans-unit>
+      <trans-unit id="6135730309605714166" datatype="html">
+        <source> Deployments </source>
+        <target state="new"> Deployments </target>
+      </trans-unit>
+      <trans-unit id="2744671069852563724" datatype="html">
+        <source> Jobs </source>
+        <target state="new"> Jobs </target>
+      </trans-unit>
+      <trans-unit id="7336635620626168769" datatype="html">
+        <source> Replica Sets </source>
+        <target state="new"> Replica Sets </target>
+      </trans-unit>
+      <trans-unit id="8932897792111782297" datatype="html">
+        <source> Replication Controllers </source>
+        <target state="new"> Replication Controllers </target>
+      </trans-unit>
+      <trans-unit id="2266759289979755671" datatype="html">
+        <source> Stateful Sets </source>
+        <target state="new"> Stateful Sets </target>
+      </trans-unit>
+      <trans-unit id="4259860093573691667" datatype="html">
+        <source> Ingress Classes </source>
+        <target state="new"> Ingress Classes </target>
+      </trans-unit>
+      <trans-unit id="2528566008917144386" datatype="html">
+        <source> Namespaces </source>
+        <target state="new"> Namespaces </target>
+      </trans-unit>
+      <trans-unit id="5270335406830903211" datatype="html">
+        <source> Network Policies </source>
+        <target state="new"> Network Policies </target>
+      </trans-unit>
+      <trans-unit id="1907942964115693326" datatype="html">
+        <source> Nodes </source>
+        <target state="new"> Nodes </target>
+      </trans-unit>
+      <trans-unit id="5080686976056401671" datatype="html">
+        <source> Persistent Volumes </source>
+        <target state="new"> Persistent Volumes </target>
+      </trans-unit>
+      <trans-unit id="7463880402272442840" datatype="html">
+        <source> Persistent Volume Claims </source>
+        <target state="new"> Persistent Volume Claims </target>
+      </trans-unit>
+      <trans-unit id="6587107798974923353" datatype="html">
+        <source> Roles </source>
+        <target state="new"> Roles </target>
+      </trans-unit>
+      <trans-unit id="7849764450282789949" datatype="html">
+        <source> Role Bindings </source>
+        <target state="new"> Role Bindings </target>
+      </trans-unit>
+      <trans-unit id="1752396967771808140" datatype="html">
+        <source> Services </source>
+        <target state="new"> Services </target>
+      </trans-unit>
+      <trans-unit id="3692552060450529673" datatype="html">
+        <source> Service Accounts </source>
+        <target state="new"> Service Accounts </target>
+      </trans-unit>
+      <trans-unit id="4148913212714984713" datatype="html">
+        <source> Storage Classes </source>
+        <target state="new"> Storage Classes </target>
+      </trans-unit>
+      <trans-unit id="9185898952551666893" datatype="html">
+        <source> Sysctls </source>
+        <target state="new"> Sysctls </target>
+      </trans-unit>
+      <trans-unit id="2346516904664196196" datatype="html">
+        <source> Workloads </source>
+        <target state="new"> Workloads </target>
+      </trans-unit>
+      <trans-unit id="7260804917752247227" datatype="html">
+        <source> Service </source>
+        <target state="new"> Service </target>
+      </trans-unit>
+      <trans-unit id="1774910053126751262" datatype="html">
+        <source> Cluster </source>
+        <target state="new"> Cluster </target>
+      </trans-unit>
+      <trans-unit id="2418254154140218613" datatype="html">
+        <source> Subjects </source>
+        <target state="new"> Subjects </target>
+      </trans-unit>
+      <trans-unit id="691615104272129409" datatype="html">
+        <source> Provisioner </source>
+        <target state="new"> Provisioner </target>
+      </trans-unit>
+      <trans-unit id="326819936092149573" datatype="html">
+        <source> Data </source>
+        <target state="new"> Data </target>
+      </trans-unit>
+      <trans-unit id="79873745480177398" datatype="html">
+        <source> Controller </source>
+        <target state="new"> Controller </target>
+      </trans-unit>
+      <trans-unit id="7457787190624460420" datatype="html">
+        <source> Node </source>
+        <target state="new"> Node </target>
+      </trans-unit>
+      <trans-unit id="7822607628884491209" datatype="html">
+        <source> IP </source>
+        <target state="new"> IP </target>
+      </trans-unit>
+      <trans-unit id="5232469860452002716" datatype="html">
+        <source> Restarts </source>
+        <target state="new"> Restarts </target>
+      </trans-unit>
+      <trans-unit id="7633317359460660426" datatype="html">
+        <source> Image Pull Secrets </source>
+        <target state="new"> Image Pull Secrets </target>
+      </trans-unit>
+      <trans-unit id="6912810280670715366" datatype="html">
+        <source> Containers </source>
+        <target state="new"> Containers </target>
+      </trans-unit>
+      <trans-unit id="5747310913564651286" datatype="html">
+        <source> Scope </source>
+        <target state="new"> Scope </target>
+      </trans-unit>
+      <trans-unit id="8728259718173346897" datatype="html">
+        <source> Group </source>
+        <target state="new"> Group </target>
+      </trans-unit>
+      <trans-unit id="5088286317508582496" datatype="html">
+        <source> Version </source>
+        <target state="new"> Version </target>
+      </trans-unit>
+      <trans-unit id="8447012746935468455" datatype="html">
+        <source> Plural </source>
+        <target state="new"> Plural </target>
+      </trans-unit>
+      <trans-unit id="8734651203481887189" datatype="html">
+        <source> Singular </source>
+        <target state="new"> Singular </target>
+      </trans-unit>
+      <trans-unit id="7962024126835900317" datatype="html">
+        <source> Workloads </source>
+        <target state="new"> Workloads </target>
+      </trans-unit>
+      <trans-unit id="5773124156533323119" datatype="html">
+        <source> Service </source>
+        <target state="new"> Service </target>
+      </trans-unit>
+      <trans-unit id="1089159169028543625" datatype="html">
+        <source> Config and Storage </source>
+        <target state="new"> Config and Storage </target>
+      </trans-unit>
+      <trans-unit id="1951040860650392508" datatype="html">
+        <source> Capacity </source>
+        <target state="new"> Capacity </target>
+      </trans-unit>
+      <trans-unit id="6188069562258249012" datatype="html">
+        <source> Claim </source>
+        <target state="new"> Claim </target>
+      </trans-unit>
+      <trans-unit id="588328081066368660" datatype="html">
+        <source> Source </source>
+        <target state="new"> Source </target>
+      </trans-unit>
+      <trans-unit id="7840301863034787689" datatype="html">
+        <source> Type </source>
+        <target state="new"> Type </target>
+      </trans-unit>
+      <trans-unit id="3158035581938683136" datatype="html">
+        <source> Path </source>
+        <target state="new"> Path </target>
+      </trans-unit>
+      <trans-unit id="5348437032805666094" datatype="html">
+        <source> Driver </source>
+        <target state="new"> Driver </target>
+      </trans-unit>
+      <trans-unit id="4369901182984274034" datatype="html">
+        <source> Read Only </source>
+        <target state="new"> Read Only </target>
+      </trans-unit>
+      <trans-unit id="7309597541402350156" datatype="html">
+        <source> Server </source>
+        <target state="new"> Server </target>
+      </trans-unit>
+      <trans-unit id="6211465185784252363" datatype="html">
+        <source> Keyring </source>
+        <target state="new"> Keyring </target>
+      </trans-unit>
+      <trans-unit id="4106503720153440119" datatype="html">
+        <source> Monitors </source>
+        <target state="new"> Monitors </target>
+      </trans-unit>
+      <trans-unit id="4499536517167963505" datatype="html">
+        <source> Pool </source>
+        <target state="new"> Pool </target>
+      </trans-unit>
+      <trans-unit id="2179675132693271881" datatype="html">
+        <source> User </source>
+        <target state="new"> User </target>
+      </trans-unit>
+      <trans-unit id="2401308451055175905" datatype="html">
+        <source> Storage Class </source>
+        <target state="new"> Storage Class </target>
+      </trans-unit>
+      <trans-unit id="7717653945231723231" datatype="html">
+        <source> Access Modes </source>
+        <target state="new"> Access Modes </target>
+      </trans-unit>
+      <trans-unit id="4044364205215189352" datatype="html">
+        <source> There is no data to display. </source>
+        <target state="new"> There is no data to display. </target>
+      </trans-unit>
+      <trans-unit id="6531676960731973663" datatype="html">
+        <source> Cluster IP </source>
+        <target state="new"> Cluster IP </target>
+      </trans-unit>
+      <trans-unit id="87114898918703327" datatype="html">
+        <source> Selector </source>
+        <target state="new"> Selector </target>
+      </trans-unit>
+      <trans-unit id="7708270344948043036" datatype="html">
+        <source>
+          <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/>
+        </source>
+        <target state="new">
+          <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0\uFFFD&quot;"/>
+        </target>
+      </trans-unit>
+      <trans-unit id="3292993112071634423" datatype="html">
+        <source> Strategy </source>
+        <target state="new"> Strategy </target>
+      </trans-unit>
+      <trans-unit id="1789396535976102331" datatype="html">
+        <source> Updated </source>
+        <target state="new"> Updated </target>
+      </trans-unit>
+      <trans-unit id="5915287617703658226" datatype="html">
+        <source> Total </source>
+        <target state="new"> Total </target>
+      </trans-unit>
+      <trans-unit id="4294442977279527891" datatype="html">
+        <source> Schedule </source>
+        <target state="new"> Schedule </target>
+      </trans-unit>
+      <trans-unit id="8410391069824298241" datatype="html">
+        <source> Active Jobs </source>
+        <target state="new"> Active Jobs </target>
+      </trans-unit>
+      <trans-unit id="3603506727718447426" datatype="html">
+        <source> Suspend </source>
+        <target state="new"> Suspend </target>
+      </trans-unit>
+      <trans-unit id="8545927193057623117" datatype="html">
+        <source> Phase </source>
+        <target state="new"> Phase </target>
+      </trans-unit>
+      <trans-unit id="3348303419576950504" datatype="html">
+        <source> Pod CIDR </source>
+        <target state="new"> Pod CIDR </target>
+      </trans-unit>
+      <trans-unit id="5609433004167243875" datatype="html">
+        <source> Taints </source>
+        <target state="new"> Taints </target>
+      </trans-unit>
+      <trans-unit id="7657467274464637184" datatype="html">
+        <source> Boot ID </source>
+        <target state="new"> Boot ID </target>
+      </trans-unit>
+      <trans-unit id="8769360593453386367" datatype="html">
+        <source> OS Image </source>
+        <target state="new"> OS Image </target>
+      </trans-unit>
+      <trans-unit id="5239009232857074926" datatype="html">
+        <source> CPU </source>
+        <target state="new"> CPU </target>
+      </trans-unit>
+      <trans-unit id="6255028082111766086" datatype="html">
+        <source> Memory </source>
+        <target state="new"> Memory </target>
+      </trans-unit>
+      <trans-unit id="2243696143525228256" datatype="html">
+        <source> Propagation policy <x id="START_TAG_MAT_SELECT" ctype="x-mat_select" equiv-text="&quot;\uFFFD#12\uFFFD&quot;"/><x id="START_TAG_MAT_OPTION" ctype="x-mat_option" equiv-text="&quot;\uFFFD*13:1\uFFFD\uFFFD#1:1\uFFFD&quot;"/> <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0:1\uFFFD&quot;"/> <x id="CLOSE_TAG_MAT_OPTION" ctype="x-mat_option" equiv-text="&quot;\uFFFD/#1:1\uFFFD\uFFFD/*13:1\uFFFD&quot;"/><x id="CLOSE_TAG_MAT_SELECT" ctype="x-mat_select" equiv-text="&quot;\uFFFD/#12\uFFFD&quot;"/></source>
+        <target state="new"> Propagation policy <x id="START_TAG_MAT_SELECT" ctype="x-mat_select" equiv-text="&quot;\uFFFD#12\uFFFD&quot;"/><x id="START_TAG_MAT_OPTION" ctype="x-mat_option" equiv-text="&quot;\uFFFD*13:1\uFFFD\uFFFD#1:1\uFFFD&quot;"/> <x id="INTERPOLATION" equiv-text="&quot;\uFFFD0:1\uFFFD&quot;"/> <x id="CLOSE_TAG_MAT_OPTION" ctype="x-mat_option" equiv-text="&quot;\uFFFD/#1:1\uFFFD\uFFFD/*13:1\uFFFD&quot;"/><x id="CLOSE_TAG_MAT_SELECT" ctype="x-mat_select" equiv-text="&quot;\uFFFD/#12\uFFFD&quot;"/></target>
+      </trans-unit>
+      <trans-unit id="9193001935256028830" datatype="html">
+        <source> Owner </source>
+        <target state="new"> Owner </target>
+      </trans-unit>
+      <trans-unit id="5883804203832913220" datatype="html">
+        <source>Hide All Namespaces option</source>
+        <target state="new">Hide All Namespaces option</target>
+      </trans-unit>
+      <trans-unit id="8967487471439603323" datatype="html">
+        <source>Hides all-namespaces option from the namespaces dropdown list in UI.</source>
+        <target state="new">Hides all-namespaces option from the namespaces dropdown list in UI.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

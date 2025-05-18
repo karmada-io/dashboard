@@ -1,0 +1,26 @@
+{
+  "/api": {
+    "target": "http://gateway:8000",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true
+  },
+  "/config": {
+    "target": "http://gateway:8000",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true
+  },
+  "/systembanner": {
+    "target": "http://gateway:8000",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true
+  },
+  "/settings": {
+    "target": "http://gateway:8000",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true
+  }
+}
