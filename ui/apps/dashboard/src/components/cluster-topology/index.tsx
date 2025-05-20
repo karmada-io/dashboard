@@ -3,50 +3,14 @@ import { Card, Spin, Empty, Checkbox, Space, Button, Tooltip, Tag, Badge, Typogr
 import { ReloadOutlined, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import i18nInstance from '@/utils/i18n';
 import { useQuery } from '@tanstack/react-query';
-import * as G6 from '@antv/g6';
+import G6 from '@antv/g6';
 import './styles.css';
 
 const { Text } = Typography;
 
-interface TopologyNode {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  parentId?: string;
-  metadata?: Record<string, any>;
-  resources?: {
-    cpu?: {
-      used: string;
-      total: string;
-      usageRate: number;
-    };
-    memory?: {
-      used: string;
-      total: string;
-      usageRate: number;
-    };
-    pods?: {
-      used: string;
-      total: string;
-      usageRate: number;
-    };
-  };
-  labels?: Record<string, string>;
-}
-
-interface TopologyEdge {
-  id: string;
-  source: string;
-  target: string;
-  type: string;
-  value: number;
-  metadata?: Record<string, any>;
-}
-
 interface TopologyData {
-  nodes: TopologyNode[];
-  edges: TopologyEdge[];
+  nodes: any[];
+  edges: any[];
   summary?: {
     totalClusters: number;
     totalNodes: number;
@@ -59,8 +23,8 @@ interface TopologyResponse {
   code: number;
   message: string;
   data: {
-    data?: TopologyData;
-  } & TopologyData;
+    data: TopologyData;
+  };
 }
 
 interface ClusterTopologyProps {
@@ -68,6 +32,13 @@ interface ClusterTopologyProps {
   height?: number;
   autoRefresh?: boolean;
   refreshInterval?: number;
+}
+
+// 声明全局 G6 类型
+declare global {
+  interface Window {
+    G6: typeof G6;
+  }
 }
 
 const ClusterTopology: React.FC<ClusterTopologyProps> = ({
@@ -78,68 +49,49 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<any>(null);
+  const graphInitializedRef = useRef(false);
   const [showResources, setShowResources] = useState(true);
   const [showNodes, setShowNodes] = useState(true);
   const [showPods, setShowPods] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
 
-  const { data, isLoading, refetch, dataUpdatedAt } = useQuery({
-    queryKey: ['GetTopology', clusterName, showResources, showNodes, showPods],
-    queryFn: async () => {
+  // 清理函数
+  const cleanupGraph = () => {
+    if (graphRef.current) {
       try {
-        const baseUrl = clusterName
-          ? `/api/v1/overview/topology/${clusterName}`
-          : '/api/v1/overview/topology';
-        
-        const params = new URLSearchParams({
-          showResources: String(showResources),
-          showNodes: String(showNodes),
-          showPods: String(showPods),
-        });
-        
-        const response = await fetch(`${baseUrl}?${params}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch topology data');
-        }
-        
-        const result = await response.json();
-        console.log('拓扑图数据获取成功:', result);
-        return result as TopologyResponse;
+        // 移除所有事件监听器
+        graphRef.current.off();
+        // 清理画布
+        graphRef.current.clear();
+        // 销毁实例
+        graphRef.current.destroy();
+        graphRef.current = null;
+        graphInitializedRef.current = false;
       } catch (err) {
-        console.error('拓扑图数据获取失败:', err);
-        setError(err instanceof Error ? err.message : '获取拓扑图数据失败');
-        throw err;
+        console.warn('清理图表时出错:', err);
       }
-    },
-    refetchInterval: autoRefresh ? refreshInterval : false,
-    refetchOnWindowFocus: true,
-  });
-
-  const checkG6Loaded = () => {
-    if (typeof window === 'undefined' || (typeof window.G6 === 'undefined' && typeof G6 === 'undefined')) {
-      console.error('G6 is not loaded');
-      setError('G6图表库未加载，请刷新页面');
-      return false;
     }
-    return true;
   };
 
+  // 组件卸载时的清理
   useEffect(() => {
-    if (!containerRef.current || !checkG6Loaded()) return;
-    
-    // 销毁旧实例
-    if (graphRef.current) {
-      graphRef.current.destroy();
-      graphRef.current = null;
-    }
+    return () => {
+      mountedRef.current = false;
+      cleanupGraph();
+    };
+  }, []);
 
-    console.log('初始化G6图表');
-    
+  const initGraph = () => {
+    if (!containerRef.current || !mountedRef.current) return null;
+
     try {
+      cleanupGraph();
+
       const container = containerRef.current;
       const width = container.clientWidth || 800;
-      const graphHeight = isFullscreen ? window.innerHeight - 150 : height;
+      const currentHeight = isFullscreen ? window.innerHeight - 150 : height;
 
       const G6Instance = window.G6 || G6;
       
@@ -415,49 +367,27 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
       const graph = new G6Instance.Graph({
         container,
         width,
-        height: graphHeight,
+        height: currentHeight,
         fitView: true,
-        fitViewPadding: 100,
+        fitViewPadding: 60,
         animate: true,
         modes: {
           default: [
-            {
-              type: 'drag-canvas',
-              enableOptimize: true,
-            },
-            {
-              type: 'zoom-canvas',
-              enableOptimize: true,
-              sensitivity: 1.5,
-            },
+            'drag-canvas',
+            'zoom-canvas',
             'drag-node',
             'click-select',
           ],
         },
-        // 布局大小配置
         layout: {
           type: 'dagre',
           rankdir: 'LR',
           align: 'UL',
-          // 节点间距
           nodesep: 20,
-          // 层间距
           ranksep: 60,
-          // 控制点
           controlPoints: true,
-          // 节点大小
           nodeSize: 80,
-          // 防止节点重叠
           preventOverlap: true,
-          // 布局结束后的回调
-          onLayoutEnd: () => {
-            if (graph && !graph.destroyed) {
-              setTimeout(() => {
-                graph.fitView(80);
-                graph.fitCenter();
-              }, 200);
-            }
-          },
         },
         defaultNode: {
           type: 'icon-node',
@@ -466,19 +396,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             fill: '#e6f7ff',
             stroke: '#1890ff',
             lineWidth: 2,
-            shadowColor: '#1890ff',
-            shadowBlur: 5,
-            shadowOffsetX: 0,
-            shadowOffsetY: 0,
-          },
-          labelCfg: {
-            position: 'bottom',
-            offset: 12,
-            style: {
-              fill: '#000',
-              fontSize: 14,
-              fontWeight: 500,
-            },
           },
         },
         defaultEdge: {
@@ -487,117 +404,214 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
             stroke: '#91d5ff',
             lineWidth: 2,
             opacity: 0.8,
-            endArrow: {
-              path: 'M 0,0 L 8,4 L 8,-4 Z',
-              fill: '#91d5ff',
-            },
-            radius: 10,
-          },
-          labelCfg: {
-            autoRotate: true,
-            style: {
-              fill: '#666',
-              fontSize: 12,
-              background: {
-                fill: '#fff',
-                padding: [2, 4],
-                radius: 2,
-              },
-            },
           },
         },
-        nodeStateStyles: {
-          hover: {
-            fill: '#d3f0ff',
-            stroke: '#69c0ff',
-            lineWidth: 2,
-            shadowBlur: 10,
-          },
-          selected: {
-            fill: '#ffd591',
-            stroke: '#ffa940',
-            lineWidth: 2,
-            shadowBlur: 10,
-          },
-        },
-        edgeStateStyles: {
-          hover: {
-            stroke: '#69c0ff',
-            lineWidth: 2,
-            shadowBlur: 5,
-          },
-        },
-        plugins: [tooltip],
       });
 
+      // 添加事件监听器
       graph.on('node:mouseenter', (evt: { item: any }) => {
+        if (!mountedRef.current) return;
         const { item } = evt;
         graph.setItemState(item, 'hover', true);
       });
 
       graph.on('node:mouseleave', (evt: { item: any }) => {
+        if (!mountedRef.current) return;
         const { item } = evt;
         graph.setItemState(item, 'hover', false);
       });
 
       graph.on('node:click', (evt: { item: any }) => {
+        if (!mountedRef.current) return;
         const { item } = evt;
         graph.setItemState(item, 'selected', true);
       });
 
       graph.on('canvas:click', () => {
+        if (!mountedRef.current) return;
         graph.getNodes().forEach((node: any) => {
           graph.clearItemStates(node);
         });
       });
 
-      graph.on('node:dragend', (evt: any) => {
-        const { item } = evt;
-        const edges = item.getEdges();
-        edges.forEach((edge: any) => {
-          graph.setItemState(edge, 'active', true);
-          setTimeout(() => {
-            graph.setItemState(edge, 'active', false);
-          }, 1000);
-        });
-      });
-
       graphRef.current = graph;
-      
-      if (data?.data) {
-        updateGraphData(data.data);
-      } else {
-        renderEmptyGraph();
-      }
-
-      console.log('G6图表创建成功');
+      graphInitializedRef.current = true;
+      return graph;
     } catch (error) {
       console.error('创建G6图表失败:', error);
       setError('创建拓扑图失败，请刷新页面重试');
+      return null;
     }
+  };
 
-    return () => {
-      if (graphRef.current) {
-        console.log('销毁G6图表');
-        graphRef.current.destroy();
-        graphRef.current = null;
+  const updateGraphData = (topologyData: any) => {
+    if (!graphRef.current || !topologyData || !mountedRef.current) return;
+    
+    try {
+      const graph = graphRef.current;
+      
+      const graphData = topologyData.data || topologyData;
+      
+      if (!Array.isArray(graphData.nodes) || !Array.isArray(graphData.edges)) {
+        console.error('拓扑图数据结构不正确:', topologyData);
+        setError('拓扑图数据结构不正确');
+        return;
       }
+
+      // 处理节点和边的数据
+      const nodes = graphData.nodes.map((node: any) => ({
+        id: node.id,
+        label: node.name,
+        size: getNodeSize(node),
+        type: 'icon-node',
+        depth: 0,
+        originData: node,
+      }));
+
+      const edges = graphData.edges.map((edge: any) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        label: edge.value > 1 ? `${edge.value}` : '',
+        type: 'line',
+        style: {
+          stroke: edge.type === 'control' ? '#1890ff' : '#52c41a',
+          lineWidth: edge.type === 'control' ? 2 : 1.5,
+          opacity: 0.8,
+          endArrow: {
+            path: 'M 0,0 L 8,4 L 8,-4 Z',
+            fill: edge.type === 'control' ? '#1890ff' : '#52c41a',
+          },
+          lineDash: edge.type === 'control' ? [0] : [5, 5],
+          animation: edge.type === 'control' ? undefined : {
+            repeat: true,
+            duration: 10000,
+            lineDashOffset: [0, -30],
+          },
+        },
+        originData: edge,
+      }));
+
+      // 使用 Promise 和 requestAnimationFrame 优化渲染
+      Promise.resolve().then(() => {
+        if (mountedRef.current && graphRef.current) {
+          graph.data({ nodes, edges });
+          
+          requestAnimationFrame(() => {
+            if (mountedRef.current && graphRef.current) {
+              try {
+                graph.render();
+                
+                // 延迟执行布局调整
+                setTimeout(() => {
+                  if (mountedRef.current && graphRef.current) {
+                    try {
+                      graph.fitView(80);
+                      graph.fitCenter();
+                    } catch (err) {
+                      console.warn('布局调整失败:', err);
+                    }
+                  }
+                }, 100);
+              } catch (err) {
+                console.warn('渲染图表失败:', err);
+                setError('渲染拓扑图失败，请刷新重试');
+              }
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error('更新拓扑图数据失败:', error);
+      setError('更新拓扑图数据失败');
+    }
+  };
+
+  // 监听窗口大小变化
+  useEffect(() => {
+    const handleResize = () => {
+      if (!containerRef.current || !graphRef.current || !mountedRef.current) return;
+
+      const container = containerRef.current;
+      const width = container.clientWidth || 800;
+      const currentHeight = isFullscreen ? window.innerHeight - 150 : height;
+
+      // 使用 requestAnimationFrame 优化重绘
+      requestAnimationFrame(() => {
+        if (mountedRef.current && graphRef.current) {
+          try {
+            graphRef.current.changeSize(width, currentHeight);
+            
+            // 延迟执行布局调整
+            setTimeout(() => {
+              if (mountedRef.current && graphRef.current) {
+                try {
+                  graphRef.current.fitView(60);
+                  graphRef.current.fitCenter();
+                } catch (err) {
+                  console.warn('调整布局失败:', err);
+                }
+              }
+            }, 100);
+          } catch (err) {
+            console.warn('调整图表大小失败:', err);
+          }
+        }
+      });
     };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [height, isFullscreen]);
 
-  const renderEmptyGraph = () => {
-    if (!graphRef.current) return;
-    
-    const emptyData = {
-      nodes: [
-        { id: 'empty', label: '等待数据...', x: 400, y: 250 }
-      ],
-      edges: []
-    };
-    
-    graphRef.current.data(emptyData);
-    graphRef.current.render();
-  };
+  // 初始化图表
+  useEffect(() => {
+    if (!graphInitializedRef.current) {
+      const graph = initGraph();
+      if (graph && mountedRef.current) {
+        graphRef.current = graph;
+      }
+    }
+  }, [height, isFullscreen]);
+
+  // 更新数据
+  const { data, isLoading, refetch, dataUpdatedAt } = useQuery<TopologyResponse>({
+    queryKey: ['GetTopology', clusterName, showResources, showNodes, showPods],
+    queryFn: async () => {
+      try {
+        const baseUrl = clusterName
+          ? `/api/v1/overview/topology/${clusterName}`
+          : '/api/v1/overview/topology';
+        
+        const params = new URLSearchParams({
+          showResources: String(showResources),
+          showNodes: String(showNodes),
+          showPods: String(showPods),
+        });
+        
+        const response = await fetch(`${baseUrl}?${params}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch topology data');
+        }
+        
+        const result = await response.json();
+        console.log('拓扑图数据获取成功:', result);
+        return result;
+      } catch (err) {
+        console.error('拓扑图数据获取失败:', err);
+        setError(err instanceof Error ? err.message : '获取拓扑图数据失败');
+        throw err;
+      }
+    },
+    refetchInterval: autoRefresh ? refreshInterval : false,
+    refetchOnWindowFocus: true,
+  });
+
+  useEffect(() => {
+    if (data?.data?.data && mountedRef.current) {
+      updateGraphData(data.data.data);
+    }
+  }, [data]);
 
   const getNodeColor = (node: any) => {
     switch (node.type) {
@@ -628,167 +642,6 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
       case 'pod': return 40;
       default: return 50;
     }
-  };
-
-  const updateGraphData = (topologyData: any) => {
-    if (!graphRef.current || !topologyData) return;
-    
-    try {
-      console.log('更新拓扑图数据:', topologyData);
-      
-      const graphData = topologyData.data || topologyData;
-      
-      if (!Array.isArray(graphData.nodes) || !Array.isArray(graphData.edges)) {
-        console.error('拓扑图数据结构不正确:', topologyData);
-        setError('拓扑图数据结构不正确');
-        return;
-      }
-      
-      const nodeGroups: Record<string, any[]> = {
-        'control-plane': [],
-        'cluster': [],
-        'node': [],
-        'pod': [],
-        'other': []
-      };
-      
-      graphData.nodes.forEach((node: any) => {
-        const type = node.type || 'other';
-        if (nodeGroups[type]) {
-          nodeGroups[type].push(node);
-        } else {
-          nodeGroups['other'].push(node);
-        }
-      });
-      
-      const nodes: any[] = [];
-      
-      nodeGroups['control-plane'].forEach((node: any) => {
-        nodes.push({
-          id: node.id,
-          label: node.name,
-          size: getNodeSize(node),
-          type: 'icon-node',
-          depth: 0,
-          originData: node,
-        });
-      });
-      
-      nodeGroups['cluster'].forEach((node: any, i: number) => {
-        nodes.push({
-          id: node.id,
-          label: node.name,
-          size: getNodeSize(node),
-          type: 'icon-node',
-          depth: 1,
-          originData: node,
-        });
-      });
-      
-      nodeGroups['node'].forEach((node: any, i: number) => {
-        nodes.push({
-          id: node.id,
-          label: node.name,
-          size: getNodeSize(node),
-          type: 'icon-node',
-          depth: 2,
-          originData: node,
-        });
-      });
-      
-      nodeGroups['pod'].forEach((node: any, i: number) => {
-        const parentEdge = graphData.edges.find((edge: any) => edge.target === node.id);
-        const parentDepth = parentEdge ? 
-          nodes.find((n: any) => n.id === parentEdge.source)?.depth || 2 : 
-          2;
-        
-        nodes.push({
-          id: node.id,
-          label: node.name,
-          size: getNodeSize(node),
-          type: 'icon-node',
-          depth: parentDepth + 1,
-          originData: node,
-        });
-      });
-      
-      nodeGroups['other'].forEach((node: any) => {
-        nodes.push({
-          id: node.id,
-          label: node.name,
-          size: getNodeSize(node),
-          type: 'icon-node',
-          depth: 3,
-          originData: node,
-        });
-      });
-      
-      const edges = graphData.edges.map((edge: any) => {
-        const isControlEdge = edge.type === 'control';
-        return {
-          id: edge.id,
-          source: edge.source,
-          target: edge.target,
-          label: edge.value > 1 ? `${edge.value}` : '',
-          type: 'line',
-          style: {
-            stroke: isControlEdge ? '#1890ff' : '#52c41a',
-            lineWidth: isControlEdge ? 2 : 1.5,
-            opacity: 0.8,
-            endArrow: {
-              path: 'M 0,0 L 8,4 L 8,-4 Z',
-              fill: isControlEdge ? '#1890ff' : '#52c41a',
-            },
-            lineDash: isControlEdge ? [0] : [5, 5],
-            animation: isControlEdge ? undefined : {
-              repeat: true,
-              duration: 10000,
-              lineDashOffset: [0, -30],
-            },
-          },
-          originData: edge,
-        };
-      });
-      
-      graphRef.current.data({
-        nodes,
-        edges,
-      });
-      
-      graphRef.current.render();
-      
-      setTimeout(() => {
-        graphRef.current.fitView(80);
-        setTimeout(() => {
-          graphRef.current.fitCenter();
-        }, 100);
-      }, 300);
-      
-      console.log('拓扑图数据已更新');
-    } catch (error) {
-      console.error('更新拓扑图数据失败:', error);
-      setError('更新拓扑图数据失败');
-    }
-  };
-
-  useEffect(() => {
-    if (data?.data) {
-      updateGraphData(data.data);
-    }
-  }, [data]);
-
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-    setTimeout(() => {
-      if (graphRef.current && containerRef.current) {
-        graphRef.current.changeSize(
-          containerRef.current.clientWidth,
-          !isFullscreen ? window.innerHeight - 120 : height
-        );
-        graphRef.current.fitView(60);
-        graphRef.current.fitCenter();
-      }
-    }, 100);
   };
 
   const renderTopologySummary = () => {
@@ -861,7 +714,19 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
           <Tooltip title={isFullscreen ? i18nInstance.t('退出全屏') : i18nInstance.t('全屏')}>
             <Button
               icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-              onClick={toggleFullscreen}
+              onClick={() => {
+                setIsFullscreen(!isFullscreen);
+                setTimeout(() => {
+                  if (graphRef.current && containerRef.current) {
+                    graphRef.current.changeSize(
+                      containerRef.current.clientWidth,
+                      !isFullscreen ? window.innerHeight - 120 : height
+                    );
+                    graphRef.current.fitView(60);
+                    graphRef.current.fitCenter();
+                  }
+                }, 100);
+              }}
               size="small"
             />
           </Tooltip>
@@ -875,46 +740,48 @@ const ClusterTopology: React.FC<ClusterTopologyProps> = ({
 
   return (
     <Card
-      title={i18nInstance.t('集群资源拓扑图')}
       className={`cluster-topology ${isFullscreen ? 'fullscreen' : ''}`}
+      title={i18nInstance.t('集群资源拓扑图')}
       extra={renderTopologyControls()}
-      styles={{ body: { padding: '12px' } }}
+      styles={{ 
+        body: { padding: '10px' }
+      }}
     >
-      {renderTopologySummary()}
       <Spin spinning={isLoading}>
         {error ? (
           <Empty
             description={
               <div>
                 <div>{error}</div>
-                <Button type="primary" onClick={() => {
-                  setError(null);
-                  refetch();
-                }} style={{ marginTop: '8px' }}>
+                <Button 
+                  type="primary" 
+                  onClick={() => {
+                    setError(null);
+                    if (!graphInitializedRef.current) {
+                      initGraph();
+                    }
+                    refetch();
+                  }}
+                  style={{ marginTop: '8px' }}
+                >
                   {i18nInstance.t('重试')}
                 </Button>
               </div>
             }
           />
         ) : (
-          <div
-            ref={containerRef}
-            className="topology-container"
-            style={{ height: isFullscreen ? 'calc(100vh - 150px)' : height }}
-          />
+          <>
+            {renderTopologySummary()}
+            <div
+              ref={containerRef}
+              className="topology-container"
+              style={{ height: isFullscreen ? 'calc(100vh - 120px)' : height }}
+            />
+          </>
         )}
-        <div style={{ marginTop: '8px', textAlign: 'center', color: '#999' }}>
-          提示：可以拖拽节点、缩放视图来调整拓扑图布局，鼠标悬停可查看详细信息
-        </div>
       </Spin>
     </Card>
   );
 };
 
-declare global {
-  interface Window {
-    G6: any;
-  }
-}
-
-export default ClusterTopology;
+export default React.memo(ClusterTopology);

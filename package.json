@@ -1,5 +1,7 @@
 {
 	"dependencies": {
-		"@antv/g6": "4.8.23"
+		"@antv/g6": "4.8.23",
+		"ahooks": "^3.8.5",
+		"react-error-boundary": "^6.0.0"
 	}
 }

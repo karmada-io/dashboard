@@ -14,15 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { SchedulePreviewResponse } from '@/services/overview';
-import { Card, Table, Badge, Tooltip, Tag, Button, Typography } from 'antd';
+import { Card, Table, Badge, Tooltip, Tag, Button, Select } from 'antd';
 import i18nInstance from '@/utils/i18n';
-import { useMemo, useRef, useEffect } from 'react';
 import insertCss from 'insert-css';
 import dayjs from 'dayjs';
 import { CheckCircleOutlined, WarningOutlined, SyncOutlined } from '@ant-design/icons';
+import { Key } from 'react';
 
-const { Text } = Typography;
+const { Option } = Select;
 
 // 插入自定义CSS样式
 insertCss(`
@@ -138,6 +139,29 @@ const getGroupColor = (group: ResourceGroupType): string => {
   return colorScheme.resourceGroups[group]?.color || colorScheme.resourceGroups.Others.color;
 };
 
+interface ResourceRecord {
+  key: string;
+  resourceType: string;
+  resourceGroup: ResourceGroupType;
+  resourceName: string;
+  namespace: string;
+  propagationPolicy: string;
+  clusterDist: {
+    clusterName: string;
+    count: number;
+    scheduledCount: number;
+    actualCount: number;
+    difference: number;
+    isConsistent: boolean;
+    weight?: number;
+  }[];
+  totalCount: number;
+  scheduledCount: number;
+  actualTotalCount: number;
+  clusterCount: number;
+  consistencyRatio: number;
+}
+
 const SchedulePreview: React.FC<SchedulePreviewProps> = ({ 
   data, 
   loading, 
@@ -145,48 +169,70 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
   onRefresh, 
   autoRefresh = false
 }) => {
-  // 更新类型记录，用于表格过滤
-  type ResourceRecord = {
-    key: string;
-    resourceType: string;
-    resourceGroup: ResourceGroupType;
-    clusterDist: any[];
-    totalCount: number;
-    scheduledCount: number;
-    actualTotalCount: number;
-    clusterCount: number;
-    consistencyRatio: number;
-    resourceNames?: string[]; // 添加可选的资源名称字段
-    resourceName?: string; // 单个资源名称字段
-    namespace?: string; // 命名空间
-    policyNames?: string[]; // 添加传播策略名称字段
-    propagationPolicy?: string; // 添加传播策略字段
-  };
+  const isMounted = useRef(true);
+  const lastDataRef = useRef(data);
+  const [error, setError] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedResourceGroup, setSelectedResourceGroup] = useState<ResourceGroupType | 'all'>('all');
 
-  // 添加页面可见性变化检测
-  const isDestroyed = useRef(false);
-  
-  // 在组件卸载时设置标志，避免对已卸载组件操作
+  // 组件挂载状态管理
   useEffect(() => {
+    isMounted.current = true;
+    
+    // 清理函数
     return () => {
-      isDestroyed.current = true;
+      isMounted.current = false;
+      lastDataRef.current = undefined;
+      setError(null);
+      setIsUpdating(false);
+      setSelectedResourceGroup('all');
     };
   }, []);
 
-  // 处理页面可见性变化，当页面重新变为可见时刷新数据
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && autoRefresh && onRefresh) {
-        onRefresh();
+  // 数据引用更新 - 使用 useMemo 优化性能，添加数据有效性检查
+  const currentData = useMemo(() => {
+    if (!isMounted.current || !data) return undefined;
+    try {
+      lastDataRef.current = data;
+      return data;
+    } catch (err) {
+      console.error('数据处理错误:', err);
+      return undefined;
+    }
+  }, [data]);
+
+  // 安全的更新函数 - 添加额外的安全检查
+  const safeSetState = useCallback((setter: any) => {
+    if (!isMounted.current) return;
+    try {
+      requestAnimationFrame(() => {
+        if (isMounted.current) {
+          setter();
+        }
+      });
+    } catch (err) {
+      console.error('状态更新错误:', err);
+      if (isMounted.current) {
+        setError('状态更新失败');
       }
-    };
+    }
+  }, []);
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [autoRefresh, onRefresh]);
+  // 处理刷新 - 添加错误处理和防抖
+  const handleRefresh = useCallback(() => {
+    if (!onRefresh || !isMounted.current || loading || isUpdating) return;
+    
+    safeSetState(() => setIsUpdating(true));
+    
+    try {
+      onRefresh();
+    } catch (err) {
+      console.error('刷新数据错误:', err);
+      setError('刷新数据失败');
+    } finally {
+      safeSetState(() => setIsUpdating(false));
+    }
+  }, [onRefresh, loading, isUpdating, safeSetState]);
 
   // 计算资源分布数据
   const resourceDistData = useMemo(() => {
@@ -232,15 +278,27 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     });
   }, [data]);
 
+  // 过滤资源数据
+  const filteredResourceData = useMemo(() => {
+    if (!resourceDistData) return [];
+    if (selectedResourceGroup === 'all') return resourceDistData;
+    return resourceDistData.filter(record => record.resourceGroup === selectedResourceGroup);
+  }, [resourceDistData, selectedResourceGroup]);
+
   // 格式化更新时间
-  const formatLastUpdatedTime = () => {
-    if (!lastUpdatedAt) return '';
-    return dayjs(lastUpdatedAt).format('YYYY-MM-DD HH:mm:ss');
-  };
+  const formatLastUpdatedTime = useCallback(() => {
+    if (!lastUpdatedAt || !isMounted.current) return '';
+    try {
+      return dayjs(lastUpdatedAt).format('YYYY-MM-DD HH:mm:ss');
+    } catch (err) {
+      console.warn('时间格式化错误:', err);
+      return '';
+    }
+  }, [lastUpdatedAt]);
 
   // 在初始加载和数据变化时打印调试日志
   useEffect(() => {
-    if (data) {
+    if (data && isMounted.current) {
       console.log('调度数据已加载:', data);
       
       // 针对详细资源信息进行调试
@@ -268,274 +326,370 @@ const SchedulePreview: React.FC<SchedulePreviewProps> = ({
     }
   }, [data]);
 
+  // 处理页面可见性变化
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && autoRefresh && !loading && !isUpdating) {
+        handleRefresh();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [autoRefresh, handleRefresh, loading, isUpdating]);
+
+  // 错误处理
+  useEffect(() => {
+    if (error) {
+      console.error('SchedulePreview 组件错误:', error);
+    }
+  }, [error]);
+
+  // 优化渲染标题 - 使用 useMemo 缓存
+  const titleContent = useMemo(() => {
+    if (!isMounted.current) return null;
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>{i18nInstance.t('32aec2df59435fa80d2d1982b3446dbb', '集群资源调度统计')}</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {lastUpdatedAt && (
+            <div style={{ marginRight: '10px', fontSize: '12px', color: 'rgba(0, 0, 0, 0.45)' }}>
+              {i18nInstance.t('93f926af36a3a0ab91b21a4e97d94cd7', '更新时间')}: {formatLastUpdatedTime()}
+            </div>
+          )}
+          {onRefresh && (
+            <Button
+              type="text"
+              icon={<SyncOutlined spin={loading || isUpdating} />}
+              onClick={handleRefresh}
+              disabled={loading || isUpdating}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }, [lastUpdatedAt, loading, isUpdating, handleRefresh, formatLastUpdatedTime]);
+
+  // 优化渲染错误状态 - 使用 useMemo 缓存
+  const errorContent = useMemo(() => {
+    if (!error) return null;
+
+    return (
+      <div style={{ textAlign: 'center', padding: '20px' }}>
+        <div style={{ color: '#ff4d4f', marginBottom: '8px' }}>{error}</div>
+        <Button 
+          type="primary" 
+          onClick={() => {
+            if (isMounted.current) {
+              setError(null);
+              handleRefresh();
+            }
+          }}
+        >
+          {i18nInstance.t('重试')}
+        </Button>
+      </div>
+    );
+  }, [error, handleRefresh]);
+
+  // 渲染资源组过滤器
+  const renderResourceGroupFilter = useCallback(() => {
+    return (
+      <div style={{ marginBottom: '16px' }}>
+        <Select
+          value={selectedResourceGroup}
+          onChange={(value: ResourceGroupType | 'all') => setSelectedResourceGroup(value)}
+          style={{ width: 200 }}
+        >
+          <Option value="all">{i18nInstance.t('全部资源组')}</Option>
+          {Object.keys(colorScheme.resourceGroups).map(group => (
+            <Option key={group} value={group}>
+              <Badge color={colorScheme.resourceGroups[group as ResourceGroupType].color} />
+              <span style={{ marginLeft: '8px' }}>{group}</span>
+            </Option>
+          ))}
+        </Select>
+      </div>
+    );
+  }, [selectedResourceGroup]);
+
+  // 渲染内容
+  const renderContent = useCallback(() => {
+    if (!data || !data.detailedResources) {
+      return (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <span style={{ color: 'rgba(0, 0, 0, 0.45)' }}>
+            {i18nInstance.t('b8dd9c5f3fe0e69e4a56a5b11a5f4c87', '暂无资源分布数据')}
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {renderResourceGroupFilter()}
+        <Table<ResourceRecord>
+          dataSource={filteredResourceData}
+          pagination={false}
+          size="small"
+          rowKey="key"
+          locale={{ 
+            emptyText: (
+              <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>
+                {i18nInstance.t('b8dd9c5f3fe0e69e4a56a5b11a5f4c87', '暂无资源分布数据')}
+              </div>
+            )
+          }}
+          style={{ 
+            background: '#fff', 
+            borderRadius: '8px' 
+          }}
+          columns={[
+            {
+              title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型')}</div>,
+              dataIndex: 'resourceType',
+              key: 'resourceType',
+              width: 150,
+              align: 'center',
+              render: (text: string, record: ResourceRecord) => (
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    gap: '4px',
+                    padding: '8px',
+                    borderLeft: `3px solid ${getResourceColor(text)}`,
+                    alignItems: 'center',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Badge
+                    color={getResourceColor(text)}
+                    text={<span style={{ fontWeight: 'bold', fontSize: '14px' }}>{text}</span>}
+                  />
+                  <Tag 
+                    color={getGroupColor(record.resourceGroup)} 
+                    style={{ fontSize: '12px', margin: 0 }}
+                  >
+                    {record.resourceGroup}
+                  </Tag>
+                </div>
+              ),
+            },
+            {
+              title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('8a6dff9bbefda5a12ade59faacd9851c', '资源名称')}</div>,
+              key: 'resourceName',
+              width: 180,
+              align: 'center',
+              render: (_: any, record: ResourceRecord) => (
+                <div style={{ 
+                  padding: '8px',
+                  textAlign: 'center'
+                }}>
+                  {record.resourceName ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                      <Tag 
+                        color="processing"
+                        style={{ 
+                          margin: 0, 
+                          fontSize: '13px',
+                        }}
+                      >
+                        {record.resourceName}
+                      </Tag>
+                      {record.namespace && (
+                        <Tag 
+                          color="default"
+                          style={{ 
+                            margin: 0, 
+                            fontSize: '12px',
+                          }}
+                        >
+                          {i18nInstance.t('8c669a5e9ad11c4c91ba89ccde1e6167', '名称空间')}：{record.namespace}
+                        </Tag>
+                      )}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '13px' }}>
+                      暂无资源名称
+                    </span>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('4b2fe09221d4ca90ee2acd2cc38c892a', '传播策略')}</div>,
+              key: 'propagationPolicy',
+              width: 180,
+              align: 'center',
+              render: (_: any, record: ResourceRecord) => (
+                <div style={{ 
+                  padding: '8px',
+                  textAlign: 'center'
+                }}>
+                  {record.propagationPolicy ? (
+                    <Tag 
+                      color="purple"
+                      style={{ 
+                        margin: 0, 
+                        fontSize: '13px',
+                      }}
+                    >
+                      {record.propagationPolicy}
+                    </Tag>
+                  ) : (
+                    <span style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '13px' }}>
+                      暂无传播策略
+                    </span>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: <div style={{ textAlign: 'center' }}>
+                <Tooltip title="左侧数字表示调度计划数量，右侧数字表示实际部署数量">
+                  {i18nInstance.t('c335768f01be88d098cb26097a5ddce7', '计划/部署')}
+                </Tooltip>
+              </div>,
+              key: 'scheduledAndActual',
+              width: 150,
+              align: 'center',
+              sorter: (a: any, b: any) => a.scheduledCount - b.scheduledCount,
+              render: (_, record) => (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    background: '#f5f5f5',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    gap: '6px'
+                  }}>
+                    <span style={{ 
+                      fontWeight: 'bold', 
+                      color: '#fff',
+                      backgroundColor: '#1890ff',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                    }}>
+                      {record.scheduledCount}
+                    </span>
+                    <span style={{ color: '#999', fontSize: '14px' }}>/</span>
+                    <span style={{ 
+                      fontWeight: 'bold', 
+                      color: '#fff',
+                      backgroundColor: record.scheduledCount === record.actualTotalCount 
+                        ? '#52c41a' // 绿色表示一致
+                        : record.scheduledCount < record.actualTotalCount 
+                          ? '#722ed1' // 紫色表示实际多于计划
+                          : '#f5222d', // 红色表示实际少于计划
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                    }}>
+                      {record.actualTotalCount}
+                    </span>
+                  </div>
+                </div>
+              )
+            },
+            {
+              title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('5e2f637c8c3bc68437b8209e6df87ad9', '集群分布')}</div>,
+              dataIndex: 'clusterDist',
+              key: 'clusterDist',
+              align: 'center',
+              render: (clusterDist, record) => (
+                <div style={{ padding: '4px', textAlign: 'center' }}>
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {clusterDist.map((cluster: any) => (
+                      <Tooltip
+                        key={`${record.key}-cluster-${cluster.clusterName}`}
+                        title={
+                          <div>
+                            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{cluster.clusterName}</div>
+                            <div>调度计划: {cluster.scheduledCount}</div>
+                            <div>实际部署: {cluster.actualCount}</div>
+                            <div>
+                              差异: 
+                              <span style={{ 
+                                color: cluster.difference > 0 ? '#52c41a' : 
+                                        cluster.difference < 0 ? '#f5222d' : '#666',
+                                fontWeight: 'bold',
+                                marginLeft: '4px'
+                              }}>
+                                {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}
+                              </span>
+                            </div>
+                          </div>
+                        }
+                      >
+                        <Tag
+                          style={{ 
+                            margin: '2px',
+                            borderColor: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                            background: cluster.isConsistent ? '#f6ffed' : '#fff2f0',
+                            fontSize: '13px'
+                          }}
+                          icon={cluster.isConsistent ? <CheckCircleOutlined /> : <WarningOutlined />}
+                        >
+                          {cluster.clusterName}
+                          {cluster.weight !== undefined && (
+                            <span style={{ margin: '0 3px', color: '#1890ff', fontWeight: 'bold' }}>
+                              权重:{cluster.weight}
+                            </span>
+                          )}
+                          <span style={{
+                            color: '#fff',
+                            background: cluster.isConsistent ? '#52c41a' : '#f5222d',
+                            padding: '0 3px',
+                            borderRadius: '10px',
+                            fontSize: '11px',
+                            marginLeft: '2px'
+                          }}>
+                            {cluster.scheduledCount}/{cluster.actualCount}
+                          </span>
+                        </Tag>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
+      </>
+    );
+  }, [data, filteredResourceData, renderResourceGroupFilter]);
+
   return (
     <Card
       className="schedule-preview-card"
       loading={loading}
-      title={
-        <div className="flex items-center justify-between">
-          <span>{i18nInstance.t('32aec2df59435fa80d2d1982b3446dbb', '集群资源调度统计')}</span>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {lastUpdatedAt && (
-              <Text type="secondary" style={{ marginRight: '10px', fontSize: '12px' }}>
-                {i18nInstance.t('93f926af36a3a0ab91b21a4e97d94cd7', '更新时间')}: {formatLastUpdatedTime()}
-              </Text>
-            )}
-            {onRefresh && (
-              <Button
-                type="text"
-                icon={<SyncOutlined spin={loading} />}
-                onClick={() => {
-                  console.log('组件内刷新按钮被点击');
-                  if (onRefresh) {
-                    onRefresh();
-                  }
-                }}
-                disabled={loading}
-                style={{ marginRight: '0px' }}
-                title={i18nInstance.t('20b9ec5834c2c149bfa27fe33ef4d745', '刷新')}
-              />
-            )}
-          </div>
-        </div>
-      }
-      bodyStyle={{ padding: '10px' }}
+      title={titleContent}
+      styles={{ 
+        body: { padding: '10px' }
+      }}
     >
-      {data && (
-                  <div style={{ background: '#f9f9f9', borderRadius: '8px', padding: '12px' }}>
-                    <div className="resource-dist-table">
-                      <Table
-                        dataSource={resourceDistData}
-                        pagination={false}
-                        size="small"
-                        rowKey="key"
-                        locale={{ emptyText: i18nInstance.t('b8dd9c5f3fe0e69e4a56a5b11a5f4c87', '暂无资源分布数据') }}
-                        style={{ background: '#fff', borderRadius: '8px' }}
-                        columns={[
-                          {
-                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('b7fde1e005f73e8e69693f5f90e138a1', '资源类型')}</div>,
-                            dataIndex: 'resourceType',
-                            key: 'resourceType',
-                            width: 150,
-                            align: 'center',
-                            filters: Object.entries(colorScheme.resourceGroups).map(([group]) => ({
-                              text: group,
-                              value: group,
-                              key: `filter-${group}`,
-                            })),
-                            onFilter: (value: any, record: ResourceRecord) => record.resourceGroup === value,
-                            render: (text, record) => (
-                              <div 
-                                style={{ 
-                                  display: 'flex', 
-                                  flexDirection: 'column',
-                                  gap: '4px',
-                                  padding: '8px',
-                                  borderLeft: `3px solid ${getResourceColor(text)}`,
-                                  alignItems: 'center',
-                                  textAlign: 'center'
-                                }}
-                              >
-                                <Badge
-                                  color={getResourceColor(text)}
-                                  text={<span style={{ fontWeight: 'bold', fontSize: '14px' }}>{text}</span>}
-                                />
-                                <Tag 
-                                  color={getGroupColor(record.resourceGroup)} 
-                                  style={{ fontSize: '12px', margin: 0 }}
-                                >
-                                  {record.resourceGroup}
-                                </Tag>
-                              </div>
-                            ),
-                          },
-                          {
-                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('8a6dff9bbefda5a12ade59faacd9851c', '资源名称')}</div>,
-                            key: 'resourceName',
-                            width: 180,
-                            align: 'center',
-                            render: (_, record) => (
-                              <div style={{ 
-                                padding: '8px',
-                                textAlign: 'center'
-                              }}>
-                                {record.resourceName ? (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                                    <Tag 
-                                      color="processing"
-                                      style={{ 
-                                        margin: 0, 
-                                        fontSize: '13px',
-                                      }}
-                                    >
-                                      {record.resourceName}
-                                    </Tag>
-                                    {record.namespace && (
-                                      <Tag 
-                                        color="default"
-                                        style={{ 
-                                          margin: 0, 
-                                          fontSize: '12px',
-                                        }}
-                                      >
-                              {i18nInstance.t('8c669a5e9ad11c4c91ba89ccde1e6167', '名称空间')}：{record.namespace}
-                                      </Tag>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
-                                    暂无资源名称
-                                  </Typography.Text>
-                                )}
-                              </div>
-                            ),
-                          },
-                          {
-                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('4b2fe09221d4ca90ee2acd2cc38c892a', '传播策略')}</div>,
-                            key: 'propagationPolicy',
-                            width: 180,
-                            align: 'center',
-                            render: (_, record) => (
-                              <div style={{ 
-                                padding: '8px',
-                                textAlign: 'center'
-                              }}>
-                                {record.propagationPolicy ? (
-                                  <Tag 
-                                    color="purple"
-                                    style={{ 
-                                      margin: 0, 
-                                      fontSize: '13px',
-                                    }}
-                                  >
-                                    {record.propagationPolicy}
-                                  </Tag>
-                                ) : (
-                                  <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
-                                    暂无传播策略
-                                  </Typography.Text>
-                                )}
-                              </div>
-                            ),
-                          },
-                          {
-                            title: <div style={{ textAlign: 'center' }}>
-                              <Tooltip title="左侧数字表示调度计划数量，右侧数字表示实际部署数量">
-                                {i18nInstance.t('c335768f01be88d098cb26097a5ddce7', '计划/部署')}
-                              </Tooltip>
-                            </div>,
-                            key: 'scheduledAndActual',
-                            width: 150,
-                            align: 'center',
-                            sorter: (a: ResourceRecord, b: ResourceRecord) => a.scheduledCount - b.scheduledCount,
-                            render: (_, record) => (
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{ 
-                                  display: 'inline-flex', 
-                                  alignItems: 'center', 
-                                  background: '#f5f5f5',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  gap: '6px'
-                                }}>
-                                  <span style={{ 
-                                    fontWeight: 'bold', 
-                                    color: '#fff',
-                                    backgroundColor: '#1890ff',
-                                    padding: '2px 8px',
-                                    borderRadius: '4px',
-                                    fontSize: '14px',
-                                  }}>
-                                    {record.scheduledCount}
-                                  </span>
-                                  <span style={{ color: '#999', fontSize: '14px' }}>/</span>
-                                  <span style={{ 
-                                    fontWeight: 'bold', 
-                                    color: '#fff',
-                                    backgroundColor: record.scheduledCount === record.actualTotalCount 
-                                      ? '#52c41a' // 绿色表示一致
-                                      : record.scheduledCount < record.actualTotalCount 
-                                        ? '#722ed1' // 紫色表示实际多于计划
-                                        : '#f5222d', // 红色表示实际少于计划
-                                    padding: '2px 8px',
-                                    borderRadius: '4px',
-                                    fontSize: '14px',
-                                  }}>
-                                    {record.actualTotalCount}
-                                  </span>
-                                </div>
-                              </div>
-                            )
-                          },
-                          {
-                            title: <div style={{ textAlign: 'center' }}>{i18nInstance.t('5e2f637c8c3bc68437b8209e6df87ad9', '集群分布')}</div>,
-                            dataIndex: 'clusterDist',
-                            key: 'clusterDist',
-                            align: 'center',
-                            render: (clusterDist, record) => (
-                              <div style={{ padding: '4px', textAlign: 'center' }}>
-                                <div className="flex flex-wrap gap-1 justify-center">
-                                  {clusterDist.map((cluster: any) => (
-                                    <Tooltip
-                                      key={`${record.key}-cluster-${cluster.clusterName}`}
-                                      title={
-                                        <div>
-                                          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{cluster.clusterName}</div>
-                                          <div>调度计划: {cluster.scheduledCount}</div>
-                                          <div>实际部署: {cluster.actualCount}</div>
-                                          <div>
-                                            差异: 
-                                            <span style={{ 
-                                              color: cluster.difference > 0 ? '#52c41a' : 
-                                                      cluster.difference < 0 ? '#f5222d' : '#666',
-                                              fontWeight: 'bold',
-                                              marginLeft: '4px'
-                                            }}>
-                                              {cluster.difference > 0 ? `+${cluster.difference}` : cluster.difference}
-                                            </span>
-                                          </div>
-                                        </div>
-                                      }
-                                    >
-                                      <Tag
-                                        style={{ 
-                                          margin: '2px',
-                                          borderColor: cluster.isConsistent ? '#52c41a' : '#f5222d',
-                                          background: cluster.isConsistent ? '#f6ffed' : '#fff2f0',
-                                          fontSize: '13px'
-                                        }}
-                                        icon={cluster.isConsistent ? <CheckCircleOutlined /> : <WarningOutlined />}
-                                      >
-                                        {cluster.clusterName}
-                                        {cluster.weight !== undefined && (
-                                          <span style={{ margin: '0 3px', color: '#1890ff', fontWeight: 'bold' }}>
-                                            权重:{cluster.weight}
-                                          </span>
-                                        )}
-                                        <span style={{
-                                          color: '#fff',
-                                          background: cluster.isConsistent ? '#52c41a' : '#f5222d',
-                                          padding: '0 3px',
-                                          borderRadius: '10px',
-                                          fontSize: '11px',
-                                          marginLeft: '2px'
-                                        }}>
-                                          {cluster.scheduledCount}/{cluster.actualCount}
-                                        </span>
-                                      </Tag>
-                                    </Tooltip>
-                                  ))}
-                                </div>
-                              </div>
-                            ),
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-      )}
+      <div style={{ background: '#f9f9f9', borderRadius: '8px', padding: '12px' }}>
+        <div className="resource-dist-table">
+          {error ? errorContent : renderContent()}
+        </div>
+      </div>
     </Card>
   );
 };
 
-export default SchedulePreview;
+// 使用 React.memo 优化性能，添加自定义比较函数
+export default React.memo(SchedulePreview, (prevProps, nextProps) => {
+  // 只在必要时重新渲染
+  return (
+    prevProps.loading === nextProps.loading &&
+    prevProps.lastUpdatedAt === nextProps.lastUpdatedAt &&
+    prevProps.autoRefresh === nextProps.autoRefresh &&
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  );
+});

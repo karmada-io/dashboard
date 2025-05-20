@@ -129,7 +129,7 @@ kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
 执行以下代码来获取JWT令牌：
 
 ```bash
-kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}"
+kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}" && echo
 ```
 
 它应该打印出类似这样的结果：

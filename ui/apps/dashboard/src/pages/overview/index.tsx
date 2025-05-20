@@ -17,16 +17,51 @@ limitations under the License.
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { Badge, Card, Col, Descriptions, DescriptionsProps, Progress, Row, Spin, Statistic, Tag, Tooltip, Typography, Button } from 'antd';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
-import { GetOverview, GetSchedulePreview } from '@/services/overview.ts';
+import { GetOverview, GetSchedulePreview, SchedulePreviewResponse } from '@/services/overview.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import SchedulePreview from '@/components/schedule-preview';
 import ClusterTopology from '@/components/cluster-topology';
 import insertCss from 'insert-css';
+import { useCallback, useMemo, useRef, useEffect, Component, ReactNode } from 'react';
 
 const { Text } = Typography;
+
+// 自定义错误边界组件
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class CustomErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('错误边界捕获到错误:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
 
 // 修改CSS样式
 insertCss(`
@@ -240,7 +275,12 @@ const Overview = () => {
   });
 
   // 获取集群调度预览数据 - 只显示Karmada调度的资源
-  const { data: scheduleData, isLoading: isScheduleLoading, refetch: refetchScheduleData, dataUpdatedAt } = useQuery({
+  const { data: scheduleData, isLoading: isScheduleLoading, refetch: refetchScheduleData, dataUpdatedAt } = useQuery<
+    SchedulePreviewResponse,
+    Error,
+    SchedulePreviewResponse,
+    [string]
+  >({
     queryKey: ['GetSchedulePreview'],
     queryFn: async () => {
       console.log('正在获取调度预览数据，时间戳:', new Date().toISOString());
@@ -253,20 +293,16 @@ const Overview = () => {
         throw error;
       }
     },
-    // 仅在全局概览页面且自动刷新启用时获取
     enabled: !clusterName,
-    // 根据autoRefresh状态决定是否启用自动刷新
     refetchInterval: autoRefresh ? REFRESH_INTERVAL : false,
-    // 设置refetchOnWindowFocus为true，确保窗口获得焦点时刷新数据
     refetchOnWindowFocus: true,
-    // 设置不要重用缓存数据，保证每次刷新都从服务器获取最新数据
     staleTime: 0,
-    // 设置重试策略
     retry: 1,
+    gcTime: REFRESH_INTERVAL
   });
 
-  // 处理手动刷新
-  const handleRefreshScheduleData = () => {
+  // 处理手动刷新 - 添加防抖
+  const handleRefreshScheduleData = useCallback(() => {
     console.log('手动刷新调度数据，时间戳:', new Date().toISOString());
     // 使用设置强制选项来确保不使用缓存
     refetchScheduleData({ cancelRefetch: true }).then(() => {
@@ -274,7 +310,7 @@ const Overview = () => {
     }).catch(error => {
       console.error('刷新调度数据出错:', error);
     });
-  };
+  }, [refetchScheduleData]);
 
   const { data: clusterData, isLoading: isClusterLoading } = useQuery({
     queryKey: ['GetClusters', clusterName],
@@ -570,33 +606,90 @@ const Overview = () => {
     );
   };
 
-  // 集群调度预览组件包装器，添加刷新控制
-  const renderSchedulePreview = () => {
-    return (
+  // 集群调度预览组件包装器
+  const renderSchedulePreview = useCallback(() => {
+    if (!scheduleData || !isMounted.current) return null;
+    
+    const ErrorFallback = (
       <div className="mb-4">
-        <SchedulePreview 
-          data={scheduleData} 
-          loading={isScheduleLoading} 
-          lastUpdatedAt={dataUpdatedAt} 
-          onRefresh={handleRefreshScheduleData}
-          autoRefresh={autoRefresh}
-        />
+        <Card>
+          <div style={{ textAlign: 'center', padding: '20px' }}>
+            <div style={{ color: '#ff4d4f', marginBottom: '8px' }}>
+              加载调度预览时出错
+            </div>
+            <Button 
+              type="primary" 
+              onClick={() => {
+                if (handleRefreshScheduleData) {
+                  handleRefreshScheduleData();
+                }
+              }}
+            >
+              重试
+            </Button>
+          </div>
+        </Card>
       </div>
     );
-  };
+    
+    return (
+      <CustomErrorBoundary fallback={ErrorFallback}>
+        <div className="mb-4">
+          <SchedulePreview 
+            data={scheduleData} 
+            loading={isScheduleLoading} 
+            lastUpdatedAt={dataUpdatedAt} 
+            onRefresh={handleRefreshScheduleData}
+            autoRefresh={autoRefresh}
+          />
+        </div>
+      </CustomErrorBoundary>
+    );
+  }, [scheduleData, isScheduleLoading, dataUpdatedAt, handleRefreshScheduleData, autoRefresh]);
 
   // 渲染拓扑图组件
-  const renderTopologySection = () => {
-    return (
+  const renderTopologySection = useCallback(() => {
+    if (!isMounted.current) return null;
+    
+    const ErrorFallback = (
       <div className="mb-4">
-        <ClusterTopology 
-          height={600}
-          autoRefresh={autoRefresh}
-          refreshInterval={REFRESH_INTERVAL}
-        />
+        <Card>
+          <div style={{ textAlign: 'center', padding: '20px' }}>
+            <div style={{ color: '#ff4d4f', marginBottom: '8px' }}>
+              加载拓扑图时出错
+            </div>
+            <Button 
+              type="primary" 
+              onClick={() => window.location.reload()}
+            >
+              重试
+            </Button>
+          </div>
+        </Card>
       </div>
     );
-  };
+    
+    return (
+      <CustomErrorBoundary fallback={ErrorFallback}>
+        <div className="mb-4">
+          <ClusterTopology 
+            height={600}
+            autoRefresh={autoRefresh}
+            refreshInterval={REFRESH_INTERVAL}
+          />
+        </div>
+      </CustomErrorBoundary>
+    );
+  }, [autoRefresh]);
+
+  // 添加组件挂载状态管理
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   return (
     <Panel>
