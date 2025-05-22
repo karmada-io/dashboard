@@ -30,9 +30,12 @@ RUN curl -LO https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl \
   && mv kubectl /usr/local/bin/kubectl \
   && chmod +x /usr/local/bin/kubectl
 
-# Download and install karmadactl (version v1.3.0)
+# Define ARG for karmadactl version (default to latest v1.13.2)
+ARG KARMADA_VERSION=v1.13.2
+
+# Download and install karmadactl using the version ARG
 RUN curl -L -o /tmp/karmadactl-linux-amd64.tgz \
-    https://github.com/karmada-io/karmada/releases/download/v1.3.0/karmadactl-linux-amd64.tgz \
+    https://github.com/karmada-io/karmada/releases/download/${KARMADA_VERSION}/karmadactl-linux-amd64.tgz \
     && tar -xzf /tmp/karmadactl-linux-amd64.tgz -C /tmp \
     && mv /tmp/karmadactl /usr/local/bin/karmadactl \
     && chmod +x /usr/local/bin/karmadactl \
