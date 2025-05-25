@@ -40,7 +40,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/remotecommand"
-	import "k8s.io/utils/ptr" 
+	"k8s.io/utils/ptr" 
 )
 
 // waitForPodReady polls until the Pod is Running and Ready, or times out.
