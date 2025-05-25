@@ -15,10 +15,13 @@ limitations under the License.
 */
 
 import Navigation from '@/components/navigation';
-const Header = () => {
+interface HeaderProps {
+  onTerminalClick?: () => void;
+}
+const Header : React.FC<HeaderProps> = ({ onTerminalClick })  => {
   return (
     <>
-      <Navigation />
+      <Navigation onTerminalClick={onTerminalClick}/>
     </>
   );
 };
