@@ -51,13 +51,25 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
   const { data } = useQuery({
     queryKey: ['GetDashboardConfig'],
     queryFn: async () => {
-      const ret = await GetDashboardConfig();
-      return ret.data;
+      try {
+        const ret = await GetDashboardConfig();
+        return ret.data;
+      } catch (error) {
+        console.error('Failed to fetch dashboard config:', error);
+        return null;
+      }
     },
   });
   const filteredMenuItems = useMemo(() => {
-    if (!data) return menuItems;
+    // 如果没有配置数据或者menu_configs为空，显示所有菜单项
+    if (!data || !data.menu_configs || data.menu_configs.length === 0) {
+      return menuItems;
+    }
     const menuInfo = traverseMenuConfig(data.menu_configs);
+    // 如果menuInfo为空对象，也显示所有菜单项
+    if (Object.keys(menuInfo).length === 0) {
+      return menuItems;
+    }
     return filterMenuItems(menuItems, menuInfo);
   }, [data, menuItems]);
   return (
@@ -79,18 +91,26 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
 };
 
 function traverseMenuConfig(
-  menu_configs: menuConfig[],
+  menu_configs: menuConfig[] | undefined | null,
 ): Record<string, boolean> {
   let menuInfo = {} as Record<string, boolean>;
+
+  // 检查 menu_configs 是否为有效的数组
+  if (!menu_configs || !Array.isArray(menu_configs)) {
+    return menuInfo;
+  }
+
   for (const menu_config of menu_configs) {
-    menuInfo[menu_config.sidebar_key] = menu_config.enable;
-    const childrenMenuInfo = menu_config.children
-      ? traverseMenuConfig(menu_config.children)
-      : {};
-    menuInfo = {
-      ...menuInfo,
-      ...childrenMenuInfo,
-    };
+    if (menu_config && menu_config.sidebar_key) {
+      menuInfo[menu_config.sidebar_key] = menu_config.enable;
+      const childrenMenuInfo = menu_config.children
+        ? traverseMenuConfig(menu_config.children)
+        : {};
+      menuInfo = {
+        ...menuInfo,
+        ...childrenMenuInfo,
+      };
+    }
   }
   return menuInfo;
 }

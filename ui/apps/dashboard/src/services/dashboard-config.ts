@@ -36,13 +36,13 @@ export interface menuConfig {
   path: string;
   enable: boolean;
   sidebar_key: string;
-  children: menuConfig[];
+  children?: menuConfig[];
 }
 
 interface DashboardConfig {
-  docker_registries: dockerRegistry[];
-  chart_registries: chartRegistry[];
-  menu_configs: menuConfig[];
+  docker_registries?: dockerRegistry[];
+  chart_registries?: chartRegistry[];
+  menu_configs?: menuConfig[];
 }
 
 export async function GetDashboardConfig() {
