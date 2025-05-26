@@ -129,5 +129,6 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.17.1 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 )
-replace k8s.io/dashboard/client => ./cmd/modules/common/client
-replace k8s.io/dashboard/main => ./cmd/modules/api
+replace k8s.io/dashboard/client => ./cmd/k8s-dashboard-api/clientwrapper
+replace k8s.io/dashboard/main => ./cmd/k8s-dashboard-api/mainwrapper
+replace k8s.io/dashboard/api/pkg/args => ./cmd/k8s-dashboard-api/argswrapper

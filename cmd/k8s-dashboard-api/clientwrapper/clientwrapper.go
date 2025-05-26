@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	upstreamclient "k8s.io/dashboard/client" // adjust import path as per your setup
-	karmadaclient "github.com/karmada-io/dashboard/pkg/client"       // your karmadaclient import
+	karmadaclient "github.com/karmada-io/dashboard/pkg/client"       // karmadaclient import
 	"k8s.io/klog/v2"
     "k8s.io/dashboard/client"
     "k8s.io/dashboard/client/cache/client" // alias cacheclient if needed
