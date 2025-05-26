@@ -131,4 +131,3 @@ require (
 )
 replace k8s.io/dashboard/client => ./cmd/k8s-dashboard-api/clientwrapper
 replace k8s.io/dashboard/main => ./cmd/k8s-dashboard-api/mainwrapper
-replace k8s.io/dashboard/api/pkg/args => ./cmd/k8s-dashboard-api/argswrapper
