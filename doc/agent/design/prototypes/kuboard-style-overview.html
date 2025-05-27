@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmada Dashboard - 系统概览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#409EFF',
+                        'primary-light': '#66B3FF',
+                        'primary-dark': '#337ECC',
+                        'success': '#67C23A',
+                        'warning': '#E6A23C',
+                        'danger': '#F56C6C',
+                        'info': '#909399',
+                        'light': '#F5F7FA',
+                        'dark': '#1D1E1F'
+                    },
+                    fontFamily: {
+                        'chinese': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(145deg, #2C3E50 0%, #34495E 100%);
+            border-right: 1px solid #E4E7ED;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            background: #F5F7FA;
+            min-height: 100vh;
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 2px 8px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(64, 158, 255, 0.1);
+            color: #409EFF;
+        }
+        
+        .nav-item.active {
+            background: #409EFF;
+            color: white;
+            box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+        }
+        
+        .metric-card {
+            background: white;
+            border: 1px solid #EBEEF5;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(64, 158, 255, 0.15);
+            border-color: #409EFF;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-success { background: #67C23A; }
+        .status-warning { background: #E6A23C; }
+        .status-danger { background: #F56C6C; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .progress-bar {
+            background: #F5F7FA;
+            border-radius: 100px;
+            overflow: hidden;
+            height: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.3s ease;
+        }
+        
+        .resource-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            color: #606266;
+            font-size: 14px;
+        }
+        
+        .breadcrumb-item::after {
+            content: '/';
+            margin: 0 8px;
+            color: #C0C4CC;
+        }
+        
+        .breadcrumb-item:last-child::after {
+            display: none;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: 1px solid;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        
+        .alert-success {
+            background: #F0F9FF;
+            border-color: #D1FAE5;
+            color: #059669;
+        }
+        
+        .alert-warning {
+            background: #FFFBEB;
+            border-color: #FED7AA;
+            color: #D97706;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #EBEEF5;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: #FAFAFA;
+            border-bottom: 1px solid #EBEEF5;
+            padding: 16px 20px;
+            font-weight: 500;
+            color: #303133;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #F2F6FC;
+            transition: background 0.2s ease;
+        }
+        
+        .table-row:hover {
+            background: #F5F7FA;
+        }
+        
+        .cluster-card {
+            background: white;
+            border: 1px solid #EBEEF5;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .cluster-card:hover {
+            border-color: #409EFF;
+            box-shadow: 0 6px 20px 0 rgba(64, 158, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-chinese">
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed left-0 top-0 h-full text-white shadow-xl z-10">
+        <!-- Logo 区域 -->
+        <div class="px-6 py-5 border-b border-gray-600">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-dharmachakra text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-semibold">Karmada Dashboard</h1>
+                    <p class="text-gray-300 text-xs">v1.13.2</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导航菜单 -->
+        <nav class="mt-4 px-2">
+            <div class="mb-4">
+                <a href="#" class="nav-item active flex items-center px-4 py-3 text-sm">
+                    <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+                    <span>系统概览</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-layer-group w-5 mr-3"></i>
+                    <span>工作负载</span>
+                    <i class="fas fa-chevron-down ml-auto text-xs"></i>
+                </a>
+                <div class="ml-8 space-y-1">
+                    <a href="#" class="nav-item flex items-center px-4 py-2 text-xs text-gray-400">
+                        <i class="fas fa-cube w-4 mr-2"></i>
+                        <span>Deployment</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-2 text-xs text-gray-400">
+                        <i class="fas fa-cubes w-4 mr-2"></i>
+                        <span>ReplicaSet</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-2 text-xs text-gray-400">
+                        <i class="fas fa-boxes w-4 mr-2"></i>
+                        <span>StatefulSet</span>
+                    </a>
+                </div>
+                
+                <a href="#" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-network-wired w-5 mr-3"></i>
+                    <span>服务发现</span>
+                    <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-shield-alt w-5 mr-3"></i>
+                    <span>策略管理</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-cogs w-5 mr-3"></i>
+                    <span>集群管理</span>
+                </a>
+            </div>
+            
+            <!-- 集群列表 -->
+            <div class="mt-6">
+                <div class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wide font-medium">
+                    成员集群
+                </div>
+                <a href="#" class="nav-item flex items-center px-4 py-2 text-sm text-gray-300">
+                    <div class="status-dot status-success"></div>
+                    <span class="flex-1">master</span>
+                    <span class="text-xs bg-success px-2 py-1 rounded">Ready</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-4 py-2 text-sm text-gray-300">
+                    <div class="status-dot status-success"></div>
+                    <span class="flex-1">branch</span>
+                    <span class="text-xs bg-success px-2 py-1 rounded">Ready</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 用户信息 -->
+        <div class="absolute bottom-4 left-4 right-4">
+            <div class="bg-gray-700 rounded-lg p-3">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-user text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium">张伟</div>
+                        <div class="text-xs text-gray-400">平台运维工程师</div>
+                    </div>
+                    <i class="fas fa-sign-out-alt text-gray-400 cursor-pointer hover:text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">首页</span>
+                        <span class="breadcrumb-item">系统概览</span>
+                    </div>
+                    <h1 class="text-2xl font-semibold text-gray-800 mt-1">系统概览</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-clock mr-1"></i>
+                        最后更新: 2025-05-20 09:15:34
+                    </div>
+                    <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="p-6">
+            <!-- 系统状态横幅 -->
+            <div class="alert alert-success mb-6">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-lg"></i>
+                    <div>
+                        <div class="font-medium">Karmada 控制面运行正常</div>
+                        <div class="text-sm opacity-80">版本 v1.13.2 | 运行时间 15天 | 管理 2 个成员集群</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心指标 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <!-- 集群数量 -->
+                <div class="metric-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="resource-icon bg-gradient-to-br from-blue-500 to-blue-600">
+                                <i class="fas fa-server"></i>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-gray-800">2</div>
+                            <div class="text-sm text-gray-500">成员集群</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-500" style="width: 100%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>就绪</span>
+                            <span>2/2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 节点数量 -->
+                <div class="metric-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="resource-icon bg-gradient-to-br from-green-500 to-green-600">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-gray-800">9</div>
+                            <div class="text-sm text-gray-500">节点总数</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-green-500" style="width: 89%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>就绪</span>
+                            <span>8/9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pod 数量 -->
+                <div class="metric-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="resource-icon bg-gradient-to-br from-purple-500 to-purple-600">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-gray-800">75</div>
+                            <div class="text-sm text-gray-500">运行 Pod</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-purple-500" style="width: 83%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>运行中</span>
+                            <span>75/90</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 策略数量 -->
+                <div class="metric-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="resource-icon bg-gradient-to-br from-orange-500 to-orange-600">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-gray-800">8</div>
+                            <div class="text-sm text-gray-500">活跃策略</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-orange-500" style="width: 100%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>生效中</span>
+                            <span>8/8</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资源使用情况和集群状态 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- 资源使用趋势 -->
+                <div class="metric-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">资源使用趋势</h3>
+                        <div class="flex space-x-2">
+                            <span class="inline-block w-3 h-3 bg-blue-500 rounded-full"></span>
+                            <span class="text-xs text-gray-500">CPU</span>
+                            <span class="inline-block w-3 h-3 bg-green-500 rounded-full ml-3"></span>
+                            <span class="text-xs text-gray-500">内存</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="resourceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 集群健康状态 -->
+                <div class="metric-card p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">集群健康状态</h3>
+                    <div class="space-y-4">
+                        <!-- Master 集群 -->
+                        <div class="cluster-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center">
+                                    <div class="status-dot status-success"></div>
+                                    <h4 class="font-medium text-gray-800">master</h4>
+                                </div>
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Ready</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                    <div class="text-gray-500">节点</div>
+                                    <div class="font-medium">5/5</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">CPU</div>
+                                    <div class="font-medium">55.6%</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">内存</div>
+                                    <div class="font-medium">53.7%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Branch 集群 -->
+                        <div class="cluster-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center">
+                                    <div class="status-dot status-success"></div>
+                                    <h4 class="font-medium text-gray-800">branch</h4>
+                                </div>
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Ready</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                    <div class="text-gray-500">节点</div>
+                                    <div class="font-medium">4/4</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">CPU</div>
+                                    <div class="font-medium">65.8%</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">内存</div>
+                                    <div class="font-medium">60.3%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近活动 -->
+            <div class="metric-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">最近活动</h3>
+                    <a href="#" class="text-primary text-sm hover:text-primary-dark">查看全部</a>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-plus text-green-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-800">创建 Deployment: nginx-app</div>
+                            <div class="text-xs text-gray-500">2 分钟前 • master 集群</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-sync text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-800">更新 PropagationPolicy: web-policy</div>
+                            <div class="text-xs text-gray-500">15 分钟前 • 全局策略</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-orange-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-800">节点 worker-03 资源使用率较高</div>
+                            <div class="text-xs text-gray-500">1 小时前 • branch 集群</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 初始化资源使用趋势图表
+        const ctx = document.getElementById('resourceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                datasets: [{
+                    label: 'CPU 使用率',
+                    data: [45, 52, 48, 61, 55, 58],
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: '内存使用率',
+                    data: [38, 44, 42, 54, 48, 51],
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

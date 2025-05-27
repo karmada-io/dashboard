@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmada-Manager - 调度可视化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'karmada-blue': '#1B4F72',
+                        'karmada-light': '#3498DB',
+                        'karmada-green': '#27AE60',
+                        'karmada-orange': '#F39C12',
+                        'karmada-red': '#E74C3C'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1B4F72 0%, #2C3E50 100%);
+        }
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+        .cluster-node {
+            transition: all 0.3s ease;
+        }
+        .cluster-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .scheduling-flow {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .replica-indicator {
+            animation: pulse 2s infinite;
+        }
+        .policy-card {
+            border-left: 4px solid #1B4F72;
+            transition: all 0.3s ease;
+        }
+        .policy-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed left-0 top-0 text-white shadow-xl z-10">
+        <div class="p-6 border-b border-blue-600">
+            <div class="flex items-center">
+                <i class="fas fa-cubes text-3xl text-blue-300 mr-3"></i>
+                <div>
+                    <h1 class="text-xl font-bold">Karmada-Manager</h1>
+                    <p class="text-blue-300 text-sm">多集群管理平台</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="mt-6">
+            <a href="overview.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+                <span>系统概览</span>
+            </a>
+            <a href="clusters.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-cubes w-5 mr-3"></i>
+                <span>集群管理</span>
+            </a>
+            <a href="workload-scheduling.html" class="flex items-center px-6 py-3 bg-blue-600 bg-opacity-50 border-r-4 border-blue-300">
+                <i class="fas fa-project-diagram w-5 mr-3"></i>
+                <span class="font-medium">调度可视化</span>
+            </a>
+            <a href="policy-management.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-shield-alt w-5 mr-3"></i>
+                <span>策略管理</span>
+            </a>
+            <div class="px-6 py-2 text-blue-300 text-sm font-medium mt-8">
+                成员集群
+            </div>
+            <a href="cluster-detail.html" class="flex items-center px-6 py-2 hover:bg-blue-600 hover:bg-opacity-30 transition-colors text-sm">
+                <i class="fas fa-server w-4 mr-3 text-green-400"></i>
+                <span>master</span>
+                <span class="ml-auto text-xs bg-green-500 px-2 py-1 rounded">Ready</span>
+            </a>
+            <a href="#" class="flex items-center px-6 py-2 hover:bg-blue-600 hover:bg-opacity-30 transition-colors text-sm">
+                <i class="fas fa-server w-4 mr-3 text-green-400"></i>
+                <span>branch</span>
+                <span class="ml-auto text-xs bg-green-500 px-2 py-1 rounded">Ready</span>
+            </a>
+        </nav>
+
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="bg-blue-600 bg-opacity-30 rounded-lg p-4">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span class="font-medium">张伟</span>
+                </div>
+                <div class="text-blue-300 text-sm">平台运维工程师</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white shadow-sm border-b px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">调度可视化</h2>
+                    <p class="text-gray-600">Karmada 工作负载调度策略和分布情况</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-layer-group mr-2"></i>
+                        <span>活跃工作负载: 12</span>
+                    </div>
+                    <button class="bg-karmada-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>创建策略
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="p-6">
+            <!-- 工作负载选择器 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-search text-karmada-blue mr-2"></i>工作负载选择器
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">工作负载类型</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-karmada-blue">
+                            <option value="">所有类型</option>
+                            <option value="deployment" selected>Deployment</option>
+                            <option value="service">Service</option>
+                            <option value="configmap">ConfigMap</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">命名空间</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-karmada-blue">
+                            <option value="">所有命名空间</option>
+                            <option value="default" selected>default</option>
+                            <option value="kube-system">kube-system</option>
+                            <option value="higress-system">higress-system</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">工作负载名称</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-karmada-blue">
+                            <option value="">选择工作负载</option>
+                            <option value="nginx-deployment" selected>nginx-deployment</option>
+                            <option value="web-server">web-server</option>
+                            <option value="api-gateway">api-gateway</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-end">
+                        <button class="w-full bg-karmada-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>查看调度
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 调度流程可视化 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-route text-karmada-blue mr-2"></i>调度流程可视化 - nginx-deployment
+                </h3>
+
+                <div class="relative">
+                    <!-- 调度流程图 -->
+                    <div class="flex items-center justify-between">
+                        <!-- Karmada 控制面 -->
+                        <div class="text-center">
+                            <div class="w-20 h-20 bg-gradient-to-br from-karmada-blue to-blue-700 rounded-full flex items-center justify-center text-white mb-3 mx-auto">
+                                <i class="fas fa-crown text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800">Karmada</h4>
+                            <p class="text-sm text-gray-600">控制面</p>
+                        </div>
+
+                        <!-- 调度箭头 -->
+                        <div class="flex-1 mx-8">
+                            <div class="relative">
+                                <div class="h-1 bg-gradient-to-r from-karmada-blue to-karmada-green"></div>
+                                <div class="absolute right-0 top-1/2 transform -translate-y-1/2">
+                                    <div class="w-0 h-0 border-l-8 border-l-karmada-green border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+                                </div>
+                                <!-- 调度信息 -->
+                                <div class="absolute top-3 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-3 border border-gray-200">
+                                    <p class="text-xs font-medium text-gray-800 mb-1">PropagationPolicy</p>
+                                    <p class="text-xs text-gray-600">nginx-propagation</p>
+                                    <p class="text-xs text-gray-600 mt-1">副本数: 5</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 成员集群 -->
+                        <div class="flex space-x-6">
+                            <!-- master 集群 -->
+                            <div class="text-center cluster-node cursor-pointer" onclick="viewClusterScheduling('master')">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center text-white mb-2 mx-auto">
+                                    <i class="fas fa-server text-xl"></i>
+                                </div>
+                                <h5 class="font-bold text-gray-800">master</h5>
+                                <p class="text-sm text-gray-600">生产集群</p>
+                                <div class="replica-indicator mt-2 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                    3 副本
+                                </div>
+                            </div>
+
+                            <!-- branch 集群 -->
+                            <div class="text-center cluster-node cursor-pointer" onclick="viewClusterScheduling('branch')">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white mb-2 mx-auto">
+                                    <i class="fas fa-server text-xl"></i>
+                                </div>
+                                <h5 class="font-bold text-gray-800">branch</h5>
+                                <p class="text-sm text-gray-600">开发集群</p>
+                                <div class="replica-indicator mt-2 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                    2 副本
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 调度策略详情和分布统计 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- 调度策略详情 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-cogs text-karmada-blue mr-2"></i>调度策略详情
+                    </h4>
+
+                    <div class="policy-card bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h5 class="font-bold text-gray-800">nginx-propagation</h5>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Active</span>
+                        </div>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">策略类型:</span>
+                                <span>PropagationPolicy</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">资源选择器:</span>
+                                <span>nginx-deployment</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">目标集群:</span>
+                                <span>master, branch</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">分配策略:</span>
+                                <span>Static</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">创建时间:</span>
+                                <span>2025-05-19 14:32:15</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <h6 class="font-medium text-blue-800 mb-2">调度规则</h6>
+                        <ul class="text-sm text-blue-700 space-y-1">
+                            <li>• master 集群: 3 副本 (60%)</li>
+                            <li>• branch 集群: 2 副本 (40%)</li>
+                            <li>• 基于集群标签: environment=production</li>
+                            <li>• 资源需求: CPU 100m, Memory 128Mi</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 分布统计 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-pie text-karmada-blue mr-2"></i>副本分布统计
+                    </h4>
+                    
+                    <div class="mb-6">
+                        <canvas id="replicaDistributionChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
+                                <span class="font-medium">master</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-green-600">3/3</div>
+                                <div class="text-xs text-gray-600">Ready</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full mr-3"></div>
+                                <span class="font-medium">branch</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-blue-600">2/2</div>
+                                <div class="text-xs text-gray-600">Ready</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pod 分布详情 -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h4 class="text-lg font-bold text-gray-800 mb-6">
+                    <i class="fas fa-cubes text-karmada-blue mr-2"></i>Pod 分布详情
+                </h4>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- master 集群 Pod -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h5 class="font-bold text-gray-800">master 集群</h5>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">3 个 Pod</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors" onclick="viewPodTrace('nginx-deployment-7d4f8c6b9-x7k2m')">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cube text-green-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-medium">nginx-deployment-7d4f8c6b9-x7k2m</div>
+                                        <div class="text-sm text-gray-600">节点: m-rke2-worker01</div>
+                                    </div>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cube text-green-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-medium">nginx-deployment-7d4f8c6b9-k9m4n</div>
+                                        <div class="text-sm text-gray-600">节点: m-rke2-worker02</div>
+                                    </div>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cube text-green-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-medium">nginx-deployment-7d4f8c6b9-p6q8r</div>
+                                        <div class="text-sm text-gray-600">节点: m-rke2-worker03</div>
+                                    </div>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- branch 集群 Pod -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h5 class="font-bold text-gray-800">branch 集群</h5>
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">2 个 Pod</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cube text-blue-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-medium">nginx-deployment-7d4f8c6b9-a1b2c</div>
+                                        <div class="text-sm text-gray-600">节点: b-rke2-worker01</div>
+                                    </div>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cube text-blue-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-medium">nginx-deployment-7d4f8c6b9-d3e4f</div>
+                                        <div class="text-sm text-gray-600">节点: b-rke2-worker02</div>
+                                    </div>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 初始化副本分布图表
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('replicaDistributionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['master', 'branch'],
+                    datasets: [{
+                        data: [3, 2],
+                        backgroundColor: [
+                            '#27AE60',
+                            '#3498DB'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // 查看集群调度详情
+        function viewClusterScheduling(clusterName) {
+            alert(`查看 ${clusterName} 集群的调度详情`);
+        }
+
+        // 查看 Pod 调度追溯
+        function viewPodTrace(podName) {
+            if (podName === 'nginx-deployment-7d4f8c6b9-x7k2m') {
+                window.open('pod-trace.html', '_blank');
+            } else {
+                alert(`查看 Pod ${podName} 的调度追溯`);
+            }
+        }
+
+        // 模拟实时更新副本状态
+        setInterval(() => {
+            const indicators = document.querySelectorAll('.replica-indicator');
+            indicators.forEach(indicator => {
+                indicator.style.animation = 'none';
+                setTimeout(() => {
+                    indicator.style.animation = 'pulse 2s infinite';
+                }, 100);
+            });
+        }, 5000);
+    </script>
+</body>
+</html> 

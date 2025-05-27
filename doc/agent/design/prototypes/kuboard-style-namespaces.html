@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmada Dashboard - 命名空间</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#409EFF',
+                        'primary-light': '#66B3FF',
+                        'primary-dark': '#337ECC',
+                        'success': '#67C23A',
+                        'warning': '#E6A23C',
+                        'danger': '#F56C6C',
+                        'info': '#909399'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(145deg, #2C3E50 0%, #34495E 100%);
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            background: #F5F7FA;
+            min-height: 100vh;
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 2px 8px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(64, 158, 255, 0.1);
+            color: #409EFF;
+        }
+        
+        .nav-item.active {
+            background: #409EFF;
+            color: white;
+            box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+        }
+        
+        .resource-card {
+            background: white;
+            border: 1px solid #EBEEF5;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(64, 158, 255, 0.15);
+            border-color: #409EFF;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #F0F9FF;
+            color: #1E40AF;
+            border: 1px solid #DBEAFE;
+        }
+        
+        .status-ready {
+            background: #DCFCE7;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: #409EFF;
+            color: white;
+            border-color: #409EFF;
+        }
+        
+        .btn-primary:hover {
+            background: #337ECC;
+            border-color: #337ECC;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #606266;
+            border-color: #DCDFE6;
+        }
+        
+        .btn-secondary:hover {
+            color: #409EFF;
+            border-color: #409EFF;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #EBEEF5;
+            overflow: hidden;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-header {
+            background: #FAFAFA;
+            border-bottom: 1px solid #EBEEF5;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .table-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-input {
+            background: white;
+            border: 1px solid #DCDFE6;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 250px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #409EFF;
+            box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+        }
+        
+        .resource-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .resource-table th {
+            background: #F8F9FA;
+            padding: 12px 20px;
+            text-align: left;
+            font-weight: 500;
+            color: #303133;
+            font-size: 14px;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        
+        .resource-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #F2F6FC;
+            color: #606266;
+            font-size: 14px;
+        }
+        
+        .resource-table tr:hover {
+            background: #F5F7FA;
+        }
+        
+        .resource-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            color: #606266;
+            font-size: 14px;
+        }
+        
+        .breadcrumb-item::after {
+            content: '/';
+            margin: 0 8px;
+            color: #C0C4CC;
+        }
+        
+        .breadcrumb-item:last-child::after {
+            display: none;
+        }
+        
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #FAFAFA;
+            border-top: 1px solid #EBEEF5;
+        }
+        
+        .pagination-info {
+            color: #606266;
+            font-size: 14px;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #DCDFE6;
+            border-radius: 6px;
+            background: white;
+            color: #606266;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .page-btn:hover {
+            color: #409EFF;
+            border-color: #409EFF;
+        }
+        
+        .page-btn.active {
+            background: #409EFF;
+            color: white;
+            border-color: #409EFF;
+        }
+        
+        .page-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed left-0 top-0 h-full text-white shadow-xl z-10">
+        <!-- Logo 区域 -->
+        <div class="px-6 py-5 border-b border-gray-600">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-dharmachakra text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-semibold">Karmada Dashboard</h1>
+                    <p class="text-gray-300 text-xs">v1.13.2</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导航菜单 -->
+        <nav class="mt-4 px-2">
+            <div class="mb-4">
+                <a href="kuboard-style-overview.html" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+                    <span>系统概览</span>
+                </a>
+                <a href="#" class="nav-item active flex items-center px-4 py-3 text-sm">
+                    <i class="fas fa-layer-group w-5 mr-3"></i>
+                    <span>工作负载</span>
+                    <i class="fas fa-chevron-down ml-auto text-xs"></i>
+                </a>
+                <div class="ml-8 space-y-1">
+                    <a href="#" class="nav-item active flex items-center px-4 py-2 text-xs">
+                        <i class="fas fa-project-diagram w-4 mr-2"></i>
+                        <span>命名空间</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-2 text-xs text-gray-400">
+                        <i class="fas fa-cube w-4 mr-2"></i>
+                        <span>Deployment</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center px-4 py-2 text-xs text-gray-400">
+                        <i class="fas fa-cubes w-4 mr-2"></i>
+                        <span>ReplicaSet</span>
+                    </a>
+                </div>
+                
+                <a href="#" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-network-wired w-5 mr-3"></i>
+                    <span>服务发现</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center px-4 py-3 text-sm text-gray-300">
+                    <i class="fas fa-shield-alt w-5 mr-3"></i>
+                    <span>策略管理</span>
+                </a>
+            </div>
+            
+            <!-- 集群列表 -->
+            <div class="mt-6">
+                <div class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wide font-medium">
+                    成员集群
+                </div>
+                <a href="#" class="nav-item flex items-center px-4 py-2 text-sm text-gray-300">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    <span class="flex-1">master</span>
+                    <span class="text-xs bg-success px-2 py-1 rounded">Ready</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-4 py-2 text-sm text-gray-300">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    <span class="flex-1">branch</span>
+                    <span class="text-xs bg-success px-2 py-1 rounded">Ready</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 用户信息 -->
+        <div class="absolute bottom-4 left-4 right-4">
+            <div class="bg-gray-700 rounded-lg p-3">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-user text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium">张伟</div>
+                        <div class="text-xs text-gray-400">平台运维工程师</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="breadcrumb mb-1">
+                        <span class="breadcrumb-item">工作负载</span>
+                        <span class="breadcrumb-item">命名空间</span>
+                    </div>
+                    <h1 class="text-2xl font-semibold text-gray-800">命名空间</h1>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="action-btn btn-secondary">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                    <button class="action-btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>新增命名空间
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="p-6">
+            <!-- 资源表格 -->
+            <div class="table-container">
+                <!-- 表格头部 -->
+                <div class="table-header">
+                    <h3 class="text-lg font-semibold text-gray-800">命名空间列表</h3>
+                    <div class="table-controls">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input 
+                                type="text" 
+                                placeholder="按名称搜索命名空间..."
+                                class="search-input pl-10"
+                            >
+                        </div>
+                        <select class="search-input w-auto">
+                            <option value="">所有集群</option>
+                            <option value="master">master</option>
+                            <option value="branch">branch</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 表格内容 -->
+                <table class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>命名空间名称</th>
+                            <th>标签</th>
+                            <th>是否跨集群自动调度</th>
+                            <th>运行状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- default 命名空间 -->
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="resource-icon bg-gradient-to-br from-blue-500 to-blue-600 mr-3">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800">default</div>
+                                        <div class="text-xs text-gray-500">kubernetes.io/metadata.name=default</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mr-1">
+                                    component=apiserver
+                                </span>
+                                <span class="text-gray-400">+1</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" style="background: #FEF3C7; color: #D97706; border-color: #FED7AA;">
+                                    no
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td class="text-gray-600">2025-05-19 20:52:48</td>
+                            <td>
+                                <div class="flex items-center space-x-2">
+                                    <button class="text-primary hover:text-primary-dark text-sm">
+                                        <i class="fas fa-eye mr-1"></i>查看
+                                    </button>
+                                    <button class="text-warning hover:text-yellow-600 text-sm">
+                                        <i class="fas fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-danger hover:text-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- karmada-cluster 命名空间 -->
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="resource-icon bg-gradient-to-br from-purple-500 to-purple-600 mr-3">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800">karmada-cluster</div>
+                                        <div class="text-xs text-gray-500">karmada.io/system=true</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mr-1">
+                                    karmada.io/system
+                                </span>
+                                <span class="text-gray-400">+1</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" style="background: #FEF3C7; color: #D97706; border-color: #FED7AA;">
+                                    no
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td class="text-gray-600">2025-05-19 21:18:34</td>
+                            <td>
+                                <div class="flex items-center space-x-2">
+                                    <button class="text-primary hover:text-primary-dark text-sm">
+                                        <i class="fas fa-eye mr-1"></i>查看
+                                    </button>
+                                    <button class="text-warning hover:text-yellow-600 text-sm">
+                                        <i class="fas fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-danger hover:text-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- karmada-es-branch 命名空间 -->
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="resource-icon bg-gradient-to-br from-green-500 to-green-600 mr-3">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800">karmada-es-branch</div>
+                                        <div class="text-xs text-gray-500">karmada.io/system=true</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mr-1">
+                                    karmada.io/system
+                                </span>
+                                <span class="text-gray-400">+1</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" style="background: #FEF3C7; color: #D97706; border-color: #FED7AA;">
+                                    no
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td class="text-gray-600">2025-05-19 21:43:59</td>
+                            <td>
+                                <div class="flex items-center space-x-2">
+                                    <button class="text-primary hover:text-primary-dark text-sm">
+                                        <i class="fas fa-eye mr-1"></i>查看
+                                    </button>
+                                    <button class="text-warning hover:text-yellow-600 text-sm">
+                                        <i class="fas fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-danger hover:text-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- karmada-es-master 命名空间 -->
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="resource-icon bg-gradient-to-br from-orange-500 to-orange-600 mr-3">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800">karmada-es-master</div>
+                                        <div class="text-xs text-gray-500">karmada.io/system=true</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mr-1">
+                                    karmada.io/system
+                                </span>
+                                <span class="text-gray-400">+1</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" style="background: #FEF3C7; color: #D97706; border-color: #FED7AA;">
+                                    no
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td class="text-gray-600">2025-05-19 21:18:34</td>
+                            <td>
+                                <div class="flex items-center space-x-2">
+                                    <button class="text-primary hover:text-primary-dark text-sm">
+                                        <i class="fas fa-eye mr-1"></i>查看
+                                    </button>
+                                    <button class="text-warning hover:text-yellow-600 text-sm">
+                                        <i class="fas fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-danger hover:text-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- karmada-system 命名空间 -->
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="resource-icon bg-gradient-to-br from-indigo-500 to-indigo-600 mr-3">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800">karmada-system</div>
+                                        <div class="text-xs text-gray-500">karmada.io/system=true</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mr-1">
+                                    karmada.io/system
+                                </span>
+                                <span class="text-gray-400">+1</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" style="background: #FEF3C7; color: #D97706; border-color: #FED7AA;">
+                                    no
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td class="text-gray-600">2025-05-19 20:55:06</td>
+                            <td>
+                                <div class="flex items-center space-x-2">
+                                    <button class="text-primary hover:text-primary-dark text-sm">
+                                        <i class="fas fa-eye mr-1"></i>查看
+                                    </button>
+                                    <button class="text-warning hover:text-yellow-600 text-sm">
+                                        <i class="fas fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-danger hover:text-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 分页 -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        显示第 1-8 项，共 8 项结果
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html> 

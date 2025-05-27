@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmada-Manager - 节点详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'karmada-blue': '#1B4F72',
+                        'karmada-light': '#3498DB',
+                        'karmada-green': '#27AE60',
+                        'karmada-orange': '#F39C12',
+                        'karmada-red': '#E74C3C'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1B4F72 0%, #2C3E50 100%);
+        }
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+        .pod-card {
+            transition: all 0.3s ease;
+        }
+        .pod-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            background-color: #1B4F72;
+            color: white;
+        }
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+        .yaml-content {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed left-0 top-0 text-white shadow-xl z-10">
+        <div class="p-6 border-b border-blue-600">
+            <div class="flex items-center">
+                <i class="fas fa-cubes text-3xl text-blue-300 mr-3"></i>
+                <div>
+                    <h1 class="text-xl font-bold">Karmada-Manager</h1>
+                    <p class="text-blue-300 text-sm">多集群管理平台</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="mt-6">
+            <a href="overview.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+                <span>系统概览</span>
+            </a>
+            <a href="clusters.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-cubes w-5 mr-3"></i>
+                <span>集群管理</span>
+            </a>
+            <a href="workload-scheduling.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-project-diagram w-5 mr-3"></i>
+                <span>调度可视化</span>
+            </a>
+            <a href="policy-management.html" class="flex items-center px-6 py-3 hover:bg-blue-600 hover:bg-opacity-30 transition-colors">
+                <i class="fas fa-shield-alt w-5 mr-3"></i>
+                <span>策略管理</span>
+            </a>
+            <div class="px-6 py-2 text-blue-300 text-sm font-medium mt-8">
+                成员集群
+            </div>
+            <a href="cluster-detail.html" class="flex items-center px-6 py-2 hover:bg-blue-600 hover:bg-opacity-30 transition-colors text-sm">
+                <i class="fas fa-server w-4 mr-3 text-green-400"></i>
+                <span>master</span>
+                <span class="ml-auto text-xs bg-green-500 px-2 py-1 rounded">Ready</span>
+            </a>
+            <a href="#" class="flex items-center px-6 py-2 hover:bg-blue-600 hover:bg-opacity-30 transition-colors text-sm">
+                <i class="fas fa-server w-4 mr-3 text-green-400"></i>
+                <span>branch</span>
+                <span class="ml-auto text-xs bg-green-500 px-2 py-1 rounded">Ready</span>
+            </a>
+        </nav>
+
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="bg-blue-600 bg-opacity-30 rounded-lg p-4">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span class="font-medium">张伟</span>
+                </div>
+                <div class="text-blue-300 text-sm">平台运维工程师</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white shadow-sm border-b px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="cluster-detail.html" class="text-karmada-blue hover:text-blue-700 mr-4">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">节点详情</h2>
+                        <p class="text-gray-600">m-rke2-master01.example.com - Control Plane 节点</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center text-sm text-green-600">
+                        <div class="status-indicator w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                        <span>Ready</span>
+                    </div>
+                    <button class="bg-karmada-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="p-6">
+            <!-- 节点基本信息 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-server text-karmada-blue mr-2"></i>节点基本信息
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">节点名称</h5>
+                        <p class="text-lg font-bold text-gray-800">m-rke2-master01.example.com</p>
+                        <div class="flex items-center mt-1">
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Control Plane</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">节点状态</h5>
+                        <div class="flex items-center">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Ready</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">MemoryPressure: False</p>
+                        <p class="text-xs text-gray-500">DiskPressure: False</p>
+                        <p class="text-xs text-gray-500">PIDPressure: False</p>
+                    </div>
+
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">IP 地址</h5>
+                        <p class="text-sm text-gray-800 font-mono">10.10.103.101</p>
+                        <p class="text-xs text-gray-500 mt-1">内部地址</p>
+                    </div>
+
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">创建时间</h5>
+                        <p class="text-sm text-gray-800">2025-05-19 13:18:34</p>
+                        <p class="text-xs text-gray-500">15小时前</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资源利用率 -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800">CPU</h4>
+                        <i class="fas fa-microchip text-2xl text-orange-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-orange-600">42.8%</p>
+                        <p class="text-sm text-gray-600">1710m / 4000m</p>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mt-2">
+                            <div class="bg-orange-500 h-3 rounded-full" style="width: 42.8%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">总容量: 4 核</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800">内存</h4>
+                        <i class="fas fa-memory text-2xl text-red-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-red-600">45.8%</p>
+                        <p class="text-sm text-gray-600">1.8G / 3.9G</p>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mt-2">
+                            <div class="bg-red-500 h-3 rounded-full" style="width: 45.8%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">可分配: 3.9G</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800">Pod</h4>
+                        <i class="fas fa-cube text-2xl text-purple-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-purple-600">17.3%</p>
+                        <p class="text-sm text-gray-600">19 / 110</p>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mt-2">
+                            <div class="bg-purple-500 h-3 rounded-full" style="width: 17.3%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">最大 Pod: 110</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800">存储</h4>
+                        <i class="fas fa-hdd text-2xl text-blue-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-blue-600">78.2%</p>
+                        <p class="text-sm text-gray-600">19.5G / 25G</p>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mt-2">
+                            <div class="bg-blue-500 h-3 rounded-full" style="width: 78.2%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">可用空间: 5.5G</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系统信息 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-info-circle text-karmada-blue mr-2"></i>系统信息
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">操作系统</h5>
+                        <p class="text-sm text-gray-800">linux</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">架构</h5>
+                        <p class="text-sm text-gray-800">amd64</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">Kubernetes 版本</h5>
+                        <p class="text-sm text-gray-800">v1.30.11+rke2r1</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">容器运行时</h5>
+                        <p class="text-sm text-gray-800">containerd://1.7.21-k3s2</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">内核版本</h5>
+                        <p class="text-sm text-gray-800">5.10.134-18.an8.x86_64</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">Kube-Proxy 版本</h5>
+                        <p class="text-sm text-gray-800">v1.30.11+rke2r1</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 标签页导航 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="border-b border-gray-200">
+                    <nav class="flex">
+                        <button onclick="showTab('pods')" class="tab-button active px-6 py-3 text-sm font-medium border-r border-gray-200 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-cube mr-2"></i>Pod 列表 (19)
+                        </button>
+                        <button onclick="showTab('conditions')" class="tab-button px-6 py-3 text-sm font-medium border-r border-gray-200 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-heartbeat mr-2"></i>节点状态
+                        </button>
+                        <button onclick="showTab('labels')" class="tab-button px-6 py-3 text-sm font-medium border-r border-gray-200 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-tags mr-2"></i>标签与注解
+                        </button>
+                        <button onclick="showTab('yaml')" class="tab-button px-6 py-3 text-sm font-medium hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-code mr-2"></i>YAML 配置
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Pod 列表标签页 -->
+                <div id="pods" class="tab-content active p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Pod 卡片 1 -->
+                        <div class="pod-card bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer" onclick="viewPodDetail('higress-gateway-68d974f7b5-cbd59')">
+                            <div class="flex items-center justify-between mb-3">
+                                <h6 class="font-bold text-gray-800 truncate">higress-gateway-68d974f7b5-cbd59</h6>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">命名空间:</span>
+                                    <span>higress-system</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">重启次数:</span>
+                                    <span>0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">CPU 请求:</span>
+                                    <span>100m</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">内存请求:</span>
+                                    <span>128Mi</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">运行时间:</span>
+                                    <span>15h</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pod 卡片 2 -->
+                        <div class="pod-card bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer">
+                            <div class="flex items-center justify-between mb-3">
+                                <h6 class="font-bold text-gray-800 truncate">higress-console-86f7d78bb9-k9xpr</h6>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">命名空间:</span>
+                                    <span>higress-system</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">重启次数:</span>
+                                    <span>0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">CPU 请求:</span>
+                                    <span>10m</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">内存请求:</span>
+                                    <span>128Mi</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">运行时间:</span>
+                                    <span>15h</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pod 卡片 3 -->
+                        <div class="pod-card bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer">
+                            <div class="flex items-center justify-between mb-3">
+                                <h6 class="font-bold text-gray-800 truncate">etcd-m-rke2-master01</h6>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Running</span>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">命名空间:</span>
+                                    <span>kube-system</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">重启次数:</span>
+                                    <span>0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">CPU 请求:</span>
+                                    <span>100m</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">内存请求:</span>
+                                    <span>100Mi</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">运行时间:</span>
+                                    <span>15h</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 更多 Pod 提示 -->
+                        <div class="col-span-full text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                            <i class="fas fa-ellipsis-h text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-600">显示 3 / 19 个 Pod</p>
+                            <button class="text-karmada-blue hover:underline mt-2">查看全部 Pod</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 节点状态标签页 -->
+                <div id="conditions" class="tab-content p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                                <div>
+                                    <h6 class="font-medium text-green-800">Ready</h6>
+                                    <p class="text-sm text-green-600">kubelet is posting ready status</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-green-600">True</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-times-circle text-gray-500 text-xl mr-3"></i>
+                                <div>
+                                    <h6 class="font-medium text-gray-800">MemoryPressure</h6>
+                                    <p class="text-sm text-gray-600">kubelet has sufficient memory available</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-600">False</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-times-circle text-gray-500 text-xl mr-3"></i>
+                                <div>
+                                    <h6 class="font-medium text-gray-800">DiskPressure</h6>
+                                    <p class="text-sm text-gray-600">kubelet has no disk pressure</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-600">False</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-times-circle text-gray-500 text-xl mr-3"></i>
+                                <div>
+                                    <h6 class="font-medium text-gray-800">PIDPressure</h6>
+                                    <p class="text-sm text-gray-600">kubelet has sufficient PID available</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-600">False</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签与注解标签页 -->
+                <div id="labels" class="tab-content p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="text-lg font-bold mb-4">标签 (Labels)</h5>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">beta.kubernetes.io/arch</span>
+                                    <span class="text-sm text-gray-600">amd64</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">beta.kubernetes.io/os</span>
+                                    <span class="text-sm text-gray-600">linux</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">kubernetes.io/arch</span>
+                                    <span class="text-sm text-gray-600">amd64</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">kubernetes.io/hostname</span>
+                                    <span class="text-sm text-gray-600">m-rke2-master01</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">kubernetes.io/os</span>
+                                    <span class="text-sm text-gray-600">linux</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">node-role.kubernetes.io/control-plane</span>
+                                    <span class="text-sm text-gray-600">true</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">node-role.kubernetes.io/master</span>
+                                    <span class="text-sm text-gray-600">true</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                    <span class="text-sm font-medium">node.kubernetes.io/instance-type</span>
+                                    <span class="text-sm text-gray-600">k3s</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="text-lg font-bold mb-4">注解 (Annotations)</h5>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-gray-50 rounded">
+                                    <div class="text-sm font-medium mb-1">node.alpha.kubernetes.io/ttl</div>
+                                    <div class="text-xs text-gray-600 font-mono">0</div>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded">
+                                    <div class="text-sm font-medium mb-1">volumes.kubernetes.io/controller-managed-attach-detach</div>
+                                    <div class="text-xs text-gray-600 font-mono">true</div>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded">
+                                    <div class="text-sm font-medium mb-1">rke2.io/internal-ip</div>
+                                    <div class="text-xs text-gray-600 font-mono">10.10.103.101</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YAML 配置标签页 -->
+                <div id="yaml" class="tab-content p-6">
+                    <div class="yaml-content">
+<pre class="text-sm">apiVersion: v1
+kind: Node
+metadata:
+  annotations:
+    node.alpha.kubernetes.io/ttl: "0"
+    volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    rke2.io/internal-ip: 10.10.103.101
+  creationTimestamp: "2025-05-19T05:18:34Z"
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: m-rke2-master01
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/control-plane: "true"
+    node-role.kubernetes.io/master: "true"
+    node.kubernetes.io/instance-type: k3s
+  name: m-rke2-master01.example.com
+  resourceVersion: "508142"
+  uid: d4c8c0a8-4d5e-4f6g-7h8i-9j0k1l2m3n4o
+spec:
+  podCIDR: 10.42.0.0/24
+  podCIDRs:
+  - 10.42.0.0/24
+status:
+  addresses:
+  - address: 10.10.103.101
+    type: InternalIP
+  - address: m-rke2-master01.example.com
+    type: Hostname
+  allocatable:
+    cpu: "4"
+    ephemeral-storage: 20959212Ki
+    hugepages-1Gi: "0"
+    hugepages-2Mi: "0"
+    memory: 3998456Ki
+    pods: "110"
+  capacity:
+    cpu: "4"
+    ephemeral-storage: 25406624Ki
+    hugepages-1Gi: "0"
+    hugepages-2Mi: "0"
+    memory: 4101056Ki
+    pods: "110"</pre>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 标签页切换
+        function showTab(tabId) {
+            // 隐藏所有标签页内容
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // 移除所有标签按钮的激活状态
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // 显示选中的标签页
+            document.getElementById(tabId).classList.add('active');
+            
+            // 激活选中的标签按钮
+            event.target.closest('.tab-button').classList.add('active');
+        }
+
+        // 查看 Pod 详情
+        function viewPodDetail(podName) {
+            if (podName === 'higress-gateway-68d974f7b5-cbd59') {
+                window.open('pod-trace.html', '_blank');
+            } else {
+                alert(`查看 Pod ${podName} 详情`);
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认显示 Pod 列表标签页
+            showTab('pods');
+        });
+    </script>
+</body>
+</html> 
