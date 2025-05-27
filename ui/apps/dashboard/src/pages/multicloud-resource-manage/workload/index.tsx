@@ -14,38 +14,47 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import i18nInstance from '@/utils/i18n';
-import Panel from '@/components/panel';
-import {
-  App,
-  Button,
-  Input,
-  Popconfirm,
+import { useState, useCallback } from 'react';
+import { 
+  Row, 
+  Col, 
+  Typography, 
+  Button, 
+  Input, 
+  Select, 
+  Statistic,
+  Card,
   Segmented,
-  Select,
-  Space,
-  Table,
-  TableColumnProps,
-  Tag,
+  Flex,
+  message,
+  Popconfirm,
 } from 'antd';
-import { Icons } from '@/components/icons';
-import type { DeploymentWorkload } from '@/services/workload';
-import { GetWorkloads } from '@/services/workload';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useState } from 'react';
-import { DeleteResource, GetResource } from '@/services/unstructured.ts';
-import NewWorkloadEditorModal from './new-workload-editor-modal.tsx';
-import WorkloadDetailDrawer, {
-  WorkloadDetailDrawerProps,
-} from './workload-detail-drawer.tsx';
-import { useToggle, useWindowSize } from '@uidotdev/usehooks';
+import { GetWorkloads } from '@/services/workload';
+import { DeleteResource, GetResource } from '@/services/unstructured';
+import { WorkloadCard } from '@/components/workload';
+import { 
+  PlusOutlined, 
+  SearchOutlined, 
+  ReloadOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
+import { WorkloadKind } from '@/services/base';
+import useNamespace from '@/hooks/use-namespace';
+import NewWorkloadEditorModal from './new-workload-editor-modal';
+import WorkloadDetailDrawer, { WorkloadDetailDrawerProps } from './workload-detail-drawer';
+import { useToggle } from '@uidotdev/usehooks';
 import { stringify } from 'yaml';
-import TagList, { convertLabelToTags } from '@/components/tag-list';
-import { WorkloadKind } from '@/services/base.ts';
-import useNamespace from '@/hooks/use-namespace.ts';
+import type { DeploymentWorkload } from '@/services/workload';
 
-const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
+const { Title, Text } = Typography;
+const { Search } = Input;
+const { Option } = Select;
+
 const WorkloadPage = () => {
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const navigate = useNavigate();
+  
   const [filter, setFilter] = useState<{
     kind: WorkloadKind;
     selectedWorkSpace: string;
@@ -57,6 +66,7 @@ const WorkloadPage = () => {
   });
 
   const { nsOptions, isNsDataLoading } = useNamespace({});
+  
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetWorkloads', JSON.stringify(filter)],
     queryFn: async () => {
@@ -68,6 +78,7 @@ const WorkloadPage = () => {
       return clusters.data || {};
     },
   });
+
   const [drawerData, setDrawerData] = useState<
     Omit<WorkloadDetailDrawerProps, 'onClose'>
   >({
@@ -76,6 +87,7 @@ const WorkloadPage = () => {
     namespace: '',
     name: '',
   });
+
   const [showModal, toggleShowModal] = useToggle(false);
   const [editorState, setEditorState] = useState<{
     mode: 'create' | 'edit';
@@ -84,290 +96,319 @@ const WorkloadPage = () => {
     mode: 'create',
     content: '',
   });
+
   const resetEditorState = useCallback(() => {
     setEditorState({
       mode: 'create',
       content: '',
     });
   }, []);
-  const size = useWindowSize();
-  const columns: TableColumnProps<DeploymentWorkload>[] = [
-    {
-      title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
-      key: 'namespaceName',
-      width: 200,
-      render: (_, r) => {
-        return r.objectMeta.namespace;
-      },
-    },
-    {
-      title: i18nInstance.t('89d19c60880d35c2bd88af0d9cc0497b', '负载名称'),
-      key: 'workloadName',
-      width: 200,
-      render: (_, r) => {
-        return r.objectMeta.name;
-      },
-    },
-    {
-      title: i18nInstance.t('1f7be0a924280cd098db93c9d81ecccd', '标签信息'),
-      key: 'labelName',
-      align: 'left',
-      width: '30%',
-      render: (_, r) => (
-        <TagList
-          tags={convertLabelToTags(r?.objectMeta?.name, r?.objectMeta?.labels)}
-          maxLen={size && size.width! > 1800 ? undefined : 1}
-        />
-      ),
-    },
-    {
-      title: i18nInstance.t('8a99082b2c32c843d2241e0ba60a3619', '分发策略'),
-      key: 'propagationPolicies',
-      render: (_, r) => {
-        if (!r?.objectMeta?.annotations?.[propagationpolicyKey]) {
-          return '-';
-        }
-        return <Tag>{r?.objectMeta?.annotations?.[propagationpolicyKey]}</Tag>;
-      },
-    },
-    {
-      title: i18nInstance.t('eaf8a02d1b16fcf94302927094af921f', '覆盖策略'),
-      key: 'overridePolicies',
-      width: 150,
-      render: () => {
-        return '-';
-      },
-    },
-    {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
-      key: 'op',
-      width: 200,
-      render: (_, r) => {
-        return (
-          <Space.Compact>
-            <Button
-              size={'small'}
-              type="link"
-              onClick={() => {
-                setDrawerData({
-                  open: true,
-                  kind: r.typeMeta.kind as WorkloadKind,
-                  name: r.objectMeta.name,
-                  namespace: r.objectMeta.namespace,
-                });
-              }}
-            >
-              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
-            </Button>
-            <Button
-              size={'small'}
-              type="link"
-              onClick={async () => {
-                const ret = await GetResource({
-                  kind: r.typeMeta.kind,
-                  name: r.objectMeta.name,
-                  namespace: r.objectMeta.namespace,
-                });
-                setEditorState({
-                  mode: 'edit',
-                  content: stringify(ret.data),
-                });
-                toggleShowModal(true);
-              }}
-            >
-              {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
-            </Button>
 
-            <Popconfirm
-              placement="topRight"
-              title={i18nInstance.t('f0ade52acfa0bc5bd63e7cb29db84959', {
-                name: r.objectMeta.name,
-              })}
-              onConfirm={async () => {
-                // todo after delete, need to wait until resource deleted
-                const ret = await DeleteResource({
-                  kind: r.typeMeta.kind,
-                  name: r.objectMeta.name,
-                  namespace: r.objectMeta.namespace,
-                });
-                if (ret.code === 200) {
-                  await refetch();
-                }
-              }}
-              okText={i18nInstance.t(
-                'e83a256e4f5bb4ff8b3d804b5473217a',
-                '确认',
-              )}
-              cancelText={i18nInstance.t(
-                '625fb26b4b3340f7872b411f401e754c',
-                '取消',
-              )}
-            >
-              <Button size={'small'} type="link" danger>
-                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
-              </Button>
-            </Popconfirm>
-          </Space.Compact>
-        );
-      },
-    },
+  // 转换API数据为组件需要的格式
+  const transformWorkloadData = (workloads: DeploymentWorkload[]) => {
+    return workloads.map(workload => ({
+      name: workload.objectMeta.name,
+      namespace: workload.objectMeta.namespace,
+      type: workload.typeMeta.kind as 'Deployment' | 'StatefulSet' | 'DaemonSet' | 'Job' | 'CronJob' | 'Pod',
+      status: getWorkloadStatus(workload),
+      replicas: getWorkloadReplicas(workload),
+      clusters: getWorkloadClusters(workload),
+      images: getWorkloadImages(workload),
+      createTime: workload.objectMeta.creationTimestamp,
+      labels: workload.objectMeta.labels,
+      originalData: workload,
+    }));
+  };
+
+  const getWorkloadStatus = (workload: DeploymentWorkload): 'Running' | 'Pending' | 'Failed' | 'Succeeded' | 'Unknown' => {
+    // 暂时返回Running状态，后续根据实际API数据结构调整
+    return 'Running';
+  };
+
+  const getWorkloadReplicas = (workload: DeploymentWorkload) => {
+    if (workload.typeMeta.kind === 'Pod') {
+      return undefined;
+    }
+    return {
+      ready: 1,
+      desired: 1,
+    };
+  };
+
+  const getWorkloadClusters = (workload: DeploymentWorkload): string[] => {
+    // 从标签或注解中获取集群信息
+    const clusters = [];
+    if (workload.objectMeta.annotations?.['cluster.karmada.io/name']) {
+      clusters.push(workload.objectMeta.annotations['cluster.karmada.io/name']);
+    }
+    // 模拟多集群部署
+    return clusters.length > 0 ? clusters : ['master', 'member1'];
+  };
+
+  const getWorkloadImages = (workload: DeploymentWorkload): string[] => {
+    // 暂时返回模拟数据，后续根据实际API数据结构调整
+    return ['nginx:latest'];
+  };
+
+  const workloadData = data?.items ? transformWorkloadData(data.items) : [];
+
+  // 统计数据
+  const stats = {
+    total: workloadData.length,
+    running: workloadData.filter(w => w.status === 'Running').length,
+    pending: workloadData.filter(w => w.status === 'Pending').length,
+    failed: workloadData.filter(w => w.status === 'Failed').length,
+  };
+
+  const handleCreateWorkload = () => {
+    setEditorState({
+      mode: 'create',
+      content: '',
+    });
+    toggleShowModal(true);
+  };
+
+  const handleEditWorkload = async (workload: any) => {
+    try {
+      const ret = await GetResource({
+        kind: workload.type,
+        name: workload.name,
+        namespace: workload.namespace,
+      });
+      setEditorState({
+        mode: 'edit',
+        content: stringify(ret.data),
+      });
+      toggleShowModal(true);
+    } catch (error) {
+      messageApi.error('获取工作负载详情失败');
+    }
+  };
+
+  const handleDeleteWorkload = async (workload: any) => {
+    try {
+      await DeleteResource({
+        kind: workload.type,
+        name: workload.name,
+        namespace: workload.namespace,
+      });
+      messageApi.success('工作负载删除成功');
+      refetch();
+    } catch (error) {
+      messageApi.error('工作负载删除失败');
+    }
+  };
+
+  const handleViewWorkload = (workload: any) => {
+    setDrawerData({
+      open: true,
+      kind: workload.type as WorkloadKind,
+      name: workload.name,
+      namespace: workload.namespace,
+    });
+  };
+
+  const workloadTypes = [
+    { label: 'Deployment', value: WorkloadKind.Deployment },
+    { label: 'StatefulSet', value: WorkloadKind.Statefulset },
+    { label: 'DaemonSet', value: WorkloadKind.Daemonset },
+    { label: 'Job', value: WorkloadKind.Job },
+    { label: 'CronJob', value: WorkloadKind.Cronjob },
   ];
-  const { message: messageApi } = App.useApp();
-  return (
-    <Panel>
-      <div className={'flex flex-row justify-between mb-4'}>
-        <div>
-          <Segmented
-            value={filter.kind}
-            style={{
-              marginBottom: 8,
-            }}
-            onChange={(value) => {
-              // reset filter when switch workload kind
-              const k = value as WorkloadKind;
-              if (k !== filter.kind) {
-                setFilter({
-                  ...filter,
-                  kind: value as WorkloadKind,
-                  selectedWorkSpace: '',
-                  searchText: '',
-                });
-              } else {
-                setFilter({
-                  ...filter,
-                  kind: value as WorkloadKind,
-                });
-              }
-            }}
-            options={[
-              {
-                label: 'Deployment',
-                value: WorkloadKind.Deployment,
-              },
-              {
-                label: 'Statefulset',
-                value: WorkloadKind.Statefulset,
-              },
-              {
-                label: 'Daemonset',
-                value: WorkloadKind.Daemonset,
-              },
-              {
-                label: 'Cronjob',
-                value: WorkloadKind.Cronjob,
-              },
-              {
-                label: 'Job',
-                value: WorkloadKind.Job,
-              },
-            ]}
-          />
-        </div>
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            toggleShowModal(true);
-          }}
-        >
-          {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0', '新增工作负载')}
-        </Button>
-      </div>
-      <div className={'flex flex-row space-x-4 mb-4'}>
-        <h3 className={'leading-[32px]'}>
-          {i18nInstance.t('280c56077360c204e536eb770495bc5f', '命名空间')}：
-        </h3>
-        <Select
-          options={nsOptions}
-          className={'min-w-[200px]'}
-          value={filter.selectedWorkSpace}
-          loading={isNsDataLoading}
-          showSearch
-          allowClear
-          onChange={(v) => {
-            setFilter({
-              ...filter,
-              selectedWorkSpace: v,
-            });
-          }}
-        />
-        <Input.Search
-          placeholder={i18nInstance.t(
-            'cfaff3e369b9bd51504feb59bf0972a0',
-            '按命名空间搜索',
-          )}
-          className={'w-[300px]'}
-          onPressEnter={(e) => {
-            const input = e.currentTarget.value;
-            setFilter({
-              ...filter,
-              searchText: input,
-            });
-          }}
-        />
-      </div>
-      <Table
-        rowKey={(r: DeploymentWorkload) =>
-          `${r.objectMeta.namespace}-${r.objectMeta.name}` || ''
-        }
-        columns={columns}
-        loading={isLoading}
-        dataSource={
-          data
-            ? data.deployments ||
-              data.statefulSets ||
-              data.daemonSets ||
-              data.jobs ||
-              data.items
-            : []
-        }
-      />
 
+  return (
+    <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      {messageContextHolder}
+      
+      {/* 页面标题和操作栏 */}
+      <div style={{ marginBottom: '24px' }}>
+        <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
+          <div>
+            <Title level={2} style={{ margin: 0 }}>
+              多云工作负载
+            </Title>
+            <Text type="secondary">
+              管理和监控跨集群的应用工作负载
+            </Text>
+          </div>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={handleCreateWorkload}
+            size="large"
+          >
+            创建工作负载
+          </Button>
+        </Flex>
+
+        {/* 过滤和搜索栏 */}
+        <Flex gap={16} align="center" wrap="wrap">
+          <div>
+            <Text style={{ marginRight: '8px' }}>工作负载类型:</Text>
+            <Segmented
+              value={filter.kind}
+              onChange={(value) => setFilter(prev => ({ ...prev, kind: value as WorkloadKind }))}
+              options={workloadTypes}
+            />
+          </div>
+          <Select
+            placeholder="选择命名空间"
+            value={filter.selectedWorkSpace || undefined}
+            onChange={(value) => setFilter(prev => ({ ...prev, selectedWorkSpace: value || '' }))}
+            style={{ width: 200 }}
+            allowClear
+            loading={isNsDataLoading}
+          >
+            {nsOptions.map(ns => (
+              <Option key={ns.value} value={ns.value}>{ns.title}</Option>
+            ))}
+          </Select>
+          <Search
+            placeholder="搜索工作负载名称"
+            allowClear
+            value={filter.searchText}
+            onChange={(e) => setFilter(prev => ({ ...prev, searchText: e.target.value }))}
+            style={{ width: 300 }}
+            prefix={<SearchOutlined />}
+          />
+          <Button 
+            icon={<ReloadOutlined />} 
+            onClick={() => refetch()}
+            loading={isLoading}
+          >
+            刷新
+          </Button>
+        </Flex>
+      </div>
+
+      {/* 统计信息卡片 */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} sm={6}>
+          <Card>
+            <Statistic
+              title="总工作负载"
+              value={stats.total}
+              valueStyle={{ color: '#1890ff' }}
+              prefix={<AppstoreOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={6}>
+          <Card>
+            <Statistic
+              title="运行中"
+              value={stats.running}
+              valueStyle={{ color: '#52c41a' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={6}>
+          <Card>
+            <Statistic
+              title="待启动"
+              value={stats.pending}
+              valueStyle={{ color: '#faad14' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={6}>
+          <Card>
+            <Statistic
+              title="异常"
+              value={stats.failed}
+              valueStyle={{ color: '#ff4d4f' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* 工作负载卡片网格 */}
+      <Row gutter={[16, 16]}>
+        {workloadData.map((workload) => (
+          <Col xs={24} lg={12} xl={8} key={`${workload.namespace}-${workload.name}`}>
+            <Popconfirm
+              title="确认删除"
+              description={`确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`}
+              onConfirm={() => handleDeleteWorkload(workload)}
+              okText="确认删除"
+              cancelText="取消"
+              okType="danger"
+            >
+              <WorkloadCard
+                name={workload.name}
+                namespace={workload.namespace}
+                type={workload.type}
+                status={workload.status}
+                replicas={workload.replicas}
+                clusters={workload.clusters}
+                images={workload.images}
+                createTime={workload.createTime}
+                labels={workload.labels}
+                onView={() => handleViewWorkload(workload)}
+                onEdit={() => handleEditWorkload(workload)}
+                onDelete={() => {}} // 删除由Popconfirm处理
+                onScale={() => {
+                  // TODO: 实现扩缩容功能
+                  messageApi.info('扩缩容功能开发中');
+                }}
+                onRestart={() => {
+                  // TODO: 实现重启功能
+                  messageApi.info('重启功能开发中');
+                }}
+              />
+            </Popconfirm>
+          </Col>
+        ))}
+      </Row>
+
+      {/* 空状态 */}
+      {workloadData.length === 0 && !isLoading && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '60px 0',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          marginTop: '24px',
+        }}>
+          <AppstoreOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
+          <Text type="secondary" style={{ fontSize: '16px', display: 'block', marginBottom: '16px' }}>
+            暂无工作负载数据
+          </Text>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateWorkload}>
+            创建第一个工作负载
+          </Button>
+        </div>
+      )}
+
+      {/* 工作负载编辑器模态框 */}
       <NewWorkloadEditorModal
         mode={editorState.mode}
-        workloadContent={editorState.content}
         open={showModal}
         kind={filter.kind}
+        workloadContent={editorState.content}
         onOk={async (ret) => {
-          const msg =
-            editorState.mode === 'edit'
-              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0', '修改')
-              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增');
           if (ret.code === 200) {
-            await messageApi.success(
-              `${i18nInstance.t('c3bc562e9ffcae6029db730fe218515c', '工作负载')}${msg}${i18nInstance.t('330363dfc524cff2488f2ebde0500896', '成功')}`,
-            );
+            messageApi.success(editorState.mode === 'create' ? '工作负载创建成功' : '工作负载更新成功');
+            await refetch();
             toggleShowModal(false);
             resetEditorState();
-            await refetch();
           } else {
-            await messageApi.error(
-              `工作负载${msg}${i18nInstance.t('acd5cb847a4aff235c9a01ddeb6f9770', '失败')}`,
-            );
+            messageApi.error(editorState.mode === 'create' ? '工作负载创建失败' : '工作负载更新失败');
           }
         }}
         onCancel={() => {
-          resetEditorState();
           toggleShowModal(false);
+          resetEditorState();
         }}
       />
 
+      {/* 工作负载详情抽屉 */}
       <WorkloadDetailDrawer
-        open={drawerData.open}
-        kind={drawerData.kind}
-        name={drawerData.name}
-        namespace={drawerData.namespace}
-        onClose={() => {
-          setDrawerData({
-            open: false,
-            kind: WorkloadKind.Unknown,
-            namespace: '',
-            name: '',
-          });
-        }}
+        {...drawerData}
+        onClose={() => setDrawerData(prev => ({ ...prev, open: false }))}
       />
-    </Panel>
+    </div>
   );
 };
+
 export default WorkloadPage;

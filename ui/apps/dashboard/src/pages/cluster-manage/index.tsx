@@ -14,52 +14,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import i18nInstance from '@/utils/i18n';
-import Panel from '@/components/panel';
-import { useQuery } from '@tanstack/react-query';
-import { GetClusters } from '@/services';
-import {
-  Cluster,
-  ClusterDetail,
-  DeleteCluster,
-  GetClusterDetail,
-} from '@/services/cluster';
-import {
-  Badge,
-  Tag,
-  Table,
-  TableColumnProps,
-  Progress,
-  Space,
-  Button,
-  Input,
-  message,
-  Popconfirm,
-} from 'antd';
-import { Icons } from '@/components/icons';
-import NewClusterModal from './new-cluster-modal';
 import { useState } from 'react';
-function getPercentColor(v: number): string {
-  // 0~60 #52C41A
-  // 60~80 #FAAD14
-  // > 80 #F5222D
-  if (v <= 60) {
-    return '#52C41A';
-  } else if (v <= 80) {
-    return '#FAAD14';
-  } else {
-    return '#F5222D';
-  }
-}
+import { 
+  Row, 
+  Col, 
+  Typography, 
+  Button, 
+  Input, 
+  Statistic,
+  Card,
+  message,
+  Select,
+  Flex,
+} from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import { GetClusters, DeleteCluster, GetClusterDetail } from '@/services/cluster';
+import { ClusterCard } from '@/components/cluster';
+import { PlusOutlined, SearchOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import NewClusterModal from './new-cluster-modal';
+import type { Cluster, ClusterDetail } from '@/services/cluster';
+
+
+const { Title, Text } = Typography;
+const { Search } = Input;
+const { Option } = Select;
+
 const ClusterManagePage = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ['GetClusters'],
-    queryFn: async () => {
-      const ret = await GetClusters();
-      return ret.data;
-    },
-  });
+  const navigate = useNavigate();
+  
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [clusterModalData, setModalData] = useState<{
     mode: 'create' | 'edit';
     open: boolean;
@@ -68,245 +54,238 @@ const ClusterManagePage = () => {
     mode: 'create',
     open: false,
   });
-  const columns: TableColumnProps<Cluster>[] = [
-    {
-      title: i18nInstance.t('c3f28b34bbdec501802fa403584267e6', '集群名称'),
-      key: 'clusterName',
-      width: 150,
-      render: (_, r) => {
-        r.ready;
-        return r.objectMeta.name;
-      },
-    },
-    {
-      title: i18nInstance.t(
-        'bd17297989ec345cbc03ae0b8a13dc0a',
-        'kubernetes版本',
-      ),
-      dataIndex: 'kubernetesVersion',
-      key: 'kubernetesVersion',
-      width: 150,
-      align: 'center',
-    },
-    {
-      title: i18nInstance.t('ee00813361387a116d274c608ba8bb13', '集群状态'),
-      dataIndex: 'ready',
-      key: 'ready',
-      align: 'center',
-      width: 150,
-      render: (v) => {
-        if (v) {
-          return (
-            <Badge
-              color={'green'}
-              text={
-                <span
-                  style={{
-                    color: '#52c41a',
-                  }}
-                >
-                  ready
-                </span>
-              }
-            />
-          );
-        } else {
-          return (
-            <Badge
-              color={'red'}
-              text={
-                <span
-                  style={{
-                    color: '#f5222d',
-                  }}
-                >
-                  not ready
-                </span>
-              }
-            />
-          );
-        }
-      },
-    },
-    {
-      title: i18nInstance.t('f0789e79d48f135e5d870753f7a85d05', '模式'),
-      dataIndex: 'syncMode',
-      width: 150,
-      align: 'center',
-      render: (v) => {
-        if (v === 'Push') {
-          return <Tag color={'gold'}>{v}</Tag>;
-        } else {
-          return <Tag color={'blue'}>{v}</Tag>;
-        }
-      },
-    },
-    {
-      title: i18nInstance.t('b86224e030e5948f96b70a4c3600b33f', '节点状态'),
-      dataIndex: 'nodeStatus',
-      align: 'center',
-      width: 150,
-      render: (_, r) => {
-        if (r.nodeSummary) {
-          const { totalNum, readyNum } = r.nodeSummary;
-          return (
-            <>
-              {readyNum}/{totalNum}
-            </>
-          );
-        }
-        return '-';
-      },
-    },
-    {
-      title: i18nInstance.t('763a78a5fc84dbca6f0137a591587f5f', 'cpu用量'),
-      dataIndex: 'cpuFraction',
-      width: '15%',
-      render: (_, r) => {
-        const fraction = parseFloat(
-          r.allocatedResources.cpuFraction.toFixed(2),
-        );
-        return (
-          <Progress
-            percent={fraction}
-            strokeColor={getPercentColor(fraction)}
-          />
-        );
-      },
-    },
-    {
-      title: i18nInstance.t('8b2e672e8b847415a47cc2dd25a87a07', 'memory用量'),
-      dataIndex: 'memoryFraction',
-      width: '15%',
-      render: (_, r) => {
-        const fraction = parseFloat(
-          r.allocatedResources.memoryFraction.toFixed(2),
-        );
-        return (
-          <Progress
-            percent={fraction}
-            strokeColor={getPercentColor(fraction)}
-          />
-        );
-      },
-    },
-    {
-      title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
-      key: 'op',
-      width: 200,
-      render: (_, r) => {
-        return (
-          <Space.Compact>
-            <Button size={'small'} type="link" disabled>
-              {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
-            </Button>
-            <Button
-              size={'small'}
-              type="link"
-              onClick={async () => {
-                const ret = await GetClusterDetail(r.objectMeta.name);
-                setModalData({
-                  open: true,
-                  mode: 'edit',
-                  clusterDetail: ret.data,
-                });
-              }}
-            >
-              {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
-            </Button>
-            <Popconfirm
-              placement="topRight"
-              title={i18nInstance.t('30ee910e8ea18311b1b2efbea94333b8', {
-                name: r.objectMeta.name,
-              })}
-              onConfirm={async () => {
-                const ret = await DeleteCluster(r.objectMeta.name);
-                if (ret.code === 200) {
-                  await messageApi.success(
-                    i18nInstance.t('fb09e53e96ff76a72894a816dd7c731c', {
-                      name: r.objectMeta.name,
-                    }),
-                  );
-                  await refetch();
-                } else {
-                  await messageApi.error(
-                    i18nInstance.t(
-                      '9e7856e9c5938b9200dbdc174e97cf8a',
-                      '集群删除失败',
-                    ),
-                  );
-                }
-              }}
-              okText={i18nInstance.t(
-                'e83a256e4f5bb4ff8b3d804b5473217a',
-                '确认',
-              )}
-              cancelText={i18nInstance.t(
-                '625fb26b4b3340f7872b411f401e754c',
-                '取消',
-              )}
-            >
-              <Button size={'small'} type="link" danger>
-                {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
-              </Button>
-            </Popconfirm>
-          </Space.Compact>
-        );
-      },
-    },
-  ];
-  return (
-    <Panel>
-      <div className={'flex flex-row justify-between mb-4'}>
-        <Input.Search
-          placeholder={i18nInstance.t(
-            'e8d235e76b8e310660e158dc4c2fd560',
-            '按集群名称搜索',
-          )}
-          className={'w-[400px]'}
-        />
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            setModalData({
-              mode: 'create',
-              open: true,
-            });
-          }}
-        >
-          {i18nInstance.t('4cd980b26c5c76cdd4a5c5e44064d6da', '新增集群')}
-        </Button>
-      </div>
-      <Table
-        rowKey={(r: Cluster) => r.objectMeta.name || ''}
-        columns={columns}
-        loading={isLoading}
-        dataSource={data?.clusters || []}
-      />
 
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['GetClusters'],
+    queryFn: async () => {
+      const ret = await GetClusters();
+      return ret.data;
+    },
+  });
+
+  // 转换API数据为组件需要的格式
+  const transformClusterData = (clusters: Cluster[]) => {
+    return clusters.map(cluster => ({
+      name: cluster.objectMeta.name,
+      status: cluster.ready ? 'ready' as const : 'notReady' as const,
+      kubernetesVersion: cluster.kubernetesVersion,
+      syncMode: cluster.syncMode as 'Push' | 'Pull',
+      nodeStatus: {
+        ready: cluster.nodeSummary?.readyNum || 0,
+        total: cluster.nodeSummary?.totalNum || 0,
+      },
+      resources: {
+        cpu: {
+          used: cluster.allocatedResources?.cpuFraction ? 
+            (cluster.allocatedResources.cpuFraction / 100) * (cluster.allocatedResources.cpuCapacity || 0) : 0,
+          total: cluster.allocatedResources?.cpuCapacity || 0,
+          percentage: cluster.allocatedResources?.cpuFraction || 0,
+        },
+        memory: {
+          used: cluster.allocatedResources?.memoryFraction ? 
+            (cluster.allocatedResources.memoryFraction / 100) * (cluster.allocatedResources.memoryCapacity || 0) / (1024 * 1024 * 1024) : 0,
+          total: (cluster.allocatedResources?.memoryCapacity || 0) / (1024 * 1024 * 1024),
+          percentage: cluster.allocatedResources?.memoryFraction || 0,
+        },
+        pods: {
+          used: cluster.allocatedResources?.allocatedPods || 0,
+          total: cluster.allocatedResources?.podCapacity || 0,
+          percentage: cluster.allocatedResources?.podFraction || 0,
+        },
+      },
+      createTime: cluster.objectMeta.creationTimestamp,
+      originalData: cluster,
+    }));
+  };
+
+  const clusterData = data ? transformClusterData(data.clusters || []) : [];
+
+  // 过滤集群数据
+  const filteredClusters = clusterData.filter(cluster => {
+    const matchesSearch = cluster.name.toLowerCase().includes(searchText.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || cluster.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // 统计数据
+  const stats = {
+    total: clusterData.length,
+    ready: clusterData.filter(c => c.status === 'ready').length,
+    notReady: clusterData.filter(c => c.status === 'notReady').length,
+  };
+
+  const handleCreateCluster = () => {
+    setModalData({
+      mode: 'create',
+      open: true,
+    });
+  };
+
+  const handleEditCluster = async (clusterName: string) => {
+    try {
+      const detail = await GetClusterDetail(clusterName);
+      setModalData({
+        mode: 'edit',
+        open: true,
+        clusterDetail: detail.data,
+      });
+    } catch (error) {
+      messageApi.error('获取集群详情失败');
+    }
+  };
+
+  const handleDeleteCluster = async (clusterName: string) => {
+    try {
+      await DeleteCluster(clusterName);
+      messageApi.success('集群删除成功');
+      refetch();
+    } catch (error) {
+      messageApi.error('集群删除失败');
+    }
+  };
+
+
+
+  return (
+    <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      {messageContextHolder}
+      
+      {/* 页面标题和操作栏 */}
+      <div style={{ marginBottom: '24px' }}>
+        <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
+          <div>
+            <Title level={2} style={{ margin: 0 }}>
+              集群管理
+            </Title>
+            <Text type="secondary">
+              管理和监控所有成员集群
+            </Text>
+          </div>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={handleCreateCluster}
+            size="large"
+          >
+            添加集群
+          </Button>
+        </Flex>
+
+        {/* 搜索和过滤栏 */}
+        <Flex gap={16} align="center">
+          <Search
+            placeholder="搜索集群名称"
+            allowClear
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 300 }}
+            prefix={<SearchOutlined />}
+          />
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: 120 }}
+          >
+            <Option value="all">全部状态</Option>
+            <Option value="ready">Ready</Option>
+            <Option value="notReady">Not Ready</Option>
+          </Select>
+          <Button 
+            icon={<ReloadOutlined />} 
+            onClick={() => refetch()}
+            loading={isLoading}
+          >
+            刷新
+          </Button>
+        </Flex>
+      </div>
+
+      {/* 统计信息卡片 */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} sm={8}>
+          <Card>
+            <Statistic
+              title="总集群数"
+              value={stats.total}
+              valueStyle={{ color: '#1890ff' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card>
+            <Statistic
+              title="正常集群"
+              value={stats.ready}
+              valueStyle={{ color: '#52c41a' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card>
+            <Statistic
+              title="异常集群"
+              value={stats.notReady}
+              valueStyle={{ color: '#ff4d4f' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* 集群卡片网格 */}
+      <Row gutter={[16, 16]}>
+        {filteredClusters.map((cluster) => (
+          <Col xs={24} lg={12} xl={8} key={cluster.name}>
+            <ClusterCard
+              name={cluster.name}
+              status={cluster.status}
+              kubernetesVersion={cluster.kubernetesVersion}
+              syncMode={cluster.syncMode}
+              nodeStatus={cluster.nodeStatus}
+              resources={cluster.resources}
+              createTime={cluster.createTime}
+              onView={() => navigate(`/cluster-manage/clusters/${cluster.name}`)}
+              onEdit={() => handleEditCluster(cluster.name)}
+              onManage={() => navigate(`/cluster-manage/clusters/${cluster.name}/nodes`)}
+                             onDelete={() => handleDeleteCluster(cluster.name)}
+            />
+          </Col>
+        ))}
+      </Row>
+
+      {/* 空状态 */}
+      {filteredClusters.length === 0 && !isLoading && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '60px 0',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          marginTop: '24px',
+        }}>
+          <Text type="secondary" style={{ fontSize: '16px' }}>
+            {searchText || statusFilter !== 'all' ? '没有找到匹配的集群' : '暂无集群数据'}
+          </Text>
+          {!searchText && statusFilter === 'all' && (
+            <div style={{ marginTop: '16px' }}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateCluster}>
+                添加第一个集群
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 新建/编辑集群模态框 */}
       <NewClusterModal
         mode={clusterModalData.mode}
         open={clusterModalData.open}
         onOk={async (ret) => {
           if (ret.code === 200) {
             if (clusterModalData.mode === 'create') {
-              await messageApi.success(
-                i18nInstance.t(
-                  'dca2754f7a646ef40f495f75145428d0',
-                  '集群接入成功',
-                ),
-              );
+              messageApi.success('集群接入成功');
             } else if (clusterModalData.mode === 'edit') {
-              await messageApi.success(
-                i18nInstance.t(
-                  '474162cdce4e540d3a4d97c6de92cd68',
-                  '集群更新成功',
-                ),
-              );
+              messageApi.success('集群更新成功');
             }
-            await refetch();
+            refetch();
             setModalData({
               clusterDetail: undefined,
               mode: 'create',
@@ -314,19 +293,9 @@ const ClusterManagePage = () => {
             });
           } else {
             if (clusterModalData.mode === 'create') {
-              await messageApi.error(
-                i18nInstance.t(
-                  '3b0b5df2e18ef97b7f948c60906a7821',
-                  '集群接入失败',
-                ),
-              );
+              messageApi.error('集群接入失败');
             } else if (clusterModalData.mode === 'edit') {
-              await messageApi.error(
-                i18nInstance.t(
-                  '01812e386ab69ce4391769918e32d6d1',
-                  '集群更新失败',
-                ),
-              );
+              messageApi.error('集群更新失败');
             }
           }
         }}
@@ -339,9 +308,8 @@ const ClusterManagePage = () => {
         }}
         clusterDetail={clusterModalData.clusterDetail}
       />
-
-      {messageContextHolder}
-    </Panel>
+    </div>
   );
 };
+
 export default ClusterManagePage;

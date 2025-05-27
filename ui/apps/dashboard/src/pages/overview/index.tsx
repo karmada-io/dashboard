@@ -14,12 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import i18nInstance from '@/utils/i18n';
-import Panel from '@/components/panel';
-import { Badge, Descriptions, DescriptionsProps, Statistic, Spin } from 'antd';
+import React from 'react';
+import { Row, Col, Typography, Space, Divider, Card } from 'antd';
 import { useQuery } from '@tanstack/react-query';
-import { GetOverview } from '@/services/overview.ts';
+import { GetOverview } from '@/services/overview';
+import { GetClusters } from '@/services/cluster';
+import { StatusCard, ResourceUsage, ClusterOverview, ResourceRadialOverview } from '@/components/dashboard';
+import { 
+  CloudServerOutlined, 
+  ClusterOutlined, 
+  SettingOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
+import i18nInstance from '@/utils/i18n';
+
+const { Title, Text } = Typography;
 
 const Overview = () => {
   const { data, isLoading } = useQuery({
@@ -29,203 +39,184 @@ const Overview = () => {
       return ret.data;
     },
   });
-  const basicItems: DescriptionsProps['items'] = [
-    {
-      key: 'karmada-version',
-      label: i18nInstance.t('66e8579fa53a0cdf402e882a3574a380', 'Karmada版本'),
-      children: data?.karmadaInfo.version.gitVersion || '-',
+
+  // 获取成员集群列表用于集群状态概览
+  const { data: clusterListData, isLoading: clusterListLoading } = useQuery({
+    queryKey: ['GetClusters'],
+    queryFn: async () => {
+      const ret = await GetClusters();
+      return ret.data;
     },
-    {
-      key: 'karmada-status',
-      label: i18nInstance.t('3fea7ca76cdece641436d7ab0d02ab1b', '状态'),
-      children:
-        data?.karmadaInfo.status === 'running' ? (
-          <Badge
-            color={'green'}
-            text={i18nInstance.t('d679aea3aae1201e38c4baaaeef86efe', '运行中')}
-          />
-        ) : (
-          <Badge
-            color={'red'}
-            text={i18nInstance.t(
-              '903b25f64e1c0d9b7f56ed80c256a2e7',
-              '未知状态',
-            )}
-          />
-        ),
-    },
-    {
-      key: 'karmada-create-time',
-      label: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
-      children:
-        (data?.karmadaInfo.createTime &&
-          dayjs(data?.karmadaInfo.createTime).format('YYYY-MM-DD HH:mm:ss')) ||
-        '-',
-    },
-    {
-      key: 'cluster-info',
-      label: i18nInstance.t('a0d6cb39b547d45a530a3308dce79c86', '工作集群信息'),
-      children: (
-        <>
-          <div>
-            <span>
-              {i18nInstance.t('6860e13ac48e930f8076ebfe37176b78', '节点数量')}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus.nodeSummary.readyNum}/
-              {data?.memberClusterStatus.nodeSummary.totalNum}
-            </span>
-          </div>
-          <div>
-            <span>
-              {i18nInstance.t(
-                'a1dacced95ddca3603110bdb1ae46af1',
-                'CPU使用情况',
-              )}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus.cpuSummary.allocatedCPU &&
-                data?.memberClusterStatus.cpuSummary.allocatedCPU.toFixed(2)}
-              /{data?.memberClusterStatus.cpuSummary.totalCPU}
-            </span>
-          </div>
-          <div>
-            <span>
-              {i18nInstance.t(
-                '5eaa09de6e55b322fcc299f641d73ce7',
-                'Memory使用情况',
-              )}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus?.memorySummary?.allocatedMemory &&
-                (
-                  data.memberClusterStatus.memorySummary.allocatedMemory /
-                  8 /
-                  1024 /
-                  1024
-                ).toFixed(2)}
-              GiB /
-              {data?.memberClusterStatus?.memorySummary?.totalMemory &&
-                data.memberClusterStatus.memorySummary.totalMemory /
-                  8 /
-                  1024 /
-                  1024}
-              GiB
-            </span>
-          </div>
-          <div>
-            <span>
-              {i18nInstance.t(
-                '820c4003e23553b3124f1608916d5282',
-                'Pod分配情况',
-              )}
-            </span>
-            ：
-            <span>
-              {data?.memberClusterStatus?.podSummary?.allocatedPod}/
-              {data?.memberClusterStatus?.podSummary?.totalPod}
-            </span>
-          </div>
-        </>
-      ),
+  });
 
-      span: 3,
-    },
-  ];
+  // 转换集群列表数据为组件需要的格式
+  const transformClusterData = () => {
+    if (!clusterListData?.clusters) return [];
+    
+    return clusterListData.clusters.map(cluster => ({
+      name: cluster.objectMeta.name,
+      status: cluster.ready ? 'ready' as const : 'notReady' as const,
+      nodes: {
+        ready: cluster.nodeSummary?.readyNum || 0,
+        total: cluster.nodeSummary?.totalNum || 0,
+      },
+      cpu: {
+        used: (cluster.allocatedResources?.cpuCapacity || 0) * (cluster.allocatedResources?.cpuFraction || 0) / 100,
+        total: cluster.allocatedResources?.cpuCapacity || 0,
+      },
+      memory: {
+        used: (cluster.allocatedResources?.memoryCapacity || 0) * (cluster.allocatedResources?.memoryFraction || 0) / 100 / (1024 * 1024 * 1024),
+        total: (cluster.allocatedResources?.memoryCapacity || 0) / (1024 * 1024 * 1024),
+      },
+      pods: {
+        used: cluster.allocatedResources?.allocatedPods || 0,
+        total: cluster.allocatedResources?.podCapacity || 0,
+      },
+      version: cluster.kubernetesVersion,
+      syncMode: cluster.syncMode,
+    }));
+  };
 
-  const resourceItems: DescriptionsProps['items'] = [
-    {
-      key: 'policy-info',
-      label: i18nInstance.t('85c6051762df2fe8f93ebc1083b7f6a4', '策略信息'),
-      children: (
-        <div className="flex flex-row space-x-4">
-          <Statistic
-            title={i18nInstance.t(
-              'a95abe7b8eeb55427547e764bf39f1c4',
-              '调度策略',
-            )}
-            value={data?.clusterResourceStatus.propagationPolicyNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '0a7e9443c41575378d2db1e288d3f1cb',
-              '差异化策略',
-            )}
-            value={data?.clusterResourceStatus.overridePolicyNum}
-          />
-        </div>
-      ),
-
-      span: 3,
-    },
-    {
-      key: 'multicloud-resources-info',
-      label: i18nInstance.t('612af712ef5ed7868a6b2f1d3d68530c', '多云资源信息'),
-      children: (
-        <div className="flex flex-row space-x-4">
-          <Statistic
-            title={i18nInstance.t(
-              '1200778cf86309309154ef88804fa22e',
-              '多云命名空间',
-            )}
-            value={data?.clusterResourceStatus.namespaceNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '3692cf6a2e079d34e7e5035aa98b1335',
-              '多云工作负载',
-            )}
-            value={data?.clusterResourceStatus.workloadNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '2030a6e845ad6476fecbc1711c9f139d',
-              '多云服务与路由',
-            )}
-            value={data?.clusterResourceStatus.serviceNum}
-          />
-
-          <Statistic
-            title={i18nInstance.t(
-              '0287028ec7eefa1333b56ee340d325a0',
-              '多云配置与秘钥',
-            )}
-            value={data?.clusterResourceStatus.configNum}
-          />
-        </div>
-      ),
-
-      span: 3,
-    },
-  ];
+  const clusterData = transformClusterData();
 
   return (
-    <Spin spinning={isLoading}>
-      <Panel>
-        <Descriptions
-          className={'mt-8'}
-          title={i18nInstance.t('9e5ffa068ed435ced73dc9bf5dd8e09c', '基本信息')}
-          bordered
-          items={basicItems}
-        />
+    <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      {/* 页面标题 */}
+      <div style={{ marginBottom: '24px' }}>
+        <Title level={2} style={{ margin: 0, color: '#000000d9' }}>
+          Karmada-Manager 概览
+        </Title>
+        <Text type="secondary">
+          多云应用管理平台总控面板 - 最后更新: {dayjs().format('YYYY-MM-DD HH:mm:ss')}
+        </Text>
+      </div>
 
-        <Descriptions
-          className={'mt-8'}
-          title={i18nInstance.t('ba584c3d8a7e637efe00449e0c93900c', '资源信息')}
-          bordered
-          items={resourceItems}
-          labelStyle={{
-            width: i18nInstance.language === 'en-US' ? '200px' : '150px',
+      {/* Karmada控制面状态卡片 */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} sm={12} lg={8}>
+          <StatusCard
+            title="Karmada版本"
+            value={data?.karmadaInfo?.version?.gitVersion || 'v1.13.2'}
+            status="info"
+            icon={<CloudServerOutlined style={{ fontSize: '16px' }} />}
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <StatusCard
+            title="运行状态"
+            value={data?.karmadaInfo?.status === 'running' ? '运行中' : '未知状态'}
+            status={data?.karmadaInfo?.status === 'running' ? 'success' : 'warning'}
+            icon={<ClusterOutlined style={{ fontSize: '16px' }} />}
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <StatusCard
+            title="运行时长"
+            value={data?.karmadaInfo?.createTime ? dayjs().diff(dayjs(data.karmadaInfo.createTime), 'day') : 0}
+            suffix="天"
+            description={data?.karmadaInfo?.createTime ? 
+              `创建于 ${dayjs(data.karmadaInfo.createTime).format('YYYY-MM-DD')}` : 
+              '创建时间未知'
+            }
+            status="info"
+            loading={isLoading}
+          />
+        </Col>
+      </Row>
+
+      {/* 成员集群资源概览 */}
+      <div style={{ marginBottom: '24px' }}>
+        <Title level={3} style={{ marginBottom: '16px', color: '#000000d9' }}>
+          成员集群资源概览
+        </Title>
+        <ResourceRadialOverview
+          nodeStats={{
+            used: data?.memberClusterStatus?.nodeSummary?.readyNum || 0,
+            total: data?.memberClusterStatus?.nodeSummary?.totalNum || 0,
           }}
+          cpuStats={{
+            used: data?.memberClusterStatus?.cpuSummary?.allocatedCPU || 0,
+            total: data?.memberClusterStatus?.cpuSummary?.totalCPU || 0,
+          }}
+          memoryStats={{
+            used: (data?.memberClusterStatus?.memorySummary?.allocatedMemory || 0) / (1024 * 1024 * 1024),
+            total: (data?.memberClusterStatus?.memorySummary?.totalMemory || 0) / (1024 * 1024 * 1024),
+          }}
+          podStats={{
+            used: data?.memberClusterStatus?.podSummary?.allocatedPod || 0,
+            total: data?.memberClusterStatus?.podSummary?.totalPod || 0,
+          }}
+          loading={isLoading}
         />
-      </Panel>
-    </Spin>
+      </div>
+
+      {/* 策略和资源统计 */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} lg={12}>
+          <Card 
+            title="策略信息" 
+            style={{ borderRadius: '8px', height: '200px' }}
+            bodyStyle={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', fontWeight: 600, color: '#1890ff', marginBottom: '8px' }}>
+                {data?.clusterResourceStatus?.propagationPolicyNum || 0}
+              </div>
+              <Text type="secondary">调度策略</Text>
+            </div>
+            <Divider type="vertical" style={{ height: '60px' }} />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', fontWeight: 600, color: '#52c41a', marginBottom: '8px' }}>
+                {data?.clusterResourceStatus?.overridePolicyNum || 0}
+              </div>
+              <Text type="secondary">差异化策略</Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card 
+            title="多云资源信息" 
+            style={{ borderRadius: '8px', height: '200px' }}
+            bodyStyle={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', alignItems: 'center' }}
+          >
+            <div style={{ textAlign: 'center', margin: '8px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: '#722ed1', marginBottom: '4px' }}>
+                {data?.clusterResourceStatus?.namespaceNum || 0}
+              </div>
+              <Text type="secondary" style={{ fontSize: '12px' }}>命名空间</Text>
+            </div>
+            <div style={{ textAlign: 'center', margin: '8px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: '#fa541c', marginBottom: '4px' }}>
+                {data?.clusterResourceStatus?.workloadNum || 0}
+              </div>
+              <Text type="secondary" style={{ fontSize: '12px' }}>工作负载</Text>
+            </div>
+            <div style={{ textAlign: 'center', margin: '8px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: '#13c2c2', marginBottom: '4px' }}>
+                {data?.clusterResourceStatus?.serviceNum || 0}
+              </div>
+              <Text type="secondary" style={{ fontSize: '12px' }}>服务与路由</Text>
+            </div>
+            <div style={{ textAlign: 'center', margin: '8px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: '#faad14', marginBottom: '4px' }}>
+                {data?.clusterResourceStatus?.configNum || 0}
+              </div>
+              <Text type="secondary" style={{ fontSize: '12px' }}>配置与秘钥</Text>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* 集群状态概览表格 */}
+      <div>
+        <Title level={3} style={{ marginBottom: '16px', color: '#000000d9' }}>
+          集群状态概览
+        </Title>
+        <ClusterOverview data={clusterData} loading={clusterListLoading} />
+      </div>
+    </div>
   );
 };
 
