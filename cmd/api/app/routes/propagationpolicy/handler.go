@@ -178,6 +178,7 @@ func handleDeletePropagationPolicy(c *gin.Context) {
 func init() {
 	r := router.V1()
 	r.GET("/propagationpolicy", handleGetPropagationPolicyList)
+	r.GET("/propagationpolicies", handleGetPropagationPolicyList)  // 添加复数形式
 	r.GET("/propagationpolicy/namespace/:namespace/:propagationPolicyName", handleGetPropagationPolicyDetail)
 	r.POST("/propagationpolicy", handlePostPropagationPolicy)
 	r.PUT("/propagationpolicy", handlePutPropagationPolicy)

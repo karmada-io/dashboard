@@ -17,18 +17,63 @@ limitations under the License.
 package node
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/resource/node"
+	enhancednode "github.com/karmada-io/dashboard/pkg/resource/node"
 )
 
-func handleGetClusterNode(c *gin.Context) {
-	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
+func handleGetMemberNodes(c *gin.Context) {
+	clusterName := c.Param("clustername")
+	memberClient := client.InClusterClientForMemberCluster(clusterName)
+	if memberClient == nil {
+		common.Fail(c, fmt.Errorf("failed to get client for cluster %s", clusterName))
+		return
+	}
+
 	dataSelect := common.ParseDataSelectPathParameter(c)
-	result, err := node.GetNodeList(memberClient, dataSelect)
+	result, err := enhancednode.GetEnhancedNodeList(memberClient, clusterName, dataSelect)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
+	common.Success(c, result)
+}
+
+func handleGetMemberNodeDetail(c *gin.Context) {
+	clusterName := c.Param("clustername")
+	nodeName := c.Param("name")
+
+	memberClient := client.InClusterClientForMemberCluster(clusterName)
+	if memberClient == nil {
+		common.Fail(c, fmt.Errorf("failed to get client for cluster %s", clusterName))
+		return
+	}
+
+	result, err := enhancednode.GetEnhancedNodeDetail(memberClient, clusterName, nodeName)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
+	common.Success(c, result)
+}
+
+func handleGetMemberNodePods(c *gin.Context) {
+	clusterName := c.Param("clustername")
+	nodeName := c.Param("name")
+
+	memberClient := client.InClusterClientForMemberCluster(clusterName)
+	if memberClient == nil {
+		common.Fail(c, fmt.Errorf("failed to get client for cluster %s", clusterName))
+		return
+	}
+
+	dataSelect := common.ParseDataSelectPathParameter(c)
+	result, err := enhancednode.GetPodsOnNode(memberClient, nodeName, dataSelect)
 	if err != nil {
 		common.Fail(c, err)
 		return
@@ -38,5 +83,7 @@ func handleGetClusterNode(c *gin.Context) {
 
 func init() {
 	r := router.MemberV1()
-	r.GET("/node", handleGetClusterNode)
+	r.GET("/nodes", handleGetMemberNodes)
+	r.GET("/nodes/:name", handleGetMemberNodeDetail)
+	r.GET("/nodes/:name/pods", handleGetMemberNodePods)
 }

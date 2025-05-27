@@ -237,6 +237,8 @@ func init() {
 	r := router.V1()
 	r.GET("/cluster", handleGetClusterList)
 	r.GET("/cluster/:name", handleGetClusterDetail)
+	r.GET("/clusters", handleGetClusterList)  // 添加复数形式路由
+	r.GET("/clusters/:name", handleGetClusterDetail)
 	r.POST("/cluster", handlePostCluster)
 	r.PUT("/cluster/:name", handlePutCluster)
 	r.DELETE("/cluster/:name", handleDeleteCluster)

@@ -94,6 +94,7 @@ func handlePostClusterPropagationPolicy(c *gin.Context) {
 func init() {
 	r := router.V1()
 	r.GET("/clusterpropagationpolicy", handleGetClusterPropagationPolicyList)
+	r.GET("/clusterpropagationpolicies", handleGetClusterPropagationPolicyList)  // 添加复数形式
 	r.GET("/clusterpropagationpolicy/:clusterPropagationPolicyName", handleGetClusterPropagationPolicyDetail)
 	r.POST("/clusterpropagationpolicy", handlePostClusterPropagationPolicy)
 }

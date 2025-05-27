@@ -94,6 +94,7 @@ func handlePostClusterOverridePolicy(c *gin.Context) {
 func init() {
 	r := router.V1()
 	r.GET("/clusteroverridepolicy", handleGetClusterOverridePolicyList)
+	r.GET("/clusteroverridepolicies", handleGetClusterOverridePolicyList)  // 添加复数形式
 	r.GET("/clusteroverridepolicy/:clusterOverridePolicyName", handleGetClusterOverridePolicyDetail)
 	r.POST("/clusteroverridepolicy", handlePostClusterOverridePolicy)
 }

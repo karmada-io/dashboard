@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pod
+package service
 
 import (
 	"github.com/gin-gonic/gin"
@@ -22,15 +22,15 @@ import (
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
-	"github.com/karmada-io/dashboard/pkg/resource/pod"
+	"github.com/karmada-io/dashboard/pkg/resource/service"
 )
 
-// return a pods list
-func handleGetMemberPod(c *gin.Context) {
+// return a services list
+func handleGetMemberService(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	nsQuery := common.ParseNamespacePathParameter(c)
-	result, err := pod.GetPodList(memberClient, nsQuery, dataSelect)
+	result, err := service.GetServiceList(memberClient, nsQuery, dataSelect)
 	if err != nil {
 		common.Fail(c, err)
 		return
@@ -38,12 +38,12 @@ func handleGetMemberPod(c *gin.Context) {
 	common.Success(c, result)
 }
 
-// return a pod detail
-func handleGetMemberPodDetail(c *gin.Context) {
+// return a service detail
+func handleGetMemberServiceDetail(c *gin.Context) {
 	memberClient := client.InClusterClientForMemberCluster(c.Param("clustername"))
 	namespace := c.Param("namespace")
 	name := c.Param("name")
-	result, err := pod.GetPodDetail(memberClient, namespace, name)
+	result, err := service.GetServiceDetail(memberClient, namespace, name)
 	if err != nil {
 		common.Fail(c, err)
 		return
@@ -53,8 +53,8 @@ func handleGetMemberPodDetail(c *gin.Context) {
 
 func init() {
 	r := router.MemberV1()
-	r.GET("/pod", handleGetMemberPod)
-	r.GET("/pods", handleGetMemberPod)  // 添加复数形式
-	r.GET("/pod/:namespace", handleGetMemberPod)
-	r.GET("/pod/:namespace/:name", handleGetMemberPodDetail)
+	r.GET("/service", handleGetMemberService)
+	r.GET("/services", handleGetMemberService) // 复数形式
+	r.GET("/service/:namespace", handleGetMemberService)
+	r.GET("/service/:namespace/:name", handleGetMemberServiceDetail)
 }

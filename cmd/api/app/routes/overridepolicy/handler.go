@@ -178,6 +178,7 @@ func handleDeleteOverridePolicy(c *gin.Context) {
 func init() {
 	r := router.V1()
 	r.GET("/overridepolicy", handleGetOverridePolicyList)
+	r.GET("/overridepolicies", handleGetOverridePolicyList)  // 添加复数形式
 	r.GET("/overridepolicy/:namespace", handleGetOverridePolicyList)
 	r.GET("/overridepolicy/namespace/:namespace/:overridePolicyName", handleGetOverridePolicyDetail)
 	r.POST("/overridepolicy", handlePostOverridePolicy)
