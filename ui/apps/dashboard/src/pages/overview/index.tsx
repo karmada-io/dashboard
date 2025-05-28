@@ -454,29 +454,36 @@ const KarmadaControlPlaneCenter: React.FC<{
       }, index: number) => {
         /**
          * 节点位置计算逻辑详解：
-         * 1. 总节点数：nodeInfo.length（当前为9个节点）
-         * 2. 角度计算：每个节点占据 360° / 总节点数 的角度
-         * 3. 起始角度：-π/2（从12点钟方向开始，即正上方）
-         * 4. 半径：280px（固定像素值，确保节点距离中心足够远）
-         * 5. 坐标系：以容器中心(50%, 50%)为原点
-         * 6. 最终位置：中心点 + 半径 * (cos(角度), sin(角度))
+         * 1. 将9个节点分成两组：左侧5个，右侧4个
+         * 2. 左侧节点：索引0-4，显示在左边红框区域
+         * 3. 右侧节点：索引5-8，显示在右边红框区域
+         * 4. 每个区域内节点垂直均分排列
          */
         
-        const totalNodes = nodeInfo.length; // 总节点数量
+        const totalNodes = nodeInfo.length; // 总节点数量 9
+        const leftSideCount = 5; // 左侧显示5个节点
+        const rightSideCount = totalNodes - leftSideCount; // 右侧显示4个节点
         
-        // 计算当前节点的角度（弧度制）
-        // 从正上方开始(-π/2)，按顺时针方向均匀分布
-        const angleInRadians = (index / totalNodes) * 2 * Math.PI - Math.PI / 2;
+        let positionX, positionY;
         
-        // 设置节点距离中心的半径（像素值）
-        const radiusInPixels = 280;
-        
-        // 计算相对于中心点的X和Y偏移量（像素值）
-        const offsetX = radiusInPixels * Math.cos(angleInRadians);
-        const offsetY = radiusInPixels * Math.sin(angleInRadians);
+        if (index < leftSideCount) {
+          // 左侧节点定位（索引0-4）
+          const leftIndex = index;
+          const leftSpacing = 100 / (leftSideCount + 1); // 垂直方向均分间距
+          
+          positionX = -42; // 左侧区域，相对于容器中心向左偏移42%
+          positionY = -50 + (leftSpacing * (leftIndex + 1)); // 从上到下均分排列，更靠近顶部
+        } else {
+          // 右侧节点定位（索引5-8）
+          const rightIndex = index - leftSideCount;
+          const rightSpacing = 100 / (rightSideCount + 1); // 垂直方向均分间距
+          
+          positionX = 42; // 右侧区域，相对于容器中心向右偏移42%
+          positionY = -50 + (rightSpacing * (rightIndex + 1)); // 从上到下均分排列，更靠近顶部
+        }
         
         // 调试信息（可在控制台查看）
-        // console.log(`节点${index}: 角度=${(angleInRadians * 180 / Math.PI).toFixed(1)}°, 偏移=(${offsetX.toFixed(1)}, ${offsetY.toFixed(1)})`);
+        // console.log(`节点${index}: 位置=(${positionX}%, ${positionY}%)`);
 
         return (
           <div
@@ -484,22 +491,22 @@ const KarmadaControlPlaneCenter: React.FC<{
             style={{
               // 使用绝对定位
               position: 'absolute',
-              // 先定位到容器中心
-              left: '50%',
-              top: '50%',
-              // 再应用偏移量：-50%是为了让元素中心对齐，然后加上计算出的偏移
-              transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`,
+              // 使用百分比定位
+              left: `calc(50% + ${positionX}%)`,
+              top: `calc(50% + ${positionY}%)`,
+              // 居中对齐
+              transform: 'translate(-50%, -50%)',
               zIndex: 2,
               cursor: 'pointer',
               transition: 'transform 0.3s ease',
             }}
             onMouseEnter={(e) => {
               // 鼠标悬停时放大1.1倍，保持位置不变
-              e.currentTarget.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1.1)`;
+              e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)';
             }}
             onMouseLeave={(e) => {
               // 鼠标离开时恢复原始大小
-              e.currentTarget.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1)`;
+              e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)';
             }}
             title={`${node.name} - ${node.cluster}集群\n角色: ${node.role === 'master' ? '主节点' : '工作节点'}\nIP: ${node.ip}\nCPU: ${node.cpu.used}/${node.cpu.total} (${node.cpu.utilization})\n内存: ${node.memory.used}/${node.memory.total} (${node.memory.utilization})\nPod: ${node.pods.used}/${node.pods.total} (${node.pods.utilization})`}
           >
@@ -530,12 +537,12 @@ const KarmadaControlPlaneCenter: React.FC<{
               minWidth: '80px',
               textAlign: 'center',
             }}>
-              <Text style={{ color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'block' }}>
+              <Text style={{ color: 'white', fontSize: '12px', fontWeight: 'bold', display: 'block' }}>
                 {node.name.length > 15 ? node.name.substring(0, 12) + '...' : node.name}
               </Text>
               <Text style={{ 
                 color: node.role === 'master' ? '#faad14' : '#13c2c2', 
-                fontSize: '8px', 
+                fontSize: '10px', 
                 fontWeight: 'bold',
                 display: 'block'
               }}>
@@ -556,7 +563,7 @@ const KarmadaControlPlaneCenter: React.FC<{
         padding: '8px 16px',
         zIndex: 3,
       }}>
-        <Text style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+        <Text style={{ color: 'white', fontSize: '16px', fontWeight: 'bold' }}>
           下属集群: {clusterListData?.clusters?.length || 0} | 节点总数: {nodeInfo.length}
         </Text>
       </div>
@@ -708,7 +715,7 @@ const Overview = () => {
               </Text>
               <Text style={{ 
                 color: 'rgba(255, 255, 255, 0.8)', 
-                fontSize: '12px',
+                fontSize: '16px',
                 display: 'block'
               }}>
                 实时监控 · 智能调度 · 统一管理
@@ -718,7 +725,7 @@ const Overview = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Text style={{ 
               color: 'rgba(255, 255, 255, 0.9)', 
-              fontSize: '12px' 
+              fontSize: '16px' 
             }}>
               最后更新: {dayjs().format('MM-DD HH:mm:ss')}
             </Text>
@@ -729,7 +736,7 @@ const Overview = () => {
             }}>
               <Text style={{ 
                 color: 'white', 
-                fontSize: '12px', 
+                fontSize: '16px', 
                 fontWeight: 'bold' 
               }}>
                 集群: {clusterListData?.clusters?.length || 0}
@@ -796,31 +803,36 @@ const Overview = () => {
                     color: 'rgba(24, 144, 255, 0.8)',
                     marginBottom: '6px'
                   }}>
-                    集群信息区域
+                    集群节点分布
                   </Text>
                   <Text style={{ 
                     fontSize: '12px', 
                     color: 'rgba(24, 144, 255, 0.6)' 
                   }}>
-                    预留空间
+                    左侧节点区域
                   </Text>
-                </div>
-                
-                {/* 装饰性元素 */}
-                <div style={{
-                  position: 'absolute',
-                  top: '15px',
-                  right: '15px',
-                  width: '40px',
-                  height: '40px',
-                  background: 'linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(24, 144, 255, 0.05) 100%)',
-                  borderRadius: '50%',
-                  border: '1px solid rgba(24, 144, 255, 0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <SettingOutlined style={{ fontSize: '16px', color: 'rgba(24, 144, 255, 0.5)' }} />
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '10px',
+                    background: 'rgba(24, 144, 255, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(24, 144, 255, 0.2)'
+                  }}>
+                    <Text style={{ 
+                      fontSize: '11px', 
+                      color: 'rgba(24, 144, 255, 0.7)',
+                      display: 'block',
+                      marginBottom: '4px'
+                    }}>
+                      显示5个节点
+                    </Text>
+                    <Text style={{ 
+                      fontSize: '10px', 
+                      color: 'rgba(24, 144, 255, 0.6)' 
+                    }}>
+                      垂直均分排列
+                    </Text>
+                  </div>
                 </div>
               </div>
             </Col>
@@ -858,13 +870,23 @@ const Overview = () => {
                   borderBottom: '2px solid rgba(82, 196, 26, 0.2)'
                 }}>
                   <DatabaseOutlined style={{ fontSize: '24px', marginRight: '8px', color: '#52c41a' }} />
-                  <Text style={{ 
-                    fontSize: '20px', 
-                    fontWeight: 'bold',
-                    color: '#52c41a'
-                  }}>
-                    节点监控中心
-                  </Text>
+                  <div>
+                    <Text style={{ 
+                      fontSize: '22px', 
+                      fontWeight: 'bold',
+                      color: '#52c41a',
+                      display: 'block'
+                    }}>
+                      节点监控中心
+                    </Text>
+                    <Text style={{ 
+                      fontSize: '14px', 
+                      color: 'rgba(82, 196, 26, 0.7)',
+                      display: 'block'
+                    }}>
+                      右侧节点区域 · 4个节点
+                    </Text>
+                  </div>
                 </div>
 
                 {/* 节点统计总览 */}
@@ -878,40 +900,40 @@ const Overview = () => {
                   <Row gutter={[12, 12]}>
                     <Col span={12}>
                       <div style={{ textAlign: 'center' }}>
-                        <Text style={{ color: '#52c41a', fontSize: '28px', fontWeight: 'bold', display: 'block' }}>
+                        <Text style={{ color: '#52c41a', fontSize: '32px', fontWeight: 'bold', display: 'block' }}>
                           {nodeInfo.length}
                         </Text>
-                        <Text style={{ color: 'rgba(82, 196, 26, 0.8)', fontSize: '14px' }}>
+                        <Text style={{ color: 'rgba(82, 196, 26, 0.8)', fontSize: '16px' }}>
                           节点总数
                         </Text>
                       </div>
                     </Col>
                     <Col span={12}>
                       <div style={{ textAlign: 'center' }}>
-                        <Text style={{ color: '#52c41a', fontSize: '28px', fontWeight: 'bold', display: 'block' }}>
+                        <Text style={{ color: '#52c41a', fontSize: '32px', fontWeight: 'bold', display: 'block' }}>
                           {nodeInfo.filter((n: any) => n.status === 'ready').length}
                         </Text>
-                        <Text style={{ color: 'rgba(82, 196, 26, 0.8)', fontSize: '14px' }}>
+                        <Text style={{ color: 'rgba(82, 196, 26, 0.8)', fontSize: '16px' }}>
                           就绪节点
                         </Text>
                       </div>
                     </Col>
                     <Col span={12}>
                       <div style={{ textAlign: 'center' }}>
-                        <Text style={{ color: '#faad14', fontSize: '24px', fontWeight: 'bold', display: 'block' }}>
+                        <Text style={{ color: '#faad14', fontSize: '28px', fontWeight: 'bold', display: 'block' }}>
                           {nodeInfo.filter((n: any) => n.role === 'master').length}
                         </Text>
-                        <Text style={{ color: 'rgba(250, 173, 20, 0.8)', fontSize: '14px' }}>
+                        <Text style={{ color: 'rgba(250, 173, 20, 0.8)', fontSize: '16px' }}>
                           主节点
                         </Text>
                       </div>
                     </Col>
                     <Col span={12}>
                       <div style={{ textAlign: 'center' }}>
-                        <Text style={{ color: '#13c2c2', fontSize: '24px', fontWeight: 'bold', display: 'block' }}>
+                        <Text style={{ color: '#13c2c2', fontSize: '28px', fontWeight: 'bold', display: 'block' }}>
                           {nodeInfo.filter((n: any) => n.role === 'worker').length}
                         </Text>
-                        <Text style={{ color: 'rgba(19, 194, 194, 0.8)', fontSize: '14px' }}>
+                        <Text style={{ color: 'rgba(19, 194, 194, 0.8)', fontSize: '16px' }}>
                           工作节点
                         </Text>
                       </div>
@@ -926,7 +948,7 @@ const Overview = () => {
                   paddingRight: '8px'
                 }}>
                   <Text style={{ 
-                    fontSize: '16px', 
+                    fontSize: '18px', 
                     fontWeight: 'bold',
                     color: '#52c41a',
                     display: 'block',
@@ -982,7 +1004,7 @@ const Overview = () => {
                             marginRight: '10px'
                           }} />
                           <Text style={{ 
-                            fontSize: '14px', 
+                            fontSize: '16px', 
                             fontWeight: 'bold',
                             color: '#333'
                           }}>
@@ -994,7 +1016,7 @@ const Overview = () => {
                             'linear-gradient(135deg, #faad14 0%, #ffc53d 100%)' : 
                             'linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%)',
                           color: 'white',
-                          fontSize: '12px',
+                          fontSize: '14px',
                           fontWeight: 'bold',
                           padding: '4px 8px',
                           borderRadius: '4px'
@@ -1005,7 +1027,7 @@ const Overview = () => {
 
                       {/* 节点基本信息 */}
                       <div style={{ marginBottom: '10px' }}>
-                        <Text style={{ fontSize: '12px', color: '#666', display: 'block' }}>
+                        <Text style={{ fontSize: '14px', color: '#666', display: 'block' }}>
                           集群: {node.cluster} | IP: {node.ip}
                         </Text>
                       </div>
@@ -1015,39 +1037,39 @@ const Overview = () => {
                         <Row gutter={[8, 6]}>
                           <Col span={8}>
                             <div style={{ textAlign: 'center' }}>
-                              <Text style={{ fontSize: '12px', color: '#1890ff', fontWeight: 'bold', display: 'block' }}>
+                              <Text style={{ fontSize: '16px', color: '#1890ff', fontWeight: 'bold', display: 'block' }}>
                                 CPU
                               </Text>
-                              <Text style={{ fontSize: '11px', color: '#666' }}>
+                              <Text style={{ fontSize: '15px', color: '#666' }}>
                                 {node.cpu.used}
                               </Text>
-                              <Text style={{ fontSize: '10px', color: '#999' }}>
+                              <Text style={{ fontSize: '14px', color: '#999' }}>
                                 ({node.cpu.utilization})
                               </Text>
                             </div>
                           </Col>
                           <Col span={8}>
                             <div style={{ textAlign: 'center' }}>
-                              <Text style={{ fontSize: '12px', color: '#52c41a', fontWeight: 'bold', display: 'block' }}>
+                              <Text style={{ fontSize: '16px', color: '#52c41a', fontWeight: 'bold', display: 'block' }}>
                                 内存
                               </Text>
-                              <Text style={{ fontSize: '11px', color: '#666' }}>
+                              <Text style={{ fontSize: '15px', color: '#666' }}>
                                 {node.memory.used}
                               </Text>
-                              <Text style={{ fontSize: '10px', color: '#999' }}>
+                              <Text style={{ fontSize: '14px', color: '#999' }}>
                                 ({node.memory.utilization})
                               </Text>
                             </div>
                           </Col>
                           <Col span={8}>
                             <div style={{ textAlign: 'center' }}>
-                              <Text style={{ fontSize: '12px', color: '#722ed1', fontWeight: 'bold', display: 'block' }}>
+                              <Text style={{ fontSize: '16px', color: '#722ed1', fontWeight: 'bold', display: 'block' }}>
                                 Pod
                               </Text>
-                              <Text style={{ fontSize: '11px', color: '#666' }}>
+                              <Text style={{ fontSize: '15px', color: '#666' }}>
                                 {node.pods.used}/{node.pods.total}
                               </Text>
-                              <Text style={{ fontSize: '10px', color: '#999' }}>
+                              <Text style={{ fontSize: '14px', color: '#999' }}>
                                 ({node.pods.utilization})
                               </Text>
                             </div>
