@@ -1,1722 +1,625 @@
-# Karmada-Manager 炫酷科技风 UI/UX 设计规范文档
+# Karmada Dashboard UI/UX 设计规范
 
-## 1. 文档信息
+## 1. 设计概述
 
-### 1.1 版本历史
+### 1.1 设计理念
+Karmada Dashboard 采用**现代科技与企业级稳重**相结合的设计理念，旨在为多云管理提供直观、高效、美观的用户界面。设计强调数据可视化、操作简便性和视觉层次感。
 
-| 版本号 | 日期 | 作者 | 变更说明 |
-|--------|------|------|----------|
-| 1.0 | 2025-01-XX | UI/UX设计师 | 初稿创建，基础UI/UX设计规范 |
-| 2.0 | 2025-01-XX | UI/UX设计师 | 炫酷科技风亮色主题设计，强视觉冲击 |
+### 1.2 设计目标
+- **专业性**: 体现企业级多云管理平台的专业性和可靠性
+- **现代感**: 融入科技元素，提升视觉冲击力
+- **易用性**: 简化操作流程，降低学习成本
+- **一致性**: 保持设计语言的统一性和连贯性
 
-### 1.2 文档目的
+## 2. 视觉设计系统
 
-基于PRD文档和用户故事地图，为Karmada-Manager提供炫酷科技风的UI/UX设计规范，在亮色主题基础上实现强烈的视觉冲击感和未来科技感，确保产品界面的现代性、吸引力和用户体验。
+### 2.1 色彩系统
 
-## 2. 设计理念和原则
-
-### 2.1 炫酷科技设计理念
-- **未来科技感**: 采用科技蓝、霓虹色彩和发光效果，营造未来感
-- **视觉冲击力**: 强烈的色彩对比、动态效果和渐变设计
-- **亮色科技风**: 在亮色背景下实现科技感，避免传统暗色局限
-- **交互丰富性**: 丰富的悬停、点击和过渡动画效果
-- **数据可视化**: 将枯燥的数据转化为炫酷的视觉展示
-
-### 2.2 核心设计原则
-- **科技优先**: 以科技感和未来感为设计出发点
-- **视觉震撼**: 通过色彩、光效、动画创造强烈视觉冲击
-- **亮色创新**: 突破传统科技风格的暗色限制
-- **用户沉浸**: 让用户沉浸在炫酷的科技界面体验中
-- **功能美观**: 在保证功能性的同时最大化视觉美感
-
-## 3. 视觉设计系统
-
-### 3.1 色彩系统 - 亮色科技风格
-
-#### 3.1.1 主色调 - 柔和科技蓝渐变系列
-```scss
-// 科技感主题色 - 柔和舒适版
-$tech-primary: #1890ff;         // 柔和科技蓝 (降低饱和度)
-$tech-primary-1: #f0f8ff;       // 最浅 (柔和蓝白)
-$tech-primary-2: #d6ebff;       // 浅 (清淡蓝)
-$tech-primary-3: #a6d2ff;       // 明亮蓝 (更柔和)
-$tech-primary-4: #73b3ff;       // 中等蓝
-$tech-primary-5: #409eff;       // 标准蓝
-$tech-primary-6: #1890ff;       // 主色调
-$tech-primary-7: #096dd9;       // 深一点
-$tech-primary-8: #0050b3;       // 更深
-$tech-primary-9: #003a8c;       // 深蓝
-$tech-primary-10: #002766;      // 最深
-
-// 辅助科技色彩 - 柔和版
-$tech-secondary: #722ed1;       // 柔和紫色
-$tech-accent: #52c41a;          // 柔和绿色
-$tech-highlight: #faad14;       // 柔和金色
+#### 主色调 (Primary Colors)
+```
+#1890ff - 主蓝色 (Primary Blue)
+用途: 主要操作按钮、重要信息标识、链接文本
+RGB: (24, 144, 255)
+HSL: (210°, 100%, 55%)
 ```
 
-#### 3.1.2 舒适功能色彩
-```scss
-// 状态颜色 - 舒适护眼版
-$success-color: #52c41a;        // 柔和绿 (成功/正常)
-$warning-color: #faad14;        // 柔和橙 (警告状态)
-$error-color: #ff4d4f;          // 柔和红 (错误/危险)
-$info-color: #1890ff;           // 柔和蓝 (信息状态)
+#### 功能色 (Functional Colors)
+```
+#52c41a - 成功绿 (Success Green)
+用途: 成功状态、正常运行指示、确认操作
+RGB: (82, 196, 26)
 
-// 特殊科技色 - 柔和版
-$pulse-color: #40a9ff;          // 柔和脉冲色
-$glow-color: #ffffff;           // 发光白色
-$energy-color: #722ed1;         // 柔和紫色
+#fa8c16 - 警告橙 (Warning Orange)  
+用途: 警告信息、需要注意的状态
+RGB: (250, 140, 22)
 
-// 舒适文本色系统
-$text-color: #262626;           // 主文本色 (柔和深灰)
-$text-color-secondary: #595959; // 次要文本色
-$text-color-disabled: #bfbfbf;  // 禁用文本色
-$text-color-accent: #1890ff;    // 强调文本色
-$text-color-light: #8c8c8c;     // 浅文本色
+#ff4d4f - 错误红 (Error Red)
+用途: 错误状态、危险操作、失败信息
+RGB: (255, 77, 79)
 
-// 舒适背景系统
-$background-color: #fafafa;     // 页面背景色 (温和灰白)
-$component-background: #ffffff; // 组件背景色
-$card-background: #ffffff;      // 卡片背景
-$overlay-background: rgba(255, 255, 255, 0.95); // 覆盖层背景
-
-// 边框和分割线 - 柔和版
-$border-color: #d9d9d9;         // 边框色 (柔和灰)
-$divider-color: #f0f0f0;        // 分割线色
-$glow-border: rgba(24, 144, 255, 0.2); // 柔和发光边框
+#722ed1 - 品牌紫 (Brand Purple)
+用途: 特殊标识、品牌元素
+RGB: (114, 46, 209)
 ```
 
-#### 3.1.3 舒适渐变色系统
-```scss
-// 舒适渐变背景
-$gradient-primary: linear-gradient(135deg, #fafafa 0%, #f0f8ff 50%, #ffffff 100%);
-$gradient-card: linear-gradient(145deg, #ffffff 0%, rgba(248,250,252,0.8) 100%);
-$gradient-button: linear-gradient(45deg, #1890ff 0%, #40a9ff 50%, #73b3ff 100%);
-$gradient-accent: linear-gradient(90deg, #722ed1 0%, #1890ff 50%, #52c41a 100%);
-
-// 柔和发光效果
-$glow-gradient: radial-gradient(circle, rgba(24,144,255,0.15) 0%, transparent 70%);
-$pulse-gradient: radial-gradient(circle, rgba(64,169,255,0.1) 0%, transparent 60%);
+#### 中性色 (Neutral Colors)
+```
+#000000d9 - 主文本 (87% 透明度)
+#00000073 - 次要文本 (45% 透明度)  
+#00000040 - 辅助文本 (25% 透明度)
+#0000000f - 分割线 (6% 透明度)
+#f0f2f5 - 页面背景
+#ffffff - 卡片背景
 ```
 
-#### 3.1.4 舒适状态色应用
-| 状态 | 颜色 | 柔和阴影效果 | 应用场景 |
-|------|------|----------|----------|
-| 🟢 Ready/Success | `#52c41a` | `box-shadow: 0 2px 8px rgba(82,196,26,0.2)` | 集群正常、Pod运行正常、操作成功 |
-| 🟡 Warning | `#faad14` | `box-shadow: 0 2px 8px rgba(250,173,20,0.2)` | 资源使用率高、配置警告 |
-| 🔴 Error/Failed | `#ff4d4f` | `box-shadow: 0 2px 8px rgba(255,77,79,0.2)` | 集群异常、Pod失败、操作错误 |
-| 🔵 Info/Processing | `#1890ff` | `box-shadow: 0 2px 8px rgba(24,144,255,0.2)` | 信息提示、处理中状态 |
-| ⚪ Unknown/Disabled | `#bfbfbf` | 无阴影 | 未知状态、禁用状态 |
-| ⚡ Energy/Active | `#722ed1` | `box-shadow: 0 2px 8px rgba(114,46,209,0.2)` | 活跃状态、高能耗 |
+#### 科技感配色 (Tech Colors)
+```
+#00d4ff - 科技蓝 (Cyber Blue)
+用途: 科技感元素、特效发光
+RGB: (0, 212, 255)
 
-### 3.2 字体系统
+#0a0e27 - 深空蓝 (Deep Space Blue)  
+用途: 科技感背景主色
+RGB: (10, 14, 39)
 
-#### 3.2.1 字体族
-```scss
-$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 
-              'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', 
-              'Helvetica', 'Arial', sans-serif;
+#1a1f3a - 星空紫 (Star Purple)
+用途: 科技感背景渐变
+RGB: (26, 31, 58)
+
+#eb2f96 - 霓虹粉 (Neon Pink)
+用途: 强调和高亮显示
+RGB: (235, 47, 150)
 ```
 
-#### 3.2.2 字体规格
-| 层级 | 字号 | 行高 | 字重 | 应用场景 |
-|------|------|------|------|----------|
-| H1 | 32px | 1.25 | 600 | 页面主标题 |
-| H2 | 24px | 1.35 | 600 | 区域标题 |
-| H3 | 20px | 1.4 | 500 | 组件标题 |
-| H4 | 16px | 1.4 | 500 | 卡片标题 |
-| Body Large | 16px | 1.5 | 400 | 重要正文 |
-| Body | 14px | 1.5 | 400 | 正文内容 |
-| Body Small | 12px | 1.5 | 400 | 辅助信息 |
-| Caption | 10px | 1.5 | 400 | 标签、状态 |
+### 2.2 字体系统
 
-### 3.3 间距系统
+#### 字体族 (Font Family)
+```css
+/* 主字体 */
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+             'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 
-#### 3.3.1 基础间距
-```scss
-$spacing-xs: 4px;    // 极小间距
-$spacing-sm: 8px;    // 小间距
-$spacing-md: 16px;   // 中等间距
-$spacing-lg: 24px;   // 大间距
-$spacing-xl: 32px;   // 超大间距
-$spacing-xxl: 48px;  // 极大间距
+/* 代码字体 */
+font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, 
+             Courier, monospace;
+
+/* 数字字体 */
+font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 
+             'Segoe UI', Roboto, sans-serif;
 ```
 
-#### 3.3.2 组件间距规范
-- **页面边距**: 24px
-- **卡片内边距**: 24px
-- **表格单元格内边距**: 16px
-- **按钮内边距**: 水平16px，垂直8px
-- **输入框内边距**: 水平12px，垂直8px
+#### 字体大小等级 (Typography Scale)
+```css
+/* 标题字体 */
+.text-4xl { font-size: 36px; line-height: 44px; } /* H1 */
+.text-3xl { font-size: 30px; line-height: 38px; } /* H2 */
+.text-2xl { font-size: 24px; line-height: 32px; } /* H3 */
+.text-xl  { font-size: 20px; line-height: 28px; } /* H4 */
+.text-lg  { font-size: 18px; line-height: 26px; } /* H5 */
 
-### 3.4 圆角和科技感阴影
-
-#### 3.4.1 圆角规范
-```scss
-$border-radius-sm: 6px;   // 小圆角：按钮、标签
-$border-radius-md: 8px;   // 中圆角：输入框、小卡片
-$border-radius-lg: 12px;  // 大圆角：大卡片、模态框
-$border-radius-xl: 16px;  // 超大圆角：主要容器
+/* 正文字体 */
+.text-base { font-size: 16px; line-height: 24px; } /* 正文 */
+.text-sm   { font-size: 14px; line-height: 20px; } /* 小字体 */
+.text-xs   { font-size: 12px; line-height: 16px; } /* 辅助文字 */
 ```
 
-#### 3.4.2 舒适阴影系统
-```scss
-// 基础阴影 - 柔和版
-$box-shadow-sm: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 
-                0 1px 4px 0 rgba(0, 0, 0, 0.04);      // 轻微阴影
-$box-shadow-md: 0 4px 16px 0 rgba(0, 0, 0, 0.08), 
-                0 2px 8px 0 rgba(0, 0, 0, 0.06);      // 标准阴影
-$box-shadow-lg: 0 8px 32px 0 rgba(0, 0, 0, 0.1), 
-                0 4px 16px 0 rgba(0, 0, 0, 0.08);     // 深度阴影
-
-// 柔和强调阴影
-$accent-shadow-sm: 0 2px 8px rgba(24, 144, 255, 0.15); // 小强调
-$accent-shadow-md: 0 4px 16px rgba(24, 144, 255, 0.2); // 中强调
-$accent-shadow-lg: 0 8px 32px rgba(24, 144, 255, 0.25); // 大强调
-
-// 状态阴影 - 舒适版
-$success-shadow: 0 2px 8px rgba(82, 196, 26, 0.2);    // 成功阴影
-$error-shadow: 0 2px 8px rgba(255, 77, 79, 0.2);      // 错误阴影
-$warning-shadow: 0 2px 8px rgba(250, 173, 20, 0.2);   // 警告阴影
-$info-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);      // 信息阴影
-
-// 卡片和组件阴影
-$card-shadow: 
-  0 2px 8px rgba(0, 0, 0, 0.06),        // 基础深度
-  0 1px 4px rgba(0, 0, 0, 0.04);        // 轻微边缘
-
-$button-shadow: 
-  0 2px 8px rgba(0, 0, 0, 0.1),         // 按钮深度
-  0 1px 4px rgba(0, 0, 0, 0.06);        // 按钮边缘
-
-$input-shadow: 
-  0 0 0 2px rgba(24, 144, 255, 0.2);    // 输入框焦点
+#### 字重 (Font Weight)
+```css
+.font-light    { font-weight: 300; } /* 细体 */
+.font-normal   { font-weight: 400; } /* 常规 */
+.font-medium   { font-weight: 500; } /* 中等 */
+.font-semibold { font-weight: 600; } /* 半粗体 */
+.font-bold     { font-weight: 700; } /* 粗体 */
 ```
 
-## 4. 布局系统
+### 2.3 间距系统 (Spacing System)
 
-### 4.1 网格系统
-
-#### 4.1.1 断点规范
-```scss
-$screen-xs: 480px;   // 超小屏
-$screen-sm: 576px;   // 小屏
-$screen-md: 768px;   // 中屏
-$screen-lg: 992px;   // 大屏
-$screen-xl: 1200px;  // 超大屏
-$screen-xxl: 1600px; // 极大屏
+#### 基础间距 (Base Spacing)
+```css
+/* 基础单位: 4px */
+.space-1  { 4px }   /* 超小间距 */
+.space-2  { 8px }   /* 小间距 */
+.space-3  { 12px }  /* 小间距+ */
+.space-4  { 16px }  /* 中等间距 */
+.space-5  { 20px }  /* 中等间距+ */
+.space-6  { 24px }  /* 大间距 */
+.space-8  { 32px }  /* 超大间距 */
+.space-12 { 48px }  /* 特大间距 */
+.space-16 { 64px }  /* 巨大间距 */
 ```
 
-#### 4.1.2 栅格系统
-- 采用24栅格系统
-- 响应式断点适配
-- 支持灵活的栅格组合
+#### 组件间距规范
+```css
+/* 页面级间距 */
+页面外边距: 24px
+区块间距: 32px
+模块间距: 24px
 
-### 4.2 页面布局
+/* 组件级间距 */
+卡片内边距: 24px
+列表项间距: 16px
+表单项间距: 16px
+按钮间距: 12px
 
-#### 4.2.1 整体布局结构
-```
-┌─────────────────────────────────────────────────┐
-│ Header (高度: 64px)                              │
-├─────────────────────────────────────────────────┤
-│ Sidebar │ Main Content                          │
-│ (宽度:  │                                       │
-│ 240px)  │                                       │
-│         │                                       │
-│         │                                       │
-│         │                                       │
-└─────────────────────────────────────────────────┘
+/* 元素级间距 */
+图标与文字: 8px
+标签间距: 4px
+内联元素: 4px
 ```
 
-#### 4.2.2 侧边栏设计
-- **宽度**: 240px (展开) / 64px (收起)
-- **背景**: 深色渐变 (#001529 到 #002140)
-- **菜单项高度**: 40px
-- **支持折叠**: 小屏设备自动折叠
+### 2.4 圆角系统 (Border Radius)
 
-#### 4.2.3 主内容区域
-- **最小宽度**: 320px
-- **最大宽度**: 无限制 (适应屏幕)
-- **边距**: 24px
-- **背景**: #f0f2f5
+```css
+.rounded-none { border-radius: 0px; }    /* 无圆角 */
+.rounded-sm   { border-radius: 4px; }    /* 小圆角 */
+.rounded      { border-radius: 6px; }    /* 标准圆角 */
+.rounded-md   { border-radius: 8px; }    /* 中等圆角 */
+.rounded-lg   { border-radius: 12px; }   /* 大圆角 */
+.rounded-xl   { border-radius: 16px; }   /* 超大圆角 */
+.rounded-full { border-radius: 50%; }    /* 圆形 */
+```
 
-## 5. 组件设计规范
+### 2.5 阴影系统 (Shadow System)
 
-### 5.1 基础组件
-
-#### 5.1.1 炫酷按钮 (Button)
-```scss
-// 科技感主要按钮
-.btn-primary {
-  background: $gradient-button;
-  border: 2px solid transparent;
-  color: #ffffff;
-  border-radius: $border-radius-md;
-  padding: 12px 24px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: $tech-button-shadow;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-  }
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: $glow-shadow-md, 0 8px 25px rgba(0, 0, 0, 0.15);
-    
-    &::before {
-      left: 100%;
-    }
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
+```css
+/* 基础阴影 */
+.shadow-sm { 
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
 }
 
-// 科技感次要按钮
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid $tech-primary;
-  color: $tech-primary;
-  border-radius: $border-radius-md;
-  padding: 10px 20px;
-  position: relative;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  font-weight: 500;
-  
-  &:hover {
-    background: $tech-primary;
-    color: #ffffff;
-    box-shadow: $glow-shadow-sm;
-    transform: translateY(-1px);
-  }
+.shadow { 
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 
+              0 1px 2px 0 rgba(0, 0, 0, 0.06); 
 }
 
-// 发光轮廓按钮
-.btn-glow {
-  background: transparent;
-  border: 2px solid $tech-primary;
-  color: $tech-primary;
-  border-radius: $border-radius-md;
-  padding: 10px 20px;
-  position: relative;
-  transition: all 0.3s ease;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: $gradient-accent;
-    border-radius: $border-radius-md;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-  }
-  
-  &:hover {
-    color: #ffffff;
-    box-shadow: $glow-shadow-md;
-    
-    &::before {
-      opacity: 1;
-    }
-  }
+.shadow-md { 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06); 
 }
 
-// 危险按钮
-.btn-danger {
-  background: linear-gradient(45deg, #ff0080, #ff4d8f);
-  border: 2px solid transparent;
-  color: #ffffff;
-  border-radius: $border-radius-md;
-  padding: 10px 20px;
-  transition: all 0.3s ease;
-  box-shadow: $error-glow;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(255, 0, 128, 0.5);
-  }
+.shadow-lg { 
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+}
+
+/* 科技感阴影 */
+.shadow-tech { 
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3),
+              0 8px 32px rgba(0, 0, 0, 0.1); 
+}
+
+.shadow-glow { 
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); 
 }
 ```
 
-#### 5.1.2 科技感卡片 (Card)
-```scss
-.card {
-  background: $gradient-card;
-  border-radius: $border-radius-lg;
-  border: 1px solid $glow-border;
-  box-shadow: $tech-card-shadow;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-lg;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: $gradient-accent;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: $glow-gradient;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    z-index: 0;
-  }
-  
-  > * {
-    position: relative;
-    z-index: 1;
-  }
-  
-  &:hover {
-    box-shadow: $tech-card-shadow, $glow-shadow-md;
-    transform: translateY(-4px);
-    border-color: $tech-primary;
-    
-    &::before {
-      opacity: 1;
-    }
-    
-    &::after {
-      opacity: 0.3;
-    }
-  }
-}
+## 3. 组件设计规范
 
-// 状态卡片变体
-.card-success {
-  border-color: rgba(0, 255, 136, 0.3);
-  
-  &:hover {
-    box-shadow: $tech-card-shadow, $success-glow;
-  }
-}
+### 3.1 按钮设计 (Button Design)
 
-.card-warning {
-  border-color: rgba(255, 140, 0, 0.3);
-  
-  &:hover {
-    box-shadow: $tech-card-shadow, $warning-glow;
-  }
-}
-
-.card-error {
-  border-color: rgba(255, 0, 128, 0.3);
-  
-  &:hover {
-    box-shadow: $tech-card-shadow, $error-glow;
-  }
-}
-
-// 能量卡片
-.card-energy {
-  border-color: rgba(124, 58, 237, 0.3);
-  
-  &::before {
-    background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc);
-  }
-  
-  &:hover {
-    box-shadow: $tech-card-shadow, $energy-glow;
-  }
-}
+#### 主要按钮 (Primary Button)
+```css
+背景: #1890ff
+文字: #ffffff  
+圆角: 6px
+高度: 32px (small) | 40px (medium) | 48px (large)
+内边距: 16px 24px
+悬停状态: 背景变为 #40a9ff
+点击状态: 背景变为 #096dd9
 ```
 
-#### 5.1.3 表格 (Table)
-```scss
-.table {
-  background: $component-background;
-  border-radius: $border-radius-lg;
-  
-  .table-header {
-    background: #fafafa;
-    font-weight: 500;
-    color: $text-color;
-  }
-  
-  .table-row {
-    border-bottom: 1px solid $divider-color;
-    
-    &:hover {
-      background: #f5f5f5;
-    }
-  }
-}
+#### 次要按钮 (Secondary Button)
+```css
+背景: transparent
+边框: 1px solid #d9d9d9
+文字: #000000d9
+悬停状态: 边框 #40a9ff，文字 #1890ff
 ```
 
-### 5.2 业务组件
-
-#### 5.2.1 状态徽章 (StatusBadge)
-```scss
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  
-  &.status-ready {
-    background: rgba(82, 196, 26, 0.1);
-    color: $success-color;
-    border: 1px solid rgba(82, 196, 26, 0.3);
-  }
-  
-  &.status-error {
-    background: rgba(255, 77, 79, 0.1);
-    color: $error-color;
-    border: 1px solid rgba(255, 77, 79, 0.3);
-  }
-  
-  &.status-warning {
-    background: rgba(250, 173, 20, 0.1);
-    color: $warning-color;
-    border: 1px solid rgba(250, 173, 20, 0.3);
-  }
-}
+#### 危险按钮 (Danger Button)
+```css
+背景: #ff4d4f
+文字: #ffffff
+悬停状态: 背景变为 #ff7875
 ```
 
-#### 5.2.2 资源使用率 (ResourceUsage)
-```scss
-.resource-usage {
-  .usage-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    
-    .usage-label {
-      font-size: 14px;
-      color: $text-color;
-    }
-    
-    .usage-value {
-      font-size: 14px;
-      font-weight: 500;
-      color: $text-color;
-    }
-  }
-  
-  .usage-progress {
-    height: 8px;
-    background: #f5f5f5;
-    border-radius: 4px;
-    overflow: hidden;
-    
-    .usage-bar {
-      height: 100%;
-      background: linear-gradient(90deg, $primary-color, $primary-5);
-      transition: width 0.3s ease;
-    }
-  }
-}
+### 3.2 卡片设计 (Card Design)
+
+#### 标准卡片
+```css
+背景: #ffffff
+圆角: 8px
+阴影: 0 1px 3px rgba(0, 0, 0, 0.1)
+边框: 1px solid #f0f0f0
+内边距: 24px
+悬停效果: 阴影增强至 0 4px 12px rgba(0, 0, 0, 0.15)
 ```
 
-## 6. 页面设计规范
-
-### 6.1 概览页面设计
-
-#### 6.1.1 布局结构
-```
-┌─────────────────────────────────────────────────┐
-│ 页面标题区域 (高度: 60px)                        │
-├─────────────────────────────────────────────────┤
-│ Karmada状态卡片区域 (高度: 120px)                │
-│ ┌─────────┐ ┌─────────┐ ┌─────────┐              │
-│ │ 版本信息 │ │ 运行状态 │ │ 运行时长 │              │
-│ └─────────┘ └─────────┘ └─────────┘              │
-├─────────────────────────────────────────────────┤
-│ 资源概览卡片区域 (高度: 120px)                   │
-│ ┌─────────┐ ┌─────────┐ ┌─────────┐              │
-│ │ 节点统计 │ │ CPU使用 │ │ 内存使用 │              │
-│ └─────────┘ └─────────┘ └─────────┘              │
-├─────────────────────────────────────────────────┤
-│ 集群状态表格区域 (自适应高度)                    │
-└─────────────────────────────────────────────────┘
+#### 科技感卡片
+```css
+背景: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)
+圆角: 16px
+边框: 1px solid rgba(0, 212, 255, 0.3)
+阴影: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 212, 255, 0.2)
+内边距: 32px
 ```
 
-#### 6.1.2 卡片设计规范
-- **卡片尺寸**: 最小宽度280px，高度100px
-- **内边距**: 24px
-- **圆角**: 8px
-- **阴影**: 轻微阴影
-- **标题字号**: 14px，字重500
-- **数值字号**: 24px，字重600
-- **单位字号**: 12px，字重400
+### 3.3 表格设计 (Table Design)
 
-### 6.2 集群管理页面设计
-
-#### 6.2.1 集群列表卡片
-```scss
-.cluster-card {
-  background: $component-background;
-  border-radius: $border-radius-lg;
-  box-shadow: $box-shadow-sm;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    box-shadow: $box-shadow-md;
-    transform: translateY(-2px);
-  }
-  
-  .cluster-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: $spacing-md;
-    
-    .cluster-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: $text-color;
-    }
-    
-    .cluster-status {
-      display: flex;
-      align-items: center;
-      
-      .status-icon {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 6px;
-        
-        &.ready { background: $success-color; }
-        &.not-ready { background: $error-color; }
-      }
-    }
-  }
-  
-  .cluster-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: $spacing-md;
-    margin-bottom: $spacing-md;
-    
-    .info-item {
-      .label {
-        font-size: 12px;
-        color: $text-color-secondary;
-        margin-bottom: 4px;
-      }
-      
-      .value {
-        font-size: 14px;
-        font-weight: 500;
-        color: $text-color;
-      }
-    }
-  }
-  
-  .cluster-resources {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: $spacing-md;
-    margin-bottom: $spacing-md;
-  }
-  
-  .cluster-actions {
-    display: flex;
-    gap: $spacing-sm;
-    justify-content: flex-end;
-  }
-}
+#### 表头设计
+```css
+背景: #fafafa
+文字: #000000d9
+字重: 600
+高度: 48px
+边框底部: 1px solid #f0f0f0
 ```
 
-#### 6.2.2 节点表格设计
-```scss
-.node-table {
-  .node-row {
-    &:hover {
-      background: rgba(24, 144, 255, 0.05);
-    }
-  }
-  
-  .node-name {
-    font-weight: 500;
-    color: $primary-color;
-    cursor: pointer;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  
-  .node-ip {
-    font-family: 'Monaco', 'Menlo', monospace;
-    font-size: 12px;
-    color: $text-color-secondary;
-  }
-  
-  .resource-cell {
-    .resource-value {
-      font-weight: 500;
-    }
-    
-    .resource-total {
-      color: $text-color-secondary;
-      font-size: 12px;
-    }
-  }
-}
+#### 表格行
+```css
+高度: 56px
+边框底部: 1px solid #f0f0f0
+悬停背景: #f5f5f5
+选中背景: #e6f7ff
 ```
 
-### 6.3 资源管理页面设计
+### 3.4 表单设计 (Form Design)
 
-#### 6.3.1 工作负载卡片
-```scss
-.workload-card {
-  background: $component-background;
-  border-radius: $border-radius-lg;
-  box-shadow: $box-shadow-sm;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
-  
-  .workload-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: $spacing-md;
-    
-    .workload-icon {
-      width: 24px;
-      height: 24px;
-      margin-right: $spacing-sm;
-      color: $primary-color;
-    }
-    
-    .workload-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: $text-color;
-    }
-  }
-  
-  .workload-meta {
-    display: flex;
-    gap: $spacing-lg;
-    margin-bottom: $spacing-md;
-    
-    .meta-item {
-      font-size: 12px;
-      color: $text-color-secondary;
-      
-      .meta-value {
-        color: $text-color;
-        font-weight: 500;
-      }
-    }
-  }
-  
-  .workload-distribution {
-    background: #fafafa;
-    padding: $spacing-md;
-    border-radius: $border-radius-md;
-    margin-bottom: $spacing-md;
-    
-    .distribution-title {
-      font-size: 12px;
-      color: $text-color-secondary;
-      margin-bottom: $spacing-sm;
-    }
-    
-    .cluster-chips {
-      display: flex;
-      gap: $spacing-sm;
-      
-      .cluster-chip {
-        background: $primary-color;
-        color: #ffffff;
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 11px;
-        font-weight: 500;
-      }
-    }
-  }
-}
+#### 输入框
+```css
+边框: 1px solid #d9d9d9
+圆角: 6px
+高度: 32px
+内边距: 4px 12px
+聚焦边框: 2px solid #1890ff
+聚焦阴影: 0 0 0 2px rgba(24, 144, 255, 0.2)
 ```
 
-### 6.4 调度可视化设计
-
-#### 6.4.1 调度流程图
-```scss
-.scheduling-flow {
-  background: $component-background;
-  padding: $spacing-xl;
-  border-radius: $border-radius-lg;
-  
-  .flow-step {
-    display: flex;
-    align-items: center;
-    margin-bottom: $spacing-lg;
-    
-    .step-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: $primary-color;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      margin-right: $spacing-md;
-    }
-    
-    .step-content {
-      flex: 1;
-      
-      .step-title {
-        font-size: 14px;
-        font-weight: 500;
-        color: $text-color;
-        margin-bottom: 4px;
-      }
-      
-      .step-description {
-        font-size: 12px;
-        color: $text-color-secondary;
-      }
-    }
-    
-    .step-result {
-      background: #f6ffed;
-      border: 1px solid #b7eb8f;
-      padding: 8px 12px;
-      border-radius: $border-radius-md;
-      font-size: 12px;
-      color: $success-color;
-      font-weight: 500;
-    }
-  }
-  
-  .flow-connector {
-    width: 2px;
-    height: 24px;
-    background: $border-color;
-    margin: 0 15px $spacing-sm 15px;
-  }
-}
+#### 标签
+```css
+字体大小: 14px
+颜色: #000000d9
+字重: 500
+底边距: 8px
 ```
 
-## 7. 交互设计规范
+## 4. 布局设计规范
 
-### 7.1 基础交互
+### 4.1 栅格系统 (Grid System)
 
-#### 7.1.1 悬停效果
-```scss
-// 卡片悬停
-.card:hover {
-  box-shadow: $box-shadow-md;
-  transform: translateY(-2px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-// 按钮悬停
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-// 表格行悬停
-.table-row:hover {
-  background: rgba(24, 144, 255, 0.05);
-}
+#### 断点设置
+```css
+xs: 0-575px    (超小屏幕)
+sm: 576-767px  (小屏幕)  
+md: 768-991px  (中等屏幕)
+lg: 992-1199px (大屏幕)
+xl: 1200px+    (超大屏幕)
 ```
 
-#### 7.1.2 点击反馈
-```scss
-// 按钮点击
-.btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-// 卡片点击
-.card:active {
-  transform: translateY(0);
-}
+#### 栅格规则
+```css
+总列数: 24列
+间隙: 16px (xs-md) | 24px (lg-xl)
+最大宽度: 1200px
+页面边距: 24px
 ```
 
-#### 7.1.3 加载状态
-```scss
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid $primary-color;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
+### 4.2 页面布局 (Page Layout)
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+#### 顶部导航 (Header)
+```css
+高度: 64px
+背景: #ffffff
+阴影: 0 2px 8px rgba(0, 0, 0, 0.15)
+内边距: 0 24px
+层级: z-index: 1000
 ```
 
-### 7.2 导航交互
-
-#### 7.2.1 面包屑导航
-```scss
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  margin-bottom: $spacing-lg;
-  
-  .breadcrumb-item {
-    color: $text-color-secondary;
-    font-size: 14px;
-    
-    &.active {
-      color: $text-color;
-      font-weight: 500;
-    }
-    
-    &:not(:last-child)::after {
-      content: '/';
-      margin: 0 8px;
-      color: $text-color-disabled;
-    }
-  }
-  
-  .breadcrumb-link {
-    color: $primary-color;
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
+#### 侧边导航 (Sidebar)
+```css
+宽度: 256px (展开) | 80px (收起)
+背景: #001529
+文字: rgba(255, 255, 255, 0.9)
+层级: z-index: 999
 ```
 
-#### 7.2.2 标签页切换
-```scss
-.tabs {
-  border-bottom: 1px solid $border-color;
-  margin-bottom: $spacing-lg;
-  
-  .tab-item {
-    padding: 12px 16px;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    color: $text-color-secondary;
-    
-    &.active {
-      color: $primary-color;
-      border-bottom-color: $primary-color;
-    }
-    
-    &:hover {
-      color: $primary-color;
-    }
-  }
-}
+#### 主内容区 (Content)
+```css
+最小高度: calc(100vh - 64px)
+背景: #f0f2f5
+内边距: 24px
 ```
 
-### 7.3 反馈机制
+### 4.3 组件布局原则
 
-#### 7.3.1 消息提示
-```scss
-.message {
-  padding: 12px 16px;
-  border-radius: $border-radius-md;
-  margin-bottom: $spacing-md;
-  display: flex;
-  align-items: center;
-  
-  &.success {
-    background: #f6ffed;
-    border: 1px solid #b7eb8f;
-    color: $success-color;
-  }
-  
-  &.error {
-    background: #fff2f0;
-    border: 1px solid #ffccc7;
-    color: $error-color;
-  }
-  
-  &.warning {
-    background: #fffbe6;
-    border: 1px solid #ffe58f;
-    color: $warning-color;
-  }
-  
-  &.info {
-    background: #e6f7ff;
-    border: 1px solid #91d5ff;
-    color: $info-color;
-  }
-}
+#### 垂直间距
+```css
+页面标题下方: 32px
+区块之间: 32px
+卡片之间: 24px
+表单项之间: 16px
 ```
 
-#### 7.3.2 加载骨架屏
-```scss
-.skeleton {
-  .skeleton-line {
-    height: 16px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: 4px;
-    margin-bottom: 8px;
-    
-    &.short { width: 60%; }
-    &.medium { width: 80%; }
-    &.long { width: 100%; }
-  }
-}
-
-@keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+#### 水平间距  
+```css
+按钮组间距: 12px
+表格列间距: 16px
+图标与文字: 8px
+内联元素: 4px
 ```
 
-## 8. 响应式设计
+## 5. 交互设计规范
 
-### 8.1 桌面端设计 (≥1200px)
+### 5.1 动画效果 (Animation)
 
-#### 8.1.1 布局特点
-- 侧边栏固定展开 (240px)
-- 主内容区域充分利用空间
-- 卡片网格布局 (3-4列)
-- 表格显示完整信息
-
-#### 8.1.2 关键组件尺寸
-```scss
-@media (min-width: 1200px) {
-  .cluster-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: $spacing-lg;
-  }
-  
-  .overview-cards {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .workload-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+#### 过渡时间
+```css
+快速过渡: 0.15s
+标准过渡: 0.3s  
+慢速过渡: 0.5s
 ```
 
-### 8.2 平板端设计 (768px-1199px)
-
-#### 8.2.1 布局调整
-- 侧边栏可收起
-- 卡片网格调整为2列
-- 表格支持横向滚动
-- 适当缩小间距
-
-#### 8.2.2 关键组件调整
-```scss
-@media (max-width: 1199px) and (min-width: 768px) {
-  .cluster-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: $spacing-md;
-  }
-  
-  .overview-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .sidebar {
-    width: 200px;
-  }
-}
+#### 缓动函数
+```css
+标准缓动: cubic-bezier(0.4, 0, 0.2, 1)
+加速缓动: cubic-bezier(0.4, 0, 1, 1)
+减速缓动: cubic-bezier(0, 0, 0.2, 1)
 ```
 
-### 8.3 移动端设计 (<768px)
-
-#### 8.3.1 布局特点
-- 侧边栏改为抽屉式
-- 卡片单列布局
-- 表格改为卡片式展示
-- 优化触摸操作
-
-#### 8.3.2 移动端适配
-```scss
-@media (max-width: 767px) {
-  .cluster-grid,
-  .overview-cards,
-  .workload-grid {
-    grid-template-columns: 1fr;
-    gap: $spacing-md;
-  }
-  
-  .sidebar {
-    position: fixed;
-    left: -240px;
-    top: 64px;
-    height: calc(100vh - 64px);
-    z-index: 1000;
-    transition: left 0.3s ease;
-    
-    &.open {
-      left: 0;
-    }
-  }
-  
-  .main-content {
-    padding: $spacing-md;
-  }
-  
-  .table-responsive {
-    overflow-x: auto;
-  }
-}
+#### 动画类型
+```css
+悬停效果: transform: scale(1.05); transition: 0.3s ease;
+淡入效果: opacity: 0 → 1; transition: 0.3s ease;
+滑入效果: transform: translateY(20px) → translateY(0);
 ```
 
-## 9. 炫酷动画和过渡系统
+### 5.2 状态反馈 (State Feedback)
 
-### 9.1 页面过渡动画
-```scss
-.page-transition {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-// 淡入放大效果
-.fade-scale-enter {
-  opacity: 0;
-  transform: scale(0.95) translateY(10px);
-}
-
-.fade-scale-enter-active {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-scale-exit {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-}
-
-.fade-scale-exit-active {
-  opacity: 0;
-  transform: scale(0.95) translateY(-10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-// 滑动进入效果
-.slide-up-enter {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.slide-up-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+#### 加载状态
+```css
+骨架屏: 灰色占位块 + 微光动画
+加载图标: 旋转动画，颜色 #1890ff
+进度条: 蓝色进度 + 百分比显示
 ```
 
-### 9.2 科技感数据动画
-```scss
-// 数据更新脉冲
-.data-update {
-  animation: techPulse 0.8s ease-in-out;
-}
-
-@keyframes techPulse {
-  0% { 
-    background-color: rgba(0, 212, 255, 0.1);
-    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
-  }
-  50% { 
-    background-color: rgba(0, 212, 255, 0.3);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-  }
-  100% { 
-    background-color: rgba(0, 212, 255, 0.1);
-    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
-  }
-}
-
-// 能量流动动画
-.energy-flow {
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(0, 212, 255, 0.4) 50%, 
-      transparent 100%);
-    animation: energyFlow 2s infinite;
-  }
-}
-
-@keyframes energyFlow {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-
-// 呼吸发光效果
-.breathing-glow {
-  animation: breathingGlow 3s ease-in-out infinite;
-}
-
-@keyframes breathingGlow {
-  0%, 100% { 
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-  }
-  50% { 
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
-  }
-}
+#### 成功状态
+```css
+颜色: #52c41a
+图标: CheckCircleOutlined
+持续时间: 3秒自动消失
 ```
 
-### 9.3 状态指示动画
-```scss
-// 加载旋转动画
-.loading-spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(0, 212, 255, 0.2);
-  border-top: 3px solid $tech-primary;
-  border-radius: 50%;
-  animation: techSpin 1s linear infinite;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    border: 1px solid transparent;
-    border-top-color: rgba(0, 212, 255, 0.5);
-    border-radius: 50%;
-    animation: techSpin 2s linear infinite reverse;
-  }
-}
-
-@keyframes techSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-// 成功状态动画
-.success-indicator {
-  animation: successGlow 0.6s ease-out;
-}
-
-@keyframes successGlow {
-  0% { 
-    box-shadow: 0 0 0 rgba(0, 255, 136, 0.5);
-    transform: scale(1);
-  }
-  50% { 
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
-    transform: scale(1.05);
-  }
-  100% { 
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
-    transform: scale(1);
-  }
-}
-
-// 错误状态动画
-.error-shake {
-  animation: errorShake 0.5s ease-in-out;
-}
-
-@keyframes errorShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
+#### 错误状态
+```css
+颜色: #ff4d4f  
+图标: CloseCircleOutlined
+持续时间: 手动关闭
 ```
 
-### 9.4 进度条动画
-```scss
-// 科技感进度条
-.tech-progress {
-  height: 8px;
-  background: rgba(0, 212, 255, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-  
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, 
-      $tech-primary 0%, 
-      $tech-primary-4 50%, 
-      $tech-primary 100%);
-    border-radius: 4px;
-    position: relative;
-    transition: width 0.5s ease;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        transparent 100%);
-      animation: progressShine 2s infinite;
-    }
-  }
-}
-
-@keyframes progressShine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-// 圆形进度动画
-.circular-progress {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  
-  svg {
-    transform: rotate(-90deg);
-  }
-  
-  .progress-circle {
-    fill: none;
-    stroke: rgba(0, 212, 255, 0.1);
-    stroke-width: 4;
-  }
-  
-  .progress-value {
-    fill: none;
-    stroke: url(#techGradient);
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-dasharray: 188.4;
-    stroke-dashoffset: 188.4;
-    transition: stroke-dashoffset 1s ease-in-out;
-    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
-  }
-}
+#### 警告状态
+```css
+颜色: #fa8c16
+图标: ExclamationCircleOutlined  
+持续时间: 5秒自动消失
 ```
 
-### 9.5 微交互动画
-```scss
-// 按钮点击波纹效果
-.ripple-effect {
-  position: relative;
-  overflow: hidden;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
-    transform: translate(-50%, -50%);
-    transition: width 0.3s, height 0.3s;
-  }
-  
-  &:active::after {
-    width: 300px;
-    height: 300px;
-  }
-}
+### 5.3 响应式设计 (Responsive Design)
 
-// 悬停放大效果
-.hover-scale {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-}
-
-// 浮动效果
-.floating {
-  animation: floating 3s ease-in-out infinite;
-}
-
-@keyframes floating {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
+#### 移动端适配 (xs: <576px)
+```css
+导航: 隐藏侧边栏，使用抽屉式菜单
+表格: 使用卡片式布局替代
+表单: 单列布局
+按钮: 最小点击区域 44px
 ```
 
-## 10. 科技感视觉特效
-
-### 10.1 全局科技背景
-```scss
-// 主页面科技背景
-.tech-background {
-  background: $gradient-primary;
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(6, 255, 165, 0.05) 0%, transparent 70%);
-    animation: techBackgroundFlow 20s ease-in-out infinite;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      linear-gradient(45deg, transparent 40%, rgba(0, 212, 255, 0.02) 50%, transparent 60%);
-    animation: techGrid 30s linear infinite;
-  }
-}
-
-@keyframes techBackgroundFlow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-@keyframes techGrid {
-  0% { transform: translateX(-100px) translateY(-100px); }
-  100% { transform: translateX(100px) translateY(100px); }
-}
+#### 平板适配 (md: 768-991px)  
+```css
+导航: 收起侧边栏
+表格: 保持表格布局，减少列数
+卡片: 2列布局
+图表: 简化显示
 ```
 
-### 10.2 粒子效果系统
-```scss
-// 浮动粒子背景
-.particles-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: rgba(0, 212, 255, 0.6);
-  border-radius: 50%;
-  animation: particleFloat 10s linear infinite;
-  
-  &:nth-child(2n) {
-    background: rgba(124, 58, 237, 0.4);
-    animation-duration: 15s;
-  }
-  
-  &:nth-child(3n) {
-    background: rgba(6, 255, 165, 0.3);
-    animation-duration: 20s;
-  }
-}
-
-@keyframes particleFloat {
-  0% {
-    transform: translateY(100vh) translateX(0) scale(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-    transform: translateY(90vh) translateX(10px) scale(1);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(10vh) translateX(-10px) scale(1);
-  }
-  100% {
-    transform: translateY(0) translateX(0) scale(0);
-    opacity: 0;
-  }
-}
+#### 桌面端优化 (lg: >992px)
+```css
+导航: 完整侧边栏
+表格: 完整功能显示
+卡片: 3-4列布局  
+图表: 完整交互功能
 ```
 
-### 10.3 数据流可视化
-```scss
-// 数据流动线条
-.data-stream {
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      $tech-primary 20%, 
-      $tech-primary-4 50%, 
-      $tech-primary 80%, 
-      transparent 100%);
-    animation: dataStreamFlow 3s ease-in-out infinite;
-  }
-}
+## 6. 数据可视化设计
 
-@keyframes dataStreamFlow {
-  0% { transform: translateX(-100%); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateX(100%); opacity: 0; }
-}
-
-// 脉冲信号
-.pulse-signal {
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    background: $tech-primary;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulseSignal 2s ease-in-out infinite;
-  }
-}
-
-@keyframes pulseSignal {
-  0%, 100% { 
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
-  }
-  50% { 
-    transform: translate(-50%, -50%) scale(1.5);
-    box-shadow: 0 0 0 20px rgba(0, 212, 255, 0);
-  }
-}
+### 6.1 图表色彩
+```css
+主色系: #1890ff, #52c41a, #fa8c16, #eb2f96, #722ed1
+渐变色: 
+  蓝色渐变: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%)
+  绿色渐变: linear-gradient(135deg, #52c41a 0%, #73d13d 100%)
+  橙色渐变: linear-gradient(135deg, #fa8c16 0%, #ffc53d 100%)
 ```
 
-### 10.4 全息界面效果
-```scss
-// 全息边框
-.hologram-border {
-  position: relative;
-  border: 1px solid transparent;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    right: -1px;
-    bottom: -1px;
-    background: linear-gradient(45deg, 
-      $tech-primary 0%, 
-      transparent 25%, 
-      $tech-secondary 50%, 
-      transparent 75%, 
-      $tech-accent 100%);
-    border-radius: inherit;
-    z-index: -1;
-    animation: hologramRotate 4s linear infinite;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: $component-background;
-    border-radius: inherit;
-    z-index: -1;
-  }
-}
+### 6.2 图表类型规范
 
-@keyframes hologramRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-// 全息文字效果
-.hologram-text {
-  color: $tech-primary;
-  text-shadow: 
-    0 0 5px rgba(0, 212, 255, 0.5),
-    0 0 10px rgba(0, 212, 255, 0.3),
-    0 0 15px rgba(0, 212, 255, 0.2);
-  animation: hologramFlicker 3s ease-in-out infinite;
-}
-
-@keyframes hologramFlicker {
-  0%, 100% { opacity: 1; }
-  95% { opacity: 1; }
-  96% { opacity: 0.8; }
-  97% { opacity: 1; }
-  98% { opacity: 0.9; }
-  99% { opacity: 1; }
-}
+#### 饼图 (Pie Chart)
+```css
+用途: 比例分布展示
+大小: 最小 200px，最大 400px
+标签: 数值+百分比
+配色: 使用主色系，避免相近颜色
 ```
 
-### 10.5 能量场效果
-```scss
-// 能量场光环
-.energy-field {
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    right: -50%;
-    bottom: -50%;
-    background: radial-gradient(circle, 
-      rgba(0, 212, 255, 0.2) 0%, 
-      rgba(0, 212, 255, 0.1) 40%, 
-      transparent 70%);
-    border-radius: 50%;
-    animation: energyFieldPulse 4s ease-in-out infinite;
-    z-index: -1;
-  }
-}
-
-@keyframes energyFieldPulse {
-  0%, 100% { transform: scale(1); opacity: 0.3; }
-  50% { transform: scale(1.2); opacity: 0.6; }
-}
-
-// 电流效果
-.electric-current {
-  position: relative;
-  overflow: hidden;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(0, 255, 255, 0.8) 50%, 
-      transparent 100%);
-    animation: electricFlow 1.5s ease-in-out infinite;
-  }
-}
-
-@keyframes electricFlow {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
+#### 柱状图 (Bar Chart)
+```css
+用途: 对比数据展示
+柱宽: 24px-48px
+间距: 柱宽的 25%
+渐变: 垂直渐变效果
 ```
 
-## 11. 可访问性设计
+#### 折线图 (Line Chart)
+```css
+用途: 趋势变化展示
+线宽: 2px-3px
+点大小: 4px-6px
+区域填充: 20% 透明度
+```
 
-### 11.1 色彩对比
-- 确保所有文本与背景的对比度至少达到 4.5:1
-- 重要信息的对比度达到 7:1
-- 不仅依赖颜色传达信息
+#### 仪表盘 (Gauge)
+```css
+用途: 实时指标展示
+大小: 120px-200px
+色彩: 根据阈值变化
+动画: 2秒缓动到目标值
+```
 
-### 11.2 键盘导航
-- 所有交互元素支持Tab键导航
-- 明确的焦点指示器
-- 逻辑清晰的Tab顺序
+### 6.3 进度指示器
 
-### 11.3 语义化标记
+#### 环形进度条
+```css
+宽度: 8px-12px
+背景: rgba(0, 0, 0, 0.06)
+进度色: 根据状态变化
+动画: 从0%到目标值，2秒缓动
+```
+
+#### 线性进度条
+```css
+高度: 6px-10px
+圆角: 与高度一致
+背景: #f5f5f5
+进度色: #1890ff
+```
+
+## 7. 图标设计规范
+
+### 7.1 图标尺寸
+```css
+小图标: 12px × 12px
+标准图标: 16px × 16px  
+中等图标: 20px × 20px
+大图标: 24px × 24px
+特大图标: 32px × 32px
+```
+
+### 7.2 图标使用规则
+
+#### 功能图标
+```css
+导航图标: 20px，颜色跟随主题
+操作图标: 16px，悬停时高亮
+状态图标: 16px，使用状态色彩
+```
+
+#### 装饰图标
+```css
+空状态图标: 64px-128px，灰色
+加载图标: 24px-32px，主色调
+品牌图标: 按实际需求，保持比例
+```
+
+### 7.3 图标与文字组合
+```css
+水平组合: 图标在左，间距 8px
+垂直组合: 图标在上，间距 4px
+按钮图标: 根据按钮大小调整，间距 6px
+```
+
+## 8. 科技感设计元素
+
+### 8.1 粒子背景
+```css
+粒子数量: 30-50个
+粒子大小: 1px-3px
+连线距离: 100px
+透明度: 0.1-0.5
+运动速度: 0.5px/frame
+```
+
+### 8.2 发光效果
+```css
+外发光: box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+内发光: box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.3);
+文字发光: text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+边框发光: border: 1px solid rgba(0, 212, 255, 0.6);
+```
+
+### 8.3 渐变背景
+```css
+科技渐变: 
+  linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)
+  
+光效渐变:
+  radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%)
+  
+能量流:
+  linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.4) 50%, transparent 100%)
+```
+
+### 8.4 全息效果
+```css
+文字全息: 
+  background: linear-gradient(45deg, #00d4ff, #7c3aed, #00d4ff);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+边框全息:
+  border: 1px solid;
+  border-image: linear-gradient(45deg, #00d4ff, #7c3aed) 1;
+```
+
+## 9. 无障碍设计 (Accessibility)
+
+### 9.1 颜色对比度
+```css
+正文文字: 对比度 ≥ 4.5:1
+大文字(≥18px): 对比度 ≥ 3:1  
+重要信息: 对比度 ≥ 7:1
+装饰元素: 可适当降低
+```
+
+### 9.2 键盘导航
+```css
+焦点指示器: 2px solid #1890ff
+跳转顺序: 逻辑性强，符合阅读习惯
+快捷键: 提供常用操作快捷键
+陷阱避免: 避免键盘焦点困住
+```
+
+### 9.3 屏幕阅读器支持
 ```html
-<!-- 状态信息 -->
-<div role="status" aria-live="polite">
-  集群状态已更新
-</div>
-
-<!-- 按钮 -->
-<button aria-label="查看集群详情">
-  查看详情
-</button>
-
-<!-- 表格 -->
-<table role="table" aria-label="集群列表">
-  <thead>
-    <tr role="row">
-      <th role="columnheader">集群名称</th>
-    </tr>
-  </thead>
-</table>
+语义化标签: 使用正确的HTML标签
+ARIA标签: 为复杂组件添加ARIA标签
+图片描述: 为有意义的图片添加alt属性
+表单标签: 为所有表单控件添加关联标签
 ```
 
-## 12. 设计资源
+## 10. 品牌元素
 
-### 12.1 图标库
-- 主要使用 Ant Design Icons
-- 自定义图标遵循24x24px网格
-- 支持多种状态和尺寸
+### 10.1 Logo使用规范
+```css
+最小尺寸: 24px (高度)
+安全边距: Logo高度的1/2
+单色版本: 在复杂背景上使用
+色彩版本: 在简洁背景上使用
+```
 
-### 12.2 插画和图片
-- 空状态插画风格统一
-- 图片压缩优化
-- 支持高清显示
+### 10.2 品牌色彩
+```css
+主品牌色: #1890ff (Karmada Blue)
+辅助色: #722ed1 (Karmada Purple)  
+中性色: #8c8c8c (Neutral Gray)
+```
 
-### 12.3 设计文件
-- Figma设计文件
-- 组件库文档
-- 设计标注规范
+### 10.3 品牌应用
+```css
+页面标题: 使用品牌字体和色彩
+按钮样式: 体现品牌特色
+图标设计: 统一的设计风格
+插画元素: 符合品牌调性
+```
 
 ---
 
-*此文档将随着设计系统的完善持续更新* 
+本设计规范为 Karmada Dashboard 的 UI/UX 设计提供了全面的指导，确保产品在视觉表现和用户体验方面达到高水准，体现出专业的多云管理平台特质。 
