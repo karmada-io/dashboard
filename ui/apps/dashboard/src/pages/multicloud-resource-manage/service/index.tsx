@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { App, Button, Input, Segmented, Select } from 'antd';
+import { App, Button, Input, Segmented, Select, Typography } from 'antd';
 import { ServiceKind } from '@/services/base';
 import { Icons } from '@/components/icons';
 import { useCallback, useState } from 'react';
@@ -28,6 +28,7 @@ import IngressTable from '@/pages/multicloud-resource-manage/service/components/
 import useNamespace from '@/hooks/use-namespace.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { DeleteResource } from '@/services/unstructured.ts';
+import '@/styles/tech-theme.css';
 const ServicePage = () => {
   const [filter, setFilter] = useState<{
     selectedWorkSpace: string;
@@ -57,147 +58,189 @@ const ServicePage = () => {
   }, []);
   const { message: messageApi } = App.useApp();
   const queryClient = useQueryClient();
+  const { Title } = Typography;
+  
   return (
-    <Panel>
-      <div className={'flex flex-row justify-between mb-4'}>
-        <div>
-          <Segmented
+    <div className="tech-background min-h-screen">
+      {/* 粒子背景效果 */}
+      <div className="tech-particles-container">
+        {Array.from({ length: 12 }, (_, i) => (
+          <div
+            key={i}
+            className="tech-particle"
             style={{
-              marginBottom: 8,
-            }}
-            options={[
-              {
-                label: 'Service',
-                value: ServiceKind.Service,
-              },
-              {
-                label: 'Ingress',
-                value: ServiceKind.Ingress,
-              },
-            ]}
-            value={filter.kind}
-            onChange={(value) => {
-              // reset filter when switch workload kind
-              if (value !== filter.kind) {
-                setFilter({
-                  ...filter,
-                  kind: value,
-                  selectedWorkSpace: '',
-                  searchText: '',
-                });
-              } else {
-                setFilter({
-                  ...filter,
-                  kind: value,
-                });
-              }
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 20}s`
             }}
           />
+        ))}
+      </div>
+
+      <div className="relative z-10 p-6">
+        {/* 页面标题 */}
+        <div className="mb-8">
+          <Title 
+            level={1} 
+            className="tech-hologram-text m-0 text-4xl font-bold"
+            style={{ color: 'var(--tech-primary)' }}
+          >
+            🚀 SERVICE MANAGEMENT
+          </Title>
+          <Typography.Text className="text-gray-600 text-lg">
+            多云服务资源管理
+          </Typography.Text>
         </div>
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            toggleShowModal(true);
-          }}
-        >
-          {i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')}
-        </Button>
-      </div>
-      <div className={'flex flex-row space-x-4 mb-4'}>
-        <h3 className={'leading-[32px]'}>
-          {i18nInstance.t('280c56077360c204e536eb770495bc5f', '命名空间')}
-        </h3>
-        <Select
-          options={nsOptions}
-          className={'min-w-[200px]'}
-          value={filter.selectedWorkSpace}
-          loading={isNsDataLoading}
-          showSearch
-          allowClear
-          onChange={(v) => {
-            setFilter({
-              ...filter,
-              selectedWorkSpace: v,
-            });
-          }}
-        />
-        <Input.Search
-          placeholder={i18nInstance.t(
-            'cfaff3e369b9bd51504feb59bf0972a0',
-            '按命名空间搜索',
+
+        {/* 操作区域 */}
+        <div className="tech-card mb-6">
+          <div className={'flex flex-row justify-between mb-6'}>
+            <div>
+              <Segmented
+                style={{
+                  marginBottom: 8,
+                  fontSize: '16px',
+                  height: '40px'
+                }}
+                options={[
+                  {
+                    label: 'Service',
+                    value: ServiceKind.Service,
+                  },
+                  {
+                    label: 'Ingress',
+                    value: ServiceKind.Ingress,
+                  },
+                ]}
+                value={filter.kind}
+                onChange={(value) => {
+                  // reset filter when switch workload kind
+                  if (value !== filter.kind) {
+                    setFilter({
+                      ...filter,
+                      kind: value,
+                      selectedWorkSpace: '',
+                      searchText: '',
+                    });
+                  } else {
+                    setFilter({
+                      ...filter,
+                      kind: value,
+                    });
+                  }
+                }}
+              />
+            </div>
+            <button
+              className="tech-btn-primary flex items-center space-x-2"
+              onClick={() => {
+                toggleShowModal(true);
+              }}
+            >
+              <Icons.add width={16} height={16} />
+              <span>{i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')}</span>
+            </button>
+          </div>
+          <div className={'flex flex-row space-x-4 mb-6'}>
+            <h3 className={'leading-[40px] text-lg font-semibold'} style={{ color: 'var(--text-color)' }}>
+              {i18nInstance.t('280c56077360c204e536eb770495bc5f', '命名空间')}
+            </h3>
+            <Select
+              options={nsOptions}
+              className={'min-w-[200px]'}
+              style={{ fontSize: '16px', height: '40px' }}
+              value={filter.selectedWorkSpace}
+              loading={isNsDataLoading}
+              showSearch
+              allowClear
+              onChange={(v) => {
+                setFilter({
+                  ...filter,
+                  selectedWorkSpace: v,
+                });
+              }}
+            />
+            <Input.Search
+              placeholder={i18nInstance.t(
+                'cfaff3e369b9bd51504feb59bf0972a0',
+                '按命名空间搜索',
+              )}
+              className={'tech-search-input w-[350px]'}
+              style={{ 
+                fontSize: '16px',
+                height: '40px'
+              }}
+              onPressEnter={(e) => {
+                const input = e.currentTarget.value;
+                setFilter({
+                  ...filter,
+                  searchText: input,
+                });
+              }}
+            />
+          </div>
+        </div>
+        {/* 数据表格区域 */}
+        <div className="tech-card">
+          {filter.kind === ServiceKind.Service && (
+            <ServiceTable
+              labelTagNum={labelTagNum}
+              searchText={filter.searchText}
+              selectedWorkSpace={filter.selectedWorkSpace}
+              onViewServiceContent={(r) => {
+                setEditorState({
+                  mode: 'detail',
+                  content: stringify(r),
+                });
+                toggleShowModal(true);
+              }}
+              onEditServiceContent={(r) => {
+                setEditorState({
+                  mode: 'edit',
+                  content: stringify(r),
+                });
+                toggleShowModal(true);
+              }}
+              onDeleteServiceContent={async (r) => {
+                try {
+                  const ret = await DeleteResource({
+                    kind: r.typeMeta.kind,
+                    name: r.objectMeta.name,
+                    namespace: r.objectMeta.namespace,
+                  });
+                  if (ret.code !== 200) {
+                    await messageApi.error(
+                      i18nInstance.t(
+                        '1ed71b1211f5d2ba41e4a23331985c7c',
+                        '删除服务失败',
+                      ),
+                    );
+                  }
+                  await queryClient.invalidateQueries({
+                    queryKey: ['GetServices'],
+                    exact: false,
+                  });
+                } catch (e) {
+                  console.log('error', e);
+                }
+              }}
+            />
           )}
-          className={'w-[300px]'}
-          onPressEnter={(e) => {
-            const input = e.currentTarget.value;
-            setFilter({
-              ...filter,
-              searchText: input,
-            });
-          }}
-        />
-      </div>
-      {filter.kind === ServiceKind.Service && (
-        <ServiceTable
-          labelTagNum={labelTagNum}
-          searchText={filter.searchText}
-          selectedWorkSpace={filter.selectedWorkSpace}
-          onViewServiceContent={(r) => {
-            setEditorState({
-              mode: 'detail',
-              content: stringify(r),
-            });
-            toggleShowModal(true);
-          }}
-          onEditServiceContent={(r) => {
-            setEditorState({
-              mode: 'edit',
-              content: stringify(r),
-            });
-            toggleShowModal(true);
-          }}
-          onDeleteServiceContent={async (r) => {
-            try {
-              const ret = await DeleteResource({
-                kind: r.typeMeta.kind,
-                name: r.objectMeta.name,
-                namespace: r.objectMeta.namespace,
-              });
-              if (ret.code !== 200) {
-                await messageApi.error(
-                  i18nInstance.t(
-                    '1ed71b1211f5d2ba41e4a23331985c7c',
-                    '删除服务失败',
-                  ),
-                );
-              }
-              await queryClient.invalidateQueries({
-                queryKey: ['GetServices'],
-                exact: false,
-              });
-            } catch (e) {
-              console.log('error', e);
-            }
-          }}
-        />
-      )}
-      {filter.kind === ServiceKind.Ingress && (
-        <IngressTable
-          labelTagNum={labelTagNum}
-          searchText={filter.searchText}
-          selectedWorkSpace={filter.selectedWorkSpace}
-          onViewIngressContent={(r) => {
-            setEditorState({
-              mode: 'edit',
-              content: stringify(r),
-            });
-            toggleShowModal(true);
-          }}
-          onDeleteIngressContent={async (r) => {
-            try {
-              const ret = await DeleteResource({
-                kind: r.typeMeta.kind,
+          {filter.kind === ServiceKind.Ingress && (
+            <IngressTable
+              labelTagNum={labelTagNum}
+              searchText={filter.searchText}
+              selectedWorkSpace={filter.selectedWorkSpace}
+              onViewIngressContent={(r) => {
+                setEditorState({
+                  mode: 'edit',
+                  content: stringify(r),
+                });
+                toggleShowModal(true);
+              }}
+              onDeleteIngressContent={async (r) => {
+                try {
+                  const ret = await DeleteResource({
+                    kind: r.typeMeta.kind,
                 name: r.objectMeta.name,
                 namespace: r.objectMeta.namespace,
               });
@@ -217,8 +260,10 @@ const ServicePage = () => {
               console.log('error', e);
             }
           }}
-        />
-      )}
+            />
+          )}
+        </div>
+      </div>
 
       <ServiceEditorModal
         mode={editorState.mode}
@@ -263,7 +308,7 @@ const ServicePage = () => {
         }}
         kind={filter.kind}
       />
-    </Panel>
+    </div>
   );
 };
 export default ServicePage;

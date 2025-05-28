@@ -115,7 +115,7 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({
         transition: 'all 0.3s ease',
         cursor: 'pointer',
       }}
-      bodyStyle={{ padding: '20px' }}
+      styles={{ body: { padding: '20px' } }}
       hoverable
       onClick={onView}
     >
@@ -169,13 +169,13 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({
             </Text>
             <Space wrap size={4}>
               {clusters.slice(0, 3).map(cluster => (
-                <Tag key={cluster} size="small" color="blue">
+                <Tag key={cluster} color="blue">
                   {cluster}
                 </Tag>
               ))}
               {clusters.length > 3 && (
                 <Tooltip title={clusters.slice(3).join(', ')}>
-                  <Tag size="small" color="default">
+                  <Tag color="default">
                     +{clusters.length - 3}
                   </Tag>
                 </Tooltip>
@@ -221,12 +221,12 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({
             </Text>
             <Space wrap size={4}>
               {Object.entries(labels).slice(0, 3).map(([key, value]) => (
-                <Tag key={key} size="small" style={{ fontSize: '10px' }}>
+                <Tag key={key} style={{ fontSize: '10px' }}>
                   {key}={value}
                 </Tag>
               ))}
               {Object.keys(labels).length > 3 && (
-                <Tag size="small" color="default" style={{ fontSize: '10px' }}>
+                <Tag color="default" style={{ fontSize: '10px' }}>
                   +{Object.keys(labels).length - 3}
                 </Tag>
               )}

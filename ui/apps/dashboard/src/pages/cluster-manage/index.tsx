@@ -30,7 +30,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters, DeleteCluster, GetClusterDetail } from '@/services/cluster';
 import { ClusterCard } from '@/components/cluster';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import NewClusterModal from './new-cluster-modal';
 import type { Cluster, ClusterDetail } from '@/services/cluster';

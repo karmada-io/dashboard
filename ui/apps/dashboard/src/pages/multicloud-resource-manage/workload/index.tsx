@@ -22,14 +22,14 @@ import {
   Button, 
   Input, 
   Select, 
-  Statistic,
-  Card,
   Segmented,
   Flex,
   message,
   Popconfirm,
 } from 'antd';
 import { useQuery } from '@tanstack/react-query';
+
+import '@/styles/tech-theme.css';
 import { GetWorkloads } from '@/services/workload';
 import { DeleteResource, GetResource } from '@/services/unstructured';
 import { WorkloadCard } from '@/components/workload';
@@ -53,7 +53,6 @@ const { Option } = Select;
 
 const WorkloadPage = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
-  const navigate = useNavigate();
   
   const [filter, setFilter] = useState<{
     kind: WorkloadKind;
@@ -120,7 +119,7 @@ const WorkloadPage = () => {
     }));
   };
 
-  const getWorkloadStatus = (workload: DeploymentWorkload): 'Running' | 'Pending' | 'Failed' | 'Succeeded' | 'Unknown' => {
+  const getWorkloadStatus = (_workload: DeploymentWorkload): 'Running' | 'Pending' | 'Failed' | 'Succeeded' | 'Unknown' => {
     // 暂时返回Running状态，后续根据实际API数据结构调整
     return 'Running';
   };
@@ -145,7 +144,7 @@ const WorkloadPage = () => {
     return clusters.length > 0 ? clusters : ['master', 'member1'];
   };
 
-  const getWorkloadImages = (workload: DeploymentWorkload): string[] => {
+  const getWorkloadImages = (_workload: DeploymentWorkload): string[] => {
     // 暂时返回模拟数据，后续根据实际API数据结构调整
     return ['nginx:latest'];
   };
@@ -217,168 +216,261 @@ const WorkloadPage = () => {
   ];
 
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+    <div className="tech-background min-h-screen">
       {messageContextHolder}
       
-      {/* 页面标题和操作栏 */}
-      <div style={{ marginBottom: '24px' }}>
-        <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
-          <div>
-            <Title level={2} style={{ margin: 0 }}>
-              多云工作负载
-            </Title>
-            <Text type="secondary">
-              管理和监控跨集群的应用工作负载
-            </Text>
-          </div>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />} 
-            onClick={handleCreateWorkload}
-            size="large"
-          >
-            创建工作负载
-          </Button>
-        </Flex>
-
-        {/* 过滤和搜索栏 */}
-        <Flex gap={16} align="center" wrap="wrap">
-          <div>
-            <Text style={{ marginRight: '8px' }}>工作负载类型:</Text>
-            <Segmented
-              value={filter.kind}
-              onChange={(value) => setFilter(prev => ({ ...prev, kind: value as WorkloadKind }))}
-              options={workloadTypes}
-            />
-          </div>
-          <Select
-            placeholder="选择命名空间"
-            value={filter.selectedWorkSpace || undefined}
-            onChange={(value) => setFilter(prev => ({ ...prev, selectedWorkSpace: value || '' }))}
-            style={{ width: 200 }}
-            allowClear
-            loading={isNsDataLoading}
-          >
-            {nsOptions.map(ns => (
-              <Option key={ns.value} value={ns.value}>{ns.title}</Option>
-            ))}
-          </Select>
-          <Search
-            placeholder="搜索工作负载名称"
-            allowClear
-            value={filter.searchText}
-            onChange={(e) => setFilter(prev => ({ ...prev, searchText: e.target.value }))}
-            style={{ width: 300 }}
-            prefix={<SearchOutlined />}
+      {/* 粒子背景效果 */}
+      <div className="tech-particles-container">
+        {Array.from({ length: 20 }, (_, i) => (
+          <div
+            key={i}
+            className="tech-particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 20}s`
+            }}
           />
-          <Button 
-            icon={<ReloadOutlined />} 
-            onClick={() => refetch()}
-            loading={isLoading}
-          >
-            刷新
-          </Button>
-        </Flex>
+        ))}
       </div>
 
-      {/* 统计信息卡片 */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={6}>
-          <Card>
-            <Statistic
-              title="总工作负载"
-              value={stats.total}
-              valueStyle={{ color: '#1890ff' }}
-              prefix={<AppstoreOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={6}>
-          <Card>
-            <Statistic
-              title="运行中"
-              value={stats.running}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={6}>
-          <Card>
-            <Statistic
-              title="待启动"
-              value={stats.pending}
-              valueStyle={{ color: '#faad14' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={6}>
-          <Card>
-            <Statistic
-              title="异常"
-              value={stats.failed}
-              valueStyle={{ color: '#ff4d4f' }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <div className="relative z-10 p-6">
+        {/* 页面标题 */}
+        <div className="mb-8">
+          <Title 
+            level={1} 
+            className="tech-hologram-text m-0 text-4xl font-bold"
+            style={{ color: 'var(--tech-primary)' }}
+          >
+            🚀 WORKLOAD MANAGEMENT
+          </Title>
+          <Text className="text-gray-600 text-lg">
+            多云工作负载管理与监控中心
+          </Text>
+        </div>
 
-      {/* 工作负载卡片网格 */}
-      <Row gutter={[16, 16]}>
-        {workloadData.map((workload) => (
-          <Col xs={24} lg={12} xl={8} key={`${workload.namespace}-${workload.name}`}>
-            <Popconfirm
-              title="确认删除"
-              description={`确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`}
-              onConfirm={() => handleDeleteWorkload(workload)}
-              okText="确认删除"
-              cancelText="取消"
-              okType="danger"
+        {/* 操作和过滤区域 */}
+        <div className="tech-card mb-6">
+          <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
+            <div>
+              <Title level={3} style={{ margin: 0, color: 'var(--text-color)' }}>
+                工作负载概览
+              </Title>
+              <Text type="secondary">
+                当前显示 {workloadData.length} 个工作负载
+              </Text>
+            </div>
+            <button 
+              className="tech-btn-primary flex items-center space-x-2"
+              onClick={handleCreateWorkload}
             >
-              <WorkloadCard
-                name={workload.name}
-                namespace={workload.namespace}
-                type={workload.type}
-                status={workload.status}
-                replicas={workload.replicas}
-                clusters={workload.clusters}
-                images={workload.images}
-                createTime={workload.createTime}
-                labels={workload.labels}
-                onView={() => handleViewWorkload(workload)}
-                onEdit={() => handleEditWorkload(workload)}
-                onDelete={() => {}} // 删除由Popconfirm处理
-                onScale={() => {
-                  // TODO: 实现扩缩容功能
-                  messageApi.info('扩缩容功能开发中');
-                }}
-                onRestart={() => {
-                  // TODO: 实现重启功能
-                  messageApi.info('重启功能开发中');
+              <PlusOutlined />
+              <span>创建工作负载</span>
+            </button>
+          </Flex>
+
+          {/* 过滤和搜索栏 */}
+          <Flex gap={16} align="center" wrap="wrap">
+            <div>
+              <Text style={{ marginRight: '8px', fontWeight: '600' }}>工作负载类型:</Text>
+              <Segmented
+                value={filter.kind}
+                onChange={(value) => setFilter(prev => ({ ...prev, kind: value as WorkloadKind }))}
+                options={workloadTypes}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  border: '1px solid var(--glow-border)',
                 }}
               />
-            </Popconfirm>
-          </Col>
-        ))}
-      </Row>
-
-      {/* 空状态 */}
-      {workloadData.length === 0 && !isLoading && (
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '60px 0',
-          backgroundColor: '#ffffff',
-          borderRadius: '8px',
-          marginTop: '24px',
-        }}>
-          <AppstoreOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-          <Text type="secondary" style={{ fontSize: '16px', display: 'block', marginBottom: '16px' }}>
-            暂无工作负载数据
-          </Text>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateWorkload}>
-            创建第一个工作负载
-          </Button>
+            </div>
+            <Select
+              placeholder="选择命名空间"
+              value={filter.selectedWorkSpace || undefined}
+              onChange={(value) => setFilter(prev => ({ ...prev, selectedWorkSpace: value || '' }))}
+              style={{ 
+                width: 200,
+              }}
+              allowClear
+              loading={isNsDataLoading}
+            >
+              {nsOptions.map(ns => (
+                <Option key={ns.value} value={ns.value}>{ns.title}</Option>
+              ))}
+            </Select>
+            <Search
+              placeholder="搜索工作负载名称"
+              allowClear
+              value={filter.searchText}
+              onChange={(e) => setFilter(prev => ({ ...prev, searchText: e.target.value }))}
+              style={{ width: 300 }}
+              className="tech-search-input"
+              prefix={<SearchOutlined />}
+            />
+            <Button 
+              icon={<ReloadOutlined />} 
+              onClick={() => refetch()}
+              loading={isLoading}
+              style={{
+                borderColor: 'var(--tech-primary)',
+                color: 'var(--tech-primary)',
+              }}
+            >
+              刷新
+            </Button>
+          </Flex>
         </div>
-      )}
+
+        {/* 统计信息卡片 */}
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={6}>
+            <div className="tech-card tech-hover-scale">
+              <div className="flex items-center justify-between mb-4">
+                <AppstoreOutlined 
+                  className="text-3xl"
+                  style={{ color: 'var(--tech-primary)' }}
+                />
+              </div>
+              <div className="text-center">
+                <div 
+                  className="text-4xl font-bold mb-2 tech-hologram-text"
+                  style={{ color: 'var(--tech-primary)' }}
+                >
+                  {stats.total}
+                </div>
+                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                  总工作负载
+                </Text>
+              </div>
+            </div>
+          </Col>
+          <Col xs={24} sm={6}>
+            <div className="tech-card tech-hover-scale">
+              <div className="flex items-center justify-between mb-4">
+                <div 
+                  className="w-3 h-3 rounded-full animate-pulse"
+                  style={{ background: 'var(--success-color)' }}
+                />
+              </div>
+              <div className="text-center">
+                <div 
+                  className="text-4xl font-bold mb-2 tech-hologram-text"
+                  style={{ color: 'var(--success-color)' }}
+                >
+                  {stats.running}
+                </div>
+                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                  运行中
+                </Text>
+              </div>
+            </div>
+          </Col>
+          <Col xs={24} sm={6}>
+            <div className="tech-card tech-hover-scale">
+              <div className="flex items-center justify-between mb-4">
+                <div 
+                  className="w-3 h-3 rounded-full animate-pulse"
+                  style={{ background: 'var(--warning-color)' }}
+                />
+              </div>
+              <div className="text-center">
+                <div 
+                  className="text-4xl font-bold mb-2 tech-hologram-text"
+                  style={{ color: 'var(--warning-color)' }}
+                >
+                  {stats.pending}
+                </div>
+                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                  待启动
+                </Text>
+              </div>
+            </div>
+          </Col>
+          <Col xs={24} sm={6}>
+            <div className="tech-card tech-hover-scale">
+              <div className="flex items-center justify-between mb-4">
+                <div 
+                  className="w-3 h-3 rounded-full animate-pulse"
+                  style={{ background: 'var(--error-color)' }}
+                />
+              </div>
+              <div className="text-center">
+                <div 
+                  className="text-4xl font-bold mb-2 tech-hologram-text"
+                  style={{ color: 'var(--error-color)' }}
+                >
+                  {stats.failed}
+                </div>
+                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                  异常
+                </Text>
+              </div>
+            </div>
+          </Col>
+        </Row>
+
+        {/* 工作负载卡片网格 */}
+        <div className="tech-card mb-6">
+          <Row gutter={[24, 24]}>
+            {workloadData.map((workload) => (
+              <Col xs={24} lg={12} xl={8} key={`${workload.namespace}-${workload.name}`}>
+                <Popconfirm
+                  title="确认删除"
+                  description={`确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`}
+                  onConfirm={() => handleDeleteWorkload(workload)}
+                  okText="确认删除"
+                  cancelText="取消"
+                  okType="danger"
+                >
+                  <WorkloadCard
+                    name={workload.name}
+                    namespace={workload.namespace}
+                    type={workload.type}
+                    status={workload.status}
+                    replicas={workload.replicas}
+                    clusters={workload.clusters}
+                    images={workload.images}
+                    createTime={workload.createTime}
+                    labels={workload.labels}
+                    onView={() => handleViewWorkload(workload)}
+                    onEdit={() => handleEditWorkload(workload)}
+                    onDelete={() => {}} // 删除由Popconfirm处理
+                    onScale={() => {
+                      // TODO: 实现扩缩容功能
+                      messageApi.info('扩缩容功能开发中');
+                    }}
+                    onRestart={() => {
+                      // TODO: 实现重启功能
+                      messageApi.info('重启功能开发中');
+                    }}
+                  />
+                </Popconfirm>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        {/* 空状态 */}
+        {workloadData.length === 0 && !isLoading && (
+          <div className="tech-card text-center py-16">
+            <AppstoreOutlined 
+              className="text-6xl mb-6"
+              style={{ color: 'var(--tech-primary)', opacity: 0.5 }}
+            />
+            <Text 
+              className="text-xl block mb-6 tech-hologram-text"
+              style={{ color: 'var(--tech-primary)' }}
+            >
+              暂无工作负载数据
+            </Text>
+            <button 
+              className="tech-btn-primary flex items-center space-x-2 mx-auto"
+              onClick={handleCreateWorkload}
+            >
+              <PlusOutlined />
+              <span>创建第一个工作负载</span>
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* 工作负载编辑器模态框 */}
       <NewWorkloadEditorModal

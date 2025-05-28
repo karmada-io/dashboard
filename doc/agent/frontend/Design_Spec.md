@@ -33,80 +33,81 @@
 
 ### 3.1 色彩系统 - 亮色科技风格
 
-#### 3.1.1 主色调 - 科技蓝渐变系列
+#### 3.1.1 主色调 - 柔和科技蓝渐变系列
 ```scss
-// 科技感主题色 - 明亮渐变
-$tech-primary: #00d4ff;         // 科技主蓝色 (亮青蓝)
-$tech-primary-1: #e6fdff;       // 最浅 (冰雪蓝)
-$tech-primary-2: #b3f7ff;       // 浅 (天空蓝)
-$tech-primary-3: #80f1ff;       // 明亮蓝
-$tech-primary-4: #4debff;       // 发光蓝
-$tech-primary-5: #1ae5ff;       // 标准科技蓝
-$tech-primary-6: #00d4ff;       // 主色调
-$tech-primary-7: #00bfeb;       // 深一点
-$tech-primary-8: #0099cc;       // 更深
-$tech-primary-9: #0073a3;       // 深科技蓝
-$tech-primary-10: #004d7a;      // 最深
+// 科技感主题色 - 柔和舒适版
+$tech-primary: #1890ff;         // 柔和科技蓝 (降低饱和度)
+$tech-primary-1: #f0f8ff;       // 最浅 (柔和蓝白)
+$tech-primary-2: #d6ebff;       // 浅 (清淡蓝)
+$tech-primary-3: #a6d2ff;       // 明亮蓝 (更柔和)
+$tech-primary-4: #73b3ff;       // 中等蓝
+$tech-primary-5: #409eff;       // 标准蓝
+$tech-primary-6: #1890ff;       // 主色调
+$tech-primary-7: #096dd9;       // 深一点
+$tech-primary-8: #0050b3;       // 更深
+$tech-primary-9: #003a8c;       // 深蓝
+$tech-primary-10: #002766;      // 最深
 
-// 辅助科技色彩
-$tech-secondary: #7c3aed;       // 科技紫色
-$tech-accent: #06ffa5;          // 科技绿色 (霓虹绿)
-$tech-highlight: #ffd700;       // 科技金色 (霓虹黄)
+// 辅助科技色彩 - 柔和版
+$tech-secondary: #722ed1;       // 柔和紫色
+$tech-accent: #52c41a;          // 柔和绿色
+$tech-highlight: #faad14;       // 柔和金色
 ```
 
-#### 3.1.2 炫酷功能色彩
+#### 3.1.2 舒适功能色彩
 ```scss
-// 状态颜色 - 高饱和度科技感
-$success-color: #00ff88;        // 霓虹绿 (成功/正常)
-$warning-color: #ff8c00;        // 科技橙 (警告状态)
-$error-color: #ff0080;          // 霓虹粉 (错误/危险)
-$info-color: #00d4ff;           // 科技蓝 (信息状态)
+// 状态颜色 - 舒适护眼版
+$success-color: #52c41a;        // 柔和绿 (成功/正常)
+$warning-color: #faad14;        // 柔和橙 (警告状态)
+$error-color: #ff4d4f;          // 柔和红 (错误/危险)
+$info-color: #1890ff;           // 柔和蓝 (信息状态)
 
-// 特殊科技色
-$pulse-color: #00ffff;          // 脉冲青色
+// 特殊科技色 - 柔和版
+$pulse-color: #40a9ff;          // 柔和脉冲色
 $glow-color: #ffffff;           // 发光白色
-$energy-color: #7c3aed;         // 能量紫色
+$energy-color: #722ed1;         // 柔和紫色
 
-// 亮色主题文本色
-$text-color: #1a1a1a;           // 主文本色 (深灰)
-$text-color-secondary: #4a4a4a; // 次要文本色
-$text-color-disabled: #9a9a9a;  // 禁用文本色
-$text-color-accent: #0073a3;    // 强调文本色
+// 舒适文本色系统
+$text-color: #262626;           // 主文本色 (柔和深灰)
+$text-color-secondary: #595959; // 次要文本色
+$text-color-disabled: #bfbfbf;  // 禁用文本色
+$text-color-accent: #1890ff;    // 强调文本色
+$text-color-light: #8c8c8c;     // 浅文本色
 
-// 亮色背景系统
-$background-color: #f8feff;     // 页面背景色 (极浅蓝白)
+// 舒适背景系统
+$background-color: #fafafa;     // 页面背景色 (温和灰白)
 $component-background: #ffffff; // 组件背景色
-$card-background: rgba(255, 255, 255, 0.9); // 卡片背景 (半透明)
+$card-background: #ffffff;      // 卡片背景
 $overlay-background: rgba(255, 255, 255, 0.95); // 覆盖层背景
 
-// 边框和分割线
-$border-color: #e0f4ff;         // 边框色 (浅科技蓝)
-$divider-color: #f0f9ff;        // 分割线色
-$glow-border: rgba(0, 212, 255, 0.3); // 发光边框
+// 边框和分割线 - 柔和版
+$border-color: #d9d9d9;         // 边框色 (柔和灰)
+$divider-color: #f0f0f0;        // 分割线色
+$glow-border: rgba(24, 144, 255, 0.2); // 柔和发光边框
 ```
 
-#### 3.1.3 渐变色系统
+#### 3.1.3 舒适渐变色系统
 ```scss
-// 科技感渐变背景
-$gradient-primary: linear-gradient(135deg, #f8feff 0%, #e6fdff 50%, #f0f9ff 100%);
-$gradient-card: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(248,254,255,0.8) 100%);
-$gradient-button: linear-gradient(45deg, #00d4ff 0%, #1ae5ff 50%, #4debff 100%);
-$gradient-accent: linear-gradient(90deg, #7c3aed 0%, #00d4ff 50%, #06ffa5 100%);
+// 舒适渐变背景
+$gradient-primary: linear-gradient(135deg, #fafafa 0%, #f0f8ff 50%, #ffffff 100%);
+$gradient-card: linear-gradient(145deg, #ffffff 0%, rgba(248,250,252,0.8) 100%);
+$gradient-button: linear-gradient(45deg, #1890ff 0%, #40a9ff 50%, #73b3ff 100%);
+$gradient-accent: linear-gradient(90deg, #722ed1 0%, #1890ff 50%, #52c41a 100%);
 
-// 发光效果渐变
-$glow-gradient: radial-gradient(circle, rgba(0,212,255,0.3) 0%, transparent 70%);
-$pulse-gradient: radial-gradient(circle, rgba(0,255,255,0.2) 0%, transparent 60%);
+// 柔和发光效果
+$glow-gradient: radial-gradient(circle, rgba(24,144,255,0.15) 0%, transparent 70%);
+$pulse-gradient: radial-gradient(circle, rgba(64,169,255,0.1) 0%, transparent 60%);
 ```
 
-#### 3.1.4 炫酷状态色应用
-| 状态 | 颜色 | 发光效果 | 应用场景 |
+#### 3.1.4 舒适状态色应用
+| 状态 | 颜色 | 柔和阴影效果 | 应用场景 |
 |------|------|----------|----------|
-| 🟢 Ready/Success | `#00ff88` | `box-shadow: 0 0 20px rgba(0,255,136,0.4)` | 集群正常、Pod运行正常、操作成功 |
-| 🟡 Warning | `#ff8c00` | `box-shadow: 0 0 15px rgba(255,140,0,0.3)` | 资源使用率高、配置警告 |
-| 🔴 Error/Failed | `#ff0080` | `box-shadow: 0 0 20px rgba(255,0,128,0.4)` | 集群异常、Pod失败、操作错误 |
-| 🔵 Info/Processing | `#00d4ff` | `box-shadow: 0 0 25px rgba(0,212,255,0.5)` | 信息提示、处理中状态 |
-| ⚪ Unknown/Disabled | `#9a9a9a` | 无发光 | 未知状态、禁用状态 |
-| ⚡ Energy/Active | `#7c3aed` | `box-shadow: 0 0 30px rgba(124,58,237,0.6)` | 活跃状态、高能耗 |
+| 🟢 Ready/Success | `#52c41a` | `box-shadow: 0 2px 8px rgba(82,196,26,0.2)` | 集群正常、Pod运行正常、操作成功 |
+| 🟡 Warning | `#faad14` | `box-shadow: 0 2px 8px rgba(250,173,20,0.2)` | 资源使用率高、配置警告 |
+| 🔴 Error/Failed | `#ff4d4f` | `box-shadow: 0 2px 8px rgba(255,77,79,0.2)` | 集群异常、Pod失败、操作错误 |
+| 🔵 Info/Processing | `#1890ff` | `box-shadow: 0 2px 8px rgba(24,144,255,0.2)` | 信息提示、处理中状态 |
+| ⚪ Unknown/Disabled | `#bfbfbf` | 无阴影 | 未知状态、禁用状态 |
+| ⚡ Energy/Active | `#722ed1` | `box-shadow: 0 2px 8px rgba(114,46,209,0.2)` | 活跃状态、高能耗 |
 
 ### 3.2 字体系统
 
@@ -158,37 +159,38 @@ $border-radius-lg: 12px;  // 大圆角：大卡片、模态框
 $border-radius-xl: 16px;  // 超大圆角：主要容器
 ```
 
-#### 3.4.2 科技感阴影系统
+#### 3.4.2 舒适阴影系统
 ```scss
-// 基础阴影
-$box-shadow-sm: 0 4px 12px 0 rgba(0, 212, 255, 0.1), 
-                0 2px 6px 0 rgba(0, 0, 0, 0.05);      // 轻微科技阴影
-$box-shadow-md: 0 8px 24px 0 rgba(0, 212, 255, 0.15), 
-                0 4px 12px 0 rgba(0, 0, 0, 0.08);     // 标准科技阴影
-$box-shadow-lg: 0 12px 40px 0 rgba(0, 212, 255, 0.2), 
-                0 8px 20px 0 rgba(0, 0, 0, 0.1);      // 深度科技阴影
+// 基础阴影 - 柔和版
+$box-shadow-sm: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 
+                0 1px 4px 0 rgba(0, 0, 0, 0.04);      // 轻微阴影
+$box-shadow-md: 0 4px 16px 0 rgba(0, 0, 0, 0.08), 
+                0 2px 8px 0 rgba(0, 0, 0, 0.06);      // 标准阴影
+$box-shadow-lg: 0 8px 32px 0 rgba(0, 0, 0, 0.1), 
+                0 4px 16px 0 rgba(0, 0, 0, 0.08);     // 深度阴影
 
-// 发光阴影
-$glow-shadow-sm: 0 0 15px rgba(0, 212, 255, 0.3);     // 小发光
-$glow-shadow-md: 0 0 25px rgba(0, 212, 255, 0.4);     // 中发光
-$glow-shadow-lg: 0 0 35px rgba(0, 212, 255, 0.5);     // 大发光
+// 柔和强调阴影
+$accent-shadow-sm: 0 2px 8px rgba(24, 144, 255, 0.15); // 小强调
+$accent-shadow-md: 0 4px 16px rgba(24, 144, 255, 0.2); // 中强调
+$accent-shadow-lg: 0 8px 32px rgba(24, 144, 255, 0.25); // 大强调
 
-// 状态发光
-$success-glow: 0 0 20px rgba(0, 255, 136, 0.4);       // 成功发光
-$error-glow: 0 0 20px rgba(255, 0, 128, 0.4);         // 错误发光
-$warning-glow: 0 0 15px rgba(255, 140, 0, 0.3);       // 警告发光
-$energy-glow: 0 0 30px rgba(124, 58, 237, 0.6);       // 能量发光
+// 状态阴影 - 舒适版
+$success-shadow: 0 2px 8px rgba(82, 196, 26, 0.2);    // 成功阴影
+$error-shadow: 0 2px 8px rgba(255, 77, 79, 0.2);      // 错误阴影
+$warning-shadow: 0 2px 8px rgba(250, 173, 20, 0.2);   // 警告阴影
+$info-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);      // 信息阴影
 
-// 多层阴影组合
-$tech-card-shadow: 
-  0 0 20px rgba(0, 212, 255, 0.1),      // 外发光
-  0 8px 32px rgba(0, 0, 0, 0.06),       // 深度
-  inset 0 1px 0 rgba(255, 255, 255, 0.9); // 内亮边
+// 卡片和组件阴影
+$card-shadow: 
+  0 2px 8px rgba(0, 0, 0, 0.06),        // 基础深度
+  0 1px 4px rgba(0, 0, 0, 0.04);        // 轻微边缘
 
-$tech-button-shadow: 
-  0 0 15px rgba(0, 212, 255, 0.3),      // 发光
-  0 4px 15px rgba(0, 0, 0, 0.1),        // 深度
-  inset 0 1px 0 rgba(255, 255, 255, 0.8); // 内亮边
+$button-shadow: 
+  0 2px 8px rgba(0, 0, 0, 0.1),         // 按钮深度
+  0 1px 4px rgba(0, 0, 0, 0.06);        // 按钮边缘
+
+$input-shadow: 
+  0 0 0 2px rgba(24, 144, 255, 0.2);    // 输入框焦点
 ```
 
 ## 4. 布局系统

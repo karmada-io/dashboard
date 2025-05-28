@@ -23,7 +23,7 @@ import {
   TagsOutlined 
 } from '@ant-design/icons';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 interface ResourceUsageProps {
   title: string;
@@ -82,12 +82,14 @@ const ResourceUsage: React.FC<ResourceUsageProps> = ({
         borderRadius: '8px',
         height: '180px',
       }}
-      bodyStyle={{ 
-        padding: '20px',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
+      styles={{ 
+        body: {
+          padding: '20px',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }
       }}
     >
       <Flex vertical gap={16} style={{ height: '100%' }}>

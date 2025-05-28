@@ -17,3 +17,44 @@ limitations under the License.
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 引入科技风格样式 */
+@import './styles/tech-theme.css';
+
+/* 全局样式重置 */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 
+               'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', 
+               'Helvetica', 'Arial', sans-serif;
+  background: var(--background-color);
+  color: var(--text-color);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--tech-primary), var(--tech-primary-4));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--tech-primary-4), var(--tech-primary));
+}

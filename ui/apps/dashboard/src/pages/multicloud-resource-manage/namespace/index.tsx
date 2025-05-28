@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import i18nInstance from '@/utils/i18n';
-import Panel from '@/components/panel';
 import { useQuery } from '@tanstack/react-query';
 import {
   App,
@@ -25,8 +24,10 @@ import {
   Space,
   Table,
   TableColumnProps,
-  Tag,
+  Typography,
 } from 'antd';
+import TechStatusBadge from '@/components/status-badge/TechStatusBadge';
+import '@/styles/tech-theme.css';
 import { GetNamespaces } from '@/services/namespace.ts';
 import type { Namespace } from '@/services/namespace.ts';
 import { Icons } from '@/components/icons';
@@ -80,16 +81,36 @@ const NamespacePage = () => {
       key: 'skipAutoPropagation',
       render: (_, r) => {
         return r.skipAutoPropagation ? (
-          <Tag color="blue">yes</Tag>
+          <TechStatusBadge status="info" text="YES" size="small" />
         ) : (
-          <Tag color="purple">no</Tag>
+          <TechStatusBadge status="success" text="NO" size="small" />
         );
       },
     },
     {
       title: i18nInstance.t('e4b51d5cd0e4f199e41c25be1c7591d3', '运行状态'),
       key: 'phase',
-      dataIndex: 'phase',
+      render: (_, r) => {
+        const getStatusType = (phase: string) => {
+          switch (phase?.toLowerCase()) {
+            case 'active':
+              return 'success';
+            case 'terminating':
+              return 'warning';
+            case 'failed':
+              return 'error';
+            default:
+              return 'info';
+          }
+        };
+        return (
+          <TechStatusBadge 
+            status={getStatusType(r.phase)} 
+            text={r.phase?.toUpperCase() || 'UNKNOWN'} 
+            size="small"
+          />
+        );
+      },
     },
     {
       title: i18nInstance.t('eca37cb0726c51702f70c486c1c38cf3', '创建时间'),
@@ -106,11 +127,27 @@ const NamespacePage = () => {
       width: 200,
       render: (_, r) => {
         return (
-          <Space.Compact>
-            <Button size={'small'} type="link" disabled={true}>
+          <Space size="small">
+            <Button 
+              size="small" 
+              type="link" 
+              disabled={true}
+              style={{ 
+                color: 'var(--tech-primary)',
+                opacity: 0.5 
+              }}
+            >
               {i18nInstance.t('607e7a4f377fa66b0b28ce318aab841f', '查看')}
             </Button>
-            <Button size={'small'} type="link" disabled={true}>
+            <Button 
+              size="small" 
+              type="link" 
+              disabled={true}
+              style={{ 
+                color: 'var(--tech-primary)',
+                opacity: 0.5 
+              }}
+            >
               {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
             </Button>
             <Popconfirm
@@ -149,11 +186,19 @@ const NamespacePage = () => {
                 '取消',
               )}
             >
-              <Button size={'small'} type="link" danger>
+              <Button 
+                size="small" 
+                type="link" 
+                danger
+                style={{ 
+                  color: 'var(--error-color)',
+                  fontWeight: 'bold'
+                }}
+              >
                 {i18nInstance.t('2f4aaddde33c9b93c36fd2503f3d122b', '删除')}
               </Button>
             </Popconfirm>
-          </Space.Compact>
+          </Space>
         );
       },
     },
@@ -161,37 +206,84 @@ const NamespacePage = () => {
 
   const [showModal, toggleShowModal] = useToggle(false);
   const { message: messageApi } = App.useApp();
+  const { Title } = Typography;
+  
   return (
-    <Panel>
-      <div className={'flex flex-row justify-between mb-4'}>
-        <Input.Search
-          placeholder={i18nInstance.t(
-            'cfaff3e369b9bd51504feb59bf0972a0',
-            '按命名空间搜索',
-          )}
-          className={'w-[400px]'}
-          onPressEnter={(e) => {
-            const input = e.currentTarget.value;
-            setSearchFilter(input);
-          }}
-        />
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            toggleShowModal(true);
-          }}
-        >
-          {i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3', '新增命名空间')}
-        </Button>
+    <div className="tech-background min-h-screen">
+      {/* 粒子背景效果 */}
+      <div className="tech-particles-container">
+        {Array.from({ length: 15 }, (_, i) => (
+          <div
+            key={i}
+            className="tech-particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 20}s`
+            }}
+          />
+        ))}
       </div>
-      <Table
-        rowKey={(r: Namespace) => r.objectMeta.name || ''}
-        columns={columns}
-        loading={isLoading}
-        dataSource={data?.namespaces || []}
-      />
+
+      <div className="relative z-10 p-6">
+        {/* 页面标题 */}
+        <div className="mb-8">
+          <Title 
+            level={1} 
+            className="tech-hologram-text m-0 text-4xl font-bold"
+            style={{ color: 'var(--tech-primary)' }}
+          >
+            📦 NAMESPACE MANAGEMENT
+          </Title>
+          <Typography.Text className="text-gray-600 text-lg">
+            多云命名空间资源管理
+          </Typography.Text>
+        </div>
+
+        {/* 操作区域 */}
+        <div className="tech-card mb-6">
+          <div className="flex flex-row justify-between mb-4">
+            <Input.Search
+              placeholder={i18nInstance.t(
+                'cfaff3e369b9bd51504feb59bf0972a0',
+                '按命名空间搜索',
+              )}
+              className="w-[400px] tech-search-input"
+              style={{
+                fontSize: '16px',
+                height: '40px',
+              }}
+              onPressEnter={(e) => {
+                const input = e.currentTarget.value;
+                setSearchFilter(input);
+              }}
+            />
+            <button
+              className="tech-btn-primary flex items-center space-x-2"
+              onClick={() => {
+                toggleShowModal(true);
+              }}
+            >
+              <Icons.add width={16} height={16} />
+              <span>{i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3', '新增命名空间')}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 数据表格 */}
+        <div className="tech-card">
+          <Table
+            rowKey={(r: Namespace) => r.objectMeta.name || ''}
+            columns={columns}
+            loading={isLoading}
+            dataSource={data?.namespaces || []}
+            className="tech-table"
+            style={{
+              background: 'transparent',
+              fontSize: '16px',
+            }}
+          />
+        </div>
+      </div>
 
       <NewNamespaceModal
         open={showModal}
@@ -218,7 +310,7 @@ const NamespacePage = () => {
           toggleShowModal(false);
         }}
       />
-    </Panel>
+    </div>
   );
 };
 

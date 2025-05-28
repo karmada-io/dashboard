@@ -14,20 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react';
-import { Row, Col, Typography, Space, Divider, Card } from 'antd';
+import { Row, Col, Typography, Divider, Card } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { GetOverview } from '@/services/overview';
 import { GetClusters } from '@/services/cluster';
-import { StatusCard, ResourceUsage, ClusterOverview, ResourceRadialOverview } from '@/components/dashboard';
+import { StatusCard, ClusterOverview, ResourceRadialOverview } from '@/components/dashboard';
 import { 
   CloudServerOutlined, 
   ClusterOutlined, 
-  SettingOutlined,
-  AppstoreOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import i18nInstance from '@/utils/i18n';
 
 const { Title, Text } = Typography;
 
@@ -158,7 +154,7 @@ const Overview = () => {
           <Card 
             title="策略信息" 
             style={{ borderRadius: '8px', height: '200px' }}
-            bodyStyle={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}
+            styles={{ body: { display: 'flex', justifyContent: 'space-around', alignItems: 'center' } }}
           >
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '32px', fontWeight: 600, color: '#1890ff', marginBottom: '8px' }}>
@@ -179,7 +175,7 @@ const Overview = () => {
           <Card 
             title="多云资源信息" 
             style={{ borderRadius: '8px', height: '200px' }}
-            bodyStyle={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', alignItems: 'center' }}
+            styles={{ body: { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', alignItems: 'center' } }}
           >
             <div style={{ textAlign: 'center', margin: '8px' }}>
               <div style={{ fontSize: '24px', fontWeight: 600, color: '#722ed1', marginBottom: '4px' }}>

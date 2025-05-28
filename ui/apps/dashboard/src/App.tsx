@@ -29,10 +29,73 @@ function App() {
     <ConfigProvider
       locale={getAntdLocale()}
       theme={{
+        token: {
+          // 舒适主题色 - 进一步降低亮度
+          colorPrimary: '#409eff',
+          colorSuccess: '#67c23a',
+          colorWarning: '#e6a23c',
+          colorError: '#f56c6c',
+          colorInfo: '#409eff',
+          
+          // 舒适背景色
+          colorBgBase: '#fafafa',
+          colorBgContainer: '#ffffff',
+          colorBgElevated: '#ffffff',
+          
+          // 舒适文字色
+          colorText: '#262626',
+          colorTextSecondary: '#595959',
+          colorTextTertiary: '#8c8c8c',
+          colorTextQuaternary: '#bfbfbf',
+          
+          // 柔和边框色
+          colorBorder: '#d9d9d9',
+          colorBorderSecondary: '#f0f0f0',
+          
+          // 圆角保持
+          borderRadius: 8,
+          borderRadiusLG: 12,
+          borderRadiusXS: 6,
+          
+          // 柔和阴影
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
+          boxShadowSecondary: '0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.06)',
+        },
         components: {
           Layout: {
             siderBg: '#ffffff',
+            bodyBg: '#fafafa',
+            headerBg: 'rgba(255, 255, 255, 0.95)',
           },
+          Menu: {
+            itemBg: 'transparent',
+            itemSelectedBg: '#ecf5ff',
+            itemSelectedColor: '#409eff',
+            itemHoverBg: '#f5f9ff',
+            itemHoverColor: '#409eff',
+            itemColor: '#595959',
+            itemActiveBg: '#ecf5ff',
+          },
+          Card: {
+            colorBgContainer: '#ffffff',
+            boxShadowTertiary: '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
+          },
+          Button: {
+            primaryShadow: '0 2px 8px rgba(24, 144, 255, 0.2)',
+            dangerShadow: '0 2px 8px rgba(255, 77, 79, 0.2)',
+          },
+          Progress: {
+            defaultColor: '#409eff',
+            remainingColor: 'rgba(64, 158, 255, 0.1)',
+          },
+          Table: {
+            headerBg: '#fafafa',
+            rowHoverBg: '#f5f5f5',
+          },
+          Tag: {
+            defaultBg: 'rgba(64, 158, 255, 0.1)',
+            defaultColor: '#409eff',
+          }
         },
       }}
     >
@@ -41,7 +104,7 @@ function App() {
           <AuthProvider>
             <HelmetProvider>
               <Helmet>
-                <title>Karmada Dashboard</title>
+                <title>Karmada Control Center - 多云管理平台</title>
                 <link
                   rel="apple-touch-icon"
                   sizes="180x180"

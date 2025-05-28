@@ -1,0 +1,623 @@
+/* Karmada-Manager 炫酷科技风格样式系统 */
+/* 基于 Design_Spec.md 设计规范 */
+
+/* ========== 舒适科技感色彩变量 ========== */
+:root {
+  /* 舒适科技感主题色 - 柔和版本 */
+  --tech-primary: #409eff;
+  --tech-primary-1: #f0f8ff;
+  --tech-primary-2: #d6ebff;
+  --tech-primary-3: #a6d2ff;
+  --tech-primary-4: #73b3ff;
+  --tech-primary-5: #409eff;
+  --tech-primary-6: #409eff;
+  --tech-primary-7: #096dd9;
+  --tech-primary-8: #0050b3;
+  --tech-primary-9: #003a8c;
+  --tech-primary-10: #002766;
+
+  /* 辅助科技色彩 - 柔和版 */
+  --tech-secondary: #722ed1;
+  --tech-accent: #67c23a;
+  --tech-highlight: #e6a23c;
+
+  /* 状态颜色 - 舒适护眼版 */
+  --success-color: #67c23a;
+  --warning-color: #e6a23c;
+  --error-color: #f56c6c;
+  --info-color: #409eff;
+
+  /* 特殊科技色 - 柔和版 */
+  --pulse-color: #40a9ff;
+  --glow-color: #ffffff;
+  --energy-color: #722ed1;
+
+  /* 舒适文本色系统 */
+  --text-color: #262626;
+  --text-color-secondary: #595959;
+  --text-color-disabled: #bfbfbf;
+  --text-color-accent: #409eff;
+  --text-color-light: #8c8c8c;
+
+  /* 舒适背景系统 */
+  --background-color: #fafafa;
+  --component-background: #ffffff;
+  --card-background: #ffffff;
+  --overlay-background: rgba(255, 255, 255, 0.95);
+
+  /* 边框和分割线 - 柔和版 */
+  --border-color: #d9d9d9;
+  --divider-color: #f0f0f0;
+  --glow-border: rgba(64, 158, 255, 0.2);
+
+  /* 间距系统 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* 圆角规范 */
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+}
+
+/* ========== 全局科技背景 ========== */
+.tech-background {
+  background: linear-gradient(135deg, #fafafa 0%, #f0f8ff 50%, #ffffff 100%);
+  position: relative;
+  min-height: 100vh;
+}
+
+.tech-background::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(64, 158, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(114, 46, 209, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(103, 194, 58, 0.03) 0%, transparent 70%);
+  animation: techBackgroundFlow 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -2;
+}
+
+.tech-background::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(45deg, transparent 40%, rgba(0, 212, 255, 0.02) 50%, transparent 60%);
+  animation: techGrid 30s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes techBackgroundFlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes techGrid {
+  0% { transform: translateX(-100px) translateY(-100px); }
+  100% { transform: translateX(100px) translateY(100px); }
+}
+
+/* ========== 科技感卡片 ========== */
+.tech-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(248,254,255,0.8) 100%);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--glow-border);
+  box-shadow: 
+    0 0 20px rgba(0, 212, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  padding: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.tech-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #7c3aed 0%, #00d4ff 50%, #06ffa5 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tech-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(0,212,255,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tech-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tech-card:hover {
+  box-shadow: 
+    0 0 20px rgba(0, 212, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 25px rgba(0, 212, 255, 0.4);
+  transform: translateY(-4px);
+  border-color: var(--tech-primary);
+}
+
+.tech-card:hover::before {
+  opacity: 1;
+}
+
+.tech-card:hover::after {
+  opacity: 0.3;
+}
+
+/* ========== 科技感按钮 ========== */
+.tech-btn-primary {
+  background: linear-gradient(45deg, #409eff 0%, #40a9ff 50%, #73b3ff 100%);
+  border: 2px solid transparent;
+  color: #ffffff;
+  border-radius: var(--border-radius-md);
+  padding: 12px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 8px rgba(64, 158, 255, 0.2),
+    0 4px 15px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: none;
+}
+
+.tech-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.tech-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 25px rgba(0, 212, 255, 0.4),
+    0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.tech-btn-primary:hover::before {
+  left: 100%;
+}
+
+.tech-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ========== 状态徽章 ========== */
+.tech-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-status-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+.tech-status-badge.success {
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.tech-status-badge.error {
+  background: rgba(255, 0, 128, 0.1);
+  color: var(--error-color);
+  border: 1px solid rgba(255, 0, 128, 0.3);
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.4);
+}
+
+.tech-status-badge.warning {
+  background: rgba(255, 140, 0, 0.1);
+  color: var(--warning-color);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+}
+
+.tech-status-badge.info {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--info-color);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);
+}
+
+/* ========== 科技感进度条 ========== */
+.tech-progress {
+  height: 8px;
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tech-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    var(--tech-primary) 0%, 
+    var(--tech-primary-4) 50%, 
+    var(--tech-primary) 100%);
+  border-radius: 4px;
+  position: relative;
+  transition: width 0.5s ease;
+}
+
+.tech-progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%);
+  animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ========== 数据更新动画 ========== */
+.tech-pulse {
+  animation: techPulse 0.8s ease-in-out;
+}
+
+@keyframes techPulse {
+  0% { 
+    background-color: rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+  }
+  50% { 
+    background-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+  }
+  100% { 
+    background-color: rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+  }
+}
+
+/* ========== 加载动画 ========== */
+.tech-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0, 212, 255, 0.2);
+  border-top: 3px solid var(--tech-primary);
+  border-radius: 50%;
+  animation: techSpin 1s linear infinite;
+  position: relative;
+}
+
+.tech-loading-spinner::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 1px solid transparent;
+  border-top-color: rgba(0, 212, 255, 0.5);
+  border-radius: 50%;
+  animation: techSpin 2s linear infinite reverse;
+}
+
+@keyframes techSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ========== 全息文字效果 ========== */
+.tech-hologram-text {
+  color: var(--tech-primary);
+  text-shadow: 
+    0 0 5px rgba(0, 212, 255, 0.5),
+    0 0 10px rgba(0, 212, 255, 0.3),
+    0 0 15px rgba(0, 212, 255, 0.2);
+  animation: hologramFlicker 3s ease-in-out infinite;
+}
+
+@keyframes hologramFlicker {
+  0%, 100% { opacity: 1; }
+  95% { opacity: 1; }
+  96% { opacity: 0.8; }
+  97% { opacity: 1; }
+  98% { opacity: 0.9; }
+  99% { opacity: 1; }
+}
+
+/* ========== 能量流动效果 ========== */
+.tech-energy-flow {
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-energy-flow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 212, 255, 0.4) 50%, 
+    transparent 100%);
+  animation: energyFlow 2s infinite;
+}
+
+@keyframes energyFlow {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ========== 悬停效果 ========== */
+.tech-hover-scale {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tech-hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* ========== 粒子容器 ========== */
+.tech-particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.tech-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(0, 212, 255, 0.6);
+  border-radius: 50%;
+  animation: particleFloat 10s linear infinite;
+}
+
+.tech-particle:nth-child(2n) {
+  background: rgba(124, 58, 237, 0.4);
+  animation-duration: 15s;
+}
+
+.tech-particle:nth-child(3n) {
+  background: rgba(6, 255, 165, 0.3);
+  animation-duration: 20s;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(90vh) translateX(10px) scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(10vh) translateX(-10px) scale(1);
+  }
+  100% {
+    transform: translateY(0) translateX(0) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ========== 响应式设计 ========== */
+@media (max-width: 768px) {
+  .tech-card {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .tech-btn-primary {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+/* ========== Ant Design 覆盖样式 ========== */
+.ant-layout {
+  background: transparent !important;
+}
+
+.ant-layout-sider {
+  background: linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%) !important;
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--glow-border) !important;
+}
+
+.ant-menu {
+  background: transparent !important;
+  border-right: none !important;
+}
+
+.ant-menu-item {
+  margin: 4px 8px !important;
+  border-radius: var(--border-radius-md) !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-menu-item:hover {
+  background: rgba(0, 212, 255, 0.1) !important;
+  color: var(--tech-primary) !important;
+}
+
+.ant-menu-item-selected {
+  background: var(--tech-primary) !important;
+  color: white !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+}
+
+.ant-card {
+  background: var(--card-background) !important;
+  border: 1px solid var(--glow-border) !important;
+  border-radius: var(--border-radius-lg) !important;
+  box-shadow: 
+    0 0 20px rgba(0, 212, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.06) !important;
+}
+
+.ant-card:hover {
+  border-color: var(--tech-primary) !important;
+  box-shadow: 
+    0 0 20px rgba(0, 212, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 0 25px rgba(0, 212, 255, 0.4) !important;
+}
+
+/* ========== 科技感表格样式 ========== */
+.tech-table .ant-table {
+  background: transparent !important;
+}
+
+.tech-table .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%) !important;
+  border-color: var(--glow-border) !important;
+  color: var(--text-color) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.tech-table .ant-table-tbody > tr {
+  background: rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.3s ease !important;
+}
+
+.tech-table .ant-table-tbody > tr:hover {
+  background: rgba(0, 212, 255, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2) !important;
+}
+
+.tech-table .ant-table-tbody > tr > td {
+  border-color: var(--divider-color) !important;
+  color: var(--text-color) !important;
+  font-size: 13px !important;
+}
+
+.tech-table .ant-table-cell {
+  position: relative;
+}
+
+.tech-table .ant-table-cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.2) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tech-table .ant-table-tbody > tr:hover .ant-table-cell::before {
+  opacity: 1;
+}
+
+/* 搜索输入框科技风格 */
+.tech-search-input .ant-input {
+  background: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-color) !important;
+  transition: all 0.3s ease !important;
+  box-shadow: none !important;
+}
+
+.tech-search-input .ant-input:focus,
+.tech-search-input .ant-input:hover {
+  border-color: var(--tech-primary) !important;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2) !important;
+  outline: none !important;
+}
+
+.tech-search-input .ant-input-search-button {
+  background: var(--tech-primary) !important;
+  border-color: var(--tech-primary) !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+.tech-search-input .ant-input-search-button:hover {
+  background: var(--tech-primary-4) !important;
+  border-color: var(--tech-primary-4) !important;
+  box-shadow: none !important;
+}
+
+/* 修复重影问题 */
+.tech-search-input .ant-input-affix-wrapper {
+  box-shadow: none !important;
+}
+
+.tech-search-input .ant-input-affix-wrapper-focused {
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2) !important;
+  border-color: var(--tech-primary) !important;
+} 

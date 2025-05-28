@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import React from 'react';
-import { Card, Statistic, Badge, Progress, Flex, Typography } from 'antd';
+import { Card, Statistic, Progress, Flex, Typography } from 'antd';
 import { CheckCircleOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -83,7 +83,7 @@ const StatusCard: React.FC<StatusCardProps> = ({
         border: `1px solid ${getStatusColor()}20`,
         ...style,
       }}
-      bodyStyle={{ padding: '20px' }}
+      styles={{ body: { padding: '20px' } }}
     >
       <Flex vertical gap={16}>
         <Flex justify="space-between" align="flex-start">

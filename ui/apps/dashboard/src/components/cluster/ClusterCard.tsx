@@ -17,7 +17,7 @@ limitations under the License.
 import React from 'react';
 import { Card, Badge, Progress, Tag, Button, Space, Typography, Flex, Divider, Popconfirm } from 'antd';
 import { EyeOutlined, SettingOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { ClusterOutlined, CloudServerOutlined } from '@ant-design/icons';
+import { ClusterOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const { Text, Title } = Typography;
@@ -93,7 +93,7 @@ const ClusterCard: React.FC<ClusterCardProps> = ({
         transition: 'all 0.3s ease',
         cursor: 'pointer',
       }}
-      bodyStyle={{ padding: '20px' }}
+      styles={{ body: { padding: '20px' } }}
       hoverable
       onClick={onView}
     >

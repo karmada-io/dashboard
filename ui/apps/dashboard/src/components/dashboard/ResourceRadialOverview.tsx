@@ -20,12 +20,11 @@ import { Progress } from 'antd';
 import { 
   CloudServerOutlined, 
   DatabaseOutlined, 
-  HddOutlined, 
   TagsOutlined,
   NodeIndexOutlined,
 } from '@ant-design/icons';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 interface ResourceData {
   title: string;
@@ -105,12 +104,15 @@ const ResourceRadialOverview: React.FC<ResourceRadialOverviewProps> = ({
       loading={loading}
       style={{
         borderRadius: '12px',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        background: '#ffffff',
         minHeight: '400px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
       }}
-      bodyStyle={{ 
-        padding: '32px',
-        height: '100%',
+      styles={{ 
+        body: {
+          padding: '32px',
+          height: '100%',
+        }
       }}
     >
       <div style={{ 
@@ -136,8 +138,8 @@ const ResourceRadialOverview: React.FC<ResourceRadialOverviewProps> = ({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-          border: '3px solid #1890ff',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+          border: '2px solid #1890ff',
         }}>
           <CloudServerOutlined style={{ 
             fontSize: '36px', 
@@ -159,10 +161,11 @@ const ResourceRadialOverview: React.FC<ResourceRadialOverviewProps> = ({
           const angle = (index * 90) - 45; // 45度间隔，从右上角开始
           const radians = (angle * Math.PI) / 180;
           const lineLength = 80;
-          const startX = 60; // 中心圆半径
-          const startY = 60;
-          const endX = startX + lineLength * Math.cos(radians);
-          const endY = startY + lineLength * Math.sin(radians);
+          // 这些变量用于计算连接线的终点，暂时注释掉
+          // const startX = 60; // 中心圆半径
+          // const startY = 60;
+          // const endX = startX + lineLength * Math.cos(radians);
+          // const endY = startY + lineLength * Math.sin(radians);
           
           return (
             <svg
@@ -183,9 +186,9 @@ const ResourceRadialOverview: React.FC<ResourceRadialOverviewProps> = ({
                 y1="150"
                 x2={150 + lineLength * Math.cos(radians)}
                 y2={150 + lineLength * Math.sin(radians)}
-                stroke="#d9d9d9"
-                strokeWidth="2"
-                strokeDasharray="5,5"
+                stroke="#f0f0f0"
+                strokeWidth="1"
+                strokeDasharray="3,3"
               />
             </svg>
           );
@@ -211,8 +214,8 @@ const ResourceRadialOverview: React.FC<ResourceRadialOverviewProps> = ({
                 background: '#ffffff',
                 borderRadius: '12px',
                 padding: '16px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                border: `2px solid ${resource.color}`,
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                border: `1px solid ${resource.color}`,
                 minWidth: '140px',
                 zIndex: 5,
               }}
