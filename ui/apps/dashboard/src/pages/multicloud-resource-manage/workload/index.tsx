@@ -270,15 +270,18 @@ const WorkloadPage = () => {
 
           {/* 过滤和搜索栏 */}
           <Flex gap={16} align="center" wrap="wrap">
-            <div>
+            <div className="tech-segmented-override">
               <Text style={{ marginRight: '8px', fontWeight: '600' }}>工作负载类型:</Text>
               <Segmented
+                className="tech-segmented"
                 value={filter.kind}
                 onChange={(value) => setFilter(prev => ({ ...prev, kind: value as WorkloadKind }))}
                 options={workloadTypes}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
+                  background: '#ffffff !important',
                   border: '1px solid var(--glow-border)',
+                  fontSize: '16px',
+                  height: '40px'
                 }}
               />
             </div>

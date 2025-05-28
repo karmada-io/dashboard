@@ -245,16 +245,17 @@ const NamespacePage = () => {
             <Input.Search
               placeholder={i18nInstance.t(
                 'cfaff3e369b9bd51504feb59bf0972a0',
-                '按命名空间搜索',
+                '搜索命名空间名称',
               )}
               className="w-[400px] tech-search-input"
               style={{
                 fontSize: '16px',
                 height: '40px',
               }}
-              onPressEnter={(e) => {
-                const input = e.currentTarget.value;
-                setSearchFilter(input);
+              allowClear
+              value={searchFilter}
+              onChange={(e) => {
+                setSearchFilter(e.target.value);
               }}
             />
             <button

@@ -94,42 +94,44 @@ const ServicePage = () => {
         {/* 操作区域 */}
         <div className="tech-card mb-6">
           <div className={'flex flex-row justify-between mb-6'}>
-            <div>
-              <Segmented
-                style={{
-                  marginBottom: 8,
-                  fontSize: '16px',
-                  height: '40px'
-                }}
-                options={[
-                  {
-                    label: 'Service',
-                    value: ServiceKind.Service,
-                  },
-                  {
-                    label: 'Ingress',
-                    value: ServiceKind.Ingress,
-                  },
-                ]}
-                value={filter.kind}
-                onChange={(value) => {
-                  // reset filter when switch workload kind
-                  if (value !== filter.kind) {
-                    setFilter({
-                      ...filter,
-                      kind: value,
-                      selectedWorkSpace: '',
-                      searchText: '',
-                    });
-                  } else {
-                    setFilter({
-                      ...filter,
-                      kind: value,
-                    });
-                  }
-                }}
-              />
-            </div>
+                      <div className="tech-segmented-override">
+            <Segmented
+              className="tech-segmented"
+              style={{
+                marginBottom: 8,
+                fontSize: '16px',
+                height: '40px',
+                background: '#ffffff !important'
+              }}
+              options={[
+                {
+                  label: 'Service',
+                  value: ServiceKind.Service,
+                },
+                {
+                  label: 'Ingress',
+                  value: ServiceKind.Ingress,
+                },
+              ]}
+              value={filter.kind}
+              onChange={(value) => {
+                // reset filter when switch workload kind
+                if (value !== filter.kind) {
+                  setFilter({
+                    ...filter,
+                    kind: value,
+                    selectedWorkSpace: '',
+                    searchText: '',
+                  });
+                } else {
+                  setFilter({
+                    ...filter,
+                    kind: value,
+                  });
+                }
+              }}
+            />
+          </div>
             <button
               className="tech-btn-primary flex items-center space-x-2"
               onClick={() => {
@@ -162,18 +164,19 @@ const ServicePage = () => {
             <Input.Search
               placeholder={i18nInstance.t(
                 'cfaff3e369b9bd51504feb59bf0972a0',
-                '按命名空间搜索',
+                '搜索服务名称',
               )}
               className={'tech-search-input w-[350px]'}
               style={{ 
                 fontSize: '16px',
                 height: '40px'
               }}
-              onPressEnter={(e) => {
-                const input = e.currentTarget.value;
+              allowClear
+              value={filter.searchText}
+              onChange={(e) => {
                 setFilter({
                   ...filter,
-                  searchText: input,
+                  searchText: e.target.value,
                 });
               }}
             />

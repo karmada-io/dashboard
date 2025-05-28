@@ -170,6 +170,11 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       columns={columns}
       loading={isLoading}
       dataSource={data?.items || []}
+      className="tech-table"
+      style={{
+        background: 'transparent',
+        fontSize: '16px',
+      }}
     />
   );
 };

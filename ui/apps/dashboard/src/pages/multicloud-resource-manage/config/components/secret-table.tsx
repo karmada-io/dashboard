@@ -165,6 +165,11 @@ const SecretTable: FC<SecretTableProps> = (props) => {
       columns={columns}
       loading={isLoading}
       dataSource={data?.secrets || []}
+      className="tech-table"
+      style={{
+        background: 'transparent',
+        fontSize: '16px',
+      }}
     />
   );
 };

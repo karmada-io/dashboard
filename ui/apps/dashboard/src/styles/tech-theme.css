@@ -488,7 +488,7 @@
 }
 
 .ant-layout-sider {
-  background: linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%) !important;
+  background: linear-gradient(180deg, rgba(64, 158, 255, 0.1) 0%, rgba(114, 46, 209, 0.05) 100%) !important;
   backdrop-filter: blur(10px);
   border-right: 1px solid var(--glow-border) !important;
 }
@@ -505,14 +505,14 @@
 }
 
 .ant-menu-item:hover {
-  background: rgba(0, 212, 255, 0.1) !important;
+  background: rgba(64, 158, 255, 0.1) !important;
   color: var(--tech-primary) !important;
 }
 
 .ant-menu-item-selected {
   background: var(--tech-primary) !important;
   color: white !important;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+  box-shadow: 0 0 15px rgba(64, 158, 255, 0.3) !important;
 }
 
 .ant-card {
@@ -520,16 +520,268 @@
   border: 1px solid var(--glow-border) !important;
   border-radius: var(--border-radius-lg) !important;
   box-shadow: 
-    0 0 20px rgba(0, 212, 255, 0.1),
+    0 0 20px rgba(64, 158, 255, 0.1),
     0 8px 32px rgba(0, 0, 0, 0.06) !important;
 }
 
 .ant-card:hover {
   border-color: var(--tech-primary) !important;
   box-shadow: 
-    0 0 20px rgba(0, 212, 255, 0.1),
+    0 0 20px rgba(64, 158, 255, 0.1),
     0 8px 32px rgba(0, 0, 0, 0.06),
-    0 0 25px rgba(0, 212, 255, 0.4) !important;
+    0 0 25px rgba(64, 158, 255, 0.4) !important;
+}
+
+/* ========== 修复Segmented组件重影问题 - 终极超强力版本 ========== */
+
+/* 第一层：完全重置Segmented组件 */
+.ant-segmented,
+.tech-segmented {
+  background: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+  padding: 2px !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* 第二层：彻底移除所有可能的thumb元素 */
+.ant-segmented .ant-segmented-thumb,
+.tech-segmented .ant-segmented-thumb,
+.ant-segmented::before,
+.tech-segmented::before,
+.ant-segmented > *::before,
+.tech-segmented > *::before {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  transform: scale(0) !important;
+  position: absolute !important;
+  z-index: -999 !important;
+}
+
+/* 第三层：重置所有项目的基础样式 */
+.ant-segmented .ant-segmented-item,
+.tech-segmented .ant-segmented-item {
+  border-radius: 6px !important;
+  transition: all 0.3s ease !important;
+  color: var(--text-color-secondary) !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  position: relative !important;
+  z-index: 2 !important;
+  overflow: visible !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* 第四层：悬停效果 */
+.ant-segmented .ant-segmented-item:hover:not(.ant-segmented-item-selected),
+.tech-segmented .ant-segmented-item:hover:not(.ant-segmented-item-selected),
+.ant-segmented .ant-segmented-item:hover:not([aria-selected="true"]),
+.tech-segmented .ant-segmented-item:hover:not([aria-selected="true"]) {
+  color: var(--tech-primary) !important;
+  background: rgba(64, 158, 255, 0.1) !important;
+}
+
+/* 第五层：超强力选中状态样式 - 使用所有可能的选择器 */
+.ant-segmented .ant-segmented-item-selected,
+.ant-segmented .ant-segmented-item.ant-segmented-item-selected,
+.tech-segmented .ant-segmented-item-selected,
+.tech-segmented .ant-segmented-item.ant-segmented-item-selected,
+.ant-segmented .ant-segmented-item[aria-selected="true"],
+.ant-segmented .ant-segmented-item[class*="selected"],
+.tech-segmented .ant-segmented-item[aria-selected="true"],
+.tech-segmented .ant-segmented-item[class*="selected"],
+.ant-segmented[class*="segmented"] .ant-segmented-item[class*="selected"],
+.tech-segmented[class*="segmented"] .ant-segmented-item[class*="selected"],
+[role="tablist"] [role="tab"][aria-selected="true"],
+.ant-segmented-item[aria-selected="true"],
+.ant-segmented-item.ant-segmented-item-selected,
+.tech-segmented .ant-segmented-item-selected {
+  background: var(--tech-primary) !important;
+  background-color: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+  border: none !important;
+  outline: none !important;
+  z-index: 10 !important;
+}
+
+/* 新增：针对label内部元素的强制样式 */
+.ant-segmented .ant-segmented-item-selected .ant-segmented-item-label,
+.tech-segmented .ant-segmented-item-selected .ant-segmented-item-label,
+.ant-segmented .ant-segmented-item[aria-selected="true"] .ant-segmented-item-label,
+.tech-segmented .ant-segmented-item[aria-selected="true"] .ant-segmented-item-label {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* 第六层：确保选中状态在所有交互下都保持 */
+.ant-segmented .ant-segmented-item-selected:hover,
+.ant-segmented .ant-segmented-item.ant-segmented-item-selected:hover,
+.tech-segmented .ant-segmented-item-selected:hover,
+.tech-segmented .ant-segmented-item.ant-segmented-item-selected:hover,
+.ant-segmented .ant-segmented-item[aria-selected="true"]:hover,
+.tech-segmented .ant-segmented-item[aria-selected="true"]:hover,
+.ant-segmented .ant-segmented-item-selected:focus,
+.tech-segmented .ant-segmented-item-selected:focus,
+.ant-segmented .ant-segmented-item[aria-selected="true"]:focus,
+.tech-segmented .ant-segmented-item[aria-selected="true"]:focus,
+.ant-segmented .ant-segmented-item-selected:active,
+.tech-segmented .ant-segmented-item-selected:active {
+  background: var(--tech-primary) !important;
+  background-color: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4) !important;
+  font-weight: 600 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* 第七层：未选中状态的明确定义 */
+.ant-segmented .ant-segmented-item[aria-selected="false"],
+.tech-segmented .ant-segmented-item[aria-selected="false"],
+.ant-segmented .ant-segmented-item:not(.ant-segmented-item-selected),
+.tech-segmented .ant-segmented-item:not(.ant-segmented-item-selected),
+.ant-segmented .ant-segmented-item:not([aria-selected="true"]),
+.tech-segmented .ant-segmented-item:not([aria-selected="true"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text-color-secondary) !important;
+}
+
+/* 未选中状态的label */
+.ant-segmented .ant-segmented-item[aria-selected="false"] .ant-segmented-item-label,
+.tech-segmented .ant-segmented-item[aria-selected="false"] .ant-segmented-item-label,
+.ant-segmented .ant-segmented-item:not(.ant-segmented-item-selected) .ant-segmented-item-label,
+.tech-segmented .ant-segmented-item:not(.ant-segmented-item-selected) .ant-segmented-item-label {
+  color: var(--text-color-secondary) !important;
+  font-weight: 500 !important;
+}
+
+/* 第八层：全局Segmented组件强制重置 */
+.ant-segmented,
+.ant-segmented *,
+.tech-segmented,
+.tech-segmented * {
+  box-shadow: none !important;
+}
+
+/* 恢复选中状态的box-shadow */
+.ant-segmented .ant-segmented-item-selected,
+.tech-segmented .ant-segmented-item-selected,
+.ant-segmented .ant-segmented-item[aria-selected="true"],
+.tech-segmented .ant-segmented-item[aria-selected="true"] {
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+}
+
+/* 第九层：使用CSS内容生成强制显示选中状态 */
+.ant-segmented .ant-segmented-item-selected::after,
+.tech-segmented .ant-segmented-item-selected::after,
+.ant-segmented .ant-segmented-item[aria-selected="true"]::after,
+.tech-segmented .ant-segmented-item[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--tech-primary) !important;
+  border-radius: 6px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* 第十层：最终保险样式 - 使用最高优先级 */
+html body .ant-segmented .ant-segmented-item-selected,
+html body .tech-segmented .ant-segmented-item-selected,
+html body .ant-segmented .ant-segmented-item[aria-selected="true"],
+html body .tech-segmented .ant-segmented-item[aria-selected="true"] {
+  background: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+/* 第十一层：内联样式级别的强制覆盖 */
+.tech-segmented-override .ant-segmented-item-selected {
+  background: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+}
+
+/* 第十二层：使用属性选择器和伪类的终极覆盖 */
+.ant-segmented .ant-segmented-item[class*="selected"][class*="item"],
+.tech-segmented .ant-segmented-item[class*="selected"][class*="item"] {
+  background: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+}
+
+/* 新增第十三层：针对具体的DOM结构的强制覆盖 */
+.ant-segmented label.ant-segmented-item-selected,
+.tech-segmented label.ant-segmented-item-selected,
+.ant-segmented label.ant-segmented-item[aria-selected="true"],
+.tech-segmented label.ant-segmented-item[aria-selected="true"],
+.ant-segmented .ant-segmented-group label.ant-segmented-item-selected,
+.tech-segmented .ant-segmented-group label.ant-segmented-item-selected {
+  background: var(--tech-primary) !important;
+  background-color: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+  border: none !important;
+  outline: none !important;
+  z-index: 10 !important;
+}
+
+/* 第十四层：针对所有可能的input状态的覆盖 */
+.ant-segmented .ant-segmented-item:has(input:checked),
+.tech-segmented .ant-segmented-item:has(input:checked),
+.ant-segmented label:has(input:checked),
+.tech-segmented label:has(input:checked) {
+  background: var(--tech-primary) !important;
+  background-color: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+  border: none !important;
+  outline: none !important;
+  z-index: 10 !important;
+}
+
+/* 第十五层：强制覆盖所有可能的CSS变量和自定义属性 */
+.ant-segmented .ant-segmented-item-selected[style],
+.tech-segmented .ant-segmented-item-selected[style],
+.ant-segmented .ant-segmented-item[aria-selected="true"][style],
+.tech-segmented .ant-segmented-item[aria-selected="true"][style] {
+  background: var(--tech-primary) !important;
+  background-color: var(--tech-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+/* 第十六层：针对所有嵌套的label和div元素 */
+.ant-segmented .ant-segmented-item-selected > div,
+.tech-segmented .ant-segmented-item-selected > div,
+.ant-segmented .ant-segmented-item[aria-selected="true"] > div,
+.tech-segmented .ant-segmented-item[aria-selected="true"] > div,
+.ant-segmented .ant-segmented-item-selected .ant-segmented-item-label,
+.tech-segmented .ant-segmented-item-selected .ant-segmented-item-label,
+.ant-segmented .ant-segmented-item[aria-selected="true"] .ant-segmented-item-label,
+.tech-segmented .ant-segmented-item[aria-selected="true"] .ant-segmented-item-label {
+  color: #ffffff !important;
+  font-weight: 600 !important;
 }
 
 /* ========== 科技感表格样式 ========== */
@@ -538,11 +790,11 @@
 }
 
 .tech-table .ant-table-thead > tr > th {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%) !important;
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.1) 0%, rgba(114, 46, 209, 0.05) 100%) !important;
   border-color: var(--glow-border) !important;
   color: var(--text-color) !important;
   font-weight: 600 !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
 }
@@ -553,14 +805,14 @@
 }
 
 .tech-table .ant-table-tbody > tr:hover {
-  background: rgba(0, 212, 255, 0.1) !important;
-  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2) !important;
+  background: rgba(64, 158, 255, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2) !important;
 }
 
 .tech-table .ant-table-tbody > tr > td {
   border-color: var(--divider-color) !important;
   color: var(--text-color) !important;
-  font-size: 13px !important;
+  font-size: 16px !important;
 }
 
 .tech-table .ant-table-cell {
@@ -574,7 +826,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.2) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(64, 158, 255, 0.2) 50%, transparent 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -583,41 +835,74 @@
   opacity: 1;
 }
 
-/* 搜索输入框科技风格 */
-.tech-search-input .ant-input {
+/* 搜索输入框科技风格 - 修复重影和阴影问题 */
+.tech-search-input .ant-input-affix-wrapper,
+.tech-search-input .ant-input-affix-wrapper-lg {
   background: #ffffff !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-color) !important;
   transition: all 0.3s ease !important;
   box-shadow: none !important;
+  outline: none !important;
+  border-radius: 6px !important;
 }
 
-.tech-search-input .ant-input:focus,
-.tech-search-input .ant-input:hover {
+.tech-search-input .ant-input,
+.tech-search-input .ant-input-lg {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-color) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-size: 16px !important;
+}
+
+.tech-search-input .ant-input-affix-wrapper:focus,
+.tech-search-input .ant-input-affix-wrapper:hover,
+.tech-search-input .ant-input-affix-wrapper-focused,
+.tech-search-input .ant-input-affix-wrapper-lg:focus,
+.tech-search-input .ant-input-affix-wrapper-lg:hover {
   border-color: var(--tech-primary) !important;
   box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2) !important;
   outline: none !important;
 }
 
-.tech-search-input .ant-input-search-button {
+.tech-search-input .ant-input:focus,
+.tech-search-input .ant-input:hover,
+.tech-search-input .ant-input-lg:focus,
+.tech-search-input .ant-input-lg:hover {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.tech-search-input .ant-input-search-button,
+.tech-search-input .ant-btn {
   background: var(--tech-primary) !important;
   border-color: var(--tech-primary) !important;
   color: white !important;
   box-shadow: none !important;
+  border-radius: 0 6px 6px 0 !important;
 }
 
-.tech-search-input .ant-input-search-button:hover {
+.tech-search-input .ant-input-search-button:hover,
+.tech-search-input .ant-btn:hover {
   background: var(--tech-primary-4) !important;
   border-color: var(--tech-primary-4) !important;
   box-shadow: none !important;
 }
 
-/* 修复重影问题 */
-.tech-search-input .ant-input-affix-wrapper {
-  box-shadow: none !important;
+/* 修复Input Search前缀/后缀动态变化警告 */
+.tech-search-input .ant-input-prefix,
+.tech-search-input .ant-input-suffix {
+  pointer-events: none !important;
 }
 
-.tech-search-input .ant-input-affix-wrapper-focused {
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2) !important;
-  border-color: var(--tech-primary) !important;
+.tech-search-input .ant-input-clear-icon {
+  pointer-events: auto !important;
+  color: var(--text-color-secondary) !important;
+}
+
+.tech-search-input .ant-input-clear-icon:hover {
+  color: var(--tech-primary) !important;
 } 

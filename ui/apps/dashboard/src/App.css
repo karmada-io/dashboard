@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/* 引入科技风格样式 - 必须在最前面 */
+@import './styles/tech-theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* 引入科技风格样式 */
-@import './styles/tech-theme.css';
 
 /* 全局样式重置 */
 * {
@@ -46,7 +46,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 212, 255, 0.1);
+  background: rgba(64, 158, 255, 0.1);
   border-radius: 4px;
 }
 

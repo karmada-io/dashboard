@@ -21,10 +21,104 @@ import { ConfigProvider, App as AntdApp } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AuthProvider from '@/components/auth';
 import { getAntdLocale } from '@/utils/i18n.tsx';
+import { useEffect } from 'react';
+import setupSegmentedAutoFix from '@/utils/segmented-fix';
 
 const queryClient = new QueryClient();
 
 function App() {
+  // 启动Segmented组件修复
+  useEffect(() => {
+    setupSegmentedAutoFix();
+    
+    // 页面完全加载后的强制修复
+    const forceFixAfterLoad = () => {
+      // 等待所有资源加载完成
+      if (document.readyState === 'complete') {
+        setTimeout(() => {
+          // 强制修复所有Segmented组件
+          const segmentedElements = document.querySelectorAll('.ant-segmented, .tech-segmented');
+          segmentedElements.forEach(element => {
+            const selectedItems = element.querySelectorAll('.ant-segmented-item-selected, .ant-segmented-item[aria-selected="true"]');
+            selectedItems.forEach(item => {
+              if (item instanceof HTMLElement) {
+                // 强制应用选中样式
+                item.style.setProperty('background', 'var(--tech-primary)', 'important');
+                item.style.setProperty('background-color', 'var(--tech-primary)', 'important');
+                item.style.setProperty('color', '#ffffff', 'important');
+                item.style.setProperty('box-shadow', '0 2px 8px rgba(64, 158, 255, 0.3)', 'important');
+                item.style.setProperty('font-weight', '600', 'important');
+                item.style.setProperty('border', 'none', 'important');
+                item.style.setProperty('z-index', '10', 'important');
+                
+                // 对内部元素也应用样式
+                const label = item.querySelector('.ant-segmented-item-label');
+                if (label instanceof HTMLElement) {
+                  label.style.setProperty('color', '#ffffff', 'important');
+                  label.style.setProperty('font-weight', '600', 'important');
+                }
+              }
+            });
+            
+            const unselectedItems = element.querySelectorAll('.ant-segmented-item:not(.ant-segmented-item-selected)');
+            unselectedItems.forEach(item => {
+              if (item instanceof HTMLElement && item.getAttribute('aria-selected') !== 'true') {
+                item.style.setProperty('background', 'transparent', 'important');
+                item.style.setProperty('background-color', 'transparent', 'important');
+                item.style.setProperty('color', 'var(--text-color-secondary)', 'important');
+                item.style.setProperty('box-shadow', 'none', 'important');
+                item.style.setProperty('font-weight', '500', 'important');
+                
+                const label = item.querySelector('.ant-segmented-item-label');
+                if (label instanceof HTMLElement) {
+                  label.style.setProperty('color', 'var(--text-color-secondary)', 'important');
+                  label.style.setProperty('font-weight', '500', 'important');
+                }
+              }
+            });
+          });
+        }, 100);
+      } else {
+        // 如果还没有完全加载，等待加载完成
+        window.addEventListener('load', forceFixAfterLoad, { once: true });
+      }
+    };
+    
+    forceFixAfterLoad();
+    
+    // 设置高频检查，确保修复持续有效
+    const highFrequencyCheck = setInterval(() => {
+      const segmentedElements = document.querySelectorAll('.ant-segmented, .tech-segmented');
+      segmentedElements.forEach(element => {
+        const selectedItems = element.querySelectorAll('.ant-segmented-item-selected, .ant-segmented-item[aria-selected="true"]');
+        selectedItems.forEach(item => {
+          if (item instanceof HTMLElement) {
+            const currentBg = window.getComputedStyle(item).backgroundColor;
+            // 如果选中项没有正确的背景色，强制应用
+            if (!currentBg.includes('64, 158, 255') && !currentBg.includes('var(--tech-primary)')) {
+              item.style.setProperty('background', 'var(--tech-primary)', 'important');
+              item.style.setProperty('background-color', 'var(--tech-primary)', 'important');
+              item.style.setProperty('color', '#ffffff', 'important');
+              item.style.setProperty('box-shadow', '0 2px 8px rgba(64, 158, 255, 0.3)', 'important');
+              item.style.setProperty('font-weight', '600', 'important');
+              
+              const label = item.querySelector('.ant-segmented-item-label');
+              if (label instanceof HTMLElement) {
+                label.style.setProperty('color', '#ffffff', 'important');
+                label.style.setProperty('font-weight', '600', 'important');
+              }
+            }
+          }
+        });
+      });
+    }, 200); // 每200ms检查一次
+    
+    // 清理函数
+    return () => {
+      clearInterval(highFrequencyCheck);
+    };
+  }, []);
+
   return (
     <ConfigProvider
       locale={getAntdLocale()}
