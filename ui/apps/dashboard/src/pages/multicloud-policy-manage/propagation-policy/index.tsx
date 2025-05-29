@@ -14,9 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import i18nInstance from '@/utils/i18n';
-import { useState } from 'react';
-import Panel from '@/components/panel';
 import {
   Button,
   Input,
@@ -29,6 +26,8 @@ import {
   TableColumnProps,
   Tag,
   Typography,
+  Dropdown,
+  MenuProps,
 } from 'antd';
 import '@/styles/tech-theme.css';
 import { Icons } from '@/components/icons';
@@ -43,11 +42,15 @@ import {
 import PropagationPolicyEditorDrawer, {
   PropagationPolicyEditorDrawerProps,
 } from './propagation-policy-editor-drawer';
+import PropagationPolicyWizardModal from './components/propagation-policy-wizard-modal';
 import { stringify } from 'yaml';
 import { GetResource } from '@/services/unstructured.ts';
 import { useDebounce } from '@uidotdev/usehooks';
 import { PolicyScope } from '@/services/base.ts';
 import useNamespace from '@/hooks/use-namespace.ts';
+import { DownOutlined, FormOutlined, CodeOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import i18nInstance from '@/utils/i18n';
 
 const PropagationPolicyManage = () => {
   const [filter, setFilter] = useState<{
@@ -95,6 +98,10 @@ const PropagationPolicyManage = () => {
     namespace: '',
     propagationContent: '',
   });
+
+  // 添加向导modal状态
+  const [wizardModalOpen, setWizardModalOpen] = useState(false);
+
   const columns = [
     filter.policyScope === PolicyScope.Namespace && {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
@@ -258,6 +265,35 @@ const PropagationPolicyManage = () => {
     });
   }
 
+  // 下拉菜单配置
+  const createMenuItems: MenuProps['items'] = [
+    {
+      key: 'wizard',
+      label: (
+        <Space>
+          <FormOutlined />
+          图形化向导
+        </Space>
+      ),
+      onClick: () => setWizardModalOpen(true),
+    },
+    {
+      key: 'yaml',
+      label: (
+        <Space>
+          <CodeOutlined />
+          YAML 编辑器
+        </Space>
+      ),
+      onClick: () => {
+        setEditorDrawerData({
+          open: true,
+          mode: 'create',
+        });
+      },
+    },
+  ];
+
   const { Title } = Typography;
   
   return (
@@ -376,28 +412,27 @@ const PropagationPolicyManage = () => {
               />
             </div>
             <div>
-              <button
-                className="tech-btn-primary flex items-center space-x-2"
-                onClick={() => {
-                  setEditorDrawerData({
-                    open: true,
-                    mode: 'create',
-                  });
-                }}
+              <Dropdown
+                menu={{ items: createMenuItems }}
+                placement="bottomRight"
+                trigger={['click']}
               >
-                <Icons.add width={16} height={16} />
-                <span>
-                  {filter.policyScope === PolicyScope.Namespace
-                    ? i18nInstance.t(
-                        '5ac6560da4f54522d590c5f8e939691b',
-                        '新增调度策略',
-                      )
-                    : i18nInstance.t(
-                        '929e0cda9f7fdc960dafe6ef742ab088',
-                        '新增集群调度策略',
-                      )}
-                </span>
-              </button>
+                <button className="tech-btn-primary flex items-center space-x-2">
+                  <Icons.add width={16} height={16} />
+                  <span>
+                    {filter.policyScope === PolicyScope.Namespace
+                      ? i18nInstance.t(
+                          '5ac6560da4f54522d590c5f8e939691b',
+                          '新增调度策略',
+                        )
+                      : i18nInstance.t(
+                          '929e0cda9f7fdc960dafe6ef742ab088',
+                          '新增集群调度策略',
+                        )}
+                  </span>
+                  <DownOutlined style={{ fontSize: '12px' }} />
+                </button>
+              </Dropdown>
             </div>
           </div>
         </div>
@@ -459,6 +494,21 @@ const PropagationPolicyManage = () => {
             );
           }
         }}
+      />
+
+      <PropagationPolicyWizardModal
+        open={wizardModalOpen}
+        scope={filter.policyScope}
+        onOk={async (ret) => {
+          if (ret.code === 200) {
+            await messageApi.success('创建传播策略成功');
+            setWizardModalOpen(false);
+            await refetch();
+          } else {
+            await messageApi.error('创建传播策略失败');
+          }
+        }}
+        onCancel={() => setWizardModalOpen(false)}
       />
 
       {messageContextHolder}
