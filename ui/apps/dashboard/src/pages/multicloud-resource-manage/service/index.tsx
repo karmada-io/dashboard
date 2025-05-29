@@ -16,19 +16,22 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
-import { App, Button, Input, Segmented, Select, Typography } from 'antd';
+import { App, Button, Input, Segmented, Select, Typography, Dropdown, MenuProps } from 'antd';
 import { ServiceKind } from '@/services/base';
 import { Icons } from '@/components/icons';
 import { useCallback, useState } from 'react';
 import { useToggle, useWindowSize } from '@uidotdev/usehooks';
 import ServiceTable from './components/service-table';
 import ServiceEditorModal from './components/service-editor-modal';
+import ServiceWizardModal from './components/service-wizard-modal';
 import { stringify } from 'yaml';
 import IngressTable from '@/pages/multicloud-resource-manage/service/components/ingress-table';
 import useNamespace from '@/hooks/use-namespace.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { DeleteResource } from '@/services/unstructured.ts';
+import { PlusOutlined, FormOutlined, CodeOutlined } from '@ant-design/icons';
 import '@/styles/tech-theme.css';
+
 const ServicePage = () => {
   const [filter, setFilter] = useState<{
     selectedWorkSpace: string;
@@ -50,6 +53,7 @@ const ServicePage = () => {
     content: '',
   });
   const [showModal, toggleShowModal] = useToggle(false);
+  const [showWizardModal, toggleShowWizardModal] = useToggle(false);
   const resetEditorState = useCallback(() => {
     setEditorState({
       mode: 'create',
@@ -59,6 +63,33 @@ const ServicePage = () => {
   const { message: messageApi } = App.useApp();
   const queryClient = useQueryClient();
   const { Title } = Typography;
+  
+  const handleCreateService = () => {
+    setEditorState({
+      mode: 'create',
+      content: '',
+    });
+    toggleShowModal(true);
+  };
+
+  const handleCreateServiceWizard = () => {
+    toggleShowWizardModal(true);
+  };
+
+  const createMenuItems: MenuProps['items'] = [
+    {
+      key: 'wizard',
+      label: '图形化向导',
+      icon: <FormOutlined />,
+      onClick: handleCreateServiceWizard,
+    },
+    {
+      key: 'yaml',
+      label: 'YAML 编辑器',
+      icon: <CodeOutlined />,
+      onClick: handleCreateService,
+    },
+  ];
   
   return (
     <div className="tech-background min-h-screen">
@@ -94,53 +125,50 @@ const ServicePage = () => {
         {/* 操作区域 */}
         <div className="tech-card mb-6">
           <div className={'flex flex-row justify-between mb-6'}>
-                      <div className="tech-segmented-override">
-            <Segmented
-              className="tech-segmented"
-              style={{
-                marginBottom: 8,
-                fontSize: '16px',
-                height: '40px',
-                background: '#ffffff !important'
-              }}
-              options={[
-                {
-                  label: 'Service',
-                  value: ServiceKind.Service,
-                },
-                {
-                  label: 'Ingress',
-                  value: ServiceKind.Ingress,
-                },
-              ]}
-              value={filter.kind}
-              onChange={(value) => {
-                // reset filter when switch workload kind
-                if (value !== filter.kind) {
-                  setFilter({
-                    ...filter,
-                    kind: value,
-                    selectedWorkSpace: '',
-                    searchText: '',
-                  });
-                } else {
-                  setFilter({
-                    ...filter,
-                    kind: value,
-                  });
-                }
-              }}
-            />
-          </div>
-            <button
-              className="tech-btn-primary flex items-center space-x-2"
-              onClick={() => {
-                toggleShowModal(true);
-              }}
-            >
-              <Icons.add width={16} height={16} />
-              <span>{i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')}</span>
-            </button>
+            <div className="tech-segmented-override">
+              <Segmented
+                className="tech-segmented"
+                style={{
+                  marginBottom: 8,
+                  fontSize: '16px',
+                  height: '40px',
+                  background: '#ffffff !important'
+                }}
+                options={[
+                  {
+                    label: 'Service',
+                    value: ServiceKind.Service,
+                  },
+                  {
+                    label: 'Ingress',
+                    value: ServiceKind.Ingress,
+                  },
+                ]}
+                value={filter.kind}
+                onChange={(value) => {
+                  // reset filter when switch workload kind
+                  if (value !== filter.kind) {
+                    setFilter({
+                      ...filter,
+                      kind: value,
+                      selectedWorkSpace: '',
+                      searchText: '',
+                    });
+                  } else {
+                    setFilter({
+                      ...filter,
+                      kind: value,
+                    });
+                  }
+                }}
+              />
+            </div>
+            <Dropdown menu={{ items: createMenuItems }} trigger={['click']}>
+              <button className="tech-btn-primary flex items-center space-x-2">
+                <PlusOutlined style={{ fontSize: '16px' }} />
+                <span>{i18nInstance.t('c7961c290ec86485d8692f3c09b4075b', '新增服务')}</span>
+              </button>
+            </Dropdown>
           </div>
           <div className={'flex flex-row space-x-4 mb-6'}>
             <h3 className={'leading-[40px] text-lg font-semibold'} style={{ color: 'var(--text-color)' }}>
@@ -310,6 +338,36 @@ const ServicePage = () => {
           toggleShowModal(false);
         }}
         kind={filter.kind}
+      />
+
+      <ServiceWizardModal
+        open={showWizardModal}
+        kind={filter.kind}
+        onOk={async (ret) => {
+          if (ret.code === 200) {
+            await messageApi.success(
+              i18nInstance.t('04a691b377c91da599d5b4b62b0cb114', '创建成功'),
+            );
+            toggleShowWizardModal(false);
+            // invalidate react query
+            await queryClient.invalidateQueries({
+              queryKey: [
+                filter.kind === ServiceKind.Service
+                  ? 'GetServices'
+                  : 'GetIngress',
+                filter.selectedWorkSpace,
+                filter.searchText,
+              ],
+            });
+          } else {
+            await messageApi.error(
+              i18nInstance.t('a889286a51f3adab3cfb6913f2b0ac2e', '创建失败'),
+            );
+          }
+        }}
+        onCancel={() => {
+          toggleShowWizardModal(false);
+        }}
       />
     </div>
   );
