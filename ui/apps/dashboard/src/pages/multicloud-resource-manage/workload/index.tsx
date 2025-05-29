@@ -26,6 +26,8 @@ import {
   Flex,
   message,
   Popconfirm,
+  Dropdown,
+  MenuProps,
 } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 
@@ -38,10 +40,14 @@ import {
   SearchOutlined, 
   ReloadOutlined,
   AppstoreOutlined,
+  DownOutlined,
+  FormOutlined,
+  CodeOutlined,
 } from '@ant-design/icons';
 import { WorkloadKind } from '@/services/base';
 import useNamespace from '@/hooks/use-namespace';
 import NewWorkloadEditorModal from './new-workload-editor-modal';
+import WorkloadWizardModal from './workload-wizard-modal';
 import WorkloadDetailDrawer, { WorkloadDetailDrawerProps } from './workload-detail-drawer';
 import { useToggle } from '@uidotdev/usehooks';
 import { stringify } from 'yaml';
@@ -88,6 +94,7 @@ const WorkloadPage = () => {
   });
 
   const [showModal, toggleShowModal] = useToggle(false);
+  const [showWizardModal, toggleShowWizardModal] = useToggle(false);
   const [editorState, setEditorState] = useState<{
     mode: 'create' | 'edit';
     content: string;
@@ -166,6 +173,25 @@ const WorkloadPage = () => {
     });
     toggleShowModal(true);
   };
+
+  const handleCreateWorkloadWizard = () => {
+    toggleShowWizardModal(true);
+  };
+
+  const createMenuItems: MenuProps['items'] = [
+    {
+      key: 'wizard',
+      label: '图形化向导',
+      icon: <FormOutlined />,
+      onClick: handleCreateWorkloadWizard,
+    },
+    {
+      key: 'yaml',
+      label: 'YAML 编辑器',
+      icon: <CodeOutlined />,
+      onClick: handleCreateWorkload,
+    },
+  ];
 
   const handleEditWorkload = async (workload: any) => {
     try {
@@ -259,13 +285,18 @@ const WorkloadPage = () => {
                 当前显示 {workloadData.length} 个工作负载
               </Text>
             </div>
-            <button 
-              className="tech-btn-primary flex items-center space-x-2"
-              onClick={handleCreateWorkload}
+            <Dropdown
+              menu={{ items: createMenuItems }}
+              placement="bottomRight"
             >
-              <PlusOutlined />
-              <span>创建工作负载</span>
-            </button>
+              <Button 
+                className="tech-btn-primary flex items-center space-x-2"
+              >
+                <PlusOutlined />
+                <span>创建工作负载</span>
+                <DownOutlined />
+              </Button>
+            </Dropdown>
           </Flex>
 
           {/* 过滤和搜索栏 */}
@@ -464,13 +495,19 @@ const WorkloadPage = () => {
             >
               暂无工作负载数据
             </Text>
-            <button 
-              className="tech-btn-primary flex items-center space-x-2 mx-auto"
-              onClick={handleCreateWorkload}
+            <Dropdown
+              menu={{ items: createMenuItems }}
+              placement="bottomRight"
             >
-              <PlusOutlined />
-              <span>创建第一个工作负载</span>
-            </button>
+              <Button 
+                className="tech-btn-primary flex items-center space-x-2"
+                style={{ margin: '0 auto' }}
+              >
+                <PlusOutlined />
+                <span>创建第一个工作负载</span>
+                <DownOutlined />
+              </Button>
+            </Dropdown>
           </div>
         )}
       </div>
@@ -494,6 +531,24 @@ const WorkloadPage = () => {
         onCancel={() => {
           toggleShowModal(false);
           resetEditorState();
+        }}
+      />
+
+      {/* 工作负载图形化向导模态框 */}
+      <WorkloadWizardModal
+        open={showWizardModal}
+        kind={filter.kind}
+        onOk={async (ret) => {
+          if (ret.code === 200) {
+            messageApi.success('工作负载创建成功');
+            await refetch();
+            toggleShowWizardModal(false);
+          } else {
+            messageApi.error('工作负载创建失败');
+          }
+        }}
+        onCancel={() => {
+          toggleShowWizardModal(false);
         }}
       />
 
