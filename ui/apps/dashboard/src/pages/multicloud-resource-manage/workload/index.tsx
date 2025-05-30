@@ -114,8 +114,40 @@ const WorkloadPage = () => {
   }, []);
 
   // 辅助函数定义
-  const getWorkloadStatus = (_workload: DeploymentWorkload): 'Running' | 'Pending' | 'Failed' | 'Succeeded' | 'Unknown' => {
-    // 暂时返回Running状态，后续根据实际API数据结构调整
+  const getWorkloadStatus = (workload: DeploymentWorkload): 'Running' | 'Pending' | 'Failed' | 'Succeeded' | 'Unknown' => {
+    const wl = workload as any;
+    
+    // 根据新的API数据结构，从pods字段获取状态信息
+    if (wl.pods) {
+      const { current, desired, running, pending, failed, succeeded } = wl.pods;
+      
+      // 如果有失败的Pod，显示Failed状态
+      if (failed > 0) {
+        return 'Failed';
+      }
+      
+      // 对于Job类型，如果成功数量达到期望值，显示Succeeded
+      if (workload.typeMeta?.kind === 'Job' && succeeded >= desired) {
+        return 'Succeeded';
+      }
+      
+      // 如果当前数量等于期望数量，显示Running状态
+      if (current >= desired && desired > 0) {
+        return 'Running';
+      }
+      
+      // 如果有待启动的Pod或当前数量小于期望数量，显示Pending状态
+      if (pending > 0 || (current < desired && desired > 0)) {
+        return 'Pending';
+      }
+      
+      // 如果期望数量为0，显示Unknown状态
+      if (desired === 0) {
+        return 'Unknown';
+      }
+    }
+    
+    // 默认返回Running状态（兼容性）
     return 'Running';
   };
 
@@ -126,6 +158,16 @@ const WorkloadPage = () => {
     
     // 从实际的工作负载数据中获取副本信息
     const wl = workload as any; // 使用any类型避免类型检查问题
+    
+    // 根据新的API数据结构，副本信息在pods字段中
+    if (wl.pods) {
+      return {
+        ready: wl.pods.current || 0, // 使用current作为ready状态
+        desired: wl.pods.desired || 0,
+      };
+    }
+    
+    // 兼容旧的数据结构（如果存在的话）
     if (workload.typeMeta?.kind === 'Deployment') {
       return {
         ready: wl.status?.readyReplicas || 0,
@@ -168,9 +210,26 @@ const WorkloadPage = () => {
     return clusters.length > 0 ? clusters : ['master', 'member1'];
   };
 
-  const getWorkloadImages = (_workload: DeploymentWorkload): string[] => {
-    // 暂时返回模拟数据，后续根据实际API数据结构调整
-    return ['nginx:latest'];
+  const getWorkloadImages = (workload: DeploymentWorkload): string[] => {
+    // 从实际的API数据中获取容器镜像信息
+    const wl = workload as any;
+    
+    if (wl.containerImages && Array.isArray(wl.containerImages)) {
+      // 处理"docker pull registry.example.com/library/nginx:latest"格式的镜像
+      return wl.containerImages.map((imageStr: string) => {
+        // 提取镜像名称，去掉"docker pull "前缀
+        const imageName = imageStr.replace(/^docker pull\s+/, '');
+        return imageName;
+      });
+    }
+    
+    // 兼容其他可能的镜像字段名
+    if (wl.images && Array.isArray(wl.images)) {
+      return wl.images;
+    }
+    
+    // 默认返回空数组
+    return [];
   };
 
   // 转换API数据为组件需要的格式
