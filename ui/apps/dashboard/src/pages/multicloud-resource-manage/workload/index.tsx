@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import { useState, useCallback } from 'react';
+import React from 'react';
 import { 
   Row, 
   Col, 
@@ -25,7 +26,7 @@ import {
   Segmented,
   Flex,
   message,
-  Popconfirm,
+  Modal,
   Dropdown,
   MenuProps,
 } from 'antd';
@@ -75,11 +76,13 @@ const WorkloadPage = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetWorkloads', JSON.stringify(filter)],
     queryFn: async () => {
+      console.log('Getting workloads with filter:', filter);
       const clusters = await GetWorkloads({
         kind: filter.kind,
-        namespace: filter.selectedWorkSpace,
+        namespace: filter.selectedWorkSpace || undefined,
         keyword: filter.searchText,
       });
+      console.log('Workloads API response:', clusters);
       return clusters.data || {};
     },
   });
@@ -110,33 +113,47 @@ const WorkloadPage = () => {
     });
   }, []);
 
-  // 转换API数据为组件需要的格式
-  const transformWorkloadData = (workloads: DeploymentWorkload[]) => {
-    return workloads.map(workload => ({
-      name: workload.objectMeta.name,
-      namespace: workload.objectMeta.namespace,
-      type: workload.typeMeta.kind as 'Deployment' | 'StatefulSet' | 'DaemonSet' | 'Job' | 'CronJob' | 'Pod',
-      status: getWorkloadStatus(workload),
-      replicas: getWorkloadReplicas(workload),
-      clusters: getWorkloadClusters(workload),
-      images: getWorkloadImages(workload),
-      createTime: workload.objectMeta.creationTimestamp,
-      labels: workload.objectMeta.labels,
-      originalData: workload,
-    }));
-  };
-
+  // 辅助函数定义
   const getWorkloadStatus = (_workload: DeploymentWorkload): 'Running' | 'Pending' | 'Failed' | 'Succeeded' | 'Unknown' => {
     // 暂时返回Running状态，后续根据实际API数据结构调整
     return 'Running';
   };
 
   const getWorkloadReplicas = (workload: DeploymentWorkload) => {
-    if (workload.typeMeta.kind === 'Pod') {
+    if (workload.typeMeta?.kind === 'Pod') {
       return undefined;
     }
+    
+    // 从实际的工作负载数据中获取副本信息
+    const wl = workload as any; // 使用any类型避免类型检查问题
+    if (workload.typeMeta?.kind === 'Deployment') {
+      return {
+        ready: wl.status?.readyReplicas || 0,
+        desired: wl.spec?.replicas || 0,
+      };
+    } else if (workload.typeMeta?.kind === 'StatefulSet') {
+      return {
+        ready: wl.status?.readyReplicas || 0,
+        desired: wl.spec?.replicas || 0,
+      };
+    } else if (workload.typeMeta?.kind === 'DaemonSet') {
+      return {
+        ready: wl.status?.numberReady || 0,
+        desired: wl.status?.desiredNumberScheduled || 0,
+      };
+    } else if (workload.typeMeta?.kind === 'Job') {
+      return {
+        ready: wl.status?.succeeded || 0,
+        desired: wl.spec?.completions || 1,
+      };
+    } else if (workload.typeMeta?.kind === 'CronJob') {
+      // CronJob 不显示副本数
+      return undefined;
+    }
+    
+    // 默认返回
     return {
-      ready: 1,
+      ready: 0,
       desired: 1,
     };
   };
@@ -144,7 +161,7 @@ const WorkloadPage = () => {
   const getWorkloadClusters = (workload: DeploymentWorkload): string[] => {
     // 从标签或注解中获取集群信息
     const clusters = [];
-    if (workload.objectMeta.annotations?.['cluster.karmada.io/name']) {
+    if (workload.objectMeta?.annotations?.['cluster.karmada.io/name']) {
       clusters.push(workload.objectMeta.annotations['cluster.karmada.io/name']);
     }
     // 模拟多集群部署
@@ -156,14 +173,66 @@ const WorkloadPage = () => {
     return ['nginx:latest'];
   };
 
-  const workloadData = data?.items ? transformWorkloadData(data.items) : [];
+  // 转换API数据为组件需要的格式
+  const transformWorkloadData = (workloads: DeploymentWorkload[]) => {
+    console.log('Transforming workload data:', workloads);
+    if (!Array.isArray(workloads)) {
+      console.warn('Workloads data is not an array:', workloads);
+      return [];
+    }
+    
+    return workloads.map(workload => {
+      console.log('Processing workload:', workload);
+      return {
+        name: workload.objectMeta?.name || 'Unknown',
+        namespace: workload.objectMeta?.namespace || 'default',
+        type: workload.typeMeta?.kind as 'Deployment' | 'StatefulSet' | 'DaemonSet' | 'Job' | 'CronJob' | 'Pod',
+        status: getWorkloadStatus(workload),
+        replicas: getWorkloadReplicas(workload),
+        clusters: getWorkloadClusters(workload),
+        images: getWorkloadImages(workload),
+        createTime: workload.objectMeta?.creationTimestamp,
+        labels: workload.objectMeta?.labels || {},
+        originalData: workload,
+      };
+    });
+  };
+
+  const workloadData = React.useMemo(() => {
+    console.log('Processing data:', data);
+    
+    if (!data) {
+      console.log('No data available');
+      return [];
+    }
+    
+    // 尝试不同的数据路径
+    let items: DeploymentWorkload[] = [];
+    
+    if (data.items && Array.isArray(data.items)) {
+      items = data.items;
+    } else if (data.deployments && Array.isArray(data.deployments)) {
+      items = data.deployments;
+    } else if (data.statefulSets && Array.isArray(data.statefulSets)) {
+      items = data.statefulSets;
+    } else if (data.daemonSets && Array.isArray(data.daemonSets)) {
+      items = data.daemonSets;
+    } else if (data.jobs && Array.isArray(data.jobs)) {
+      items = data.jobs;
+    } else if (Array.isArray(data)) {
+      items = data;
+    }
+    
+    console.log('Found items:', items);
+    return transformWorkloadData(items);
+  }, [data]);
 
   // 统计数据
   const stats = {
     total: workloadData.length,
-    running: workloadData.filter(w => w.status === 'Running').length,
-    pending: workloadData.filter(w => w.status === 'Pending').length,
-    failed: workloadData.filter(w => w.status === 'Failed').length,
+    running: workloadData.filter((w: any) => w.status === 'Running').length,
+    pending: workloadData.filter((w: any) => w.status === 'Pending').length,
+    failed: workloadData.filter((w: any) => w.status === 'Failed').length,
   };
 
   const handleCreateWorkload = () => {
@@ -443,40 +512,69 @@ const WorkloadPage = () => {
 
         {/* 工作负载卡片网格 */}
         <div className="tech-card mb-6">
+          {/* 调试信息面板 */}
+          {process.env.NODE_ENV === 'development' && (
+            <details style={{ marginBottom: '16px', border: '1px solid #e8e8e8', padding: '12px', borderRadius: '6px' }}>
+              <summary style={{ cursor: 'pointer', fontWeight: 'bold', color: '#1890ff' }}>
+                🔍 调试信息面板
+              </summary>
+              <div style={{ marginTop: '12px', fontSize: '12px' }}>
+                <p><strong>当前过滤器:</strong> {JSON.stringify(filter, null, 2)}</p>
+                <p><strong>API是否加载中:</strong> {isLoading ? '是' : '否'}</p>
+                <p><strong>原始数据存在:</strong> {data ? '是' : '否'}</p>
+                <p><strong>转换后工作负载数量:</strong> {workloadData.length}</p>
+                {data && (
+                  <details style={{ marginTop: '8px' }}>
+                    <summary>原始API响应</summary>
+                    <pre style={{ background: '#f8f8f8', padding: '8px', borderRadius: '4px', marginTop: '8px', overflow: 'auto', maxHeight: '200px' }}>
+                      {JSON.stringify(data, null, 2)}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            </details>
+          )}
+          
           <Row gutter={[24, 24]}>
             {workloadData.map((workload) => (
               <Col xs={24} lg={12} xl={8} key={`${workload.namespace}-${workload.name}`}>
-                <Popconfirm
-                  title="确认删除"
-                  description={`确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`}
-                  onConfirm={() => handleDeleteWorkload(workload)}
-                  okText="确认删除"
-                  cancelText="取消"
-                  okType="danger"
-                >
-                  <WorkloadCard
-                    name={workload.name}
-                    namespace={workload.namespace}
-                    type={workload.type}
-                    status={workload.status}
-                    replicas={workload.replicas}
-                    clusters={workload.clusters}
-                    images={workload.images}
-                    createTime={workload.createTime}
-                    labels={workload.labels}
-                    onView={() => handleViewWorkload(workload)}
-                    onEdit={() => handleEditWorkload(workload)}
-                    onDelete={() => {}} // 删除由Popconfirm处理
-                    onScale={() => {
-                      // TODO: 实现扩缩容功能
-                      messageApi.info('扩缩容功能开发中');
-                    }}
-                    onRestart={() => {
-                      // TODO: 实现重启功能
-                      messageApi.info('重启功能开发中');
-                    }}
-                  />
-                </Popconfirm>
+                <WorkloadCard
+                  name={workload.name}
+                  namespace={workload.namespace}
+                  type={workload.type}
+                  status={workload.status}
+                  replicas={workload.replicas}
+                  clusters={workload.clusters}
+                  images={workload.images}
+                  createTime={workload.createTime}
+                  labels={workload.labels}
+                  onView={() => handleViewWorkload(workload)}
+                  onEdit={() => handleEditWorkload(workload)}
+                  onDelete={() => {
+                    // 显示删除确认对话框
+                    Modal.confirm({
+                      title: '确认删除',
+                      content: `确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`,
+                      onOk: async () => {
+                        await handleDeleteWorkload(workload);
+                      },
+                      onCancel() {
+                        // 取消删除
+                      },
+                      okText: '确认删除',
+                      cancelText: '取消',
+                      okType: 'danger',
+                    });
+                  }}
+                  onScale={() => {
+                    // TODO: 实现扩缩容功能
+                    messageApi.info('扩缩容功能开发中');
+                  }}
+                  onRestart={() => {
+                    // TODO: 实现重启功能
+                    messageApi.info('重启功能开发中');
+                  }}
+                />
               </Col>
             ))}
           </Row>
@@ -495,6 +593,27 @@ const WorkloadPage = () => {
             >
               暂无工作负载数据
             </Text>
+            
+            {/* 调试信息 */}
+            {process.env.NODE_ENV === 'development' && data && (
+              <details style={{ textAlign: 'left', margin: '20px auto', maxWidth: '800px' }}>
+                <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>
+                  📊 查看原始API响应数据（调试用）
+                </summary>
+                <pre style={{ 
+                  background: '#f5f5f5', 
+                  padding: '15px', 
+                  borderRadius: '5px',
+                  fontSize: '12px',
+                  overflow: 'auto',
+                  maxHeight: '300px',
+                  textAlign: 'left'
+                }}>
+                  {JSON.stringify(data, null, 2)}
+                </pre>
+              </details>
+            )}
+            
             <Dropdown
               menu={{ items: createMenuItems }}
               placement="bottomRight"

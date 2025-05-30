@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Card, Badge, Tag, Button, Space, Typography, Flex, Tooltip } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import { AppstoreOutlined, ContainerOutlined, CloudOutlined } from '@ant-design/icons';
@@ -58,6 +58,8 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({
   onScale,
   onRestart,
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  
   const getStatusBadge = () => {
     switch (status) {
       case 'Running':
@@ -109,6 +111,7 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({
 
   return (
     <Card
+      ref={cardRef}
       style={{
         borderRadius: '12px',
         boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.08)',
