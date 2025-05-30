@@ -20,15 +20,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
-	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
-	"github.com/karmada-io/dashboard/pkg/client"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -40,7 +35,12 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/remotecommand"
-	"k8s.io/utils/ptr" 
+	"k8s.io/utils/ptr"
+
+	"github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
+	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
+	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
+	"github.com/karmada-io/dashboard/pkg/client"
 )
 
 // waitForPodReady polls until the Pod is Running and Ready, or times out.
@@ -219,6 +219,7 @@ func GenerateKubeConfig(token string) ([]byte, error) {
 	return clientcmd.Write(cfg)
 }
 
+// ExecIntoPodWithInput Inject the kubeconfig into the pod
 func ExecIntoPodWithInput(
 	ctx context.Context,
 	restCfg *rest.Config,
@@ -333,8 +334,6 @@ func TriggerTerminal(c *gin.Context) {
 		return
 	}
 
-
-
 	c.JSON(200, gin.H{
 		"data": gin.H{
 			"podName":   pod.Name,
@@ -345,12 +344,13 @@ func TriggerTerminal(c *gin.Context) {
 	})
 }
 
+// TerminalResponse represents the response in WaitForTerminal.
 type TerminalResponse struct {
 	ID string `json:"id"`
 }
 
 func handleExecShell(c *gin.Context) {
-	sessionID, err := genTerminalSessionId()
+	sessionID, err := genTerminalSessionID()
 	if err != nil {
 		common.Fail(c, err)
 		return
@@ -366,7 +366,6 @@ func handleExecShell(c *gin.Context) {
 		bound:    make(chan error),
 		sizeChan: make(chan remotecommand.TerminalSize),
 	})
-
 
 	//restfulRequest := restful.NewRequest(c.Request)
 	//go WaitForTerminal(client.InClusterClient(), cfg, restfulRequest, sessionID)

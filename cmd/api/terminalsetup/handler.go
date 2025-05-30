@@ -22,14 +22,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/karmada-io/dashboard/cmd/api/app/router"
-	"github.com/karmada-io/dashboard/pkg/client"
 	"io"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -37,10 +35,13 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
 	"k8s.io/klog/v2"
-	//"k8s.io/dashboard/api/pkg/args"
+
+	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	"github.com/karmada-io/dashboard/pkg/client"
 )
 
-const END_OF_TRANSMISSION = "\u0004"
+// ENDOFTRANSMISSION signals the end of data transmission in the terminal session.
+const ENDOFTRANSMISSION = "\u0004"
 
 // PtyHandler is what remotecommand expects from a pty
 type PtyHandler interface {
@@ -87,12 +88,12 @@ func (t TerminalSession) Read(p []byte) (int, error) {
 	m, err := t.sockJSSession.Recv()
 	if err != nil {
 		// Send terminated signal to process to avoid resource leak
-		return copy(p, END_OF_TRANSMISSION), err
+		return copy(p, ENDOFTRANSMISSION), err
 	}
 
 	var msg TerminalMessage
 	if err := json.Unmarshal([]byte(m), &msg); err != nil {
-		return copy(p, END_OF_TRANSMISSION), err
+		return copy(p, ENDOFTRANSMISSION), err
 	}
 
 	switch msg.Op {
@@ -102,7 +103,7 @@ func (t TerminalSession) Read(p []byte) (int, error) {
 		t.sizeChan <- remotecommand.TerminalSize{Width: msg.Cols, Height: msg.Rows}
 		return 0, nil
 	default:
-		return copy(p, END_OF_TRANSMISSION), fmt.Errorf("unknown message type '%s'", msg.Op)
+		return copy(p, ENDOFTRANSMISSION), fmt.Errorf("unknown message type '%s'", msg.Op)
 	}
 }
 
@@ -146,33 +147,33 @@ type SessionMap struct {
 	Lock     sync.RWMutex
 }
 
-// Get return a given terminalSession by sessionId
-func (sm *SessionMap) Get(sessionId string) TerminalSession {
+// Get returns a given TerminalSession by sessionID.
+func (sm *SessionMap) Get(sessionID string) TerminalSession {
 	sm.Lock.RLock()
 	defer sm.Lock.RUnlock()
-	return sm.Sessions[sessionId]
+	return sm.Sessions[sessionID]
 }
 
 // Set store a TerminalSession to SessionMap
-func (sm *SessionMap) Set(sessionId string, session TerminalSession) {
+func (sm *SessionMap) Set(sessionID string, session TerminalSession) {
 	sm.Lock.Lock()
 	defer sm.Lock.Unlock()
-	sm.Sessions[sessionId] = session
+	sm.Sessions[sessionID] = session
 }
 
 // Close shuts down the SockJS connection and sends the status code and reason to the client
 // Can happen if the process exits or if there is an error starting up the process
 // For now the status code is unused and reason is shown to the user (unless "")
-func (sm *SessionMap) Close(sessionId string, status uint32, reason string) {
+func (sm *SessionMap) Close(sessionID string, status uint32, reason string) {
 	sm.Lock.Lock()
 	defer sm.Lock.Unlock()
-	ses := sm.Sessions[sessionId]
+	ses := sm.Sessions[sessionID]
 	err := ses.sockJSSession.Close(status, reason)
 	if err != nil {
 		klog.Error(err)
 	}
 	close(ses.sizeChan)
-	delete(sm.Sessions, sessionId)
+	delete(sm.Sessions, sessionID)
 }
 
 var terminalSessions = SessionMap{Sessions: make(map[string]TerminalSession)}
@@ -214,7 +215,6 @@ func handleTerminalSession(session sockjs.Session) {
 		klog.V(2).Infof("handleTerminalSession: can't find session '%s'", msg.SessionID)
 		return
 	}
-
 
 	// Update the terminal session with the new SockJS session
 	terminalSession.sockJSSession = session
@@ -272,11 +272,11 @@ func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, terminalInfo
 	return nil
 }
 
-// genTerminalSessionId generates a random session ID string. The format is not really interesting.
+// genTerminalSessionID generates a random session ID string. The format is not really interesting.
 // This ID is used to identify the session when the client opens the SockJS connection.
 // Not the same as the SockJS session id! We can't use that as that is generated
 // on the client side and we don't have it yet at this point.
-func genTerminalSessionId() (string, error) {
+func genTerminalSessionID() (string, error) {
 	bytes := make([]byte, 16)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
@@ -298,6 +298,8 @@ func isValidShell(validShells []string, shell string) bool {
 
 // WaitForTerminal is called from apihandler.handleAttach as a goroutine
 // Waits for the SockJS connection to be opened by the client the session to be bound in handleTerminalSession
+//
+//revive:disable:var-naming
 func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, terminalInfo TerminalInfo, sessionId string) {
 	shell := terminalInfo.Shell
 
@@ -345,11 +347,11 @@ func GetToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": rawToken})
 }
 
+// Init initializes the terminal setup.
 func Init() {
 	r := router.V1()
 
 	r.POST("/terminal", TriggerTerminal)
-
 
 	r.Any("/terminal/sockjs/*w", gin.WrapH(CreateAttachHandler("/api/v1/terminal/sockjs")))
 	r.GET("/terminal/pod/:namespace/:pod/shell/:container", handleExecShell)

@@ -19,8 +19,8 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
-
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
@@ -33,6 +33,7 @@ const (
 	tokenServiceAccountKey = "serviceaccount"
 )
 
+// GetCurrentUser returns the current user from the context .
 func GetCurrentUser(c *gin.Context) (*v1.User, int, error) {
 	return me(c.Request)
 }

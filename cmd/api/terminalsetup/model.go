@@ -16,6 +16,7 @@ limitations under the License.
 
 package terminalsetup
 
+// TerminalInfo represents the information required for terminal operations.
 type TerminalInfo struct {
 	Shell         string
 	Namespace     string
