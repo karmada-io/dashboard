@@ -41,6 +41,17 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     base: process.env.NODE_ENV === 'development' ? '' : '/static',
+    // ─── ADD SECTION ──────────────────────────────────
+    define: {
+      // make `global` in your code point at `window` in the browser
+      global: 'window',
+    },
+    optimizeDeps: {
+      // ensure Vite pre-bundles the SockJS client
+      include: ['sockjs-client'],
+    },
+    // ────────────────────────────────────────────────────────
+
     plugins: [
       banner(license) as Plugin,
       react(),
@@ -52,10 +63,22 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     resolve: {
-      alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+      alias: [
+        { find: '@', replacement: path.resolve(__dirname, 'src') },
+        {
+          find: '@packages/terminal',
+          replacement: path.resolve(__dirname, '../../packages/terminal/src'),
+        },
+      ],
     },
     server: {
       proxy: {
+        '^/api/v1/terminal/sockjs*': {
+          target: 'ws://localhost:8000',
+          changeOrigin: false,
+          secure: false,
+          ws: true,
+        },
         '^/api/v1.*': {
           target: 'http://localhost:8000',
           changeOrigin: true,

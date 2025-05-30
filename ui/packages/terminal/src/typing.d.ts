@@ -52,7 +52,7 @@ export interface ClientOptions {
 
 export interface BaseTerminalOptions {
   clientOptions: ClientOptions;
-  xtermOptions: ITerminalOptions;
+  xtermOptions: ITerminalOptions & { cols?: number; rows?: number };
 }
 
 export type RendererType = 'dom' | 'canvas' | 'webgl';
