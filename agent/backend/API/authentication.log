@@ -1,0 +1,23 @@
+[0;34m[INFO][0m 🔐 开始认证接口测试...
+[0;34m[INFO][0m 🚀 测试: 登录接口
+[0;34m[INFO][0m 📡 请求: POST http://localhost:8000/api/v1/login
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "MSG_LOGIN_UNAUTHORIZED_ERROR",
+  "data": null
+}
+[0;32m[PASS][0m 登录接口 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 用户信息接口
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/me
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "MSG_LOGIN_UNAUTHORIZED_ERROR",
+  "data": null
+}
+[0;32m[PASS][0m 用户信息接口 ✅
+----------------------------------------

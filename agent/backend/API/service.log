@@ -1,0 +1,142 @@
+[0;34m[INFO][0m 🌐 开始服务接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取服务列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/service
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 2
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-19T12:52:49Z",
+          "uid": "6bf4b7d5-634e-412d-ba6d-26e22eace40a"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.96.0.1"
+      },
+      {
+        "objectMeta": {
+          "name": "karmada-aggregated-apiserver",
+          "namespace": "karmada-system",
+          "creationTimestamp": "2025-05-19T12:55:08Z",
+          "uid": "18be4c3d-b591-45cd-a6af-92f04ae2f11d"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "karmada-aggregated-apiserver.karmada-system",
+          "ports": null
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ExternalName",
+        "clusterIP": ""
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取服务列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间服务列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/service/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 1
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-19T12:52:49Z",
+          "uid": "6bf4b7d5-634e-412d-ba6d-26e22eace40a"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.96.0.1"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间服务列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取服务详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/service/default/test-service
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "services \"test-service\" not found",
+  "data": null
+}
+[0;32m[PASS][0m 获取服务详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取服务事件
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/service/default/test-service/event
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "events": [],
+    "errors": null
+  }
+}
+[0;32m[PASS][0m 获取服务事件 ✅
+----------------------------------------

@@ -1,0 +1,426 @@
+[0;34m[INFO][0m 📁 开始命名空间接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取命名空间列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/namespace
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 10
+    },
+    "namespaces": [
+      {
+        "objectMeta": {
+          "name": "default",
+          "labels": {
+            "kubernetes.io/metadata.name": "default"
+          },
+          "creationTimestamp": "2025-05-19T12:52:48Z",
+          "uid": "efa5f1f9-804f-4437-b7f6-96767c158401"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "huinong",
+          "labels": {
+            "kubernetes.io/metadata.name": "huinong"
+          },
+          "creationTimestamp": "2025-05-31T17:36:13Z",
+          "uid": "47856bb9-cce9-48ca-94ff-f6352244224d"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Terminating",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "karmada-cluster",
+          "labels": {
+            "karmada.io/system": "true",
+            "kubernetes.io/metadata.name": "karmada-cluster"
+          },
+          "creationTimestamp": "2025-05-19T13:18:34Z",
+          "uid": "95a33091-61a7-43d6-9bb7-c8a79a0e7830"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "karmada-es-branch",
+          "labels": {
+            "karmada.io/system": "true",
+            "kubernetes.io/metadata.name": "karmada-es-branch"
+          },
+          "creationTimestamp": "2025-05-19T13:43:59Z",
+          "uid": "5823eae8-5bc8-4bfa-8a62-9bf6d2e40529"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "karmada-es-master",
+          "labels": {
+            "karmada.io/system": "true",
+            "kubernetes.io/metadata.name": "karmada-es-master"
+          },
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "cc820e68-7ccd-4f1c-8f43-3911a1294e25"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "karmada-system",
+          "labels": {
+            "karmada.io/system": "true",
+            "kubernetes.io/metadata.name": "karmada-system"
+          },
+          "creationTimestamp": "2025-05-19T12:55:06Z",
+          "uid": "8b4936eb-d05f-4119-96fe-89e5335f4b76"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "kube-node-lease",
+          "labels": {
+            "kubernetes.io/metadata.name": "kube-node-lease"
+          },
+          "creationTimestamp": "2025-05-19T12:52:48Z",
+          "uid": "4fddb136-2716-4c91-a9b6-94eb1df8ccfe"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "kube-public",
+          "labels": {
+            "kubernetes.io/metadata.name": "kube-public"
+          },
+          "creationTimestamp": "2025-05-19T12:52:48Z",
+          "uid": "3e9e9c87-2999-4012-bd81-03661cc5643e"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "kube-system",
+          "labels": {
+            "kubernetes.io/metadata.name": "kube-system"
+          },
+          "creationTimestamp": "2025-05-19T12:52:47Z",
+          "uid": "6c04fda5-8ef4-4cc6-8a2c-b71178a1bb7f"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      },
+      {
+        "objectMeta": {
+          "name": "test-namespace",
+          "labels": {
+            "kubernetes.io/metadata.name": "test-namespace"
+          },
+          "creationTimestamp": "2025-06-01T13:48:03Z",
+          "uid": "bd1c10e4-6522-4f48-ab58-aeb621ca497d"
+        },
+        "typeMeta": {
+          "kind": "namespace"
+        },
+        "phase": "Active",
+        "skipAutoPropagation": false
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取命名空间列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取命名空间详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/namespace/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "objectMeta": {
+      "name": "default",
+      "labels": {
+        "kubernetes.io/metadata.name": "default"
+      },
+      "creationTimestamp": "2025-05-19T12:52:48Z",
+      "uid": "efa5f1f9-804f-4437-b7f6-96767c158401"
+    },
+    "typeMeta": {
+      "kind": "namespace"
+    },
+    "phase": "Active",
+    "skipAutoPropagation": false,
+    "errors": null
+  }
+}
+[0;32m[PASS][0m 获取命名空间详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取命名空间事件
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/namespace/default/event
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 9
+    },
+    "events": [
+      {
+        "objectMeta": {
+          "name": "master.1844f06fa2b6ac30",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:08:37Z",
+          "uid": "733a727d-8afe-4ec2-8a25-14e047826f59"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Taint cluster succeed: cluster now has taints([{Key:cluster.karmada.io/terminating,Effect:NoExecute}]).",
+        "sourceComponent": "cluster-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 1,
+        "firstSeen": "2025-06-01T14:08:37Z",
+        "lastSeen": "2025-06-01T14:08:37Z",
+        "reason": "TaintClusterSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "master.1844f06fa32fff39",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:08:37Z",
+          "uid": "f6f7dac9-bb69-4983-b6b1-2715ab198c7e"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Removed execution space for cluster(master).",
+        "sourceComponent": "cluster-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 4,
+        "firstSeen": "2025-06-01T14:08:37Z",
+        "lastSeen": "2025-06-01T14:08:57Z",
+        "reason": "RemoveExecutionSpaceSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "master.1844f0921f5098e6",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "90873a47-cfd7-4ad1-803b-606f6d63cd7a"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "namespaces \"karmada-es-master\" not found",
+        "sourceComponent": "unified-auth-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 1,
+        "firstSeen": "2025-06-01T14:11:05Z",
+        "lastSeen": "2025-06-01T14:11:05Z",
+        "reason": "SyncImpersonationConfigFailed",
+        "type": "Warning"
+      },
+      {
+        "objectMeta": {
+          "name": "master.1844f0922058a174",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "2baf6e1e-0528-4e35-b3f0-0711790c5e2e"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Created execution space(karmada-es-master) for cluster(master).",
+        "sourceComponent": "cluster-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 1,
+        "firstSeen": "2025-06-01T14:11:05Z",
+        "lastSeen": "2025-06-01T14:11:05Z",
+        "reason": "CreateExecutionSpaceSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "master.1844f0922113b259",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "b6f3894b-6267-48de-8389-a2291a5cf11b"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Taint cluster succeed: cluster now has taints([{Key:cluster.karmada.io/not-ready,Effect:NoSchedule}]).",
+        "sourceComponent": "cluster-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 1,
+        "firstSeen": "2025-06-01T14:11:05Z",
+        "lastSeen": "2025-06-01T14:11:05Z",
+        "reason": "TaintClusterSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "master.1844f09224ed6c57",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "a8619510-a73e-4117-ab27-365c0e020798"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Sync impersonation config succeed.",
+        "sourceComponent": "unified-auth-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 1,
+        "firstSeen": "2025-06-01T14:11:05Z",
+        "lastSeen": "2025-06-01T14:11:05Z",
+        "reason": "SyncImpersonationConfigSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "master.1844f0922f4730d2",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "ac963237-49d1-46f9-9fb2-56c7cc77c5db"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Taint cluster succeed: cluster now does not have taints.",
+        "sourceComponent": "cluster-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Cluster",
+        "objectName": "master",
+        "count": 1,
+        "firstSeen": "2025-06-01T14:11:05Z",
+        "lastSeen": "2025-06-01T14:11:05Z",
+        "reason": "TaintClusterSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "test-namespace.1844ef50535bd89a",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T13:48:03Z",
+          "uid": "4b5be7d3-49f1-478c-8d25-7a4223672b3b"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Successfully applied resource(/test-namespace) to cluster master",
+        "sourceComponent": "execution-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Namespace",
+        "objectName": "test-namespace",
+        "count": 2,
+        "firstSeen": "2025-06-01T13:48:03Z",
+        "lastSeen": "2025-06-01T14:11:06Z",
+        "reason": "SyncSucceed",
+        "type": "Normal"
+      },
+      {
+        "objectMeta": {
+          "name": "test-namespace.1844ef50537ae446",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T13:48:03Z",
+          "uid": "96131e02-f3c0-4a63-b238-37f112281308"
+        },
+        "typeMeta": {
+          "kind": "event"
+        },
+        "message": "Successfully applied resource(/test-namespace) to cluster branch",
+        "sourceComponent": "execution-controller",
+        "sourceHost": "",
+        "object": "",
+        "objectKind": "Namespace",
+        "objectName": "test-namespace",
+        "count": 1,
+        "firstSeen": "2025-06-01T13:48:03Z",
+        "lastSeen": "2025-06-01T13:48:03Z",
+        "reason": "SyncSucceed",
+        "type": "Normal"
+      }
+    ],
+    "errors": null
+  }
+}
+[0;32m[PASS][0m 获取命名空间事件 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 创建命名空间接口
+[0;34m[INFO][0m 📡 请求: POST http://localhost:8000/api/v1/namespace
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "namespaces \"test-namespace\" already exists",
+  "data": null
+}
+[0;32m[PASS][0m 创建命名空间接口 ✅
+----------------------------------------

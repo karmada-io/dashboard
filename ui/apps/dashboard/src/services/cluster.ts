@@ -64,6 +64,48 @@ export interface ClusterDetail extends Cluster {
   taints: TaintParam[];
 }
 
+// 新增：节点相关接口
+export interface ClusterNode {
+  objectMeta: ObjectMeta;
+  typeMeta: TypeMeta;
+  ready: string;
+  allocatedResources?: {
+    cpuCapacity: number;
+    memoryCapacity: number;
+    podCapacity: number;
+  };
+  status?: {
+    capacity?: {
+      cpu: string;
+      memory: string;
+      pods: string;
+    };
+    allocatable?: {
+      cpu: string;
+      memory: string;
+      pods: string;
+    };
+    conditions?: Array<{
+      type: string;
+      status: string;
+      lastTransitionTime: string;
+      reason: string;
+      message: string;
+    }>;
+    addresses?: Array<{
+      type: string;
+      address: string;
+    }>;
+  };
+}
+
+export interface ListMemberClusterNodesResp {
+  listMeta: {
+    totalItems: number;
+  };
+  nodes: ClusterNode[];
+}
+
 export async function GetClusters() {
   const resp = await karmadaClient.get<IResponse<ListClusterResp>>('/cluster');
   return resp.data;
@@ -117,6 +159,14 @@ export async function UpdateCluster(params: {
 export async function DeleteCluster(clusterName: string) {
   const resp = await karmadaClient.delete<IResponse<ClusterDetail>>(
     `/cluster/${clusterName}`,
+  );
+  return resp.data;
+}
+
+// 新增：获取成员集群节点列表
+export async function GetMemberClusterNodes(params: { clusterName: string }) {
+  const resp = await karmadaClient.get<IResponse<ListMemberClusterNodesResp>>(
+    `/member/${params.clusterName}/nodes`,
   );
   return resp.data;
 }

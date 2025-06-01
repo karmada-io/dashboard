@@ -1,0 +1,101 @@
+[0;34m[INFO][0m 📋 开始调度接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取Deployment调度信息
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/workloads/default/test-deployment/scheduling?kind=Deployment
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "workloadInfo": {
+      "name": "test-deployment",
+      "namespace": "default",
+      "kind": "Deployment",
+      "apiVersion": "apps/v1",
+      "replicas": 0,
+      "readyReplicas": 0
+    },
+    "clusterPlacements": null,
+    "schedulingStatus": {
+      "phase": "Pending",
+      "message": "No resource binding found"
+    }
+  }
+}
+[0;32m[PASS][0m 获取Deployment调度信息 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取StatefulSet调度信息
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/workloads/default/test-deployment/scheduling?kind=StatefulSet
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "workloadInfo": {
+      "name": "test-deployment",
+      "namespace": "default",
+      "kind": "StatefulSet",
+      "apiVersion": "apps/v1",
+      "replicas": 0,
+      "readyReplicas": 0
+    },
+    "clusterPlacements": null,
+    "schedulingStatus": {
+      "phase": "Pending",
+      "message": "No resource binding found"
+    }
+  }
+}
+[0;32m[PASS][0m 获取StatefulSet调度信息 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取DaemonSet调度信息
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/workloads/default/test-deployment/scheduling?kind=DaemonSet
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "workloadInfo": {
+      "name": "test-deployment",
+      "namespace": "default",
+      "kind": "DaemonSet",
+      "apiVersion": "apps/v1",
+      "replicas": 0,
+      "readyReplicas": 0
+    },
+    "clusterPlacements": null,
+    "schedulingStatus": {
+      "phase": "Pending",
+      "message": "No resource binding found"
+    }
+  }
+}
+[0;32m[PASS][0m 获取DaemonSet调度信息 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取test-deployment调度信息
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/workloads/default/test-deployment/scheduling
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "workloadInfo": {
+      "name": "test-deployment",
+      "namespace": "default",
+      "kind": "Deployment",
+      "apiVersion": "apps/v1",
+      "replicas": 0,
+      "readyReplicas": 0
+    },
+    "clusterPlacements": null,
+    "schedulingStatus": {
+      "phase": "Pending",
+      "message": "No resource binding found"
+    }
+  }
+}
+[0;32m[PASS][0m 获取test-deployment调度信息 ✅
+----------------------------------------

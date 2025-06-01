@@ -1,0 +1,227 @@
+[0;34m[INFO][0m ⚙️ 开始工作负载接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取daemonset列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/daemonset
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "daemonSets": [],
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取daemonset列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间daemonset列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/daemonset/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "daemonSets": [],
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间daemonset列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取statefulset列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/statefulset
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "statefulSets": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取statefulset列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间statefulset列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/statefulset/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "statefulSets": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间statefulset列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取job列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/job
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "jobs": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取job列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间job列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/job/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "jobs": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间job列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取cronjob列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/cronjob
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "items": [],
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取cronjob列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间cronjob列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/cronjob/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "items": [],
+    "status": {
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间cronjob列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取ingress列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/ingress
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "items": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取ingress列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间ingress列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/ingress/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "items": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间ingress列表 ✅
+----------------------------------------

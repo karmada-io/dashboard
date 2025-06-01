@@ -1,0 +1,107 @@
+[0;34m[INFO][0m 📋 开始策略接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取propagationpolicy列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/propagationpolicy
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "propagationpolicys": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取propagationpolicy列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 删除propagationpolicy接口
+[0;34m[INFO][0m 📡 请求: DELETE http://localhost:8000/api/v1/propagationpolicy
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "propagationpolicies.policy.karmada.io \"test-policy\" not found",
+  "data": null
+}
+[0;32m[PASS][0m 删除propagationpolicy接口 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取clusterpropagationpolicy列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/clusterpropagationpolicy
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "clusterPropagationPolicies": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取clusterpropagationpolicy列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 删除clusterpropagationpolicy接口
+[0;34m[INFO][0m 📡 请求: DELETE http://localhost:8000/api/v1/clusterpropagationpolicy
+[0;34m[INFO][0m 📥 响应状态码: 404
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+404
+404 page not found
+[0;32m[PASS][0m 删除clusterpropagationpolicy接口 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取overridepolicy列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/overridepolicy
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "overridepolicys": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取overridepolicy列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 删除overridepolicy接口
+[0;34m[INFO][0m 📡 请求: DELETE http://localhost:8000/api/v1/overridepolicy
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "overridepolicies.policy.karmada.io \"test-policy\" not found",
+  "data": null
+}
+[0;32m[PASS][0m 删除overridepolicy接口 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取clusteroverridepolicy列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/clusteroverridepolicy
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "clusterOverridePolicies": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取clusteroverridepolicy列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 删除clusteroverridepolicy接口
+[0;34m[INFO][0m 📡 请求: DELETE http://localhost:8000/api/v1/clusteroverridepolicy
+[0;34m[INFO][0m 📥 响应状态码: 404
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+404
+404 page not found
+[0;32m[PASS][0m 删除clusteroverridepolicy接口 ✅
+----------------------------------------

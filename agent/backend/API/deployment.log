@@ -1,0 +1,185 @@
+[0;34m[INFO][0m 🚀 开始部署接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取部署列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/deployment
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 1
+    },
+    "status": {
+      "running": 1,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "deployments": [
+      {
+        "objectMeta": {
+          "name": "test-deployment",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T13:48:03Z",
+          "uid": "3b5dfa70-49c2-48d9-b915-de6ffb7c0fea"
+        },
+        "typeMeta": {
+          "kind": "deployment",
+          "scalable": true,
+          "restartable": true
+        },
+        "pods": {
+          "current": 0,
+          "desired": 1,
+          "running": 0,
+          "pending": 0,
+          "failed": 0,
+          "succeeded": 0,
+          "warnings": []
+        },
+        "containerImages": [
+          "nginx:latest"
+        ],
+        "initContainerImages": null
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取部署列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间部署列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/deployment/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 1
+    },
+    "status": {
+      "running": 1,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "terminating": 0
+    },
+    "deployments": [
+      {
+        "objectMeta": {
+          "name": "test-deployment",
+          "namespace": "default",
+          "creationTimestamp": "2025-06-01T13:48:03Z",
+          "uid": "3b5dfa70-49c2-48d9-b915-de6ffb7c0fea"
+        },
+        "typeMeta": {
+          "kind": "deployment",
+          "scalable": true,
+          "restartable": true
+        },
+        "pods": {
+          "current": 0,
+          "desired": 1,
+          "running": 0,
+          "pending": 0,
+          "failed": 0,
+          "succeeded": 0,
+          "warnings": []
+        },
+        "containerImages": [
+          "nginx:latest"
+        ],
+        "initContainerImages": null
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间部署列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取部署详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/deployment/default/test-deployment
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "objectMeta": {
+      "name": "test-deployment",
+      "namespace": "default",
+      "creationTimestamp": "2025-06-01T13:48:03Z",
+      "uid": "3b5dfa70-49c2-48d9-b915-de6ffb7c0fea"
+    },
+    "typeMeta": {
+      "kind": "deployment",
+      "scalable": true,
+      "restartable": true
+    },
+    "pods": {
+      "current": 0,
+      "desired": 1,
+      "running": 0,
+      "pending": 0,
+      "failed": 0,
+      "succeeded": 0,
+      "warnings": []
+    },
+    "containerImages": [
+      "nginx:latest"
+    ],
+    "initContainerImages": null,
+    "selector": {
+      "app": "test-app"
+    },
+    "statusInfo": {
+      "replicas": 0,
+      "updated": 0,
+      "available": 0,
+      "unavailable": 0
+    },
+    "conditions": [],
+    "strategy": "RollingUpdate",
+    "minReadySeconds": 0,
+    "rollingUpdateStrategy": {
+      "maxSurge": "25%",
+      "maxUnavailable": "25%"
+    },
+    "revisionHistoryLimit": 10,
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取部署详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取部署事件
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/deployment/default/test-deployment/event
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "events": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取部署事件 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 创建部署接口
+[0;34m[INFO][0m 📡 请求: POST http://localhost:8000/api/v1/deployment
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "deployments.apps \"test-deployment\" already exists",
+  "data": null
+}
+[0;32m[PASS][0m 创建部署接口 ✅
+----------------------------------------

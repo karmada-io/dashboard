@@ -1,0 +1,208 @@
+[0;34m[INFO][0m 🏗️ 开始集群管理接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取集群列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/cluster
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 2
+    },
+    "clusters": [
+      {
+        "objectMeta": {
+          "name": "branch",
+          "creationTimestamp": "2025-05-19T13:43:59Z",
+          "uid": "c9befe5f-7b39-47cd-ac86-199e0844f77f"
+        },
+        "typeMeta": {
+          "kind": "cluster"
+        },
+        "ready": "True",
+        "kubernetesVersion": "v1.30.11+rke2r1",
+        "syncMode": "Push",
+        "nodeSummary": {
+          "totalNum": 4,
+          "readyNum": 4
+        },
+        "allocatedResources": {
+          "cpuCapacity": 16,
+          "cpuFraction": 65.78125,
+          "memoryCapacity": 16978542592,
+          "memoryFraction": 60.32076665246865,
+          "allocatedPods": 36,
+          "podCapacity": 440,
+          "podFraction": 8.181818181818182
+        }
+      },
+      {
+        "objectMeta": {
+          "name": "master",
+          "labels": {
+            "test": "test"
+          },
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "38c1dbf9-b9e1-4b75-b020-90931797ad42"
+        },
+        "typeMeta": {
+          "kind": "cluster"
+        },
+        "ready": "True",
+        "kubernetesVersion": "v1.30.11+rke2r1",
+        "syncMode": "Push",
+        "nodeSummary": {
+          "totalNum": 5,
+          "readyNum": 5
+        },
+        "allocatedResources": {
+          "cpuCapacity": 20,
+          "cpuFraction": 55.625,
+          "memoryCapacity": 17207132160,
+          "memoryFraction": 53.74273551465332,
+          "allocatedPods": 39,
+          "podCapacity": 550,
+          "podFraction": 7.090909090909091
+        }
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取集群列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取集群列表(复数)
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/clusters
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 2
+    },
+    "clusters": [
+      {
+        "objectMeta": {
+          "name": "branch",
+          "creationTimestamp": "2025-05-19T13:43:59Z",
+          "uid": "c9befe5f-7b39-47cd-ac86-199e0844f77f"
+        },
+        "typeMeta": {
+          "kind": "cluster"
+        },
+        "ready": "True",
+        "kubernetesVersion": "v1.30.11+rke2r1",
+        "syncMode": "Push",
+        "nodeSummary": {
+          "totalNum": 4,
+          "readyNum": 4
+        },
+        "allocatedResources": {
+          "cpuCapacity": 16,
+          "cpuFraction": 65.78125,
+          "memoryCapacity": 16978542592,
+          "memoryFraction": 60.32076665246865,
+          "allocatedPods": 36,
+          "podCapacity": 440,
+          "podFraction": 8.181818181818182
+        }
+      },
+      {
+        "objectMeta": {
+          "name": "master",
+          "labels": {
+            "test": "test"
+          },
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "38c1dbf9-b9e1-4b75-b020-90931797ad42"
+        },
+        "typeMeta": {
+          "kind": "cluster"
+        },
+        "ready": "True",
+        "kubernetesVersion": "v1.30.11+rke2r1",
+        "syncMode": "Push",
+        "nodeSummary": {
+          "totalNum": 5,
+          "readyNum": 5
+        },
+        "allocatedResources": {
+          "cpuCapacity": 20,
+          "cpuFraction": 55.625,
+          "memoryCapacity": 17207132160,
+          "memoryFraction": 53.74273551465332,
+          "allocatedPods": 39,
+          "podCapacity": 550,
+          "podFraction": 7.090909090909091
+        }
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取集群列表(复数) ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取集群详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/cluster/master
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "objectMeta": {
+      "name": "master",
+      "labels": {
+        "test": "test"
+      },
+      "creationTimestamp": "2025-06-01T14:11:05Z",
+      "uid": "38c1dbf9-b9e1-4b75-b020-90931797ad42"
+    },
+    "typeMeta": {
+      "kind": "cluster"
+    },
+    "ready": "True",
+    "kubernetesVersion": "v1.30.11+rke2r1",
+    "syncMode": "Push",
+    "nodeSummary": {
+      "totalNum": 5,
+      "readyNum": 5
+    },
+    "allocatedResources": {
+      "cpuCapacity": 20,
+      "cpuFraction": 55.625,
+      "memoryCapacity": 17207132160,
+      "memoryFraction": 53.74273551465332,
+      "allocatedPods": 39,
+      "podCapacity": 550,
+      "podFraction": 7.090909090909091
+    }
+  }
+}
+[0;32m[PASS][0m 获取集群详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 创建集群接口
+[0;34m[INFO][0m 📡 请求: POST http://localhost:8000/api/v1/cluster
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "invalid configuration: no configuration has been provided, try setting KUBERNETES_MASTER environment variable",
+  "data": null
+}
+[0;32m[PASS][0m 创建集群接口 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 更新集群接口
+[0;34m[INFO][0m 📡 请求: PUT http://localhost:8000/api/v1/cluster/master
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": "ok"
+}
+[0;32m[PASS][0m 更新集群接口 ✅
+----------------------------------------

@@ -1,0 +1,196 @@
+[0;34m[INFO][0m 🔧 开始配置接口测试...
+[0;34m[INFO][0m 🚀 测试: 获取configmap列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/configmap
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 3
+    },
+    "items": [
+      {
+        "objectMeta": {
+          "name": "cluster-info",
+          "namespace": "kube-public",
+          "creationTimestamp": "2025-05-19T12:55:09Z",
+          "uid": "d1f90696-e509-4dc7-9c01-9e23f826c62f"
+        },
+        "typeMeta": {
+          "kind": "configmap"
+        }
+      },
+      {
+        "objectMeta": {
+          "name": "extension-apiserver-authentication",
+          "namespace": "kube-system",
+          "creationTimestamp": "2025-05-19T12:52:48Z",
+          "uid": "f788e3cd-a2b1-4349-a357-38f04f2eaac4"
+        },
+        "typeMeta": {
+          "kind": "configmap"
+        }
+      },
+      {
+        "objectMeta": {
+          "name": "kube-apiserver-legacy-service-account-token-tracking",
+          "namespace": "kube-system",
+          "creationTimestamp": "2025-05-19T12:52:48Z",
+          "uid": "01fd00e0-c03f-4722-822c-4b28a1f230d2"
+        },
+        "typeMeta": {
+          "kind": "configmap"
+        }
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取configmap列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间configmap列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/configmap/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "items": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间configmap列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取secret列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/secret
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 6
+    },
+    "secrets": [
+      {
+        "objectMeta": {
+          "name": "branch",
+          "namespace": "karmada-cluster",
+          "labels": {
+            "karmada.io/system": "true"
+          },
+          "creationTimestamp": "2025-05-19T13:43:59Z",
+          "uid": "5553af2b-f3f0-4178-a1b8-d8248270b6fe"
+        },
+        "typeMeta": {
+          "kind": "secret"
+        },
+        "type": "Opaque"
+      },
+      {
+        "objectMeta": {
+          "name": "branch-impersonator",
+          "namespace": "karmada-cluster",
+          "labels": {
+            "karmada.io/system": "true"
+          },
+          "creationTimestamp": "2025-05-19T13:43:58Z",
+          "uid": "c7e07c6e-79de-4f61-8014-bdec303ca1d3"
+        },
+        "typeMeta": {
+          "kind": "secret"
+        },
+        "type": "Opaque"
+      },
+      {
+        "objectMeta": {
+          "name": "master",
+          "namespace": "karmada-cluster",
+          "labels": {
+            "karmada.io/system": "true"
+          },
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "13aa2a94-caff-465a-8baa-b535d278ee42"
+        },
+        "typeMeta": {
+          "kind": "secret"
+        },
+        "type": "Opaque"
+      },
+      {
+        "objectMeta": {
+          "name": "master-impersonator",
+          "namespace": "karmada-cluster",
+          "labels": {
+            "karmada.io/system": "true"
+          },
+          "creationTimestamp": "2025-06-01T14:11:05Z",
+          "uid": "fbe3c329-ec3c-4981-809b-3219634daa46"
+        },
+        "typeMeta": {
+          "kind": "secret"
+        },
+        "type": "Opaque"
+      },
+      {
+        "objectMeta": {
+          "name": "karmada-dashboard-secret",
+          "namespace": "karmada-system",
+          "labels": {
+            "kubernetes.io/legacy-token-last-used": "2025-06-01"
+          },
+          "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Secret\",\"metadata\":{\"annotations\":{\"kubernetes.io/service-account.name\":\"karmada-dashboard\"},\"name\":\"karmada-dashboard-secret\",\"namespace\":\"karmada-system\"},\"type\":\"kubernetes.io/service-account-token\"}\n",
+            "kubernetes.io/service-account.name": "karmada-dashboard",
+            "kubernetes.io/service-account.uid": "a8c87f97-d0f9-44ee-969d-f8780c553cf2"
+          },
+          "creationTimestamp": "2025-05-20T05:26:07Z",
+          "uid": "ea54517d-1424-4af0-88f9-001a6bddefeb"
+        },
+        "typeMeta": {
+          "kind": "secret"
+        },
+        "type": "kubernetes.io/service-account-token"
+      },
+      {
+        "objectMeta": {
+          "name": "kubeconfig",
+          "namespace": "karmada-system",
+          "creationTimestamp": "2025-05-20T05:25:45Z",
+          "uid": "d66638ab-139c-49c6-b615-409c1898b7e2"
+        },
+        "typeMeta": {
+          "kind": "secret"
+        },
+        "type": "Opaque"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取secret列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取指定命名空间secret列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/secret/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 0
+    },
+    "secrets": [],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取指定命名空间secret列表 ✅
+----------------------------------------

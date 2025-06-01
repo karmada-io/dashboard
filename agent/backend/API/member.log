@@ -1,0 +1,4214 @@
+[0;34m[INFO][0m 🌍 开始成员集群接口测试...
+[0;34m[INFO][0m 🔍 测试集群: master
+[0;34m[INFO][0m 🚀 测试: 获取成员集群master节点列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/master/nodes
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 5
+    },
+    "nodes": [
+      {
+        "objectMeta": {
+          "name": "m-rke2-master01.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "m-rke2-master01.example.com",
+            "kubernetes.io/os": "linux",
+            "node-role.kubernetes.io/control-plane": "true",
+            "node-role.kubernetes.io/etcd": "true",
+            "node-role.kubernetes.io/master": "true",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.10.11",
+            "etcd.rke2.cattle.io/local-snapshots-timestamp": "2025-06-01T22:18:16+08:00",
+            "etcd.rke2.cattle.io/node-address": "10.10.10.11",
+            "etcd.rke2.cattle.io/node-name": "m-rke2-master01.example.com-026a16de",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"86:fd:a9:39:2f:be\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.10.11",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/encryption-config-hash": "start-13501d9503f805b5625272ab9a600b3cd403ea72a6d45f42e9446c6128e2654a",
+            "rke2.io/hostname": "M-RKE2-Master01.example.com",
+            "rke2.io/internal-ip": "10.10.10.11",
+            "rke2.io/node-args": "[\"server\",\"--token\",\"********\",\"--tls-san\",\"127.0.0.1\",\"--tls-san\",\"10.10.10.250\",\"--tls-san\",\"10.10.10.11\",\"--tls-san\",\"10.10.10.12\",\"--tls-san\",\"10.10.10.13\",\"--tls-san\",\"M-RKE2-Balance.example.com\",\"--tls-san\",\"M-RKE2-Master01.example.com\",\"--tls-san\",\"M-RKE2-Master02.example.com\",\"--tls-san\",\"M-RKE2-Master03.example.com\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "IZ47AZ476YGXZKNCN3DRZTAIZVR5BAH75UUU7KGXDKEWXH4V7JNQ====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:21:50Z",
+          "uid": "d967ac3d-603e-4a4a-bd0e-2ecef4f1c72b"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902512Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902512Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:21:42Z",
+              "lastTransitionTime": "2025-06-01T09:21:42Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "EtcdIsVoter",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:26:08Z",
+              "lastTransitionTime": "2025-05-18T11:21:53Z",
+              "reason": "MemberNotLearner",
+              "message": "Node is a voting member of the etcd cluster"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:22:11Z",
+              "lastTransitionTime": "2025-05-23T03:11:27Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:22:11Z",
+              "lastTransitionTime": "2025-05-23T03:11:27Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:22:11Z",
+              "lastTransitionTime": "2025-05-23T03:11:27Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:22:11Z",
+              "lastTransitionTime": "2025-05-23T03:11:27Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.10.11"
+            },
+            {
+              "type": "Hostname",
+              "address": "M-RKE2-Master01.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "2f9b4d56-aec6-71a3-6be1-6cf7ae036284",
+            "bootID": "61814f32-b2d8-4891-a412-59176ec4c78a",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "registry.example.com/library/nginx@sha256:e5e2c4be5cea9bf49b2c976c65b4fca33d9d094b276a5e517d8e5748100a3c73",
+                "registry.example.com/library/nginx:latest"
+              ],
+              "sizeBytes": 73307408
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-admin@sha256:cef8ee3d792aa3ec6f30197eb1b665f620c127d7d4056da2b143464c144dbbd8",
+                "registry.example.com/huinong/huinong-admin:latest"
+              ],
+              "sizeBytes": 22285466
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 19,
+          "runningCount": 13,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "3675m",
+            "utilization": "91.9%"
+          },
+          "memory": {
+            "capacity": "7902512Ki",
+            "allocatable": "7902512Ki",
+            "allocated": "4884267008",
+            "utilization": "60.4%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "13",
+            "utilization": "11.8%"
+          }
+        },
+        "clusterName": "master"
+      },
+      {
+        "objectMeta": {
+          "name": "m-rke2-master02.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "m-rke2-master02.example.com",
+            "kubernetes.io/os": "linux",
+            "node-role.kubernetes.io/control-plane": "true",
+            "node-role.kubernetes.io/etcd": "true",
+            "node-role.kubernetes.io/master": "true",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.10.12",
+            "etcd.rke2.cattle.io/local-snapshots-timestamp": "2025-06-01T22:17:02+08:00",
+            "etcd.rke2.cattle.io/node-address": "10.10.10.12",
+            "etcd.rke2.cattle.io/node-name": "m-rke2-master02.example.com-2c47be0f",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"b2:da:0f:d6:ac:59\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.10.12",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/encryption-config-hash": "start-13501d9503f805b5625272ab9a600b3cd403ea72a6d45f42e9446c6128e2654a",
+            "rke2.io/hostname": "M-RKE2-Master02.example.com",
+            "rke2.io/internal-ip": "10.10.10.12",
+            "rke2.io/node-args": "[\"server\",\"--server\",\"https://M-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--tls-san\",\"127.0.0.1\",\"--tls-san\",\"10.10.10.250\",\"--tls-san\",\"10.10.10.11\",\"--tls-san\",\"10.10.10.12\",\"--tls-san\",\"10.10.10.13\",\"--tls-san\",\"M-RKE2-Balance.example.com\",\"--tls-san\",\"M-RKE2-Master01.example.com\",\"--tls-san\",\"M-RKE2-Master02.example.com\",\"--tls-san\",\"M-RKE2-Master03.example.com\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "VCSPDJMF3YIWOEAYK3KOCRNKPIB3KV5DUD72QH4GVSHX6QUSPCKQ====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:31:00Z",
+          "uid": "ab6acde4-0aa8-4de3-a9b3-318a91762ce6"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902500Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902500Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:21:31Z",
+              "lastTransitionTime": "2025-06-01T09:21:31Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "EtcdIsVoter",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:26:08Z",
+              "lastTransitionTime": "2025-05-18T11:31:08Z",
+              "reason": "MemberNotLearner",
+              "message": "Node is a voting member of the etcd cluster"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:21:59Z",
+              "lastTransitionTime": "2025-05-23T03:10:54Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:21:59Z",
+              "lastTransitionTime": "2025-05-23T03:10:54Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:21:59Z",
+              "lastTransitionTime": "2025-05-23T03:10:54Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:21:59Z",
+              "lastTransitionTime": "2025-05-23T03:10:54Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.10.12"
+            },
+            {
+              "type": "Hostname",
+              "address": "M-RKE2-Master02.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "04094d56-7ff6-d745-0334-9716deaff3d4",
+            "bootID": "7fe52ce2-df0b-4eb2-b910-ef6c671b25b3",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "registry.example.com/library/nginx@sha256:e5e2c4be5cea9bf49b2c976c65b4fca33d9d094b276a5e517d8e5748100a3c73",
+                "registry.example.com/library/nginx:latest"
+              ],
+              "sizeBytes": 73307408
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-admin@sha256:cef8ee3d792aa3ec6f30197eb1b665f620c127d7d4056da2b143464c144dbbd8",
+                "registry.example.com/huinong/huinong-admin:latest"
+              ],
+              "sizeBytes": 22285466
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 10,
+          "runningCount": 10,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "3550m",
+            "utilization": "88.8%"
+          },
+          "memory": {
+            "capacity": "7902500Ki",
+            "allocatable": "7902500Ki",
+            "allocated": "4657774592",
+            "utilization": "57.6%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "10",
+            "utilization": "9.1%"
+          }
+        },
+        "clusterName": "master"
+      },
+      {
+        "objectMeta": {
+          "name": "m-rke2-master03.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "m-rke2-master03.example.com",
+            "kubernetes.io/os": "linux",
+            "node-role.kubernetes.io/control-plane": "true",
+            "node-role.kubernetes.io/etcd": "true",
+            "node-role.kubernetes.io/master": "true",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.10.13",
+            "etcd.rke2.cattle.io/local-snapshots-timestamp": "2025-06-01T22:19:21+08:00",
+            "etcd.rke2.cattle.io/node-address": "10.10.10.13",
+            "etcd.rke2.cattle.io/node-name": "m-rke2-master03.example.com-ded54596",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"92:5b:e8:eb:2b:b4\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.10.13",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/encryption-config-hash": "start-13501d9503f805b5625272ab9a600b3cd403ea72a6d45f42e9446c6128e2654a",
+            "rke2.io/hostname": "M-RKE2-Master03.example.com",
+            "rke2.io/internal-ip": "10.10.10.13",
+            "rke2.io/node-args": "[\"server\",\"--server\",\"https://M-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--tls-san\",\"127.0.0.1\",\"--tls-san\",\"10.10.10.250\",\"--tls-san\",\"10.10.10.11\",\"--tls-san\",\"10.10.10.12\",\"--tls-san\",\"10.10.10.13\",\"--tls-san\",\"M-RKE2-Balance.example.com\",\"--tls-san\",\"M-RKE2-Master01.example.com\",\"--tls-san\",\"M-RKE2-Master02.example.com\",\"--tls-san\",\"M-RKE2-Master03.example.com\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "VCSPDJMF3YIWOEAYK3KOCRNKPIB3KV5DUD72QH4GVSHX6QUSPCKQ====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:32:24Z",
+          "uid": "35707fd9-f461-4b64-9bdb-914967f22300"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902496Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902496Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:22:34Z",
+              "lastTransitionTime": "2025-06-01T09:22:34Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "EtcdIsVoter",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:26:08Z",
+              "lastTransitionTime": "2025-05-18T11:32:38Z",
+              "reason": "MemberNotLearner",
+              "message": "Node is a voting member of the etcd cluster"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:22:29Z",
+              "lastTransitionTime": "2025-05-23T02:09:27Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:22:29Z",
+              "lastTransitionTime": "2025-05-23T02:09:27Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:22:29Z",
+              "lastTransitionTime": "2025-05-23T02:09:27Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:22:29Z",
+              "lastTransitionTime": "2025-05-23T03:32:31Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.10.13"
+            },
+            {
+              "type": "Hostname",
+              "address": "M-RKE2-Master03.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "4ede4d56-ffd6-372f-b1ea-a2e6d51af0ef",
+            "bootID": "eed77d2f-87a9-4ad7-a252-a6c262bf088b",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "registry.example.com/library/nginx@sha256:e5e2c4be5cea9bf49b2c976c65b4fca33d9d094b276a5e517d8e5748100a3c73",
+                "registry.example.com/library/nginx:latest"
+              ],
+              "sizeBytes": 73307408
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/higress@sha256:f24d5ac7d8dce8de24463cc9c00a1b56013dd8aea090f9dee33bfac0936b3fa4",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/higress:2.1.3"
+              ],
+              "sizeBytes": 64922585
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/pilot@sha256:b0497fc6e0768132629e569d56b13ef1b59180f83020e482f325854dba5756f5",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/pilot:2.1.3"
+              ],
+              "sizeBytes": 62385197
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-admin@sha256:cef8ee3d792aa3ec6f30197eb1b665f620c127d7d4056da2b143464c144dbbd8",
+                "registry.example.com/huinong/huinong-admin:latest"
+              ],
+              "sizeBytes": 22285466
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 9,
+          "runningCount": 9,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "2450m",
+            "utilization": "61.3%"
+          },
+          "memory": {
+            "capacity": "7902496Ki",
+            "allocatable": "7902496Ki",
+            "allocated": "6671040512",
+            "utilization": "82.4%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "9",
+            "utilization": "8.2%"
+          }
+        },
+        "clusterName": "master"
+      },
+      {
+        "objectMeta": {
+          "name": "m-rke2-node01.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "m-rke2-node01.example.com",
+            "kubernetes.io/os": "linux",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.10.14",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"56:a3:03:e4:8e:bb\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.10.14",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/hostname": "M-RKE2-Node01.example.com",
+            "rke2.io/internal-ip": "10.10.10.14",
+            "rke2.io/node-args": "[\"agent\",\"--server\",\"https://M-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "OYJFZKEXY45JMW2MOL54ICNYXIOPVVQUWWQSDFHOUHXT4C3BM5IA====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:50:04Z",
+          "uid": "53d4c37b-8ba1-46f5-8d2e-7a73fa3fd18e"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3779832Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3779832Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:23:32Z",
+              "lastTransitionTime": "2025-06-01T09:23:32Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:07Z",
+              "lastTransitionTime": "2025-06-01T09:23:08Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:07Z",
+              "lastTransitionTime": "2025-06-01T09:23:08Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:07Z",
+              "lastTransitionTime": "2025-06-01T09:23:08Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:24:07Z",
+              "lastTransitionTime": "2025-06-01T09:23:09Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.10.14"
+            },
+            {
+              "type": "Hostname",
+              "address": "M-RKE2-Node01.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "5d634d56-d2ea-c081-e2f7-522c2e126b92",
+            "bootID": "c04a6567-728b-47d1-8d7c-e783af74e878",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/console@sha256:301333af93bcd4187977e424e689be69a29e3c7126cada0cfec9f03a489401a3",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/console:2.1.3"
+              ],
+              "sizeBytes": 305972826
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "registry.example.com/library/nginx@sha256:e5e2c4be5cea9bf49b2c976c65b4fca33d9d094b276a5e517d8e5748100a3c73",
+                "registry.example.com/library/nginx:latest"
+              ],
+              "sizeBytes": 73307408
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-users@sha256:8b330ba9209fd707ab4956ca7603bfdf3aa02fe9a830d2f0f6666c0e786ac16b",
+                "registry.example.com/huinong/huinong-users:latest"
+              ],
+              "sizeBytes": 37727972
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-admin@sha256:cef8ee3d792aa3ec6f30197eb1b665f620c127d7d4056da2b143464c144dbbd8",
+                "registry.example.com/huinong/huinong-admin:latest"
+              ],
+              "sizeBytes": 22285466
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 4,
+          "runningCount": 4,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "850m",
+            "utilization": "21.2%"
+          },
+          "memory": {
+            "capacity": "3779832Ki",
+            "allocatable": "3779832Ki",
+            "allocated": "765460480",
+            "utilization": "19.8%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "4",
+            "utilization": "3.6%"
+          }
+        },
+        "clusterName": "master"
+      },
+      {
+        "objectMeta": {
+          "name": "m-rke2-node02.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "m-rke2-node02.example.com",
+            "kubernetes.io/os": "linux",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.10.15",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"82:e6:a8:eb:35:f8\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.10.15",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/hostname": "M-RKE2-Node02.example.com",
+            "rke2.io/internal-ip": "10.10.10.15",
+            "rke2.io/node-args": "[\"agent\",\"--server\",\"https://M-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "OYJFZKEXY45JMW2MOL54ICNYXIOPVVQUWWQSDFHOUHXT4C3BM5IA====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:49:40Z",
+          "uid": "70baac18-a1bd-485a-be66-0ca000291946"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3779844Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3779844Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:23:33Z",
+              "lastTransitionTime": "2025-06-01T09:23:33Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:23Z",
+              "lastTransitionTime": "2025-06-01T09:23:08Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:23Z",
+              "lastTransitionTime": "2025-06-01T09:23:08Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:23Z",
+              "lastTransitionTime": "2025-06-01T09:23:08Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:24:23Z",
+              "lastTransitionTime": "2025-06-01T09:23:09Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.10.15"
+            },
+            {
+              "type": "Hostname",
+              "address": "M-RKE2-Node02.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "b4ab4d56-28d6-edfc-b181-9380f2b9ddd1",
+            "bootID": "f957166e-4711-44cd-a4fe-fcadb30455dc",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "registry.example.com/library/nginx@sha256:e5e2c4be5cea9bf49b2c976c65b4fca33d9d094b276a5e517d8e5748100a3c73",
+                "registry.example.com/library/nginx:latest"
+              ],
+              "sizeBytes": 73307408
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-users@sha256:8b330ba9209fd707ab4956ca7603bfdf3aa02fe9a830d2f0f6666c0e786ac16b",
+                "registry.example.com/huinong/huinong-users:latest"
+              ],
+              "sizeBytes": 37727972
+            },
+            {
+              "names": [
+                "registry.example.com/huinong/huinong-admin@sha256:cef8ee3d792aa3ec6f30197eb1b665f620c127d7d4056da2b143464c144dbbd8",
+                "registry.example.com/huinong/huinong-admin:latest"
+              ],
+              "sizeBytes": 22285466
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 3,
+          "runningCount": 3,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "600m",
+            "utilization": "15.0%"
+          },
+          "memory": {
+            "capacity": "3779844Ki",
+            "allocatable": "3779844Ki",
+            "allocated": "228589568",
+            "utilization": "5.9%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "3",
+            "utilization": "2.7%"
+          }
+        },
+        "clusterName": "master"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群master节点列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群master节点详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/master/nodes/test-node
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "failed to get node test-node: nodes \"test-node\" not found",
+  "data": null
+}
+[0;32m[PASS][0m 获取成员集群master节点详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群master服务列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/master/service
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 7
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-18T11:21:48Z",
+          "uid": "d85963d3-bdb6-47f4-887c-31f1560f8fb5"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.1"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-console",
+          "namespace": "higress-system",
+          "labels": {
+            "app.kubernetes.io/instance": "higress",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-console",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-console-2.1.3"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:42:50Z",
+          "uid": "1a2e1329-2388-4d5f-a9c3-8e8a3120b098"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-console.higress-system",
+          "ports": [
+            {
+              "port": 8080,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "higress",
+          "app.kubernetes.io/name": "higress-console"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.21.50"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-controller",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-controller",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-controller",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-controller"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:42:50Z",
+          "uid": "4c4c586a-d292-4a4f-86fd-67b412a32070"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-controller.higress-system",
+          "ports": [
+            {
+              "port": 8888,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 8889,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15051,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15010,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15012,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15014,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-controller",
+          "higress": "higress-controller"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.186.128"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-gateway",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-gateway",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-gateway",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-system-higress-gateway"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:42:50Z",
+          "uid": "3251c10c-158b-4c59-8bce-bf1f36e2e9f7"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-gateway.higress-system",
+          "ports": [
+            {
+              "port": 80,
+              "protocol": "TCP",
+              "nodePort": 30269
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 30897
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-gateway",
+          "higress": "higress-system-higress-gateway"
+        },
+        "type": "LoadBalancer",
+        "clusterIP": "10.43.49.153"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-coredns-rke2-coredns",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/instance": "rke2-coredns",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-coredns",
+            "helm.sh/chart": "rke2-coredns-1.39.100",
+            "k8s-app": "kube-dns",
+            "kubernetes.io/cluster-service": "true",
+            "kubernetes.io/name": "CoreDNS"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-coredns",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T11:22:19Z",
+          "uid": "19a5b39c-068c-424c-8737-ea0234d05a8f"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-coredns-rke2-coredns.kube-system",
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP",
+              "nodePort": 0
+            },
+            {
+              "port": 53,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "rke2-coredns",
+          "app.kubernetes.io/name": "rke2-coredns",
+          "k8s-app": "kube-dns"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.10"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-ingress-nginx-controller-admission",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/component": "controller",
+            "app.kubernetes.io/instance": "rke2-ingress-nginx",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-ingress-nginx",
+            "app.kubernetes.io/part-of": "rke2-ingress-nginx",
+            "app.kubernetes.io/version": "1.12.1",
+            "helm.sh/chart": "rke2-ingress-nginx-4.12.100"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-ingress-nginx",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T11:23:21Z",
+          "uid": "4907aea7-7cba-44c5-82c9-4b7fdfbb470c"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-ingress-nginx-controller-admission.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/component": "controller",
+          "app.kubernetes.io/instance": "rke2-ingress-nginx",
+          "app.kubernetes.io/name": "rke2-ingress-nginx"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.42.154"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-metrics-server",
+          "namespace": "kube-system",
+          "labels": {
+            "app": "rke2-metrics-server",
+            "app.kubernetes.io/instance": "rke2-metrics-server",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-metrics-server",
+            "app.kubernetes.io/version": "0.7.2",
+            "helm.sh/chart": "rke2-metrics-server-3.12.200"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-metrics-server",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T11:23:15Z",
+          "uid": "1c2971c0-e7af-443f-9eb5-abae08bb9968"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-metrics-server.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "rke2-metrics-server",
+          "app.kubernetes.io/instance": "rke2-metrics-server",
+          "app.kubernetes.io/name": "rke2-metrics-server"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.180.142"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群master服务列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群master服务列表(复数)
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/master/services
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 7
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-18T11:21:48Z",
+          "uid": "d85963d3-bdb6-47f4-887c-31f1560f8fb5"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.1"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-console",
+          "namespace": "higress-system",
+          "labels": {
+            "app.kubernetes.io/instance": "higress",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-console",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-console-2.1.3"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:42:50Z",
+          "uid": "1a2e1329-2388-4d5f-a9c3-8e8a3120b098"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-console.higress-system",
+          "ports": [
+            {
+              "port": 8080,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "higress",
+          "app.kubernetes.io/name": "higress-console"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.21.50"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-controller",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-controller",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-controller",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-controller"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:42:50Z",
+          "uid": "4c4c586a-d292-4a4f-86fd-67b412a32070"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-controller.higress-system",
+          "ports": [
+            {
+              "port": 8888,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 8889,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15051,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15010,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15012,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15014,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-controller",
+          "higress": "higress-controller"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.186.128"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-gateway",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-gateway",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-gateway",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-system-higress-gateway"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:42:50Z",
+          "uid": "3251c10c-158b-4c59-8bce-bf1f36e2e9f7"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-gateway.higress-system",
+          "ports": [
+            {
+              "port": 80,
+              "protocol": "TCP",
+              "nodePort": 30269
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 30897
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-gateway",
+          "higress": "higress-system-higress-gateway"
+        },
+        "type": "LoadBalancer",
+        "clusterIP": "10.43.49.153"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-coredns-rke2-coredns",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/instance": "rke2-coredns",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-coredns",
+            "helm.sh/chart": "rke2-coredns-1.39.100",
+            "k8s-app": "kube-dns",
+            "kubernetes.io/cluster-service": "true",
+            "kubernetes.io/name": "CoreDNS"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-coredns",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T11:22:19Z",
+          "uid": "19a5b39c-068c-424c-8737-ea0234d05a8f"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-coredns-rke2-coredns.kube-system",
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP",
+              "nodePort": 0
+            },
+            {
+              "port": 53,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "rke2-coredns",
+          "app.kubernetes.io/name": "rke2-coredns",
+          "k8s-app": "kube-dns"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.10"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-ingress-nginx-controller-admission",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/component": "controller",
+            "app.kubernetes.io/instance": "rke2-ingress-nginx",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-ingress-nginx",
+            "app.kubernetes.io/part-of": "rke2-ingress-nginx",
+            "app.kubernetes.io/version": "1.12.1",
+            "helm.sh/chart": "rke2-ingress-nginx-4.12.100"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-ingress-nginx",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T11:23:21Z",
+          "uid": "4907aea7-7cba-44c5-82c9-4b7fdfbb470c"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-ingress-nginx-controller-admission.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/component": "controller",
+          "app.kubernetes.io/instance": "rke2-ingress-nginx",
+          "app.kubernetes.io/name": "rke2-ingress-nginx"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.42.154"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-metrics-server",
+          "namespace": "kube-system",
+          "labels": {
+            "app": "rke2-metrics-server",
+            "app.kubernetes.io/instance": "rke2-metrics-server",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-metrics-server",
+            "app.kubernetes.io/version": "0.7.2",
+            "helm.sh/chart": "rke2-metrics-server-3.12.200"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-metrics-server",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T11:23:15Z",
+          "uid": "1c2971c0-e7af-443f-9eb5-abae08bb9968"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-metrics-server.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "rke2-metrics-server",
+          "app.kubernetes.io/instance": "rke2-metrics-server",
+          "app.kubernetes.io/name": "rke2-metrics-server"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.180.142"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群master服务列表(复数) ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群master默认命名空间服务
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/master/service/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 1
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-18T11:21:48Z",
+          "uid": "d85963d3-bdb6-47f4-887c-31f1560f8fb5"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.1"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群master默认命名空间服务 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群master服务详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/master/service/default/kubernetes
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "objectMeta": {
+      "name": "kubernetes",
+      "namespace": "default",
+      "labels": {
+        "component": "apiserver",
+        "provider": "kubernetes"
+      },
+      "creationTimestamp": "2025-05-18T11:21:48Z",
+      "uid": "d85963d3-bdb6-47f4-887c-31f1560f8fb5"
+    },
+    "typeMeta": {
+      "kind": "service"
+    },
+    "internalEndpoint": {
+      "host": "kubernetes",
+      "ports": [
+        {
+          "port": 443,
+          "protocol": "TCP",
+          "nodePort": 0
+        }
+      ]
+    },
+    "externalEndpoints": [],
+    "selector": null,
+    "type": "ClusterIP",
+    "clusterIP": "10.43.0.1",
+    "endpointList": {
+      "listMeta": {
+        "totalItems": 1
+      },
+      "endpoints": [
+        {
+          "objectMeta": {
+            "creationTimestamp": null
+          },
+          "typeMeta": {
+            "kind": "endpoint"
+          },
+          "host": "10.10.10.11",
+          "nodeName": null,
+          "ready": true,
+          "ports": [
+            {
+              "name": "https",
+              "port": 6443,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        {
+          "objectMeta": {
+            "creationTimestamp": null
+          },
+          "typeMeta": {
+            "kind": "endpoint"
+          },
+          "host": "10.10.10.12",
+          "nodeName": null,
+          "ready": true,
+          "ports": [
+            {
+              "name": "https",
+              "port": 6443,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        {
+          "objectMeta": {
+            "creationTimestamp": null
+          },
+          "typeMeta": {
+            "kind": "endpoint"
+          },
+          "host": "10.10.10.13",
+          "nodeName": null,
+          "ready": true,
+          "ports": [
+            {
+              "name": "https",
+              "port": 6443,
+              "protocol": "TCP"
+            }
+          ]
+        }
+      ]
+    },
+    "sessionAffinity": "None",
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群master服务详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🔍 测试集群: branch
+[0;34m[INFO][0m 🚀 测试: 获取成员集群branch节点列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/branch/nodes
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 4
+    },
+    "nodes": [
+      {
+        "objectMeta": {
+          "name": "b-rke2-master01.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "b-rke2-master01.example.com",
+            "kubernetes.io/os": "linux",
+            "node-role.kubernetes.io/control-plane": "true",
+            "node-role.kubernetes.io/etcd": "true",
+            "node-role.kubernetes.io/master": "true",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.20.11",
+            "etcd.rke2.cattle.io/local-snapshots-timestamp": "2025-06-01T22:20:23+08:00",
+            "etcd.rke2.cattle.io/node-address": "10.10.20.11",
+            "etcd.rke2.cattle.io/node-name": "b-rke2-master01.example.com-7296130c",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"9e:81:b3:0c:1a:cc\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.20.11",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/encryption-config-hash": "start-fc2d1c332f384b41eef37f9d09fc873af6951af1f80a6d4d3454e7afbf1afa23",
+            "rke2.io/hostname": "B-RKE2-Master01.example.com",
+            "rke2.io/internal-ip": "10.10.20.11",
+            "rke2.io/node-args": "[\"server\",\"--token\",\"********\",\"--tls-san\",\"127.0.0.1\",\"--tls-san\",\"10.10.20.250\",\"--tls-san\",\"10.10.20.11\",\"--tls-san\",\"10.10.20.12\",\"--tls-san\",\"10.10.20.13\",\"--tls-san\",\"B-RKE2-Balance.example.com\",\"--tls-san\",\"B-RKE2-Master01.example.com\",\"--tls-san\",\"B-RKE2-Master02.example.com\",\"--tls-san\",\"B-RKE2-Master03.example.com\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "GY42QDUSIQKKVSZCJUE3CAVAPGSQSCQLS3OJT3IFGTC6ESHSWEOA====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T10:36:59Z",
+          "uid": "7c2549f6-a7e8-4959-b5f4-4e18a6e916af"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902496Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902496Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:23:04Z",
+              "lastTransitionTime": "2025-06-01T09:23:04Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "EtcdIsVoter",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:22:42Z",
+              "lastTransitionTime": "2025-05-18T10:37:13Z",
+              "reason": "MemberNotLearner",
+              "message": "Node is a voting member of the etcd cluster"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:23:33Z",
+              "lastTransitionTime": "2025-05-25T01:28:02Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:23:33Z",
+              "lastTransitionTime": "2025-05-25T01:28:02Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:23:33Z",
+              "lastTransitionTime": "2025-05-25T01:28:02Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:23:33Z",
+              "lastTransitionTime": "2025-05-25T01:28:02Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.20.11"
+            },
+            {
+              "type": "Hostname",
+              "address": "B-RKE2-Master01.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "7ac34d56-94a6-58ba-d5c9-447df722f9ee",
+            "bootID": "9d6a1182-ce1d-431e-8a10-b7c313124908",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 9,
+          "runningCount": 9,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "3450m",
+            "utilization": "86.2%"
+          },
+          "memory": {
+            "capacity": "7902496Ki",
+            "allocatable": "7902496Ki",
+            "allocated": "4523556864",
+            "utilization": "55.9%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "9",
+            "utilization": "8.2%"
+          }
+        },
+        "clusterName": "branch"
+      },
+      {
+        "objectMeta": {
+          "name": "b-rke2-master02.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "b-rke2-master02.example.com",
+            "kubernetes.io/os": "linux",
+            "node-role.kubernetes.io/control-plane": "true",
+            "node-role.kubernetes.io/etcd": "true",
+            "node-role.kubernetes.io/master": "true",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.20.12",
+            "etcd.rke2.cattle.io/local-snapshots-timestamp": "2025-06-01T22:20:20+08:00",
+            "etcd.rke2.cattle.io/node-address": "10.10.20.12",
+            "etcd.rke2.cattle.io/node-name": "b-rke2-master02.example.com-595e8e23",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"66:c7:86:57:eb:dc\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.20.12",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/encryption-config-hash": "start-fc2d1c332f384b41eef37f9d09fc873af6951af1f80a6d4d3454e7afbf1afa23",
+            "rke2.io/hostname": "B-RKE2-Master02.example.com",
+            "rke2.io/internal-ip": "10.10.20.12",
+            "rke2.io/node-args": "[\"server\",\"--server\",\"https://B-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--tls-san\",\"127.0.0.1\",\"--tls-san\",\"10.10.20.250\",\"--tls-san\",\"10.10.20.11\",\"--tls-san\",\"10.10.20.12\",\"--tls-san\",\"10.10.20.13\",\"--tls-san\",\"B-RKE2-Balance.example.com\",\"--tls-san\",\"B-RKE2-Master01.example.com\",\"--tls-san\",\"B-RKE2-Master02.example.com\",\"--tls-san\",\"B-RKE2-Master03.example.com\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "JGJXATYND7VDIF3WPP2B2D2KFLXFQAD4RTDCSV5A636MUIAMDH7A====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:20:07Z",
+          "uid": "286b2816-7029-48be-a149-b07516903d62"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902488Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902488Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:24:01Z",
+              "lastTransitionTime": "2025-06-01T09:24:01Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "EtcdIsVoter",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:22:42Z",
+              "lastTransitionTime": "2025-05-18T11:20:28Z",
+              "reason": "MemberNotLearner",
+              "message": "Node is a voting member of the etcd cluster"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:08Z",
+              "lastTransitionTime": "2025-05-21T19:33:32Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:08Z",
+              "lastTransitionTime": "2025-05-21T19:33:32Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:24:08Z",
+              "lastTransitionTime": "2025-05-21T19:33:32Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:24:08Z",
+              "lastTransitionTime": "2025-05-21T19:33:32Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.20.12"
+            },
+            {
+              "type": "Hostname",
+              "address": "B-RKE2-Master02.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "491f4d56-7ae6-7bbf-0628-cacc0555841f",
+            "bootID": "5641aeef-1a26-47a1-8079-ee23cd469981",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/console@sha256:301333af93bcd4187977e424e689be69a29e3c7126cada0cfec9f03a489401a3",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/console:2.1.3"
+              ],
+              "sizeBytes": 305972826
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 14,
+          "runningCount": 14,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "3925m",
+            "utilization": "98.1%"
+          },
+          "memory": {
+            "capacity": "7902488Ki",
+            "allocatable": "7902488Ki",
+            "allocated": "5421137920",
+            "utilization": "67.0%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "14",
+            "utilization": "12.7%"
+          }
+        },
+        "clusterName": "branch"
+      },
+      {
+        "objectMeta": {
+          "name": "b-rke2-master03.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "b-rke2-master03.example.com",
+            "kubernetes.io/os": "linux",
+            "node-role.kubernetes.io/control-plane": "true",
+            "node-role.kubernetes.io/etcd": "true",
+            "node-role.kubernetes.io/master": "true",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.20.13",
+            "etcd.rke2.cattle.io/local-snapshots-timestamp": "2025-06-01T22:20:38+08:00",
+            "etcd.rke2.cattle.io/node-address": "10.10.20.13",
+            "etcd.rke2.cattle.io/node-name": "b-rke2-master03.example.com-a0295331",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"96:ed:28:0b:3c:e2\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.20.13",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/encryption-config-hash": "start-fc2d1c332f384b41eef37f9d09fc873af6951af1f80a6d4d3454e7afbf1afa23",
+            "rke2.io/hostname": "B-RKE2-Master03.example.com",
+            "rke2.io/internal-ip": "10.10.20.13",
+            "rke2.io/node-args": "[\"server\",\"--server\",\"https://B-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--tls-san\",\"127.0.0.1\",\"--tls-san\",\"10.10.20.250\",\"--tls-san\",\"10.10.20.11\",\"--tls-san\",\"10.10.20.12\",\"--tls-san\",\"10.10.20.13\",\"--tls-san\",\"B-RKE2-Balance.example.com\",\"--tls-san\",\"B-RKE2-Master01.example.com\",\"--tls-san\",\"B-RKE2-Master02.example.com\",\"--tls-san\",\"B-RKE2-Master03.example.com\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "JGJXATYND7VDIF3WPP2B2D2KFLXFQAD4RTDCSV5A636MUIAMDH7A====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:21:27Z",
+          "uid": "9c3d2f5e-565d-42b3-8b9d-a31ec4705cae"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902520Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "7902520Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:22:58Z",
+              "lastTransitionTime": "2025-06-01T09:22:58Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "EtcdIsVoter",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:22:42Z",
+              "lastTransitionTime": "2025-05-18T11:21:43Z",
+              "reason": "MemberNotLearner",
+              "message": "Node is a voting member of the etcd cluster"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:23:21Z",
+              "lastTransitionTime": "2025-05-21T19:35:29Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:23:21Z",
+              "lastTransitionTime": "2025-05-21T19:35:29Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:23:21Z",
+              "lastTransitionTime": "2025-05-21T19:35:29Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:23:21Z",
+              "lastTransitionTime": "2025-05-21T19:35:29Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.20.13"
+            },
+            {
+              "type": "Hostname",
+              "address": "B-RKE2-Master03.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "eaa24d56-294d-14c0-13b9-3da401523fb6",
+            "bootID": "2c14315b-e155-4526-952b-a202992589b1",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/higress@sha256:f24d5ac7d8dce8de24463cc9c00a1b56013dd8aea090f9dee33bfac0936b3fa4",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/higress:2.1.3"
+              ],
+              "sizeBytes": 64922585
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/pilot@sha256:b0497fc6e0768132629e569d56b13ef1b59180f83020e482f325854dba5756f5",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/pilot:2.1.3"
+              ],
+              "sizeBytes": 62385197
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 10,
+          "runningCount": 10,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "2550m",
+            "utilization": "63.7%"
+          },
+          "memory": {
+            "capacity": "7902520Ki",
+            "allocatable": "7902520Ki",
+            "allocated": "6805258240",
+            "utilization": "84.1%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "10",
+            "utilization": "9.1%"
+          }
+        },
+        "clusterName": "branch"
+      },
+      {
+        "objectMeta": {
+          "name": "b-rke2-node01.example.com",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "b-rke2-node01.example.com",
+            "kubernetes.io/os": "linux",
+            "node.kubernetes.io/instance-type": "rke2"
+          },
+          "annotations": {
+            "alpha.kubernetes.io/provided-node-ip": "10.10.20.14",
+            "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"72:95:06:85:24:5d\"}",
+            "flannel.alpha.coreos.com/backend-type": "vxlan",
+            "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+            "flannel.alpha.coreos.com/public-ip": "10.10.20.14",
+            "node.alpha.kubernetes.io/ttl": "0",
+            "rke2.io/hostname": "B-RKE2-Node01.example.com",
+            "rke2.io/internal-ip": "10.10.20.14",
+            "rke2.io/node-args": "[\"agent\",\"--server\",\"https://B-RKE2-Balance.example.com:9345\",\"--token\",\"********\",\"--disable\",\"rke2-ingress-nginx\"]",
+            "rke2.io/node-config-hash": "E2VQBKBKAIJZCNHNBEB24R7QFRZTGOOTYYQIMELO6DVLM2DGTSBA====",
+            "rke2.io/node-env": "{}",
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2025-05-18T11:22:56Z",
+          "uid": "f31e8990-7426-48d2-96b0-190efb1a4920"
+        },
+        "typeMeta": {
+          "kind": "node"
+        },
+        "status": {
+          "capacity": {
+            "cpu": "4",
+            "ephemeral-storage": "40125296Ki",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3779892Ki",
+            "pods": "110"
+          },
+          "allocatable": {
+            "cpu": "4",
+            "ephemeral-storage": "39033887919",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3779892Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "type": "NetworkUnavailable",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T09:25:22Z",
+              "lastTransitionTime": "2025-06-01T09:25:22Z",
+              "reason": "FlannelIsUp",
+              "message": "Flannel is running on this node"
+            },
+            {
+              "type": "MemoryPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:26:13Z",
+              "lastTransitionTime": "2025-06-01T09:25:04Z",
+              "reason": "KubeletHasSufficientMemory",
+              "message": "kubelet has sufficient memory available"
+            },
+            {
+              "type": "DiskPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:26:13Z",
+              "lastTransitionTime": "2025-06-01T09:25:04Z",
+              "reason": "KubeletHasNoDiskPressure",
+              "message": "kubelet has no disk pressure"
+            },
+            {
+              "type": "PIDPressure",
+              "status": "False",
+              "lastHeartbeatTime": "2025-06-01T14:26:13Z",
+              "lastTransitionTime": "2025-06-01T09:25:04Z",
+              "reason": "KubeletHasSufficientPID",
+              "message": "kubelet has sufficient PID available"
+            },
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastHeartbeatTime": "2025-06-01T14:26:13Z",
+              "lastTransitionTime": "2025-06-01T09:25:05Z",
+              "reason": "KubeletReady",
+              "message": "kubelet is posting ready status"
+            }
+          ],
+          "addresses": [
+            {
+              "type": "InternalIP",
+              "address": "10.10.20.14"
+            },
+            {
+              "type": "Hostname",
+              "address": "B-RKE2-Node01.example.com"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "nodeInfo": {
+            "machineID": "fd5a8fc9e9b244c2b76b3da365df278f",
+            "systemUUID": "fea64d56-9c3b-95f1-c996-efb671be71c5",
+            "bootID": "a54a7cde-0d95-4b73-9b5c-169e611646f0",
+            "kernelVersion": "5.10.134-18.an8.x86_64",
+            "osImage": "Anolis OS 8.10",
+            "containerRuntimeVersion": "containerd://1.7.26-k3s1",
+            "kubeletVersion": "v1.30.11+rke2r1",
+            "kubeProxyVersion": "v1.30.11+rke2r1",
+            "operatingSystem": "linux",
+            "architecture": "amd64"
+          },
+          "images": [
+            {
+              "names": [
+                "docker.io/rancher/nginx-ingress-controller:v1.12.1-hardened1"
+              ],
+              "sizeBytes": 761840672
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-kubernetes:v1.30.11-rke2r1-build20250312"
+              ],
+              "sizeBytes": 760790088
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-calico:v3.29.2-build20250306"
+              ],
+              "sizeBytes": 595156302
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway@sha256:e4db1475139159c186007b6095d8003f2d505f5177fbe53f2898b7f6bb9b1051",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/gateway:2.1.3"
+              ],
+              "sizeBytes": 314644934
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-runtime:v1.30.11-rke2r1"
+              ],
+              "sizeBytes": 314102100
+            },
+            {
+              "names": [
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/console@sha256:301333af93bcd4187977e424e689be69a29e3c7126cada0cfec9f03a489401a3",
+                "registry.example.com/higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/console:2.1.3"
+              ],
+              "sizeBytes": 305972826
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-flannel:v0.26.5-build20250306"
+              ],
+              "sizeBytes": 225547041
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-helm:v0.9.4-build20250113"
+              ],
+              "sizeBytes": 190360365
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-coredns:v1.12.0-build20241126"
+              ],
+              "sizeBytes": 87621814
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-sig-storage-snapshot-controller:v8.2.0"
+              ],
+              "sizeBytes": 71925470
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-ingress-nginx-kube-webhook-certgen:v1.5.2"
+              ],
+              "sizeBytes": 68239185
+            },
+            {
+              "names": [
+                "docker.io/rancher/rke2-cloud-provider:v1.30.6-0.20241016053533-5ec454f50e7a-build20241016"
+              ],
+              "sizeBytes": 67537469
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-dns-node-cache:1.24.0-build20241211"
+              ],
+              "sizeBytes": 59510833
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-k8s-metrics-server:v0.7.2-build20250110"
+              ],
+              "sizeBytes": 59272714
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-cluster-autoscaler:v1.9.0-build20241126"
+              ],
+              "sizeBytes": 47029838
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-etcd:v3.5.19-k3s1-build20250306"
+              ],
+              "sizeBytes": 46953385
+            },
+            {
+              "names": [
+                "docker.io/rancher/hardened-addon-resizer:1.8.22-build20250110"
+              ],
+              "sizeBytes": 40286212
+            },
+            {
+              "names": [
+                "docker.io/rancher/klipper-lb:v0.4.13"
+              ],
+              "sizeBytes": 12716739
+            },
+            {
+              "names": [
+                "docker.io/rancher/mirrored-pause:3.6"
+              ],
+              "sizeBytes": 685844
+            }
+          ]
+        },
+        "podSummary": {
+          "totalCount": 3,
+          "runningCount": 3,
+          "pendingCount": 0,
+          "failedCount": 0
+        },
+        "resourceSummary": {
+          "cpu": {
+            "capacity": "4",
+            "allocatable": "4",
+            "allocated": "600m",
+            "utilization": "15.0%"
+          },
+          "memory": {
+            "capacity": "3779892Ki",
+            "allocatable": "3779892Ki",
+            "allocated": "228589568",
+            "utilization": "5.9%"
+          },
+          "pods": {
+            "capacity": "110",
+            "allocatable": "110",
+            "allocated": "3",
+            "utilization": "2.7%"
+          }
+        },
+        "clusterName": "branch"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群branch节点列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群branch节点详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/branch/nodes/test-node
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 500,
+  "message": "failed to get node test-node: nodes \"test-node\" not found",
+  "data": null
+}
+[0;32m[PASS][0m 获取成员集群branch节点详情 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群branch服务列表
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/branch/service
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 7
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-18T10:37:01Z",
+          "uid": "e9cdf578-fd96-41b0-8a88-c2450c2b80d3"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.1"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-console",
+          "namespace": "higress-system",
+          "labels": {
+            "app.kubernetes.io/instance": "higress",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-console",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-console-2.1.3"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:43:46Z",
+          "uid": "995a5fa7-bd85-4b18-847a-0e8afc7488d4"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-console.higress-system",
+          "ports": [
+            {
+              "port": 8080,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "higress",
+          "app.kubernetes.io/name": "higress-console"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.15.7"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-controller",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-controller",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-controller",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-controller"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:43:46Z",
+          "uid": "467daa4d-0cae-4809-98d9-ede31d707ec4"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-controller.higress-system",
+          "ports": [
+            {
+              "port": 8888,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 8889,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15051,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15010,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15012,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15014,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-controller",
+          "higress": "higress-controller"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.154.37"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-gateway",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-gateway",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-gateway",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-system-higress-gateway"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:43:46Z",
+          "uid": "80dca9bf-a286-443f-aabc-5e07536ab6e3"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-gateway.higress-system",
+          "ports": [
+            {
+              "port": 80,
+              "protocol": "TCP",
+              "nodePort": 32486
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 30442
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-gateway",
+          "higress": "higress-system-higress-gateway"
+        },
+        "type": "LoadBalancer",
+        "clusterIP": "10.43.144.203"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-coredns-rke2-coredns",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/instance": "rke2-coredns",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-coredns",
+            "helm.sh/chart": "rke2-coredns-1.39.100",
+            "k8s-app": "kube-dns",
+            "kubernetes.io/cluster-service": "true",
+            "kubernetes.io/name": "CoreDNS"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-coredns",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T10:37:58Z",
+          "uid": "b63554b8-589b-46f0-a4b9-0f9132332e32"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-coredns-rke2-coredns.kube-system",
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP",
+              "nodePort": 0
+            },
+            {
+              "port": 53,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "rke2-coredns",
+          "app.kubernetes.io/name": "rke2-coredns",
+          "k8s-app": "kube-dns"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.10"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-ingress-nginx-controller-admission",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/component": "controller",
+            "app.kubernetes.io/instance": "rke2-ingress-nginx",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-ingress-nginx",
+            "app.kubernetes.io/part-of": "rke2-ingress-nginx",
+            "app.kubernetes.io/version": "1.12.1",
+            "helm.sh/chart": "rke2-ingress-nginx-4.12.100"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-ingress-nginx",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T10:38:22Z",
+          "uid": "a3e9deca-dbec-4c7b-a603-7f7bc55c75cc"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-ingress-nginx-controller-admission.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/component": "controller",
+          "app.kubernetes.io/instance": "rke2-ingress-nginx",
+          "app.kubernetes.io/name": "rke2-ingress-nginx"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.17.122"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-metrics-server",
+          "namespace": "kube-system",
+          "labels": {
+            "app": "rke2-metrics-server",
+            "app.kubernetes.io/instance": "rke2-metrics-server",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-metrics-server",
+            "app.kubernetes.io/version": "0.7.2",
+            "helm.sh/chart": "rke2-metrics-server-3.12.200"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-metrics-server",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T10:38:15Z",
+          "uid": "41aada9b-6bf5-46dc-875c-a0435b2cce93"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-metrics-server.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "rke2-metrics-server",
+          "app.kubernetes.io/instance": "rke2-metrics-server",
+          "app.kubernetes.io/name": "rke2-metrics-server"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.57.87"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群branch服务列表 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群branch服务列表(复数)
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/branch/services
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 7
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-18T10:37:01Z",
+          "uid": "e9cdf578-fd96-41b0-8a88-c2450c2b80d3"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.1"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-console",
+          "namespace": "higress-system",
+          "labels": {
+            "app.kubernetes.io/instance": "higress",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-console",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-console-2.1.3"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:43:46Z",
+          "uid": "995a5fa7-bd85-4b18-847a-0e8afc7488d4"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-console.higress-system",
+          "ports": [
+            {
+              "port": 8080,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "higress",
+          "app.kubernetes.io/name": "higress-console"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.15.7"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-controller",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-controller",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-controller",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-controller"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:43:46Z",
+          "uid": "467daa4d-0cae-4809-98d9-ede31d707ec4"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-controller.higress-system",
+          "ports": [
+            {
+              "port": 8888,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 8889,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15051,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15010,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15012,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            },
+            {
+              "port": 15014,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-controller",
+          "higress": "higress-controller"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.154.37"
+      },
+      {
+        "objectMeta": {
+          "name": "higress-gateway",
+          "namespace": "higress-system",
+          "labels": {
+            "app": "higress-gateway",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "higress-gateway",
+            "app.kubernetes.io/version": "2.1.3",
+            "helm.sh/chart": "higress-core-2.1.3",
+            "higress": "higress-system-higress-gateway"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "higress",
+            "meta.helm.sh/release-namespace": "higress-system"
+          },
+          "creationTimestamp": "2025-05-20T00:43:46Z",
+          "uid": "80dca9bf-a286-443f-aabc-5e07536ab6e3"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "higress-gateway.higress-system",
+          "ports": [
+            {
+              "port": 80,
+              "protocol": "TCP",
+              "nodePort": 32486
+            },
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 30442
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "higress-gateway",
+          "higress": "higress-system-higress-gateway"
+        },
+        "type": "LoadBalancer",
+        "clusterIP": "10.43.144.203"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-coredns-rke2-coredns",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/instance": "rke2-coredns",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-coredns",
+            "helm.sh/chart": "rke2-coredns-1.39.100",
+            "k8s-app": "kube-dns",
+            "kubernetes.io/cluster-service": "true",
+            "kubernetes.io/name": "CoreDNS"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-coredns",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T10:37:58Z",
+          "uid": "b63554b8-589b-46f0-a4b9-0f9132332e32"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-coredns-rke2-coredns.kube-system",
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP",
+              "nodePort": 0
+            },
+            {
+              "port": 53,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/instance": "rke2-coredns",
+          "app.kubernetes.io/name": "rke2-coredns",
+          "k8s-app": "kube-dns"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.10"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-ingress-nginx-controller-admission",
+          "namespace": "kube-system",
+          "labels": {
+            "app.kubernetes.io/component": "controller",
+            "app.kubernetes.io/instance": "rke2-ingress-nginx",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-ingress-nginx",
+            "app.kubernetes.io/part-of": "rke2-ingress-nginx",
+            "app.kubernetes.io/version": "1.12.1",
+            "helm.sh/chart": "rke2-ingress-nginx-4.12.100"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-ingress-nginx",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T10:38:22Z",
+          "uid": "a3e9deca-dbec-4c7b-a603-7f7bc55c75cc"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-ingress-nginx-controller-admission.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app.kubernetes.io/component": "controller",
+          "app.kubernetes.io/instance": "rke2-ingress-nginx",
+          "app.kubernetes.io/name": "rke2-ingress-nginx"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.17.122"
+      },
+      {
+        "objectMeta": {
+          "name": "rke2-metrics-server",
+          "namespace": "kube-system",
+          "labels": {
+            "app": "rke2-metrics-server",
+            "app.kubernetes.io/instance": "rke2-metrics-server",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "rke2-metrics-server",
+            "app.kubernetes.io/version": "0.7.2",
+            "helm.sh/chart": "rke2-metrics-server-3.12.200"
+          },
+          "annotations": {
+            "meta.helm.sh/release-name": "rke2-metrics-server",
+            "meta.helm.sh/release-namespace": "kube-system"
+          },
+          "creationTimestamp": "2025-05-18T10:38:15Z",
+          "uid": "41aada9b-6bf5-46dc-875c-a0435b2cce93"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "rke2-metrics-server.kube-system",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": {
+          "app": "rke2-metrics-server",
+          "app.kubernetes.io/instance": "rke2-metrics-server",
+          "app.kubernetes.io/name": "rke2-metrics-server"
+        },
+        "type": "ClusterIP",
+        "clusterIP": "10.43.57.87"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群branch服务列表(复数) ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群branch默认命名空间服务
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/branch/service/default
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "listMeta": {
+      "totalItems": 1
+    },
+    "services": [
+      {
+        "objectMeta": {
+          "name": "kubernetes",
+          "namespace": "default",
+          "labels": {
+            "component": "apiserver",
+            "provider": "kubernetes"
+          },
+          "creationTimestamp": "2025-05-18T10:37:01Z",
+          "uid": "e9cdf578-fd96-41b0-8a88-c2450c2b80d3"
+        },
+        "typeMeta": {
+          "kind": "service"
+        },
+        "internalEndpoint": {
+          "host": "kubernetes",
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP",
+              "nodePort": 0
+            }
+          ]
+        },
+        "externalEndpoints": [],
+        "selector": null,
+        "type": "ClusterIP",
+        "clusterIP": "10.43.0.1"
+      }
+    ],
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群branch默认命名空间服务 ✅
+----------------------------------------
+[0;34m[INFO][0m 🚀 测试: 获取成员集群branch服务详情
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/member/branch/service/default/kubernetes
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "objectMeta": {
+      "name": "kubernetes",
+      "namespace": "default",
+      "labels": {
+        "component": "apiserver",
+        "provider": "kubernetes"
+      },
+      "creationTimestamp": "2025-05-18T10:37:01Z",
+      "uid": "e9cdf578-fd96-41b0-8a88-c2450c2b80d3"
+    },
+    "typeMeta": {
+      "kind": "service"
+    },
+    "internalEndpoint": {
+      "host": "kubernetes",
+      "ports": [
+        {
+          "port": 443,
+          "protocol": "TCP",
+          "nodePort": 0
+        }
+      ]
+    },
+    "externalEndpoints": [],
+    "selector": null,
+    "type": "ClusterIP",
+    "clusterIP": "10.43.0.1",
+    "endpointList": {
+      "listMeta": {
+        "totalItems": 1
+      },
+      "endpoints": [
+        {
+          "objectMeta": {
+            "creationTimestamp": null
+          },
+          "typeMeta": {
+            "kind": "endpoint"
+          },
+          "host": "10.10.20.11",
+          "nodeName": null,
+          "ready": true,
+          "ports": [
+            {
+              "name": "https",
+              "port": 6443,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        {
+          "objectMeta": {
+            "creationTimestamp": null
+          },
+          "typeMeta": {
+            "kind": "endpoint"
+          },
+          "host": "10.10.20.12",
+          "nodeName": null,
+          "ready": true,
+          "ports": [
+            {
+              "name": "https",
+              "port": 6443,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        {
+          "objectMeta": {
+            "creationTimestamp": null
+          },
+          "typeMeta": {
+            "kind": "endpoint"
+          },
+          "host": "10.10.20.13",
+          "nodeName": null,
+          "ready": true,
+          "ports": [
+            {
+              "name": "https",
+              "port": 6443,
+              "protocol": "TCP"
+            }
+          ]
+        }
+      ]
+    },
+    "sessionAffinity": "None",
+    "errors": []
+  }
+}
+[0;32m[PASS][0m 获取成员集群branch服务详情 ✅
+----------------------------------------

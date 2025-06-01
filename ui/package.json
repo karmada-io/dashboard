@@ -30,6 +30,8 @@
     "turbo": "^2.0.6"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.0.0",
+    "@antv/g6": "^5.0.48",
     "dayjs": "^1.11.11"
   },
   "packageManager": "pnpm@9.1.2",

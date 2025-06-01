@@ -26,12 +26,13 @@
     ]
   },
   "dependencies": {
+    "@ant-design/charts": "^2.2.1",
+    "@antv/g6": "^5.0.48",
     "@karmada/i18n-tool": "workspace:*",
     "@karmada/utils": "workspace:*",
     "@monaco-editor/react": "^4.6.0",
     "@tanstack/react-query": "^5.59.8",
     "@uidotdev/usehooks": "^2.4.1",
-    "@ant-design/charts": "^2.2.1",
     "antd": "^5.21.3",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",

@@ -1,0 +1,52 @@
+[0;34m[INFO][0m 📊 开始概览接口测试...
+[0;34m[INFO][0m 🚀 测试: 概览接口
+[0;34m[INFO][0m 📡 请求: GET http://localhost:8000/api/v1/overview
+[0;34m[INFO][0m 📥 响应状态码: 200
+[0;34m[INFO][0m 📄 响应内容 (完整数据):
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "karmadaInfo": {
+      "version": {
+        "gitVersion": "v1.13.2",
+        "gitCommit": "c292ad93c55259d553cc3a4408c6a33b682a93b6",
+        "gitTreeState": "clean",
+        "buildDate": "2025-04-30T07:36:02Z",
+        "goVersion": "go1.22.12",
+        "compiler": "gc",
+        "platform": "linux/amd64"
+      },
+      "status": "running",
+      "createTime": "2025-05-19T12:55:19Z"
+    },
+    "memberClusterStatus": {
+      "nodeSummary": {
+        "totalNum": 9,
+        "readyNum": 9
+      },
+      "cpuSummary": {
+        "totalCPU": 36,
+        "allocatedCPU": 21.65
+      },
+      "memorySummary": {
+        "totalMemory": 34185674752,
+        "allocatedMemory": 19489170584.315975
+      },
+      "podSummary": {
+        "totalPod": 990,
+        "allocatedPod": 75
+      }
+    },
+    "clusterResourceStatus": {
+      "propagationPolicyNum": 0,
+      "overridePolicyNum": 0,
+      "namespaceNum": 10,
+      "workloadNum": 1,
+      "serviceNum": 2,
+      "configNum": 9
+    }
+  }
+}
+[0;32m[PASS][0m 概览接口 ✅
+----------------------------------------
