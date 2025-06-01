@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { GetOverview } from '@/services/overview';
 import { GetClusters } from '@/services/cluster';
 import { ClusterOverview } from '@/components/dashboard';
+import { G6ClusterTopology } from '@/components/topology';
 import { 
   CloudServerOutlined, 
   ClusterOutlined,
@@ -252,6 +253,12 @@ const Overview = () => {
               </Card>
             </Col>
           </Row>
+
+          {/* 集群拓扑图 */}
+          <G6ClusterTopology 
+            clusterListData={clusterListData}
+            isLoading={clusterListLoading}
+          />
 
           {/* 集群状态概览表格 */}
           <div style={{ marginBottom: '40px' }}>
