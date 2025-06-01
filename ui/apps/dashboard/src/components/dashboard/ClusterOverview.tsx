@@ -77,6 +77,14 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
     .cluster-overview-table .ant-badge-status-text {
       font-size: 14px !important;
     }
+    .cluster-overview-table .ant-table-measure-row {
+      display: none !important;
+    }
+    .cluster-overview-table .ant-table-tbody > .ant-table-measure-row {
+      display: none !important;
+      height: 0 !important;
+      visibility: hidden !important;
+    }
   `;
 
   const getStatusBadge = (status: string) => {
@@ -242,7 +250,16 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       <style dangerouslySetInnerHTML={{ __html: tableStyles }} />
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data.filter(item => 
+          item && 
+          item.name && 
+          item.name.trim() !== '' &&
+          item.status &&
+          item.nodes &&
+          item.cpu &&
+          item.memory &&
+          item.pods
+        )}
         loading={loading}
         rowKey="name"
         pagination={false}
@@ -254,6 +271,10 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
         }}
         scroll={{ x: 1200 }}
         className="cluster-overview-table"
+        locale={{
+          emptyText: loading ? '加载中...' : '暂无集群数据'
+        }}
+        showSorterTooltip={false}
       />
     </>
   );

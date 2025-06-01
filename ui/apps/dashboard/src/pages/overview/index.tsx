@@ -60,28 +60,33 @@ const Overview = () => {
   const transformClusterData = () => {
     if (!clusterListData?.clusters) return [];
     
-    return clusterListData.clusters.map(cluster => ({
-      name: cluster.objectMeta.name,
-      status: cluster.ready ? 'ready' as const : 'notReady' as const,
-      nodes: {
-        ready: cluster.nodeSummary?.readyNum || 0,
-        total: cluster.nodeSummary?.totalNum || 0,
-      },
-      cpu: {
-        used: (cluster.allocatedResources?.cpuCapacity || 0) * (cluster.allocatedResources?.cpuFraction || 0) / 100,
-        total: cluster.allocatedResources?.cpuCapacity || 0,
-      },
-      memory: {
-        used: (cluster.allocatedResources?.memoryCapacity || 0) * (cluster.allocatedResources?.memoryFraction || 0) / 100 / (1024 * 1024 * 1024),
-        total: (cluster.allocatedResources?.memoryCapacity || 0) / (1024 * 1024 * 1024),
-      },
-      pods: {
-        used: cluster.allocatedResources?.allocatedPods || 0,
-        total: cluster.allocatedResources?.podCapacity || 0,
-      },
-      version: cluster.kubernetesVersion,
-      syncMode: cluster.syncMode,
-    }));
+    return clusterListData.clusters
+      .filter(cluster => 
+        cluster?.objectMeta?.name && // 必须有名称
+        cluster.objectMeta.name.trim() !== '' // 名称不能为空
+      )
+      .map(cluster => ({
+        name: cluster.objectMeta.name,
+        status: cluster.ready ? 'ready' as const : 'notReady' as const,
+        nodes: {
+          ready: cluster.nodeSummary?.readyNum || 0,
+          total: cluster.nodeSummary?.totalNum || 0,
+        },
+        cpu: {
+          used: (cluster.allocatedResources?.cpuCapacity || 0) * (cluster.allocatedResources?.cpuFraction || 0) / 100,
+          total: cluster.allocatedResources?.cpuCapacity || 0,
+        },
+        memory: {
+          used: (cluster.allocatedResources?.memoryCapacity || 0) * (cluster.allocatedResources?.memoryFraction || 0) / 100 / (1024 * 1024 * 1024),
+          total: (cluster.allocatedResources?.memoryCapacity || 0) / (1024 * 1024 * 1024),
+        },
+        pods: {
+          used: cluster.allocatedResources?.allocatedPods || 0,
+          total: cluster.allocatedResources?.podCapacity || 0,
+        },
+        version: cluster.kubernetesVersion || 'Unknown',
+        syncMode: cluster.syncMode || 'Push',
+      }));
   };
 
   const clusterData = transformClusterData();
