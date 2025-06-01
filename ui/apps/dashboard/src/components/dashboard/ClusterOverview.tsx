@@ -56,6 +56,29 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  // 添加内联样式
+  const tableStyles = `
+    .cluster-overview-table .ant-table-thead > tr > th {
+      font-size: 16px !important;
+      font-weight: bold !important;
+      padding: 16px 12px !important;
+      background-color: #fafafa !important;
+    }
+    .cluster-overview-table .ant-table-tbody > tr > td {
+      padding: 16px 12px !important;
+      font-size: 14px !important;
+    }
+    .cluster-overview-table .ant-table-tbody > tr {
+      height: 60px !important;
+    }
+    .cluster-overview-table .ant-progress-text {
+      font-size: 14px !important;
+    }
+    .cluster-overview-table .ant-badge-status-text {
+      font-size: 14px !important;
+    }
+  `;
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ready':
@@ -93,7 +116,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       key: 'name',
       width: 150,
       render: (text) => (
-        <Text strong style={{ color: '#1890ff' }}>
+        <Text strong style={{ color: '#1890ff', fontSize: '16px' }}>
           {text}
         </Text>
       ),
@@ -103,7 +126,11 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status) => getStatusBadge(status),
+      render: (status) => (
+        <div style={{ fontSize: '14px' }}>
+          {getStatusBadge(status)}
+        </div>
+      ),
     },
     {
       title: '节点数',
@@ -112,8 +139,8 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       width: 100,
       render: (nodes) => (
         <Space direction="vertical" size={0}>
-          <Text>{nodes.ready}/{nodes.total}</Text>
-          <Text type="secondary" style={{ fontSize: '12px' }}>
+          <Text style={{ fontSize: '16px', fontWeight: 'bold' }}>{nodes.ready}/{nodes.total}</Text>
+          <Text type="secondary" style={{ fontSize: '14px' }}>
             Ready
           </Text>
         </Space>
@@ -127,7 +154,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       render: (cpu) => (
         <Space direction="vertical" size={4}>
           {getResourceProgress(cpu.used, cpu.total)}
-          <Text type="secondary" style={{ fontSize: '12px' }}>
+          <Text type="secondary" style={{ fontSize: '14px' }}>
             {cpu.used.toFixed(1)}/{cpu.total} Core
           </Text>
         </Space>
@@ -141,7 +168,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       render: (memory) => (
         <Space direction="vertical" size={4}>
           {getResourceProgress(memory.used, memory.total)}
-          <Text type="secondary" style={{ fontSize: '12px' }}>
+          <Text type="secondary" style={{ fontSize: '14px' }}>
             {memory.used.toFixed(1)}/{memory.total.toFixed(1)} GB
           </Text>
         </Space>
@@ -155,7 +182,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       render: (pods) => (
         <Space direction="vertical" size={4}>
           {getResourceProgress(pods.used, pods.total)}
-          <Text type="secondary" style={{ fontSize: '12px' }}>
+          <Text type="secondary" style={{ fontSize: '14px' }}>
             {pods.used}/{pods.total}
           </Text>
         </Space>
@@ -167,7 +194,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       key: 'version',
       width: 120,
       render: (version) => (
-        <Tag color="blue">{version}</Tag>
+        <Tag color="blue" style={{ fontSize: '14px', padding: '4px 8px' }}>{version}</Tag>
       ),
     },
     {
@@ -176,7 +203,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       key: 'syncMode',
       width: 100,
       render: (mode) => (
-        <Tag color={mode === 'Push' ? 'green' : 'orange'}>
+        <Tag color={mode === 'Push' ? 'green' : 'orange'} style={{ fontSize: '14px', padding: '4px 8px' }}>
           {mode}
         </Tag>
       ),
@@ -189,17 +216,19 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
         <Space>
           <Button 
             type="link" 
-            size="small" 
+            size="middle" 
             icon={<EyeOutlined />}
             onClick={() => navigate(`/cluster-manage/clusters/${record.name}`)}
+            style={{ fontSize: '14px' }}
           >
             查看
           </Button>
           <Button 
             type="link" 
-            size="small" 
+            size="middle" 
             icon={<SettingOutlined />}
             onClick={() => navigate(`/cluster-manage/clusters/${record.name}/nodes`)}
+            style={{ fontSize: '14px' }}
           >
             管理
           </Button>
@@ -209,19 +238,24 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      loading={loading}
-      rowKey="name"
-      pagination={false}
-      size="middle"
-      style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '8px',
-      }}
-      scroll={{ x: 1200 }}
-    />
+    <>
+      <style dangerouslySetInnerHTML={{ __html: tableStyles }} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        rowKey="name"
+        pagination={false}
+        size="large"
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          fontSize: '16px'
+        }}
+        scroll={{ x: 1200 }}
+        className="cluster-overview-table"
+      />
+    </>
   );
 };
 

@@ -55,3 +55,11 @@ cd ui
 pnpm run dashboard:dev
 ```
 then open your browser with `http://localhost:5173/`, if you can see the overview page of dashboard, it means everything is ok, start developing now.
+
+_output/bin/linux/amd64/karmada-dashboard-api   --karmada-kubeconfig=/root/.kube/karmada.config   --karmada-context=karmada-apiserver   --kubeconfig=/root/.kube/config   --context=default   --insecure-port=8000
+
+export KUBECONFIG=/etc/karmada/karmada-apiserver.config
+
+kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}" && echo
+
+eyJhbGciOiJSUzI1NiIsImtpZCI6IngyN2IzYnE0TkdIRFpOSXFleWpkemg1Z01zTHpNM1RfV3VfbDRqcEtYUncifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrYXJtYWRhLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJrYXJtYWRhLWRhc2hib2FyZC1zZWNyZXQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoia2FybWFkYS1kYXNoYm9hcmQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJhOGM4N2Y5Ny1kMGY5LTQ0ZWUtOTY5ZC1mODc4MGM1NTNjZjIiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a2FybWFkYS1zeXN0ZW06a2FybWFkYS1kYXNoYm9hcmQifQ.Bz1A-hgBPJHXh6487a_CJq_Kvo5q6V-wYt4volNlIM-aoeyPlSGdlT53TGfrRXAlV8tSo_RKX-aa-OTjP5T6dXeiU0dIcFIRI5d5kZWBFDnoxDzk9nTVncO6Q3SCosGKK2b4Fpm8tZjckIQdruc3Y59Nl-LqLmesuPnow_ldNZOgbxUfwvnBJ_lT6r_ZgRha3gv3jw9jlH3_6fISxwpwGNgdkvQDOPZfX7amFumzmMaackcvaCiD2QOd3CXeJjny6ZUZSaR5AjP3gIaMWxR0BVyQlZKrGpP9iSEj48tSoaO4Lj2H-TMe8eAp9Q6leXaM4rO-H5deDM4rrIjsy_993_cyWTgtDHUsbHX08-M_DHHeiibQ_RjazJqgTA9MEBIQiD-YmVManWh8P6JQT0zHtAB70r-Ly-DmpjwsEQjW9YA6xi0CIsRTjBPPj10YXKqOfi2jLOfeqBrCgo7zYUny2HTZ2_wPOSHtjOyAOaiHU2nmGSSq6k9o2dbtQtev8HMM

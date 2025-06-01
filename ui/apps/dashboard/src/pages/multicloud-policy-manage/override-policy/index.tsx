@@ -50,6 +50,7 @@ import OverridePolicyEditorDrawer, {
   OverridePolicyEditorDrawerProps,
 } from './override-policy-editor-drawer.tsx';
 import { GetNamespaces } from '@/services/namespace.ts';
+import ScrollContainer from '@/components/common/ScrollContainer';
 
 export type PolicyScope = 'namespace-scope' | 'cluster-scope';
 const OverridePolicyManage = () => {
@@ -269,200 +270,206 @@ const OverridePolicyManage = () => {
   const { Title } = Typography;
   
   return (
-    <div className="tech-background min-h-screen">
-      {/* 粒子背景效果 */}
-      <div className="tech-particles-container">
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            className="tech-particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 20}s`
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 p-6">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <Title 
-            level={1} 
-            className="tech-hologram-text m-0 text-4xl font-bold"
-            style={{ color: 'var(--tech-primary)' }}
-          >
-            ⚙️ OVERRIDE POLICY MANAGEMENT
-          </Title>
-          <Typography.Text className="text-gray-600 text-lg">
-            多云差异化策略管理
-          </Typography.Text>
+    <ScrollContainer
+      height="100vh"
+      padding="0"
+      background="transparent"
+    >
+      <div className="tech-background min-h-screen">
+        {/* 粒子背景效果 */}
+        <div className="tech-particles-container">
+          {Array.from({ length: 15 }, (_, i) => (
+            <div
+              key={i}
+              className="tech-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 20}s`
+              }}
+            />
+          ))}
         </div>
 
-        {/* 操作区域 */}
-        <div className="tech-card mb-6">
-          <div className="tech-segmented-override">
-            <Segmented
-              className="tech-segmented"
-              value={filter.policyScope}
-              style={{
-                marginBottom: 16,
-                fontSize: '16px',
-                height: '40px',
-                background: '#ffffff !important'
-              }}
-              onChange={(value) => {
-                setFilter({
-                  ...filter,
-                  policyScope: value as PolicyScope,
-                });
-              }}
-              options={[
-                {
-                  label: i18nInstance.t(
-                    'bf15e71b2553d369585ace795d15ac3b',
-                    '命名空间级别',
-                  ),
-                  value: 'namespace-scope',
-                },
-                {
-                  label: i18nInstance.t(
-                    '860f29d8fc7a68113902db52885111d4',
-                    '集群级别',
-                  ),
-                  value: 'cluster-scope',
-                },
-              ]}
-            />
+        <div className="relative z-10 p-6">
+          {/* 页面标题 */}
+          <div className="mb-8">
+            <Title 
+              level={1} 
+              className="tech-hologram-text m-0 text-4xl font-bold"
+              style={{ color: 'var(--tech-primary)' }}
+            >
+              ⚙️ OVERRIDE POLICY MANAGEMENT
+            </Title>
+            <Typography.Text className="text-gray-600 text-lg">
+              多云差异化策略管理
+            </Typography.Text>
           </div>
 
-          <div className={'flex flex-row mb-4 justify-between'}>
-            <div className={'flex flex-row space-x-4'}>
-              {filter.policyScope === 'namespace-scope' && (
-                <>
-                  <h3 className={'leading-[40px] text-lg font-semibold'} style={{ color: 'var(--text-color)' }}>
-                    {i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}
-                  </h3>
-                  <Select
-                    options={nsOptions}
-                    className={'min-w-[200px]'}
-                    style={{ fontSize: '16px', height: '40px' }}
-                    value={filter.selectedWorkSpace}
-                    loading={isNsDataLoading}
-                    showSearch
-                    allowClear
-                    placeholder={''}
-                    onChange={(v) => {
-                      setFilter({
-                        ...filter,
-                        selectedWorkSpace: v,
-                      });
-                    }}
-                  />
-                </>
-              )}
-
-              <Input.Search
-                placeholder={i18nInstance.t(
-                  '88270824e97355ca21f4101e5f1b73a0',
-                  '搜索策略名称',
-                )}
-                className={'w-[400px] tech-search-input'}
-                style={{ 
+          {/* 操作区域 */}
+          <div className="tech-card mb-6">
+            <div className="tech-segmented-override">
+              <Segmented
+                className="tech-segmented"
+                value={filter.policyScope}
+                style={{
+                  marginBottom: 16,
                   fontSize: '16px',
-                  height: '40px'
+                  height: '40px',
+                  background: '#ffffff !important'
                 }}
-                allowClear
-                value={filter.searchText}
-                onChange={(e) => {
+                onChange={(value) => {
                   setFilter({
                     ...filter,
-                    searchText: e.target.value,
+                    policyScope: value as PolicyScope,
                   });
                 }}
+                options={[
+                  {
+                    label: i18nInstance.t(
+                      'bf15e71b2553d369585ace795d15ac3b',
+                      '命名空间级别',
+                    ),
+                    value: 'namespace-scope',
+                  },
+                  {
+                    label: i18nInstance.t(
+                      '860f29d8fc7a68113902db52885111d4',
+                      '集群级别',
+                    ),
+                    value: 'cluster-scope',
+                  },
+                ]}
               />
             </div>
-            <div>
-              <button
-                className="tech-btn-primary flex items-center space-x-2"
-                onClick={() => {
-                  setEditorDrawerData({
-                    open: true,
-                    mode: 'create',
-                    isClusterScope: filter.policyScope === 'cluster-scope',
-                  });
-                }}
-              >
-                <Icons.add width={16} height={16} />
-                <span>
-                  {filter.policyScope === 'namespace-scope'
-                    ? i18nInstance.t(
-                        '7c7e4becc6e9b2be2a196ed506cdc518',
-                        '新增差异化策略',
-                      )
-                    : i18nInstance.t(
-                        'd4e6e1153ed42d2b2482f22ee04ac05a',
-                        '新增集群差异化策略',
-                      )}
-                </span>
-              </button>
+
+            <div className={'flex flex-row mb-4 justify-between'}>
+              <div className={'flex flex-row space-x-4'}>
+                {filter.policyScope === 'namespace-scope' && (
+                  <>
+                    <h3 className={'leading-[40px] text-lg font-semibold'} style={{ color: 'var(--text-color)' }}>
+                      {i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}
+                    </h3>
+                    <Select
+                      options={nsOptions}
+                      className={'min-w-[200px]'}
+                      style={{ fontSize: '16px', height: '40px' }}
+                      value={filter.selectedWorkSpace}
+                      loading={isNsDataLoading}
+                      showSearch
+                      allowClear
+                      placeholder={''}
+                      onChange={(v) => {
+                        setFilter({
+                          ...filter,
+                          selectedWorkSpace: v,
+                        });
+                      }}
+                    />
+                  </>
+                )}
+
+                <Input.Search
+                  placeholder={i18nInstance.t(
+                    '88270824e97355ca21f4101e5f1b73a0',
+                    '搜索策略名称',
+                  )}
+                  className={'w-[400px] tech-search-input'}
+                  style={{ 
+                    fontSize: '16px',
+                    height: '40px'
+                  }}
+                  allowClear
+                  value={filter.searchText}
+                  onChange={(e) => {
+                    setFilter({
+                      ...filter,
+                      searchText: e.target.value,
+                    });
+                  }}
+                />
+              </div>
+              <div>
+                <button
+                  className="tech-btn-primary flex items-center space-x-2"
+                  onClick={() => {
+                    setEditorDrawerData({
+                      open: true,
+                      mode: 'create',
+                      isClusterScope: filter.policyScope === 'cluster-scope',
+                    });
+                  }}
+                >
+                  <Icons.add width={16} height={16} />
+                  <span>
+                    {filter.policyScope === 'namespace-scope'
+                      ? i18nInstance.t(
+                          '7c7e4becc6e9b2be2a196ed506cdc518',
+                          '新增差异化策略',
+                        )
+                      : i18nInstance.t(
+                          'd4e6e1153ed42d2b2482f22ee04ac05a',
+                          '新增集群差异化策略',
+                        )}
+                  </span>
+                </button>
+              </div>
             </div>
+          </div>
+
+          {/* 数据表格 */}
+          <div className="tech-card">
+            <Table
+              rowKey={(r: OverridePolicy) => r.objectMeta.name || ''}
+              columns={columns}
+              loading={isLoading}
+              dataSource={data || []}
+              className="tech-table"
+              style={{
+                background: 'transparent',
+                fontSize: '16px',
+              }}
+            />
           </div>
         </div>
 
-        {/* 数据表格 */}
-        <div className="tech-card">
-          <Table
-            rowKey={(r: OverridePolicy) => r.objectMeta.name || ''}
-            columns={columns}
-            loading={isLoading}
-            dataSource={data || []}
-            className="tech-table"
-            style={{
-              background: 'transparent',
-              fontSize: '16px',
-            }}
-          />
-        </div>
+        <OverridePolicyEditorDrawer
+          open={editorDrawerData.open}
+          name={editorDrawerData.name}
+          namespace={editorDrawerData.namespace}
+          mode={editorDrawerData.mode}
+          overrideContent={editorDrawerData.overrideContent}
+          isClusterScope={editorDrawerData.isClusterScope}
+          onClose={() => {
+            setEditorDrawerData({
+              open: false,
+              mode: 'detail',
+              name: '',
+              namespace: '',
+              overrideContent: '',
+            });
+          }}
+          onCreate={async (ret) => {
+            if (ret.code === 200) {
+              await messageApi.success('新增覆盖策略成功');
+              resetEditorDrawerData();
+              await refetch();
+            } else {
+              await messageApi.error('新增覆盖策略失败');
+            }
+          }}
+          onUpdate={async (ret) => {
+            if (ret.code === 200) {
+              await messageApi.success('编辑覆盖策略成功');
+              resetEditorDrawerData();
+              await refetch();
+            } else {
+              await messageApi.error('编辑覆盖策略失败');
+            }
+          }}
+        />
+        {messageContextHolder}
       </div>
-
-      <OverridePolicyEditorDrawer
-        open={editorDrawerData.open}
-        name={editorDrawerData.name}
-        namespace={editorDrawerData.namespace}
-        mode={editorDrawerData.mode}
-        overrideContent={editorDrawerData.overrideContent}
-        isClusterScope={editorDrawerData.isClusterScope}
-        onClose={() => {
-          setEditorDrawerData({
-            open: false,
-            mode: 'detail',
-            name: '',
-            namespace: '',
-            overrideContent: '',
-          });
-        }}
-        onCreate={async (ret) => {
-          if (ret.code === 200) {
-            await messageApi.success('新增覆盖策略成功');
-            resetEditorDrawerData();
-            await refetch();
-          } else {
-            await messageApi.error('新增覆盖策略失败');
-          }
-        }}
-        onUpdate={async (ret) => {
-          if (ret.code === 200) {
-            await messageApi.success('编辑覆盖策略成功');
-            resetEditorDrawerData();
-            await refetch();
-          } else {
-            await messageApi.error('编辑覆盖策略失败');
-          }
-        }}
-      />
-      {messageContextHolder}
-    </div>
+    </ScrollContainer>
   );
 };
 export default OverridePolicyManage;

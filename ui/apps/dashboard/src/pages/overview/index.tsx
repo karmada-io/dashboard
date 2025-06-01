@@ -37,6 +37,7 @@ import {
   HddOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import ScrollContainer from '@/components/common/ScrollContainer';
 
 const { Title, Text } = Typography;
 
@@ -243,11 +244,14 @@ const KarmadaControlPlaneCenter: React.FC<{
   return (
     <div style={{ 
       position: 'relative', 
-      height: '700px', 
+      height: '600px', 
       background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
       borderRadius: '20px',
       overflow: 'hidden',
-      border: '1px solid rgba(0, 212, 255, 0.3)'
+      border: '1px solid rgba(0, 212, 255, 0.3)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     }}>
       {/* 背景Canvas */}
       <canvas
@@ -269,8 +273,8 @@ const KarmadaControlPlaneCenter: React.FC<{
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: '200px',
-        height: '200px',
+        width: '220px',
+        height: '220px',
         background: 'radial-gradient(circle, rgba(24, 144, 255, 0.3) 0%, rgba(24, 144, 255, 0.1) 100%)',
         borderRadius: '50%',
         border: '3px solid #1890ff',
@@ -281,30 +285,30 @@ const KarmadaControlPlaneCenter: React.FC<{
         zIndex: 3,
         boxShadow: '0 0 30px rgba(24, 144, 255, 0.5)',
       }}>
-        <DashboardOutlined style={{ fontSize: '32px', color: '#1890ff', marginBottom: '8px' }} />
-        <Text style={{ color: 'white', fontSize: '16px', fontWeight: 'bold', textAlign: 'center' }}>
+        <DashboardOutlined style={{ fontSize: '36px', color: '#1890ff', marginBottom: '10px' }} />
+        <Text style={{ color: 'white', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
           Karmada
         </Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '12px', textAlign: 'center' }}>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px', textAlign: 'center' }}>
           控制平面
         </Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '10px', textAlign: 'center', marginTop: '4px' }}>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px', textAlign: 'center', marginTop: '6px' }}>
           {data?.karmadaInfo?.version?.gitVersion || 'v1.13.2'}
         </Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '10px', textAlign: 'center' }}>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px', textAlign: 'center' }}>
           运行中 {data?.karmadaInfo?.createTime ? dayjs().diff(dayjs(data.karmadaInfo.createTime), 'day') : 0}天
         </Text>
       </div>
 
-      {/* 四个角的资源指标卡片 - 调整位置更靠近中心 */}
+      {/* 四个角的资源指标卡片 - 调整位置更靠近边缘 */}
       {/* 左上角 - 节点统计 */}
       <div style={{
         position: 'absolute',
         top: '50%',
         left: '50%',
-        transform: 'translate(calc(-50% - 200px), calc(-50% - 140px))',
-        width: '140px',
-        height: '120px',
+        transform: 'translate(calc(-50% - 240px), calc(-50% - 160px))',
+        width: '150px',
+        height: '130px',
         background: 'linear-gradient(135deg, #fa8c16 0%, #faad14 100%)',
         borderRadius: '16px',
         border: '2px solid #fa8c16',
@@ -312,21 +316,21 @@ const KarmadaControlPlaneCenter: React.FC<{
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        padding: '16px',
+        padding: '18px',
         zIndex: 2,
         boxShadow: '0 4px 15px rgba(250, 140, 22, 0.4)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <NodeIndexOutlined style={{ fontSize: '20px', color: 'white', marginRight: '8px' }} />
-          <Text style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>节点统计</Text>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <NodeIndexOutlined style={{ fontSize: '22px', color: 'white', marginRight: '8px' }} />
+          <Text style={{ color: 'white', fontSize: '13px', fontWeight: 'bold' }}>节点统计</Text>
         </div>
-        <Text style={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>{nodeStats.used}</Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '10px' }}>
+        <Text style={{ color: 'white', fontSize: '26px', fontWeight: 'bold' }}>{nodeStats.used}</Text>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '11px' }}>
           /{nodeStats.total} Ready
         </Text>
         <CircularProgress
           percentage={calculatePercentage(nodeStats.used, nodeStats.total)}
-          size={40}
+          size={42}
           strokeWidth={3}
           color="white"
         />
@@ -337,9 +341,9 @@ const KarmadaControlPlaneCenter: React.FC<{
         position: 'absolute',
         top: '50%',
         left: '50%',
-        transform: 'translate(calc(-50% + 200px), calc(-50% - 140px))',
-        width: '140px',
-        height: '120px',
+        transform: 'translate(calc(-50% + 240px), calc(-50% - 160px))',
+        width: '150px',
+        height: '130px',
         background: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)',
         borderRadius: '16px',
         border: '2px solid #1890ff',
@@ -347,23 +351,23 @@ const KarmadaControlPlaneCenter: React.FC<{
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        padding: '16px',
+        padding: '18px',
         zIndex: 2,
         boxShadow: '0 4px 15px rgba(24, 144, 255, 0.4)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <ThunderboltOutlined style={{ fontSize: '20px', color: 'white', marginRight: '8px' }} />
-          <Text style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>CPU</Text>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <ThunderboltOutlined style={{ fontSize: '22px', color: 'white', marginRight: '8px' }} />
+          <Text style={{ color: 'white', fontSize: '13px', fontWeight: 'bold' }}>CPU</Text>
         </div>
-        <Text style={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
+        <Text style={{ color: 'white', fontSize: '26px', fontWeight: 'bold' }}>
           {cpuStats.used.toFixed(1)}
         </Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '10px' }}>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '11px' }}>
           /{cpuStats.total.toFixed(1)} Core
         </Text>
         <CircularProgress
           percentage={calculatePercentage(cpuStats.used, cpuStats.total)}
-          size={40}
+          size={42}
           strokeWidth={3}
           color="white"
         />
@@ -374,9 +378,9 @@ const KarmadaControlPlaneCenter: React.FC<{
         position: 'absolute',
         top: '50%',
         left: '50%',
-        transform: 'translate(calc(-50% - 200px), calc(-50% + 140px))',
-        width: '140px',
-        height: '120px',
+        transform: 'translate(calc(-50% - 240px), calc(-50% + 160px))',
+        width: '150px',
+        height: '130px',
         background: 'linear-gradient(135deg, #722ed1 0%, #9254de 100%)',
         borderRadius: '16px',
         border: '2px solid #722ed1',
@@ -384,21 +388,21 @@ const KarmadaControlPlaneCenter: React.FC<{
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        padding: '16px',
+        padding: '18px',
         zIndex: 2,
         boxShadow: '0 4px 15px rgba(114, 46, 209, 0.4)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <RocketOutlined style={{ fontSize: '20px', color: 'white', marginRight: '8px' }} />
-          <Text style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>Pod负载</Text>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <RocketOutlined style={{ fontSize: '22px', color: 'white', marginRight: '8px' }} />
+          <Text style={{ color: 'white', fontSize: '13px', fontWeight: 'bold' }}>Pod负载</Text>
         </div>
-        <Text style={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>{podStats.used}</Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '10px' }}>
+        <Text style={{ color: 'white', fontSize: '26px', fontWeight: 'bold' }}>{podStats.used}</Text>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '11px' }}>
           /{podStats.total} Pod
         </Text>
         <CircularProgress
           percentage={calculatePercentage(podStats.used, podStats.total)}
-          size={40}
+          size={42}
           strokeWidth={3}
           color="white"
         />
@@ -409,9 +413,9 @@ const KarmadaControlPlaneCenter: React.FC<{
         position: 'absolute',
         top: '50%',
         left: '50%',
-        transform: 'translate(calc(-50% + 200px), calc(-50% + 140px))',
-        width: '140px',
-        height: '120px',
+        transform: 'translate(calc(-50% + 240px), calc(-50% + 160px))',
+        width: '150px',
+        height: '130px',
         background: 'linear-gradient(135deg, #52c41a 0%, #73d13d 100%)',
         borderRadius: '16px',
         border: '2px solid #52c41a',
@@ -419,23 +423,23 @@ const KarmadaControlPlaneCenter: React.FC<{
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        padding: '16px',
+        padding: '18px',
         zIndex: 2,
         boxShadow: '0 4px 15px rgba(82, 196, 26, 0.4)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <HddOutlined style={{ fontSize: '20px', color: 'white', marginRight: '8px' }} />
-          <Text style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>内存</Text>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <HddOutlined style={{ fontSize: '22px', color: 'white', marginRight: '8px' }} />
+          <Text style={{ color: 'white', fontSize: '13px', fontWeight: 'bold' }}>内存</Text>
         </div>
-        <Text style={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
+        <Text style={{ color: 'white', fontSize: '26px', fontWeight: 'bold' }}>
           {memoryStats.used.toFixed(1)}
         </Text>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '10px' }}>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '11px' }}>
           /{memoryStats.total.toFixed(1)} GB
         </Text>
         <CircularProgress
           percentage={calculatePercentage(memoryStats.used, memoryStats.total)}
-          size={40}
+          size={42}
           strokeWidth={3}
           color="white"
         />
@@ -746,34 +750,12 @@ const Overview = () => {
         </div>
       </div>
 
-      {/* 自定义滚动容器 */}
-      <div style={{
-        height: 'calc(100vh - 60px)', // 减去导航栏高度
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        padding: '0',
-        scrollbarWidth: 'thin',
-        scrollbarColor: '#1890ff #f0f0f0',
-      }}>
-        {/* 自定义滚动条样式 */}
-        <style>{`
-          div::-webkit-scrollbar {
-            width: 8px;
-          }
-          div::-webkit-scrollbar-track {
-            background: #f0f0f0;
-            border-radius: 4px;
-          }
-          div::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #1890ff 0%, #40a9ff 100%);
-            border-radius: 4px;
-            transition: background 0.3s ease;
-          }
-          div::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #096dd9 0%, #1890ff 100%);
-          }
-        `}</style>
-
+      {/* 使用ScrollContainer包装主要内容 */}
+      <ScrollContainer
+        height="calc(100vh - 60px)"
+        padding="0"
+        background="transparent"
+      >
         <div style={{ padding: '24px' }}>
           {/* 主要内容区域 - 三栏布局 */}
           <Row gutter={[24, 24]} style={{ minHeight: '600px' }}>
@@ -1100,8 +1082,13 @@ const Overview = () => {
             </Col>
           </Row>
 
+          {/* 集群状态概览表格 */}
+          <div style={{ marginTop: '40px', marginBottom: '40px' }}>
+            <ClusterOverview data={clusterData} loading={clusterListLoading} />
+          </div>
+
           {/* 策略和资源统计 - 优化样式 */}
-          <Row gutter={[24, 24]} style={{ marginTop: '40px', marginBottom: '40px' }}>
+          <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
             <Col xs={24} lg={12}>
               <Card 
                 title={
@@ -1113,7 +1100,8 @@ const Overview = () => {
                 style={{ 
                   borderRadius: '16px',
                   border: '1px solid #f0f0f0',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  height: '280px'
                 }}
                 bodyStyle={{ padding: '28px' }}
               >
@@ -1166,7 +1154,8 @@ const Overview = () => {
                 style={{ 
                   borderRadius: '16px',
                   border: '1px solid #f0f0f0',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  height: '280px'
                 }}
                 bodyStyle={{ padding: '28px' }}
               >
@@ -1215,51 +1204,8 @@ const Overview = () => {
               </Card>
             </Col>
           </Row>
-
-          {/* 集群状态概览表格 - 优化标题 */}
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ 
-              marginBottom: '24px',
-              padding: '20px 0',
-              borderBottom: '2px solid #f0f0f0'
-            }}>
-              <Title level={2} style={{ 
-                margin: 0, 
-                color: '#000000d9',
-                fontSize: '24px',
-                fontWeight: 'bold'
-              }}>
-                <ClusterOutlined style={{ marginRight: '12px', color: '#1890ff' }} />
-                集群状态概览
-              </Title>
-              <Text type="secondary" style={{ fontSize: '14px', marginLeft: '36px' }}>
-                实时监控所有成员集群的运行状态和资源使用情况
-              </Text>
-            </div>
-            <ClusterOverview data={clusterData} loading={clusterListLoading} />
-          </div>
-
-          {/* 页面底部间距 */}
-          <div style={{ height: '32px' }} />
         </div>
-      </div>
-
-      {/* 回到顶部按钮 */}
-      <BackTop
-        style={{
-          height: 48,
-          width: 48,
-          lineHeight: '48px',
-          borderRadius: '24px',
-          backgroundColor: '#1890ff',
-          color: 'white',
-          fontSize: '20px',
-          boxShadow: '0 4px 12px rgba(24, 144, 255, 0.4)',
-        }}
-        target={() => document.querySelector('[style*="overflow-y: auto"]') as HTMLElement}
-      >
-        <VerticalAlignTopOutlined />
-      </BackTop>
+      </ScrollContainer>
     </div>
   );
 };

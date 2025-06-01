@@ -103,7 +103,7 @@ kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
 
 Execute the following code to get the jwt token:
 ```bash
-kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}"
+kubectl -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}" && echo
 ```
 
 it should print results like this:

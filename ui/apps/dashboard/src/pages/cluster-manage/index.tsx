@@ -34,7 +34,8 @@ import { PlusOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom';
 import NewClusterModal from './new-cluster-modal';
 import type { Cluster, ClusterDetail } from '@/services/cluster';
-
+import '@/styles/tech-theme.css';
+import ScrollContainer from '@/components/common/ScrollContainer';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -144,171 +145,232 @@ const ClusterManagePage = () => {
     }
   };
 
-
-
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
-      {messageContextHolder}
-      
-      {/* 页面标题和操作栏 */}
-      <div style={{ marginBottom: '24px' }}>
-        <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
-          <div>
-            <Title level={2} style={{ margin: 0 }}>
-              集群管理
+    <ScrollContainer
+      height="100vh"
+      padding="0"
+      background="transparent"
+    >
+      <div className="tech-background min-h-screen">
+        {/* 粒子背景效果 */}
+        <div className="tech-particles-container">
+          {Array.from({ length: 12 }, (_, i) => (
+            <div
+              key={i}
+              className="tech-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 20}s`
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 p-6">
+          {/* 页面标题 */}
+          <div className="mb-8">
+            <Title 
+              level={1} 
+              className="tech-hologram-text m-0 text-4xl font-bold"
+              style={{ color: 'var(--tech-primary)' }}
+            >
+              🖥️ CLUSTER MANAGEMENT
             </Title>
-            <Text type="secondary">
-              管理和监控所有成员集群
+            <Text className="text-gray-600 text-lg">
+              多云集群管理与监控中心
             </Text>
           </div>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />} 
-            onClick={handleCreateCluster}
-            size="large"
-          >
-            添加集群
-          </Button>
-        </Flex>
 
-        {/* 搜索和过滤栏 */}
-        <Flex gap={16} align="center">
-          <Search
-            placeholder="搜索集群名称"
-            allowClear
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 300 }}
-            prefix={<SearchOutlined />}
-          />
-          <Select
-            value={statusFilter}
-            onChange={setStatusFilter}
-            style={{ width: 120 }}
-          >
-            <Option value="all">全部状态</Option>
-            <Option value="ready">Ready</Option>
-            <Option value="notReady">Not Ready</Option>
-          </Select>
-          <Button 
-            icon={<ReloadOutlined />} 
-            onClick={() => refetch()}
-            loading={isLoading}
-          >
-            刷新
-          </Button>
-        </Flex>
-      </div>
+          {/* 操作区域 */}
+          <div className="tech-card mb-6">
+            <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
+              <div>
+                <Title level={3} style={{ margin: 0, color: 'var(--text-color)' }}>
+                  集群概览
+                </Title>
+                <Text type="secondary">
+                  当前管理 {stats.total} 个集群，{stats.ready} 个正常运行
+                </Text>
+              </div>
+              <button 
+                className="tech-btn-primary flex items-center space-x-2"
+                onClick={handleCreateCluster}
+              >
+                <PlusOutlined />
+                <span>添加集群</span>
+              </button>
+            </Flex>
 
-      {/* 统计信息卡片 */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="总集群数"
-              value={stats.total}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="正常集群"
-              value={stats.ready}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="异常集群"
-              value={stats.notReady}
-              valueStyle={{ color: '#ff4d4f' }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* 集群卡片网格 */}
-      <Row gutter={[16, 16]}>
-        {filteredClusters.map((cluster) => (
-          <Col xs={24} lg={12} xl={8} key={cluster.name}>
-            <ClusterCard
-              name={cluster.name}
-              status={cluster.status}
-              kubernetesVersion={cluster.kubernetesVersion}
-              syncMode={cluster.syncMode}
-              nodeStatus={cluster.nodeStatus}
-              resources={cluster.resources}
-              createTime={cluster.createTime}
-              onView={() => navigate(`/cluster-manage/clusters/${cluster.name}`)}
-              onEdit={() => handleEditCluster(cluster.name)}
-              onManage={() => navigate(`/cluster-manage/clusters/${cluster.name}/nodes`)}
-                             onDelete={() => handleDeleteCluster(cluster.name)}
-            />
-          </Col>
-        ))}
-      </Row>
-
-      {/* 空状态 */}
-      {filteredClusters.length === 0 && !isLoading && (
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '60px 0',
-          backgroundColor: '#ffffff',
-          borderRadius: '8px',
-          marginTop: '24px',
-        }}>
-          <Text type="secondary" style={{ fontSize: '16px' }}>
-            {searchText || statusFilter !== 'all' ? '没有找到匹配的集群' : '暂无集群数据'}
-          </Text>
-          {!searchText && statusFilter === 'all' && (
-            <div style={{ marginTop: '16px' }}>
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateCluster}>
-                添加第一个集群
+            {/* 搜索和过滤栏 */}
+            <Flex gap={16} align="center">
+              <Search
+                placeholder="搜索集群名称"
+                allowClear
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: 300 }}
+                className="tech-search-input"
+                prefix={<SearchOutlined />}
+              />
+              <Select
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 120 }}
+              >
+                <Option value="all">全部状态</Option>
+                <Option value="ready">Ready</Option>
+                <Option value="notReady">Not Ready</Option>
+              </Select>
+              <Button 
+                icon={<ReloadOutlined />} 
+                onClick={() => refetch()}
+                loading={isLoading}
+                style={{
+                  borderColor: 'var(--tech-primary)',
+                  color: 'var(--tech-primary)',
+                }}
+              >
+                刷新
               </Button>
+            </Flex>
+          </div>
+
+          {/* 统计信息卡片 */}
+          <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+            <Col xs={24} sm={8}>
+              <div className="tech-card tech-hover-scale">
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--tech-primary)' }}
+                  >
+                    {stats.total}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    总集群数
+                  </Text>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={8}>
+              <div className="tech-card tech-hover-scale">
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--success-color)' }}
+                  >
+                    {stats.ready}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    正常集群
+                  </Text>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={8}>
+              <div className="tech-card tech-hover-scale">
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--error-color)' }}
+                  >
+                    {stats.notReady}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    异常集群
+                  </Text>
+                </div>
+              </div>
+            </Col>
+          </Row>
+
+          {/* 集群卡片网格 */}
+          <div className="tech-card mb-6">
+            <Row gutter={[24, 24]}>
+              {filteredClusters.map((cluster) => (
+                <Col xs={24} lg={12} xl={8} key={cluster.name}>
+                  <ClusterCard
+                    name={cluster.name}
+                    status={cluster.status}
+                    kubernetesVersion={cluster.kubernetesVersion}
+                    syncMode={cluster.syncMode}
+                    nodeStatus={cluster.nodeStatus}
+                    resources={cluster.resources}
+                    createTime={cluster.createTime}
+                    onView={() => navigate(`/cluster-manage/clusters/${cluster.name}`)}
+                    onEdit={() => handleEditCluster(cluster.name)}
+                    onManage={() => navigate(`/cluster-manage/clusters/${cluster.name}/nodes`)}
+                    onDelete={() => handleDeleteCluster(cluster.name)}
+                  />
+                </Col>
+              ))}
+            </Row>
+          </div>
+
+          {/* 空状态 */}
+          {filteredClusters.length === 0 && !isLoading && (
+            <div className="tech-card text-center py-16">
+              <PlusOutlined 
+                className="text-6xl mb-6"
+                style={{ color: 'var(--tech-primary)', opacity: 0.5 }}
+              />
+              <Text 
+                className="text-xl block mb-6 tech-hologram-text"
+                style={{ color: 'var(--tech-primary)' }}
+              >
+                {searchText || statusFilter !== 'all' ? '没有找到匹配的集群' : '暂无集群数据'}
+              </Text>
+              {!searchText && statusFilter === 'all' && (
+                <button 
+                  className="tech-btn-primary flex items-center space-x-2"
+                  style={{ margin: '0 auto' }}
+                  onClick={handleCreateCluster}
+                >
+                  <PlusOutlined />
+                  <span>添加第一个集群</span>
+                </button>
+              )}
             </div>
           )}
         </div>
-      )}
 
-      {/* 新建/编辑集群模态框 */}
-      <NewClusterModal
-        mode={clusterModalData.mode}
-        open={clusterModalData.open}
-        onOk={async (ret) => {
-          if (ret.code === 200) {
-            if (clusterModalData.mode === 'create') {
-              messageApi.success('集群接入成功');
-            } else if (clusterModalData.mode === 'edit') {
-              messageApi.success('集群更新成功');
+        {/* 新建/编辑集群模态框 */}
+        <NewClusterModal
+          mode={clusterModalData.mode}
+          open={clusterModalData.open}
+          onOk={async (ret) => {
+            if (ret.code === 200) {
+              if (clusterModalData.mode === 'create') {
+                messageApi.success('集群接入成功');
+              } else if (clusterModalData.mode === 'edit') {
+                messageApi.success('集群更新成功');
+              }
+              refetch();
+              setModalData({
+                clusterDetail: undefined,
+                mode: 'create',
+                open: false,
+              });
+            } else {
+              if (clusterModalData.mode === 'create') {
+                messageApi.error('集群接入失败');
+              } else if (clusterModalData.mode === 'edit') {
+                messageApi.error('集群更新失败');
+              }
             }
-            refetch();
+          }}
+          onCancel={() => {
             setModalData({
               clusterDetail: undefined,
               mode: 'create',
               open: false,
             });
-          } else {
-            if (clusterModalData.mode === 'create') {
-              messageApi.error('集群接入失败');
-            } else if (clusterModalData.mode === 'edit') {
-              messageApi.error('集群更新失败');
-            }
-          }
-        }}
-        onCancel={() => {
-          setModalData({
-            clusterDetail: undefined,
-            mode: 'create',
-            open: false,
-          });
-        }}
-        clusterDetail={clusterModalData.clusterDetail}
-      />
-    </div>
+          }}
+          clusterDetail={clusterModalData.clusterDetail}
+        />
+        {messageContextHolder}
+      </div>
+    </ScrollContainer>
   );
 };
 

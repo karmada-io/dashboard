@@ -28,6 +28,8 @@ import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
 import '@/styles/tech-theme.css';
+import ScrollContainer from '@/components/common/ScrollContainer';
+
 const ConfigPage = () => {
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
@@ -53,161 +55,167 @@ const ConfigPage = () => {
   const { Title } = Typography;
   
   return (
-    <div className="tech-background min-h-screen">
-      {/* 粒子背景效果 */}
-      <div className="tech-particles-container">
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            className="tech-particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 20}s`
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 p-6">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <Title 
-            level={1} 
-            className="tech-hologram-text m-0 text-4xl font-bold"
-            style={{ color: 'var(--tech-primary)' }}
-          >
-            ⚙️ CONFIG MANAGEMENT
-          </Title>
-          <Typography.Text className="text-gray-600 text-lg">
-            多云配置管理
-          </Typography.Text>
-        </div>
-
-        {/* 操作区域 */}
-        <div className="tech-card mb-6">
-          <QueryFilter
-            filter={filter}
-            setFilter={(v) => {
-              setFilter(v);
-            }}
-            onNewConfig={createConfig}
-            nsOptions={nsOptions}
-            isNsDataLoading={isNsDataLoading}
-          />
-        </div>
-
-        {/* 数据表格 */}
-        <div className="tech-card">
-          {filter.kind === ConfigKind.ConfigMap && (
-            <ConfigMapTable
-              labelTagNum={tagNum}
-              searchText={filter.searchText}
-              selectedWorkSpace={filter.selectedWorkspace}
-              onViewConfigMapContent={(r) => {
-                viewConfig(stringify(r));
-              }}
-              onEditConfigMapContent={(r) => {
-                editConfig(stringify(r));
-              }}
-              onDeleteConfigMapContent={async (r) => {
-                try {
-                  const ret = await DeleteResource({
-                    kind: r.typeMeta.kind,
-                    name: r.objectMeta.name,
-                    namespace: r.objectMeta.namespace,
-                  });
-                  if (ret.code !== 200) {
-                    await messageApi.error(
-                      i18nInstance.t(
-                        'f8484c9d3de78566f9e255360977f12c',
-                        '删除配置失败',
-                      ),
-                    );
-                  }
-                  await queryClient.invalidateQueries({
-                    queryKey: ['GetConfigMaps'],
-                    exact: false,
-                  });
-                } catch (e) {
-                  console.log('error', e);
-                }
+    <ScrollContainer
+      height="100vh"
+      padding="0"
+      background="transparent"
+    >
+      <div className="tech-background min-h-screen">
+        {/* 粒子背景效果 */}
+        <div className="tech-particles-container">
+          {Array.from({ length: 15 }, (_, i) => (
+            <div
+              key={i}
+              className="tech-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 20}s`
               }}
             />
-          )}
-          {filter.kind === ConfigKind.Secret && (
-            <SecretTable
-              labelTagNum={tagNum}
-              searchText={filter.searchText}
-              selectedWorkSpace={filter.selectedWorkspace}
-              onViewSecret={(r) => {
-                viewConfig(stringify(r));
-              }}
-              onEditSecret={(r) => {
-                editConfig(stringify(r));
-              }}
-              onDeleteSecretContent={async (r) => {
-                try {
-                  const ret = await DeleteResource({
-                    kind: r.typeMeta.kind,
-                    name: r.objectMeta.name,
-                    namespace: r.objectMeta.namespace,
-                  });
-                  if (ret.code !== 200) {
-                    await messageApi.error(
-                      i18nInstance.t(
-                        '1de397f628eb5943bdb6861ad667ff0a',
-                        '删除秘钥失败',
-                      ),
-                    );
-                  }
-                  await queryClient.invalidateQueries({
-                    queryKey: ['GetSecrets'],
-                    exact: false,
-                  });
-                } catch (e) {
-                  console.log('error', e);
-                }
-              }}
-            />
-          )}
+          ))}
         </div>
-      </div>
 
-      <ConfigEditorModal
-        mode={editor.mode}
-        workloadContent={editor.content}
-        open={editor.show}
-        kind={filter.kind}
-        onOk={async (ret) => {
-          if (editor.mode === 'read') {
-            hideEditor();
-            return;
-          }
-          const msg =
-            editor.mode === 'edit'
-              ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0', '修改')
-              : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增');
-          if (ret.code === 200) {
-            await messageApi.success(
-              `${msg}${i18nInstance.t('a6d38572262cb1b1238d449b4098f002', '配置成功')}`,
-            );
-            hideEditor();
-            if (editor.mode === 'create') {
-              await queryClient.invalidateQueries({
-                queryKey: ['GetConfigMaps'],
-                exact: false,
-              });
+        <div className="relative z-10 p-6">
+          {/* 页面标题 */}
+          <div className="mb-8">
+            <Title 
+              level={1} 
+              className="tech-hologram-text m-0 text-4xl font-bold"
+              style={{ color: 'var(--tech-primary)' }}
+            >
+              ⚙️ CONFIG MANAGEMENT
+            </Title>
+            <Typography.Text className="text-gray-600 text-lg">
+              多云配置管理
+            </Typography.Text>
+          </div>
+
+          {/* 操作区域 */}
+          <div className="tech-card mb-6">
+            <QueryFilter
+              filter={filter}
+              setFilter={(v) => {
+                setFilter(v);
+              }}
+              onNewConfig={createConfig}
+              nsOptions={nsOptions}
+              isNsDataLoading={isNsDataLoading}
+            />
+          </div>
+
+          {/* 数据表格 */}
+          <div className="tech-card">
+            {filter.kind === ConfigKind.ConfigMap && (
+              <ConfigMapTable
+                labelTagNum={tagNum}
+                searchText={filter.searchText}
+                selectedWorkSpace={filter.selectedWorkspace}
+                onViewConfigMapContent={(r) => {
+                  viewConfig(stringify(r));
+                }}
+                onEditConfigMapContent={(r) => {
+                  editConfig(stringify(r));
+                }}
+                onDeleteConfigMapContent={async (r) => {
+                  try {
+                    const ret = await DeleteResource({
+                      kind: r.typeMeta.kind,
+                      name: r.objectMeta.name,
+                      namespace: r.objectMeta.namespace,
+                    });
+                    if (ret.code !== 200) {
+                      await messageApi.error(
+                        i18nInstance.t(
+                          'f8484c9d3de78566f9e255360977f12c',
+                          '删除配置失败',
+                        ),
+                      );
+                    }
+                    await queryClient.invalidateQueries({
+                      queryKey: ['GetConfigMaps'],
+                      exact: false,
+                    });
+                  } catch (e) {
+                    console.log('error', e);
+                  }
+                }}
+              />
+            )}
+            {filter.kind === ConfigKind.Secret && (
+              <SecretTable
+                labelTagNum={tagNum}
+                searchText={filter.searchText}
+                selectedWorkSpace={filter.selectedWorkspace}
+                onViewSecret={(r) => {
+                  viewConfig(stringify(r));
+                }}
+                onEditSecret={(r) => {
+                  editConfig(stringify(r));
+                }}
+                onDeleteSecretContent={async (r) => {
+                  try {
+                    const ret = await DeleteResource({
+                      kind: r.typeMeta.kind,
+                      name: r.objectMeta.name,
+                      namespace: r.objectMeta.namespace,
+                    });
+                    if (ret.code !== 200) {
+                      await messageApi.error(
+                        i18nInstance.t(
+                          '1de397f628eb5943bdb6861ad667ff0a',
+                          '删除秘钥失败',
+                        ),
+                      );
+                    }
+                    await queryClient.invalidateQueries({
+                      queryKey: ['GetSecrets'],
+                      exact: false,
+                    });
+                  } catch (e) {
+                    console.log('error', e);
+                  }
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        <ConfigEditorModal
+          mode={editor.mode}
+          workloadContent={editor.content}
+          open={editor.show}
+          kind={filter.kind}
+          onOk={async (ret) => {
+            if (editor.mode === 'read') {
+              hideEditor();
+              return;
             }
-          } else {
-            await messageApi.error(
-              `${msg}${i18nInstance.t('03d3b00687bbab3e9a7e1bd3aeeaa0a4', '配置失败')}`,
-            );
-          }
-        }}
-        onCancel={hideEditor}
-      />
-      {messageContextHolder}
-    </div>
+            const msg =
+              editor.mode === 'edit'
+                ? i18nInstance.t('8347a927c09a4ec2fe473b0a93f667d0', '修改')
+                : i18nInstance.t('66ab5e9f24c8f46012a25c89919fb191', '新增');
+            if (ret.code === 200) {
+              await messageApi.success(
+                `${msg}${i18nInstance.t('a6d38572262cb1b1238d449b4098f002', '配置成功')}`,
+              );
+              hideEditor();
+              if (editor.mode === 'create') {
+                await queryClient.invalidateQueries({
+                  queryKey: ['GetConfigMaps'],
+                  exact: false,
+                });
+              }
+            } else {
+              await messageApi.error(
+                `${msg}${i18nInstance.t('03d3b00687bbab3e9a7e1bd3aeeaa0a4', '配置失败')}`,
+              );
+            }
+          }}
+          onCancel={hideEditor}
+        />
+        {messageContextHolder}
+      </div>
+    </ScrollContainer>
   );
 };
 export default ConfigPage;

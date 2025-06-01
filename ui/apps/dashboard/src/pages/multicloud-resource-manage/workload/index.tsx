@@ -53,6 +53,7 @@ import WorkloadDetailDrawer, { WorkloadDetailDrawerProps } from './workload-deta
 import { useToggle } from '@uidotdev/usehooks';
 import { stringify } from 'yaml';
 import type { DeploymentWorkload } from '@/services/workload';
+import ScrollContainer from '@/components/common/ScrollContainer';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -119,7 +120,7 @@ const WorkloadPage = () => {
     
     // 根据新的API数据结构，从pods字段获取状态信息
     if (wl.pods) {
-      const { current, desired, running, pending, failed, succeeded } = wl.pods;
+      const { current, desired, pending, failed, succeeded } = wl.pods;
       
       // 如果有失败的Pod，显示Failed状态
       if (failed > 0) {
@@ -242,6 +243,7 @@ const WorkloadPage = () => {
     
     return workloads.map(workload => {
       console.log('Processing workload:', workload);
+      
       return {
         name: workload.objectMeta?.name || 'Unknown',
         namespace: workload.objectMeta?.namespace || 'default',
@@ -370,372 +372,378 @@ const WorkloadPage = () => {
   ];
 
   return (
-    <div className="tech-background min-h-screen">
-      {messageContextHolder}
-      
-      {/* 粒子背景效果 */}
-      <div className="tech-particles-container">
-        {Array.from({ length: 20 }, (_, i) => (
-          <div
-            key={i}
-            className="tech-particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 20}s`
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 p-6">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <Title 
-            level={1} 
-            className="tech-hologram-text m-0 text-4xl font-bold"
-            style={{ color: 'var(--tech-primary)' }}
-          >
-            🚀 WORKLOAD MANAGEMENT
-          </Title>
-          <Text className="text-gray-600 text-lg">
-            多云工作负载管理与监控中心
-          </Text>
-        </div>
-
-        {/* 操作和过滤区域 */}
-        <div className="tech-card mb-6">
-          <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
-            <div>
-              <Title level={3} style={{ margin: 0, color: 'var(--text-color)' }}>
-                工作负载概览
-              </Title>
-              <Text type="secondary">
-                当前显示 {workloadData.length} 个工作负载
-              </Text>
-            </div>
-            <Dropdown
-              menu={{ items: createMenuItems }}
-              placement="bottomRight"
-            >
-              <Button 
-                className="tech-btn-primary flex items-center space-x-2"
-              >
-                <PlusOutlined />
-                <span>创建工作负载</span>
-                <DownOutlined />
-              </Button>
-            </Dropdown>
-          </Flex>
-
-          {/* 过滤和搜索栏 */}
-          <Flex gap={16} align="center" wrap="wrap">
-            <div className="tech-segmented-override">
-              <Text style={{ marginRight: '8px', fontWeight: '600' }}>工作负载类型:</Text>
-              <Segmented
-                className="tech-segmented"
-                value={filter.kind}
-                onChange={(value) => setFilter(prev => ({ ...prev, kind: value as WorkloadKind }))}
-                options={workloadTypes}
-                style={{
-                  background: '#ffffff !important',
-                  border: '1px solid var(--glow-border)',
-                  fontSize: '16px',
-                  height: '40px'
-                }}
-              />
-            </div>
-            <Select
-              placeholder="选择命名空间"
-              value={filter.selectedWorkSpace || undefined}
-              onChange={(value) => setFilter(prev => ({ ...prev, selectedWorkSpace: value || '' }))}
-              style={{ 
-                width: 200,
-              }}
-              allowClear
-              loading={isNsDataLoading}
-            >
-              {nsOptions.map(ns => (
-                <Option key={ns.value} value={ns.value}>{ns.title}</Option>
-              ))}
-            </Select>
-            <Search
-              placeholder="搜索工作负载名称"
-              allowClear
-              value={filter.searchText}
-              onChange={(e) => setFilter(prev => ({ ...prev, searchText: e.target.value }))}
-              style={{ width: 300 }}
-              className="tech-search-input"
-              prefix={<SearchOutlined />}
-            />
-            <Button 
-              icon={<ReloadOutlined />} 
-              onClick={() => refetch()}
-              loading={isLoading}
+    <ScrollContainer
+      height="100vh"
+      padding="0"
+      background="transparent"
+    >
+      <div className="tech-background min-h-screen">
+        {messageContextHolder}
+        
+        {/* 粒子背景效果 */}
+        <div className="tech-particles-container">
+          {Array.from({ length: 20 }, (_, i) => (
+            <div
+              key={i}
+              className="tech-particle"
               style={{
-                borderColor: 'var(--tech-primary)',
-                color: 'var(--tech-primary)',
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 20}s`
               }}
-            >
-              刷新
-            </Button>
-          </Flex>
-        </div>
-
-        {/* 统计信息卡片 */}
-        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
-          <Col xs={24} sm={6}>
-            <div className="tech-card tech-hover-scale">
-              <div className="flex items-center justify-between mb-4">
-                <AppstoreOutlined 
-                  className="text-3xl"
-                  style={{ color: 'var(--tech-primary)' }}
-                />
-              </div>
-              <div className="text-center">
-                <div 
-                  className="text-4xl font-bold mb-2 tech-hologram-text"
-                  style={{ color: 'var(--tech-primary)' }}
-                >
-                  {stats.total}
-                </div>
-                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
-                  总工作负载
-                </Text>
-              </div>
-            </div>
-          </Col>
-          <Col xs={24} sm={6}>
-            <div className="tech-card tech-hover-scale">
-              <div className="flex items-center justify-between mb-4">
-                <div 
-                  className="w-3 h-3 rounded-full animate-pulse"
-                  style={{ background: 'var(--success-color)' }}
-                />
-              </div>
-              <div className="text-center">
-                <div 
-                  className="text-4xl font-bold mb-2 tech-hologram-text"
-                  style={{ color: 'var(--success-color)' }}
-                >
-                  {stats.running}
-                </div>
-                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
-                  运行中
-                </Text>
-              </div>
-            </div>
-          </Col>
-          <Col xs={24} sm={6}>
-            <div className="tech-card tech-hover-scale">
-              <div className="flex items-center justify-between mb-4">
-                <div 
-                  className="w-3 h-3 rounded-full animate-pulse"
-                  style={{ background: 'var(--warning-color)' }}
-                />
-              </div>
-              <div className="text-center">
-                <div 
-                  className="text-4xl font-bold mb-2 tech-hologram-text"
-                  style={{ color: 'var(--warning-color)' }}
-                >
-                  {stats.pending}
-                </div>
-                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
-                  待启动
-                </Text>
-              </div>
-            </div>
-          </Col>
-          <Col xs={24} sm={6}>
-            <div className="tech-card tech-hover-scale">
-              <div className="flex items-center justify-between mb-4">
-                <div 
-                  className="w-3 h-3 rounded-full animate-pulse"
-                  style={{ background: 'var(--error-color)' }}
-                />
-              </div>
-              <div className="text-center">
-                <div 
-                  className="text-4xl font-bold mb-2 tech-hologram-text"
-                  style={{ color: 'var(--error-color)' }}
-                >
-                  {stats.failed}
-                </div>
-                <Text className="text-gray-600 font-semibold uppercase tracking-wide">
-                  异常
-                </Text>
-              </div>
-            </div>
-          </Col>
-        </Row>
-
-        {/* 工作负载卡片网格 */}
-        <div className="tech-card mb-6">
-          {/* 调试信息面板 */}
-          {process.env.NODE_ENV === 'development' && (
-            <details style={{ marginBottom: '16px', border: '1px solid #e8e8e8', padding: '12px', borderRadius: '6px' }}>
-              <summary style={{ cursor: 'pointer', fontWeight: 'bold', color: '#1890ff' }}>
-                🔍 调试信息面板
-              </summary>
-              <div style={{ marginTop: '12px', fontSize: '12px' }}>
-                <p><strong>当前过滤器:</strong> {JSON.stringify(filter, null, 2)}</p>
-                <p><strong>API是否加载中:</strong> {isLoading ? '是' : '否'}</p>
-                <p><strong>原始数据存在:</strong> {data ? '是' : '否'}</p>
-                <p><strong>转换后工作负载数量:</strong> {workloadData.length}</p>
-                {data && (
-                  <details style={{ marginTop: '8px' }}>
-                    <summary>原始API响应</summary>
-                    <pre style={{ background: '#f8f8f8', padding: '8px', borderRadius: '4px', marginTop: '8px', overflow: 'auto', maxHeight: '200px' }}>
-                      {JSON.stringify(data, null, 2)}
-                    </pre>
-                  </details>
-                )}
-              </div>
-            </details>
-          )}
-          
-          <Row gutter={[24, 24]}>
-            {workloadData.map((workload) => (
-              <Col xs={24} lg={12} xl={8} key={`${workload.namespace}-${workload.name}`}>
-                <WorkloadCard
-                  name={workload.name}
-                  namespace={workload.namespace}
-                  type={workload.type}
-                  status={workload.status}
-                  replicas={workload.replicas}
-                  clusters={workload.clusters}
-                  images={workload.images}
-                  createTime={workload.createTime}
-                  labels={workload.labels}
-                  onView={() => handleViewWorkload(workload)}
-                  onEdit={() => handleEditWorkload(workload)}
-                  onDelete={() => {
-                    // 显示删除确认对话框
-                    Modal.confirm({
-                      title: '确认删除',
-                      content: `确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`,
-                      onOk: async () => {
-                        await handleDeleteWorkload(workload);
-                      },
-                      onCancel() {
-                        // 取消删除
-                      },
-                      okText: '确认删除',
-                      cancelText: '取消',
-                      okType: 'danger',
-                    });
-                  }}
-                  onScale={() => {
-                    // TODO: 实现扩缩容功能
-                    messageApi.info('扩缩容功能开发中');
-                  }}
-                  onRestart={() => {
-                    // TODO: 实现重启功能
-                    messageApi.info('重启功能开发中');
-                  }}
-                />
-              </Col>
-            ))}
-          </Row>
-        </div>
-
-        {/* 空状态 */}
-        {workloadData.length === 0 && !isLoading && (
-          <div className="tech-card text-center py-16">
-            <AppstoreOutlined 
-              className="text-6xl mb-6"
-              style={{ color: 'var(--tech-primary)', opacity: 0.5 }}
             />
-            <Text 
-              className="text-xl block mb-6 tech-hologram-text"
+          ))}
+        </div>
+
+        <div className="relative z-10 p-6">
+          {/* 页面标题 */}
+          <div className="mb-8">
+            <Title 
+              level={1} 
+              className="tech-hologram-text m-0 text-4xl font-bold"
               style={{ color: 'var(--tech-primary)' }}
             >
-              暂无工作负载数据
+              🚀 WORKLOAD MANAGEMENT
+            </Title>
+            <Text className="text-gray-600 text-lg">
+              多云工作负载管理与监控中心
             </Text>
-            
-            {/* 调试信息 */}
-            {process.env.NODE_ENV === 'development' && data && (
-              <details style={{ textAlign: 'left', margin: '20px auto', maxWidth: '800px' }}>
-                <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>
-                  📊 查看原始API响应数据（调试用）
+          </div>
+
+          {/* 操作和过滤区域 */}
+          <div className="tech-card mb-6">
+            <Flex justify="space-between" align="center" style={{ marginBottom: '16px' }}>
+              <div>
+                <Title level={3} style={{ margin: 0, color: 'var(--text-color)' }}>
+                  工作负载概览
+                </Title>
+                <Text type="secondary">
+                  当前显示 {workloadData.length} 个工作负载
+                </Text>
+              </div>
+              <Dropdown
+                menu={{ items: createMenuItems }}
+                placement="bottomRight"
+              >
+                <Button 
+                  className="tech-btn-primary flex items-center space-x-2"
+                >
+                  <PlusOutlined />
+                  <span>创建工作负载</span>
+                  <DownOutlined />
+                </Button>
+              </Dropdown>
+            </Flex>
+
+            {/* 过滤和搜索栏 */}
+            <Flex gap={16} align="center" wrap="wrap">
+              <div className="tech-segmented-override">
+                <Text style={{ marginRight: '8px', fontWeight: '600' }}>工作负载类型:</Text>
+                <Segmented
+                  className="tech-segmented"
+                  value={filter.kind}
+                  onChange={(value) => setFilter(prev => ({ ...prev, kind: value as WorkloadKind }))}
+                  options={workloadTypes}
+                  style={{
+                    background: '#ffffff !important',
+                    border: '1px solid var(--glow-border)',
+                    fontSize: '16px',
+                    height: '40px'
+                  }}
+                />
+              </div>
+              <Select
+                placeholder="选择命名空间"
+                value={filter.selectedWorkSpace || undefined}
+                onChange={(value) => setFilter(prev => ({ ...prev, selectedWorkSpace: value || '' }))}
+                style={{ 
+                  width: 200,
+                }}
+                allowClear
+                loading={isNsDataLoading}
+              >
+                {nsOptions.map(ns => (
+                  <Option key={ns.value} value={ns.value}>{ns.title}</Option>
+                ))}
+              </Select>
+              <Search
+                placeholder="搜索工作负载名称"
+                allowClear
+                value={filter.searchText}
+                onChange={(e) => setFilter(prev => ({ ...prev, searchText: e.target.value }))}
+                style={{ width: 300 }}
+                className="tech-search-input"
+                prefix={<SearchOutlined />}
+              />
+              <Button 
+                icon={<ReloadOutlined />} 
+                onClick={() => refetch()}
+                loading={isLoading}
+                style={{
+                  borderColor: 'var(--tech-primary)',
+                  color: 'var(--tech-primary)',
+                }}
+              >
+                刷新
+              </Button>
+            </Flex>
+          </div>
+
+          {/* 统计信息卡片 */}
+          <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+            <Col xs={24} sm={6}>
+              <div className="tech-card tech-hover-scale">
+                <div className="flex items-center justify-between mb-4">
+                  <AppstoreOutlined 
+                    className="text-3xl"
+                    style={{ color: 'var(--tech-primary)' }}
+                  />
+                </div>
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--tech-primary)' }}
+                  >
+                    {stats.total}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    总工作负载
+                  </Text>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={6}>
+              <div className="tech-card tech-hover-scale">
+                <div className="flex items-center justify-between mb-4">
+                  <div 
+                    className="w-3 h-3 rounded-full animate-pulse"
+                    style={{ background: 'var(--success-color)' }}
+                  />
+                </div>
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--success-color)' }}
+                  >
+                    {stats.running}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    运行中
+                  </Text>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={6}>
+              <div className="tech-card tech-hover-scale">
+                <div className="flex items-center justify-between mb-4">
+                  <div 
+                    className="w-3 h-3 rounded-full animate-pulse"
+                    style={{ background: 'var(--warning-color)' }}
+                  />
+                </div>
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--warning-color)' }}
+                  >
+                    {stats.pending}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    待启动
+                  </Text>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={6}>
+              <div className="tech-card tech-hover-scale">
+                <div className="flex items-center justify-between mb-4">
+                  <div 
+                    className="w-3 h-3 rounded-full animate-pulse"
+                    style={{ background: 'var(--error-color)' }}
+                  />
+                </div>
+                <div className="text-center">
+                  <div 
+                    className="text-4xl font-bold mb-2 tech-hologram-text"
+                    style={{ color: 'var(--error-color)' }}
+                  >
+                    {stats.failed}
+                  </div>
+                  <Text className="text-gray-600 font-semibold uppercase tracking-wide">
+                    异常
+                  </Text>
+                </div>
+              </div>
+            </Col>
+          </Row>
+
+          {/* 工作负载卡片网格 */}
+          <div className="tech-card mb-6">
+            {/* 调试信息面板 */}
+            {process.env.NODE_ENV === 'development' && (
+              <details style={{ marginBottom: '16px', border: '1px solid #e8e8e8', padding: '12px', borderRadius: '6px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 'bold', color: '#1890ff' }}>
+                  🔍 调试信息面板
                 </summary>
-                <pre style={{ 
-                  background: '#f5f5f5', 
-                  padding: '15px', 
-                  borderRadius: '5px',
-                  fontSize: '12px',
-                  overflow: 'auto',
-                  maxHeight: '300px',
-                  textAlign: 'left'
-                }}>
-                  {JSON.stringify(data, null, 2)}
-                </pre>
+                <div style={{ marginTop: '12px', fontSize: '12px' }}>
+                  <p><strong>当前过滤器:</strong> {JSON.stringify(filter, null, 2)}</p>
+                  <p><strong>API是否加载中:</strong> {isLoading ? '是' : '否'}</p>
+                  <p><strong>原始数据存在:</strong> {data ? '是' : '否'}</p>
+                  <p><strong>转换后工作负载数量:</strong> {workloadData.length}</p>
+                  {data && (
+                    <details style={{ marginTop: '8px' }}>
+                      <summary>原始API响应</summary>
+                      <pre style={{ background: '#f8f8f8', padding: '8px', borderRadius: '4px', marginTop: '8px', overflow: 'auto', maxHeight: '200px' }}>
+                        {JSON.stringify(data, null, 2)}
+                      </pre>
+                    </details>
+                  )}
+                </div>
               </details>
             )}
             
-            <Dropdown
-              menu={{ items: createMenuItems }}
-              placement="bottomRight"
-            >
-              <Button 
-                className="tech-btn-primary flex items-center space-x-2"
-                style={{ margin: '0 auto' }}
-              >
-                <PlusOutlined />
-                <span>创建第一个工作负载</span>
-                <DownOutlined />
-              </Button>
-            </Dropdown>
+            <Row gutter={[24, 24]}>
+              {workloadData.map((workload) => (
+                <Col xs={24} lg={12} xl={8} key={`${workload.namespace}-${workload.name}`}>
+                  <WorkloadCard
+                    name={workload.name}
+                    namespace={workload.namespace}
+                    type={workload.type}
+                    status={workload.status}
+                    replicas={workload.replicas}
+                    clusters={workload.clusters}
+                    images={workload.images}
+                    createTime={workload.createTime}
+                    labels={workload.labels}
+                    onView={() => handleViewWorkload(workload)}
+                    onEdit={() => handleEditWorkload(workload)}
+                    onDelete={() => {
+                      // 显示删除确认对话框
+                      Modal.confirm({
+                        title: '确认删除',
+                        content: `确定要删除工作负载 "${workload.name}" 吗？此操作不可恢复。`,
+                        onOk: async () => {
+                          await handleDeleteWorkload(workload);
+                        },
+                        onCancel() {
+                          // 取消删除
+                        },
+                        okText: '确认删除',
+                        cancelText: '取消',
+                        okType: 'danger',
+                      });
+                    }}
+                    onScale={() => {
+                      // TODO: 实现扩缩容功能
+                      messageApi.info('扩缩容功能开发中');
+                    }}
+                    onRestart={() => {
+                      // TODO: 实现重启功能
+                      messageApi.info('重启功能开发中');
+                    }}
+                  />
+                </Col>
+              ))}
+            </Row>
           </div>
-        )}
-      </div>
 
-      {/* 工作负载编辑器模态框 */}
-      <NewWorkloadEditorModal
-        mode={editorState.mode}
-        open={showModal}
-        kind={filter.kind}
-        workloadContent={editorState.content}
-        onOk={async (ret) => {
-          if (ret.code === 200) {
-            messageApi.success(editorState.mode === 'create' ? '工作负载创建成功' : '工作负载更新成功');
-            await refetch();
+          {/* 空状态 */}
+          {workloadData.length === 0 && !isLoading && (
+            <div className="tech-card text-center py-16">
+              <AppstoreOutlined 
+                className="text-6xl mb-6"
+                style={{ color: 'var(--tech-primary)', opacity: 0.5 }}
+              />
+              <Text 
+                className="text-xl block mb-6 tech-hologram-text"
+                style={{ color: 'var(--tech-primary)' }}
+              >
+                暂无工作负载数据
+              </Text>
+              
+              {/* 调试信息 */}
+              {process.env.NODE_ENV === 'development' && data && (
+                <details style={{ textAlign: 'left', margin: '20px auto', maxWidth: '800px' }}>
+                  <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>
+                    📊 查看原始API响应数据（调试用）
+                  </summary>
+                  <pre style={{ 
+                    background: '#f5f5f5', 
+                    padding: '15px', 
+                    borderRadius: '5px',
+                    fontSize: '12px',
+                    overflow: 'auto',
+                    maxHeight: '300px',
+                    textAlign: 'left'
+                  }}>
+                    {JSON.stringify(data, null, 2)}
+                  </pre>
+                </details>
+              )}
+              
+              <Dropdown
+                menu={{ items: createMenuItems }}
+                placement="bottomRight"
+              >
+                <Button 
+                  className="tech-btn-primary flex items-center space-x-2"
+                  style={{ margin: '0 auto' }}
+                >
+                  <PlusOutlined />
+                  <span>创建第一个工作负载</span>
+                  <DownOutlined />
+                </Button>
+              </Dropdown>
+            </div>
+          )}
+        </div>
+
+        {/* 工作负载编辑器模态框 */}
+        <NewWorkloadEditorModal
+          mode={editorState.mode}
+          open={showModal}
+          kind={filter.kind}
+          workloadContent={editorState.content}
+          onOk={async (ret) => {
+            if (ret.code === 200) {
+              messageApi.success(editorState.mode === 'create' ? '工作负载创建成功' : '工作负载更新成功');
+              await refetch();
+              toggleShowModal(false);
+              resetEditorState();
+            } else {
+              messageApi.error(editorState.mode === 'create' ? '工作负载创建失败' : '工作负载更新失败');
+            }
+          }}
+          onCancel={() => {
             toggleShowModal(false);
             resetEditorState();
-          } else {
-            messageApi.error(editorState.mode === 'create' ? '工作负载创建失败' : '工作负载更新失败');
-          }
-        }}
-        onCancel={() => {
-          toggleShowModal(false);
-          resetEditorState();
-        }}
-      />
+          }}
+        />
 
-      {/* 工作负载图形化向导模态框 */}
-      <WorkloadWizardModal
-        open={showWizardModal}
-        kind={filter.kind}
-        onOk={async (ret) => {
-          if (ret.code === 200) {
-            messageApi.success('工作负载创建成功');
-            await refetch();
+        {/* 工作负载图形化向导模态框 */}
+        <WorkloadWizardModal
+          open={showWizardModal}
+          kind={filter.kind}
+          onOk={async (ret) => {
+            if (ret.code === 200) {
+              messageApi.success('工作负载创建成功');
+              await refetch();
+              toggleShowWizardModal(false);
+            } else {
+              messageApi.error('工作负载创建失败');
+            }
+          }}
+          onCancel={() => {
             toggleShowWizardModal(false);
-          } else {
-            messageApi.error('工作负载创建失败');
-          }
-        }}
-        onCancel={() => {
-          toggleShowWizardModal(false);
-        }}
-      />
+          }}
+        />
 
-      {/* 工作负载详情抽屉 */}
-      <WorkloadDetailDrawer
-        {...drawerData}
-        onClose={() => setDrawerData(prev => ({ ...prev, open: false }))}
-      />
-    </div>
+        {/* 工作负载详情抽屉 */}
+        <WorkloadDetailDrawer
+          {...drawerData}
+          onClose={() => setDrawerData(prev => ({ ...prev, open: false }))}
+        />
+      </div>
+    </ScrollContainer>
   );
 };
 

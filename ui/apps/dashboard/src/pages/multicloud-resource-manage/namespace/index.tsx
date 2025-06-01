@@ -38,6 +38,7 @@ import { DeleteResource } from '@/services/unstructured';
 import { useState } from 'react';
 import { DataSelectQuery } from '@/services/base.ts';
 import TagList, { convertLabelToTags } from '@/components/tag-list';
+import ScrollContainer from '@/components/common/ScrollContainer';
 
 const NamespacePage = () => {
   const [searchFilter, setSearchFilter] = useState('');
@@ -209,109 +210,115 @@ const NamespacePage = () => {
   const { Title } = Typography;
   
   return (
-    <div className="tech-background min-h-screen">
-      {/* 粒子背景效果 */}
-      <div className="tech-particles-container">
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            className="tech-particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 20}s`
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 p-6">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <Title 
-            level={1} 
-            className="tech-hologram-text m-0 text-4xl font-bold"
-            style={{ color: 'var(--tech-primary)' }}
-          >
-            📦 NAMESPACE MANAGEMENT
-          </Title>
-          <Typography.Text className="text-gray-600 text-lg">
-            多云命名空间资源管理
-          </Typography.Text>
-        </div>
-
-        {/* 操作区域 */}
-        <div className="tech-card mb-6">
-          <div className="flex flex-row justify-between mb-4">
-            <Input.Search
-              placeholder={i18nInstance.t(
-                'cfaff3e369b9bd51504feb59bf0972a0',
-                '搜索命名空间名称',
-              )}
-              className="w-[400px] tech-search-input"
+    <ScrollContainer
+      height="100vh"
+      padding="0"
+      background="transparent"
+    >
+      <div className="tech-background min-h-screen">
+        {/* 粒子背景效果 */}
+        <div className="tech-particles-container">
+          {Array.from({ length: 15 }, (_, i) => (
+            <div
+              key={i}
+              className="tech-particle"
               style={{
-                fontSize: '16px',
-                height: '40px',
-              }}
-              allowClear
-              value={searchFilter}
-              onChange={(e) => {
-                setSearchFilter(e.target.value);
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 20}s`
               }}
             />
-            <button
-              className="tech-btn-primary flex items-center space-x-2"
-              onClick={() => {
-                toggleShowModal(true);
-              }}
+          ))}
+        </div>
+
+        <div className="relative z-10 p-6">
+          {/* 页面标题 */}
+          <div className="mb-8">
+            <Title 
+              level={1} 
+              className="tech-hologram-text m-0 text-4xl font-bold"
+              style={{ color: 'var(--tech-primary)' }}
             >
-              <Icons.add width={16} height={16} />
-              <span>{i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3', '新增命名空间')}</span>
-            </button>
+              📦 NAMESPACE MANAGEMENT
+            </Title>
+            <Typography.Text className="text-gray-600 text-lg">
+              多云命名空间资源管理
+            </Typography.Text>
+          </div>
+
+          {/* 操作区域 */}
+          <div className="tech-card mb-6">
+            <div className="flex flex-row justify-between mb-4">
+              <Input.Search
+                placeholder={i18nInstance.t(
+                  'cfaff3e369b9bd51504feb59bf0972a0',
+                  '搜索命名空间名称',
+                )}
+                className="w-[400px] tech-search-input"
+                style={{
+                  fontSize: '16px',
+                  height: '40px',
+                }}
+                allowClear
+                value={searchFilter}
+                onChange={(e) => {
+                  setSearchFilter(e.target.value);
+                }}
+              />
+              <button
+                className="tech-btn-primary flex items-center space-x-2"
+                onClick={() => {
+                  toggleShowModal(true);
+                }}
+              >
+                <Icons.add width={16} height={16} />
+                <span>{i18nInstance.t('ac2f01145a5c4a9aaaf2f828650d91a3', '新增命名空间')}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 数据表格 */}
+          <div className="tech-card">
+            <Table
+              rowKey={(r: Namespace) => r.objectMeta.name || ''}
+              columns={columns}
+              loading={isLoading}
+              dataSource={data?.namespaces || []}
+              className="tech-table"
+              style={{
+                background: 'transparent',
+                fontSize: '16px',
+              }}
+            />
           </div>
         </div>
 
-        {/* 数据表格 */}
-        <div className="tech-card">
-          <Table
-            rowKey={(r: Namespace) => r.objectMeta.name || ''}
-            columns={columns}
-            loading={isLoading}
-            dataSource={data?.namespaces || []}
-            className="tech-table"
-            style={{
-              background: 'transparent',
-              fontSize: '16px',
-            }}
-          />
-        </div>
-      </div>
-
-      <NewNamespaceModal
-        open={showModal}
-        onOk={async (ret) => {
-          if (ret.code === 200) {
-            await messageApi.success(
-              i18nInstance.t(
-                '03b7ea4ba52a71e18764013f4696afe0',
-                '创建命名空间成功',
-              ),
-            );
+        <NewNamespaceModal
+          open={showModal}
+          onOk={async (ret) => {
+            if (ret.code === 200) {
+              await messageApi.success(
+                i18nInstance.t(
+                  '03b7ea4ba52a71e18764013f4696afe0',
+                  '创建命名空间成功',
+                ),
+              );
+              toggleShowModal(false);
+              await refetch();
+            } else {
+              await messageApi.error(
+                i18nInstance.t(
+                  'ca0f9765a014b2d0bcaef7b90c6eddd9',
+                  '创建命名空间失败',
+                ),
+              );
+            }
+          }}
+          onCancel={() => {
             toggleShowModal(false);
-            await refetch();
-          } else {
-            await messageApi.error(
-              i18nInstance.t(
-                'ca0f9765a014b2d0bcaef7b90c6eddd9',
-                '创建命名空间失败',
-              ),
-            );
-          }
-        }}
-        onCancel={() => {
-          toggleShowModal(false);
-        }}
-      />
-    </div>
+          }}
+        />
+      </div>
+    </ScrollContainer>
   );
 };
 
