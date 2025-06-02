@@ -1259,11 +1259,13 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
             minWidth: `${sidebarWidth}px`,
             maxWidth: `${sidebarWidth}px`,
             flexShrink: 0,
+            height: '800px', // 确保与主容器高度一致
           }}>
             {/* 拖拽调整宽度的分隔条 */}
             <div
               style={{
                 width: '4px',
+                height: '100%', // 明确设置高度为100%
                 background: 'linear-gradient(to bottom, #1890ff, #722ed1)',
                 cursor: 'col-resize',
                 position: 'relative',
@@ -1329,6 +1331,7 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                 width: `${sidebarWidth - 12}px`,
                 minWidth: `${sidebarWidth - 12}px`,
                 maxWidth: `${sidebarWidth - 12}px`,
+                height: '776px', // 固定高度，稍小于主容器以留出marginBottom空间
               }}
               bodyStyle={{ 
                 padding: '0',
