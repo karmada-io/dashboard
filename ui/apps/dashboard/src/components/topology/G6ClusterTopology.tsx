@@ -321,21 +321,14 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
             const data = d.data;
             if (!data) return d.id;
             
-            // 根据节点类型生成不同的标签内容
+            // 根据节点类型生成不同的标签内容 - 只显示名称
             switch (data.type) {
               case 'control-plane':
-                return `${data.name}\nKarmada v1.13.2`;
+                return `${data.name}`;
               case 'cluster':
-                return `${data.name}\n${data.version || 'Unknown'}`;
+                return `${data.name}`;
               case 'worker-node':
-                const osInfo = data.nodeDetail?.status?.nodeInfo?.osImage || 'Unknown OS';
-                const k8sVersion = data.version || 'Unknown';
-                // 简化操作系统名称显示
-                const shortOS = osInfo.includes('Anolis') ? 'Anolis OS' : 
-                               osInfo.includes('Ubuntu') ? 'Ubuntu' : 
-                               osInfo.includes('CentOS') ? 'CentOS' :
-                               osInfo.includes('RHEL') ? 'RHEL' : 'Linux';
-                return `${data.name}\n${k8sVersion}\n${shortOS}`;
+                return `${data.name}`;
               default:
                 return data.name || d.id;
             }
@@ -360,9 +353,9 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
           labelLineHeight: 1.2,
           labelMaxLines: (d: any) => {
             switch (d.data?.type) {
-              case 'control-plane': return 2;
-              case 'cluster': return 2;
-              case 'worker-node': return 3;
+              case 'control-plane': return 1;
+              case 'cluster': return 1;
+              case 'worker-node': return 1;
               default: return 1;
             }
           },
@@ -478,7 +471,6 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
           type: 'tooltip',
           trigger: 'pointerenter',
           enterable: true,
-          fixToNode: [1, 0.5],
           offset: 15,
           className: 'g6-tooltip-custom',
           shouldBegin: (evt: any) => {
@@ -515,6 +507,11 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               return '<div style="padding: 12px; background: rgba(0,0,0,0.9); color: white; border-radius: 8px;">数据加载中...</div>';
             }
             
+            // 动态调整tooltip宽度，确保不超出屏幕
+            const screenWidth = window.innerWidth;
+            const maxWidth = Math.min(750, screenWidth * 0.9);
+            const dynamicStyle = `max-width: ${maxWidth}px; width: auto;`;
+            
             if (data?.type === 'control-plane') {
               const readyClusters = clusterListData?.clusters?.filter((c: ClusterData) => c.ready).length || 0;
               const totalNodes = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.nodeSummary.totalNum, 0) || 0;
@@ -522,7 +519,7 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               const totalPods = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.allocatedResources.allocatedPods, 0) || 0;
               
               return `
-                <div style="padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 650px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
                   <h4 style="margin: 0 0 12px 0; color: #1890ff; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold;">
                     <img src="/Karmada.png" style="width: 28px; height: 28px;" onerror="this.style.display='none';" />
                     🎛️ Karmada 控制平面
@@ -595,7 +592,7 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               const getMemoryGB = (bytes: number) => (bytes / (1024 * 1024 * 1024)).toFixed(1);
               
               return `
-                <div style="padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 700px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
                   <h4 style="margin: 0 0 12px 0; color: #13c2c2; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold;">
                     <img src="/cluster.png" style="width: 26px; height: 26px;" onerror="this.style.display='none';" />
                     🏗️ 集群: ${data.name}
@@ -620,9 +617,9 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                           ${data.syncMode === 'Push' ? '⬆️ Push' : '⬇️ Pull'}
                         </span>
                       </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                         <span>创建时间:</span>
-                        <span style="color: #87e8de;">${cluster?.objectMeta?.creationTimestamp ? new Date(cluster.objectMeta.creationTimestamp).toLocaleString('zh-CN') : 'N/A'}</span>
+                        <span style="color: #87e8de; text-align: right; max-width: 200px; word-break: break-all;">${cluster?.objectMeta?.creationTimestamp ? new Date(cluster.objectMeta.creationTimestamp).toLocaleString('zh-CN') : 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -696,7 +693,7 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
             } else if (data?.type === 'worker-node') {
               if (data.status === 'loading') {
                 return `
-                  <div style="padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 300px; text-align: center;">
+                  <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 300px; text-align: center;">
                     <h4 style="margin: 0 0 8px 0; color: #faad14; display: flex; align-items: center; gap: 8px; justify-content: center;">
                       <img src="/node.png" style="width: 20px; height: 20px;" onerror="this.style.display='none';" />
                       🔄 节点信息加载中...
@@ -735,7 +732,7 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               const podUsagePercent = (Math.random() * 50); // 模拟Pod使用率
 
               return `
-                <div style="padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 480px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 750px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
                   <h4 style="margin: 0 0 12px 0; color: ${data.status === 'ready' ? '#52c41a' : '#ff4d4f'}; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold;">
                     <img src="/node.png" style="width: 26px; height: 26px;" onerror="this.style.display='none';" />
                     🖥️ ${data.name}
@@ -759,15 +756,15 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                         <span style="color: #13c2c2; font-weight: bold;">${data.roles?.join(', ') || 'worker'}</span>
                       </div>
                       ${data.internalIP ? `
-                        <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                        <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                           <span>内部IP:</span>
-                          <span style="color: #b7eb8f;">${data.internalIP}</span>
+                          <span style="color: #b7eb8f; word-break: break-all;">${data.internalIP}</span>
                         </div>
                       ` : ''}
                       ${data.hostname ? `
-                        <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                        <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                           <span>主机名:</span>
-                          <span style="color: #b7eb8f;">${data.hostname}</span>
+                          <span style="color: #b7eb8f; word-break: break-all; max-width: 300px; text-align: right;">${data.hostname}</span>
                         </div>
                       ` : ''}
                       <div style="margin: 4px 0; display: flex; justify-content: space-between;">
@@ -781,25 +778,25 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                   <div style="background: rgba(24, 144, 255, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
                     <div style="font-size: 14px; margin-bottom: 8px; color: #69c0ff;">🖥️ 系统信息</div>
                     <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                         <span>操作系统:</span>
-                        <span style="color: #91d5ff;">${nodeInfo.osImage || 'N/A'}</span>
+                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.osImage || 'N/A'}</span>
                       </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                         <span>内核版本:</span>
-                        <span style="color: #91d5ff;">${nodeInfo.kernelVersion || 'N/A'}</span>
+                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.kernelVersion || 'N/A'}</span>
                       </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                         <span>容器运行时:</span>
-                        <span style="color: #91d5ff;">${nodeInfo.containerRuntimeVersion || 'N/A'}</span>
+                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.containerRuntimeVersion || 'N/A'}</span>
                       </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                         <span>Kubelet版本:</span>
-                        <span style="color: #91d5ff;">${nodeInfo.kubeletVersion || 'N/A'}</span>
+                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.kubeletVersion || 'N/A'}</span>
                       </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
+                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
                         <span>架构:</span>
-                        <span style="color: #91d5ff;">${nodeInfo.architecture || 'N/A'}</span>
+                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.architecture || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -964,17 +961,64 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
           padding: 0 !important;
           z-index: 9999 !important;
           pointer-events: auto !important;
+          max-width: min(750px, 90vw) !important;
+          min-width: 280px !important;
+          word-wrap: break-word !important;
+          overflow: visible !important;
+          white-space: normal !important;
+          position: absolute !important;
         }
         
-        .g6-tooltip-custom .tooltip-content {
-          padding: 16px;
-          max-width: 480px;
-          line-height: 1.4;
+        /* 当tooltip在右侧边界时，调整位置 */
+        .g6-tooltip-custom.tooltip-right {
+          transform: translateX(-100%) translateY(-50%) !important;
+        }
+        
+        /* 当tooltip在左侧边界时，调整位置 */
+        .g6-tooltip-custom.tooltip-left {
+          transform: translateX(0%) translateY(-50%) !important;
+        }
+        
+        /* 当tooltip在底部边界时，调整位置 */
+        .g6-tooltip-custom.tooltip-bottom {
+          transform: translateX(-50%) translateY(0%) !important;
         }
         
         /* 确保tooltip在拖拽时隐藏 */
         .g6-element-dragging .g6-tooltip-custom {
           display: none !important;
+        }
+        
+        /* 确保tooltip内容不会被截断 */
+        .g6-tooltip-custom * {
+          box-sizing: border-box !important;
+        }
+
+        .g6-tooltip-custom .tooltip-content {
+          padding: 16px;
+          max-width: min(750px, 90vw);
+          min-width: 280px;
+          line-height: 1.4;
+          overflow: visible;
+          word-wrap: break-word;
+        }
+        
+        /* 确保tooltip在拖拽时隐藏 */
+        .g6-element-dragging .g6-tooltip-custom {
+          display: none !important;
+        }
+        
+        /* 确保tooltip内容不会被截断 */
+        .g6-tooltip-custom * {
+          box-sizing: border-box !important;
+        }
+        
+        /* 响应式设计 - 在小屏幕上进一步限制宽度 */
+        @media (max-width: 768px) {
+          .g6-tooltip-custom {
+            max-width: 95vw !important;
+            min-width: 250px !important;
+          }
         }
       `}</style>
 
