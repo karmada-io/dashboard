@@ -64,6 +64,9 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [clusterNodes, setClusterNodes] = useState<Record<string, ClusterNode[]>>({});
   const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+  const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(400);
 
   /**
    * 预加载图片
@@ -265,7 +268,13 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
           version: cluster.kubernetesVersion,
           syncMode: cluster.syncMode,
           nodeCount: cluster.nodeSummary.totalNum,
-          readyNodes: cluster.nodeSummary.readyNum
+          readyNodes: cluster.nodeSummary.readyNum,
+          // 集群资源使用情况
+          cpuFraction: cluster.allocatedResources?.cpuFraction || 0,
+          memoryFraction: cluster.allocatedResources?.memoryFraction || 0,
+          podFraction: cluster.allocatedResources?.podFraction || 0,
+          allocatedPods: cluster.allocatedResources?.allocatedPods || 0,
+          podCapacity: cluster.allocatedResources?.podCapacity || 0
         },
           children: nodes.length > 0 ? nodes.map((node) => ({
             id: `${clusterName}-${node.objectMeta.name}`,
@@ -284,7 +293,12 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               podsCapacity: node.status?.capacity?.pods,
               cpuAllocatable: node.status?.allocatable?.cpu,
               memoryAllocatable: node.status?.allocatable?.memory,
-              podsAllocatable: node.status?.allocatable?.pods
+              podsAllocatable: node.status?.allocatable?.pods,
+              // 资源使用情况
+              cpuFraction: node.allocatedResources?.cpuFraction || 0,
+              memoryFraction: node.allocatedResources?.memoryFraction || 0,
+              podFraction: node.allocatedResources?.podFraction || 0,
+              allocatedPods: node.allocatedResources?.allocatedPods || 0
             }
           })) : Array.from({ length: cluster.nodeSummary.totalNum }, (_, index) => ({
             id: `${clusterName}-loading-node-${index + 1}`,
@@ -310,6 +324,11 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
     }
 
     const treeData = transformClusterDataToTree(clusterListData.clusters);
+    
+    // 默认选择控制平面节点
+    if (!selectedNode) {
+      setSelectedNode(treeData.data);
+    }
     
     const graph = new Graph({
       container: containerRef.current,
@@ -466,437 +485,506 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
           },
         }
       ],
-      plugins: [
-        {
-          type: 'tooltip',
-          trigger: 'pointerenter',
-          enterable: true,
-          offset: 15,
-          className: 'g6-tooltip-custom',
-          shouldBegin: (evt: any) => {
-            // 调试日志
-            console.log('Tooltip shouldBegin triggered:', evt);
-            
-            // 检查是否在拖拽状态
-            const graph = evt.view?.graph;
-            if (graph?.isDragging) {
-              console.log('Tooltip blocked: graph is dragging');
-              return false;
-            }
-            
-            // 检查事件目标
-            const target = evt.target;
-            console.log('Event target:', target, target?.getType?.());
-            
-            return target && target.getType && target.getType() === 'node';
-          },
-          itemTypes: ['node'], // 只对节点显示tooltip
-          getContent: (evt: any, items: any) => {
-            console.log('Tooltip getContent triggered:', evt, items);
-            
-            const item = items[0];
-            if (!item) {
-              console.log('No item found for tooltip');
-              return '';
-            }
-            
-            const data = item.model?.data || item.data;
-            console.log('Node data for tooltip:', data);
-            
-            if (!data) {
-              return '<div style="padding: 12px; background: rgba(0,0,0,0.9); color: white; border-radius: 8px;">数据加载中...</div>';
-            }
-            
-            // 动态调整tooltip宽度，确保不超出屏幕
-            const screenWidth = window.innerWidth;
-            const maxWidth = Math.min(750, screenWidth * 0.9);
-            const dynamicStyle = `max-width: ${maxWidth}px; width: auto;`;
-            
-            if (data?.type === 'control-plane') {
-              const readyClusters = clusterListData?.clusters?.filter((c: ClusterData) => c.ready).length || 0;
-              const totalNodes = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.nodeSummary.totalNum, 0) || 0;
-              const readyNodes = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.nodeSummary.readyNum, 0) || 0;
-              const totalPods = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.allocatedResources.allocatedPods, 0) || 0;
-              
-              return `
-                <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 650px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-                  <h4 style="margin: 0 0 12px 0; color: #1890ff; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold;">
-                    <img src="/Karmada.png" style="width: 28px; height: 28px;" onerror="this.style.display='none';" />
-                    🎛️ Karmada 控制平面
-                  </h4>
-                  
-                  <div style="background: rgba(24, 144, 255, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #69c0ff;">📊 系统概览</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>版本:</span>
-                        <span style="color: #91d5ff; font-weight: bold;">v1.13.2</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>API版本:</span>
-                        <span style="color: #91d5ff;">v1alpha1</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>运行时间:</span>
-                        <span style="color: #91d5ff;">7天8小时</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style="background: rgba(82, 196, 26, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #95de64;">🏗️ 集群管理</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>管理集群总数:</span>
-                        <span style="color: #b7eb8f; font-weight: bold;">${data.totalClusters}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>健康集群:</span>
-                        <span style="color: #52c41a; font-weight: bold;">${readyClusters}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>异常集群:</span>
-                        <span style="color: ${data.totalClusters - readyClusters > 0 ? '#ff4d4f' : '#52c41a'}; font-weight: bold;">${data.totalClusters - readyClusters}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style="background: rgba(19, 194, 194, 0.1); padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #5cdbd3;">🖥️ 资源统计</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>节点总数:</span>
-                        <span style="color: #87e8de; font-weight: bold;">${totalNodes}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>就绪节点:</span>
-                        <span style="color: #52c41a; font-weight: bold;">${readyNodes}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>运行Pod数:</span>
-                        <span style="color: #87e8de; font-weight: bold;">${totalPods}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              `;
-            } else if (data?.type === 'cluster') {
-              const cluster = clusterListData?.clusters?.find(c => c.objectMeta.name === data.name);
-              const cpuUsagePercent = cluster?.allocatedResources?.cpuFraction || 0;
-              const memoryUsagePercent = cluster?.allocatedResources?.memoryFraction || 0;
-              // 计算Pod使用率
-              const podUsagePercent = cluster?.allocatedResources ? 
-                ((cluster.allocatedResources.allocatedPods / cluster.allocatedResources.podCapacity) * 100) : 0;
-              
-              const getCpuCores = (capacity: number) => capacity || 0;
-              const getMemoryGB = (bytes: number) => (bytes / (1024 * 1024 * 1024)).toFixed(1);
-              
-              return `
-                <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 700px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-                  <h4 style="margin: 0 0 12px 0; color: #13c2c2; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold;">
-                    <img src="/cluster.png" style="width: 26px; height: 26px;" onerror="this.style.display='none';" />
-                    🏗️ 集群: ${data.name}
-                  </h4>
-                  
-                  <div style="background: rgba(19, 194, 194, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #5cdbd3;">📋 基本信息</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>状态:</span>
-                        <span style="color: ${data.status === 'ready' ? '#52c41a' : '#ff4d4f'}; font-weight: bold; display: flex; align-items: center; gap: 4px;">
-                          ${data.status === 'ready' ? '🟢 Ready' : '🔴 NotReady'}
-                        </span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>Kubernetes版本:</span>
-                        <span style="color: #87e8de; font-weight: bold;">${data.version}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>同步模式:</span>
-                        <span style="color: ${data.syncMode === 'Push' ? '#52c41a' : '#faad14'}; font-weight: bold;">
-                          ${data.syncMode === 'Push' ? '⬆️ Push' : '⬇️ Pull'}
-                        </span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                        <span>创建时间:</span>
-                        <span style="color: #87e8de; text-align: right; max-width: 200px; word-break: break-all;">${cluster?.objectMeta?.creationTimestamp ? new Date(cluster.objectMeta.creationTimestamp).toLocaleString('zh-CN') : 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style="background: rgba(82, 196, 26, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #95de64;">🖥️ 节点状态</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>节点总数:</span>
-                        <span style="color: #b7eb8f; font-weight: bold;">${data.nodeCount}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>就绪节点:</span>
-                        <span style="color: #52c41a; font-weight: bold;">${data.readyNodes}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>异常节点:</span>
-                        <span style="color: ${data.nodeCount - data.readyNodes > 0 ? '#ff4d4f' : '#52c41a'}; font-weight: bold;">${data.nodeCount - data.readyNodes}</span>
-                      </div>
-                      <div style="margin: 4px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>节点健康率:</span>
-                          <span style="color: #52c41a; font-weight: bold;">${((data.readyNodes / data.nodeCount) * 100).toFixed(1)}%</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, #52c41a, #73d13d); height: 100%; width: ${(data.readyNodes / data.nodeCount) * 100}%; transition: width 0.3s ease;"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style="background: rgba(250, 173, 20, 0.1); padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #ffd666;">⚡ 资源使用率</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>CPU使用率:</span>
-                          <span style="color: ${cpuUsagePercent > 80 ? '#ff4d4f' : cpuUsagePercent > 60 ? '#faad14' : '#52c41a'}; font-weight: bold;">${cpuUsagePercent.toFixed(1)}%</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, ${cpuUsagePercent > 80 ? '#ff4d4f' : cpuUsagePercent > 60 ? '#faad14' : '#52c41a'}, ${cpuUsagePercent > 80 ? '#ff7875' : cpuUsagePercent > 60 ? '#ffc53d' : '#73d13d'}); height: 100%; width: ${cpuUsagePercent}%; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="margin-top: 2px; color: #bbb; font-size: 11px;">总计: ${getCpuCores(cluster?.allocatedResources?.cpuCapacity || 0)} cores</div>
-                      </div>
-                      
-                      <div style="margin: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>内存使用率:</span>
-                          <span style="color: ${memoryUsagePercent > 80 ? '#ff4d4f' : memoryUsagePercent > 60 ? '#faad14' : '#52c41a'}; font-weight: bold;">${memoryUsagePercent.toFixed(1)}%</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, ${memoryUsagePercent > 80 ? '#ff4d4f' : memoryUsagePercent > 60 ? '#faad14' : '#52c41a'}, ${memoryUsagePercent > 80 ? '#ff7875' : memoryUsagePercent > 60 ? '#ffc53d' : '#73d13d'}); height: 100%; width: ${memoryUsagePercent}%; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="margin-top: 2px; color: #bbb; font-size: 11px;">总计: ${getMemoryGB(cluster?.allocatedResources?.memoryCapacity || 0)} GB</div>
-                      </div>
-                      
-                      <div style="margin: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>Pod使用率:</span>
-                          <span style="color: ${podUsagePercent > 80 ? '#ff4d4f' : podUsagePercent > 60 ? '#faad14' : '#52c41a'}; font-weight: bold;">${podUsagePercent.toFixed(1)}%</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, ${podUsagePercent > 80 ? '#ff4d4f' : podUsagePercent > 60 ? '#faad14' : '#52c41a'}, ${podUsagePercent > 80 ? '#ff7875' : podUsagePercent > 60 ? '#ffc53d' : '#73d13d'}); height: 100%; width: ${podUsagePercent}%; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="margin-top: 2px; color: #bbb; font-size: 11px;">${cluster?.allocatedResources?.allocatedPods || 0} / ${cluster?.allocatedResources?.podCapacity || 0} pods</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              `;
-            } else if (data?.type === 'worker-node') {
-              if (data.status === 'loading') {
-                return `
-                  <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 300px; text-align: center;">
-                    <h4 style="margin: 0 0 8px 0; color: #faad14; display: flex; align-items: center; gap: 8px; justify-content: center;">
-                      <img src="/node.png" style="width: 20px; height: 20px;" onerror="this.style.display='none';" />
-                      🔄 节点信息加载中...
-                    </h4>
-                    <div style="margin: 12px 0;">
-                      <div style="width: 20px; height: 20px; border: 2px solid #faad14; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                    </div>
-                    <p style="margin: 0; font-size: 13px; color: #ccc;">正在获取 ${data.parentCluster} 集群的节点详细信息...</p>
-                    <style>
-                      @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                      }
-                    </style>
-                  </div>
-                `;
-              }
-
-              const node = data.nodeDetail;
-              const cpuCapacity = formatResource(data.cpuCapacity || '0');
-              const memoryCapacity = formatResource(data.memoryCapacity || '0Ki');
-              const cpuAllocatable = formatResource(data.cpuAllocatable || '0');
-              const memoryAllocatable = formatResource(data.memoryAllocatable || '0Ki');
-              
-              // 获取节点的系统信息
-              const nodeInfo = node?.status?.nodeInfo;
-              const conditions = node?.status?.conditions || [];
-              const readyCondition = conditions.find((c: any) => c.type === 'Ready');
-              const memoryCondition = conditions.find((c: any) => c.type === 'MemoryPressure');
-              const diskCondition = conditions.find((c: any) => c.type === 'DiskPressure');
-              const pidCondition = conditions.find((c: any) => c.type === 'PIDPressure');
-              
-              // 计算资源使用百分比（这里是模拟数据，实际应该从监控系统获取）
-              const cpuUsagePercent = Math.random() * 80; // 模拟CPU使用率
-              const memoryUsagePercent = Math.random() * 70; // 模拟内存使用率
-              const podUsagePercent = (Math.random() * 50); // 模拟Pod使用率
-
-              return `
-                <div style="${dynamicStyle} padding: 16px; background: rgba(0,0,0,0.9); color: white; border-radius: 12px; max-width: 750px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-                  <h4 style="margin: 0 0 12px 0; color: ${data.status === 'ready' ? '#52c41a' : '#ff4d4f'}; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold;">
-                    <img src="/node.png" style="width: 26px; height: 26px;" onerror="this.style.display='none';" />
-                    🖥️ ${data.name}
-                  </h4>
-                  
-                  <div style="background: rgba(82, 196, 26, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #95de64;">📋 基本信息</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>状态:</span>
-                        <span style="color: ${data.status === 'ready' ? '#52c41a' : '#ff4d4f'}; font-weight: bold; display: flex; align-items: center; gap: 4px;">
-                          ${data.status === 'ready' ? '🟢 Ready' : '🔴 NotReady'}
-                        </span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>所属集群:</span>
-                        <span style="color: #b7eb8f; font-weight: bold;">${data.parentCluster}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>节点角色:</span>
-                        <span style="color: #13c2c2; font-weight: bold;">${data.roles?.join(', ') || 'worker'}</span>
-                      </div>
-                      ${data.internalIP ? `
-                        <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                          <span>内部IP:</span>
-                          <span style="color: #b7eb8f; word-break: break-all;">${data.internalIP}</span>
-                        </div>
-                      ` : ''}
-                      ${data.hostname ? `
-                        <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                          <span>主机名:</span>
-                          <span style="color: #b7eb8f; word-break: break-all; max-width: 300px; text-align: right;">${data.hostname}</span>
-                        </div>
-                      ` : ''}
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between;">
-                        <span>Kubernetes版本:</span>
-                        <span style="color: #b7eb8f;">${data.version}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  ${nodeInfo ? `
-                  <div style="background: rgba(24, 144, 255, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #69c0ff;">🖥️ 系统信息</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                        <span>操作系统:</span>
-                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.osImage || 'N/A'}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                        <span>内核版本:</span>
-                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.kernelVersion || 'N/A'}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                        <span>容器运行时:</span>
-                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.containerRuntimeVersion || 'N/A'}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                        <span>Kubelet版本:</span>
-                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.kubeletVersion || 'N/A'}</span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                        <span>架构:</span>
-                        <span style="color: #91d5ff; max-width: 350px; text-align: right; word-break: break-all;">${nodeInfo.architecture || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-                  ` : ''}
-
-                  <div style="background: rgba(250, 173, 20, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #ffd666;">⚡ 资源容量</div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                      <div style="margin: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>CPU:</span>
-                          <span style="color: #ffd666; font-weight: bold;">${cpuCapacity.value.toFixed(1)} ${cpuCapacity.unit}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; color: #bbb;">
-                          <span>可分配:</span>
-                          <span>${cpuAllocatable.value.toFixed(1)} ${cpuAllocatable.unit}</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, #faad14, #ffc53d); height: 100%; width: ${cpuUsagePercent}%; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="margin-top: 2px; color: #bbb; font-size: 11px;">使用率: ${cpuUsagePercent.toFixed(1)}%</div>
-                      </div>
-                      
-                      <div style="margin: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>内存:</span>
-                          <span style="color: #ffd666; font-weight: bold;">${memoryCapacity.value.toFixed(1)} ${memoryCapacity.unit}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; color: #bbb;">
-                          <span>可分配:</span>
-                          <span>${memoryAllocatable.value.toFixed(1)} ${memoryAllocatable.unit}</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, #52c41a, #73d13d); height: 100%; width: ${memoryUsagePercent}%; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="margin-top: 2px; color: #bbb; font-size: 11px;">使用率: ${memoryUsagePercent.toFixed(1)}%</div>
-                      </div>
-                      
-                      <div style="margin: 6px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                          <span>Pod容量:</span>
-                          <span style="color: #ffd666; font-weight: bold;">${data.podsCapacity || 'N/A'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; color: #bbb;">
-                          <span>可分配:</span>
-                          <span>${data.podsAllocatable || 'N/A'}</span>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                          <div style="background: linear-gradient(90deg, #1890ff, #40a9ff); height: 100%; width: ${podUsagePercent}%; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="margin-top: 2px; color: #bbb; font-size: 11px;">使用率: ${podUsagePercent.toFixed(1)}%</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style="background: rgba(19, 194, 194, 0.1); padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 14px; margin-bottom: 8px; color: #5cdbd3;">🔍 健康状态</div>
-                    <div style="font-size: 12px; line-height: 1.4;">
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; align-items: center;">
-                        <span>Ready:</span>
-                        <span style="color: ${readyCondition?.status === 'True' ? '#52c41a' : '#ff4d4f'}; font-weight: bold;">
-                          ${readyCondition?.status === 'True' ? '✅ True' : '❌ False'}
-                        </span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; align-items: center;">
-                        <span>内存压力:</span>
-                        <span style="color: ${memoryCondition?.status === 'False' ? '#52c41a' : '#ff4d4f'}; font-weight: bold;">
-                          ${memoryCondition?.status === 'False' ? '✅ 正常' : '⚠️ 有压力'}
-                        </span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; align-items: center;">
-                        <span>磁盘压力:</span>
-                        <span style="color: ${diskCondition?.status === 'False' ? '#52c41a' : '#ff4d4f'}; font-weight: bold;">
-                          ${diskCondition?.status === 'False' ? '✅ 正常' : '⚠️ 有压力'}
-                        </span>
-                      </div>
-                      <div style="margin: 4px 0; display: flex; justify-content: space-between; align-items: center;">
-                        <span>PID压力:</span>
-                        <span style="color: ${pidCondition?.status === 'False' ? '#52c41a' : '#ff4d4f'}; font-weight: bold;">
-                          ${pidCondition?.status === 'False' ? '✅ 正常' : '⚠️ 有压力'}
-                        </span>
-                      </div>
-                      ${readyCondition?.lastTransitionTime ? `
-                      <div style="margin: 8px 0 4px 0; padding-top: 8px; border-top: 1px solid #444; color: #bbb; font-size: 11px;">
-                        最后状态变更: ${new Date(readyCondition.lastTransitionTime).toLocaleString('zh-CN')}
-                      </div>
-                      ` : ''}
-                    </div>
-                  </div>
-                </div>
-              `;
-            }
-            return '';
-          },
-        }
-      ],
     });
 
     graph.render();
+    
+    // 添加节点点击事件
+    graph.on('node:click', (evt: any) => {
+      console.log('=== Node Click Event ===');
+      console.log('Full event:', evt);
+      console.log('Event type:', evt.type);
+      console.log('Event itemType:', evt.itemType);
+      console.log('Event itemId:', evt.itemId);
+      console.log('Event target:', evt.target);
+      
+      // 尝试多种方式获取节点数据
+      let nodeData = null;
+      let nodeId = null;
+      
+      // 获取节点ID
+      if (evt.itemId) {
+        nodeId = evt.itemId;
+      } else if (evt.target?.id) {
+        nodeId = evt.target.id;
+      }
+      
+      console.log('Node ID:', nodeId);
+      
+      if (nodeId) {
+        // 通过图实例获取节点数据
+        try {
+          const nodeModel = graph.getNodeData(nodeId);
+          console.log('Node model from graph:', nodeModel);
+          nodeData = nodeModel?.data || nodeModel;
+        } catch (error) {
+          console.warn('Error getting node data from graph:', error);
+        }
+      }
+      
+      // 如果上面的方法失败，尝试其他方式
+      if (!nodeData) {
+        // 方式1: 从事件目标获取
+        if (evt.target?.model?.data) {
+          nodeData = evt.target.model.data;
+          console.log('Got data from evt.target.model.data');
+        }
+        // 方式2: 从事件目标直接获取
+        else if (evt.target?.data) {
+          nodeData = evt.target.data;
+          console.log('Got data from evt.target.data');
+        }
+        // 方式3: 从item获取
+        else if (evt.item) {
+          const model = evt.item.getModel();
+          nodeData = model?.data || model;
+          console.log('Got data from evt.item.getModel()');
+        }
+      }
+      
+      console.log('Final node data:', nodeData);
+      console.log('Node data type:', nodeData?.type);
+      console.log('Node data name:', nodeData?.name);
+      console.log('=== End Node Click Event ===');
+      
+      if (nodeData) {
+        console.log('✅ Setting selected node:', nodeData);
+        setSelectedNode(nodeData);
+        setShowSidebar(true);
+      } else {
+        console.warn('❌ No node data found in click event');
+        // 作为备用方案，如果有nodeId，创建一个基本的节点数据
+        if (nodeId) {
+          console.log('🔄 Creating fallback node data for:', nodeId);
+          const fallbackData = {
+            type: nodeId.includes('control-plane') ? 'control-plane' : 
+                  nodeId.includes('loading-node') ? 'worker-node' : 'cluster',
+            name: nodeId,
+            id: nodeId
+          };
+          setSelectedNode(fallbackData);
+          setShowSidebar(true);
+        }
+      }
+    });
+    
     graphRef.current = graph;
+  };
+
+  /**
+   * 生成侧边栏内容
+   */
+  const generateSidebarContent = (data: any) => {
+    if (!data) return null;
+
+    if (data?.type === 'control-plane') {
+      const readyClusters = clusterListData?.clusters?.filter((c: ClusterData) => c.ready).length || 0;
+      const totalNodes = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.nodeSummary.totalNum, 0) || 0;
+      const readyNodes = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.nodeSummary.readyNum, 0) || 0;
+      const totalPods = clusterListData?.clusters?.reduce((sum: number, c: ClusterData) => sum + c.allocatedResources.allocatedPods, 0) || 0;
+      
+      return (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+            <img src="/Karmada.png" style={{ width: '28px', height: '28px' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <Text style={{ fontSize: '18px', fontWeight: 'bold', color: '#1890ff' }}>🎛️ Karmada 控制平面</Text>
+          </div>
+          
+          <Card size="small" style={{ marginBottom: '12px', background: 'rgba(24, 144, 255, 0.1)' }}>
+            <Text strong style={{ color: '#69c0ff' }}>📊 系统概览</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>版本:</span>
+                <Text strong style={{ color: '#91d5ff' }}>v1.13.2</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>API版本:</span>
+                <Text style={{ color: '#91d5ff' }}>v1alpha1</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>运行时间:</span>
+                <Text style={{ color: '#91d5ff' }}>7天8小时</Text>
+              </div>
+            </div>
+          </Card>
+
+          <Card size="small" style={{ marginBottom: '12px', background: 'rgba(82, 196, 26, 0.1)' }}>
+            <Text strong style={{ color: '#95de64' }}>🏗️ 集群管理</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>管理集群总数:</span>
+                <Text strong style={{ color: '#b7eb8f' }}>{data.totalClusters}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>健康集群:</span>
+                <Text strong style={{ color: '#52c41a' }}>{readyClusters}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>异常集群:</span>
+                <Text strong style={{ color: data.totalClusters - readyClusters > 0 ? '#ff4d4f' : '#52c41a' }}>{data.totalClusters - readyClusters}</Text>
+              </div>
+            </div>
+          </Card>
+
+          <Card size="small" style={{ background: 'rgba(19, 194, 194, 0.1)' }}>
+            <Text strong style={{ color: '#5cdbd3' }}>🖥️ 资源统计</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>节点总数:</span>
+                <Text strong style={{ color: '#87e8de' }}>{totalNodes}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>就绪节点:</span>
+                <Text strong style={{ color: '#52c41a' }}>{readyNodes}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>运行Pod数:</span>
+                <Text strong style={{ color: '#87e8de' }}>{totalPods}</Text>
+              </div>
+            </div>
+          </Card>
+        </div>
+      );
+    } else if (data?.type === 'cluster') {
+      const cluster = clusterListData?.clusters?.find(c => c.objectMeta.name === data.name);
+      const cpuUsagePercent = data.cpuFraction || 0;
+      const memoryUsagePercent = data.memoryFraction || 0;
+      const podUsagePercent = data.podFraction || 0;
+      
+      const getCpuCores = (capacity: number) => capacity || 0;
+      const getMemoryGB = (bytes: number) => (bytes / (1024 * 1024 * 1024)).toFixed(1);
+      
+      return (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+            <img src="/cluster.png" style={{ width: '26px', height: '26px' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <Text style={{ fontSize: '18px', fontWeight: 'bold', color: '#13c2c2' }}>🏗️ 集群: {data.name}</Text>
+          </div>
+          
+          <Card size="small" style={{ marginBottom: '12px', background: 'rgba(19, 194, 194, 0.1)' }}>
+            <Text strong style={{ color: '#5cdbd3' }}>📋 基本信息</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>状态:</span>
+                <Text strong style={{ color: data.status === 'ready' ? '#52c41a' : '#ff4d4f' }}>
+                  {data.status === 'ready' ? '🟢 Ready' : '🔴 NotReady'}
+                </Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>Kubernetes版本:</span>
+                <Text strong style={{ color: '#87e8de' }}>{data.version}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>同步模式:</span>
+                <Text strong style={{ color: data.syncMode === 'Push' ? '#52c41a' : '#faad14' }}>
+                  {data.syncMode === 'Push' ? '⬆️ Push' : '⬇️ Pull'}
+                </Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                <span>创建时间:</span>
+                <Text style={{ color: '#87e8de', textAlign: 'right', maxWidth: '200px', wordBreak: 'break-all' }}>
+                  {cluster?.objectMeta?.creationTimestamp ? new Date(cluster.objectMeta.creationTimestamp).toLocaleString('zh-CN') : 'N/A'}
+                </Text>
+              </div>
+            </div>
+          </Card>
+
+          <Card size="small" style={{ marginBottom: '12px', background: 'rgba(82, 196, 26, 0.1)' }}>
+            <Text strong style={{ color: '#95de64' }}>🖥️ 节点状态</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>节点总数:</span>
+                <Text strong style={{ color: '#b7eb8f' }}>{data.nodeCount}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>就绪节点:</span>
+                <Text strong style={{ color: '#52c41a' }}>{data.readyNodes}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>异常节点:</span>
+                <Text strong style={{ color: data.nodeCount - data.readyNodes > 0 ? '#ff4d4f' : '#52c41a' }}>{data.nodeCount - data.readyNodes}</Text>
+              </div>
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>节点健康率:</span>
+                  <Text strong style={{ color: '#52c41a' }}>{((data.readyNodes / data.nodeCount) * 100).toFixed(1)}%</Text>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    background: 'linear-gradient(90deg, #52c41a, #73d13d)', 
+                    height: '100%', 
+                    width: `${(data.readyNodes / data.nodeCount) * 100}%`, 
+                    transition: 'width 0.3s ease' 
+                  }}></div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card size="small" style={{ background: 'rgba(250, 173, 20, 0.1)' }}>
+            <Text strong style={{ color: '#ffd666' }}>⚡ 资源使用率</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>CPU使用率:</span>
+                  <Text strong style={{ color: cpuUsagePercent > 0.8 ? '#ff4d4f' : cpuUsagePercent > 0.6 ? '#faad14' : '#52c41a' }}>
+                    {(cpuUsagePercent * 100).toFixed(1)}%
+                  </Text>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    background: `linear-gradient(90deg, ${cpuUsagePercent > 0.8 ? '#ff4d4f' : cpuUsagePercent > 0.6 ? '#faad14' : '#52c41a'}, ${cpuUsagePercent > 0.8 ? '#ff7875' : cpuUsagePercent > 0.6 ? '#ffc53d' : '#73d13d'})`, 
+                    height: '100%', 
+                    width: `${cpuUsagePercent * 100}%`, 
+                    transition: 'width 0.3s ease' 
+                  }}></div>
+                </div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(cpuUsagePercent * 100).toFixed(1)}%</div>
+              </div>
+              
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>内存使用率:</span>
+                  <Text strong style={{ color: memoryUsagePercent > 0.8 ? '#ff4d4f' : memoryUsagePercent > 0.6 ? '#faad14' : '#52c41a' }}>
+                    {(memoryUsagePercent * 100).toFixed(1)}%
+                  </Text>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    background: `linear-gradient(90deg, ${memoryUsagePercent > 0.8 ? '#ff4d4f' : memoryUsagePercent > 0.6 ? '#faad14' : '#52c41a'}, ${memoryUsagePercent > 0.8 ? '#ff7875' : memoryUsagePercent > 0.6 ? '#ffc53d' : '#73d13d'})`, 
+                    height: '100%', 
+                    width: `${memoryUsagePercent * 100}%`, 
+                    transition: 'width 0.3s ease' 
+                  }}></div>
+                </div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(memoryUsagePercent * 100).toFixed(1)}%</div>
+              </div>
+              
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>Pod使用率:</span>
+                  <Text strong style={{ color: podUsagePercent > 0.8 ? '#ff4d4f' : podUsagePercent > 0.6 ? '#faad14' : '#52c41a' }}>
+                    {(podUsagePercent * 100).toFixed(1)}%
+                  </Text>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    background: `linear-gradient(90deg, ${podUsagePercent > 0.8 ? '#ff4d4f' : podUsagePercent > 0.6 ? '#faad14' : '#52c41a'}, ${podUsagePercent > 0.8 ? '#ff7875' : podUsagePercent > 0.6 ? '#ffc53d' : '#73d13d'})`, 
+                    height: '100%', 
+                    width: `${podUsagePercent * 100}%`, 
+                    transition: 'width 0.3s ease' 
+                  }}></div>
+                </div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>
+                  已分配: {data.allocatedPods} / {data.podCapacity || 'N/A'} pods ({(podUsagePercent * 100).toFixed(1)}%)
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      );
+    } else if (data?.type === 'worker-node') {
+      if (data.status === 'loading') {
+        return (
+          <div style={{ textAlign: 'center', padding: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginBottom: '16px' }}>
+              <img src="/node.png" style={{ width: '20px', height: '20px' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <Text style={{ fontSize: '16px', fontWeight: 'bold', color: '#faad14' }}>🔄 节点信息加载中...</Text>
+            </div>
+            <Spin size="large" />
+            <div style={{ marginTop: '12px' }}>
+              <Text type="secondary">正在获取 {data.parentCluster} 集群的节点详细信息...</Text>
+            </div>
+          </div>
+        );
+      }
+
+      const node = data.nodeDetail;
+      const cpuCapacity = formatResource(data.cpuCapacity || '0');
+      const memoryCapacity = formatResource(data.memoryCapacity || '0Ki');
+      const cpuAllocatable = formatResource(data.cpuAllocatable || '0');
+      const memoryAllocatable = formatResource(data.memoryAllocatable || '0Ki');
+      
+      // 获取节点的系统信息
+      const nodeInfo = node?.status?.nodeInfo;
+      const conditions = node?.status?.conditions || [];
+      const readyCondition = conditions.find((c: any) => c.type === 'Ready');
+      const memoryCondition = conditions.find((c: any) => c.type === 'MemoryPressure');
+      const diskCondition = conditions.find((c: any) => c.type === 'DiskPressure');
+      const pidCondition = conditions.find((c: any) => c.type === 'PIDPressure');
+      
+      // 计算真实的资源使用百分比
+      const cpuUsagePercent = data.cpuFraction || 0;
+      const memoryUsagePercent = data.memoryFraction || 0;
+      const podUsagePercent = data.podFraction || 0;
+      
+      // 获取已分配的Pod数量
+      const allocatedPods = data.allocatedPods || 0;
+      const totalPods = parseInt(data.podsCapacity || '0') || 0;
+
+      return (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+            <img src="/node.png" style={{ width: '26px', height: '26px' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <Text style={{ fontSize: '18px', fontWeight: 'bold', color: data.status === 'ready' ? '#52c41a' : '#ff4d4f' }}>
+              🖥️ {data.name}
+            </Text>
+          </div>
+          
+          <Card size="small" style={{ marginBottom: '12px', background: 'rgba(82, 196, 26, 0.1)' }}>
+            <Text strong style={{ color: '#95de64' }}>📋 基本信息</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>状态:</span>
+                <Text strong style={{ color: data.status === 'ready' ? '#52c41a' : '#ff4d4f' }}>
+                  {data.status === 'ready' ? '🟢 Ready' : '🔴 NotReady'}
+                </Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>所属集群:</span>
+                <Text strong style={{ color: '#b7eb8f' }}>{data.parentCluster}</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>节点角色:</span>
+                <Text strong style={{ color: '#13c2c2' }}>{data.roles?.join(', ') || 'worker'}</Text>
+              </div>
+              {data.internalIP && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>内部IP:</span>
+                  <Text style={{ color: '#b7eb8f', wordBreak: 'break-all' }}>{data.internalIP}</Text>
+                </div>
+              )}
+              {data.hostname && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>主机名:</span>
+                  <Text style={{ color: '#b7eb8f', wordBreak: 'break-all', maxWidth: '300px', textAlign: 'right' }}>{data.hostname}</Text>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
+                <span>Kubernetes版本:</span>
+                <Text style={{ color: '#b7eb8f' }}>{data.version}</Text>
+              </div>
+            </div>
+          </Card>
+
+          {nodeInfo && (
+            <Card size="small" style={{ marginBottom: '12px', background: 'rgba(24, 144, 255, 0.1)' }}>
+              <Text strong style={{ color: '#69c0ff' }}>🖥️ 系统信息</Text>
+              <div style={{ marginTop: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>操作系统:</span>
+                  <Text style={{ color: '#91d5ff', maxWidth: '350px', textAlign: 'right', wordBreak: 'break-all' }}>{nodeInfo.osImage || 'N/A'}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>内核版本:</span>
+                  <Text style={{ color: '#91d5ff', maxWidth: '350px', textAlign: 'right', wordBreak: 'break-all' }}>{nodeInfo.kernelVersion || 'N/A'}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>容器运行时:</span>
+                  <Text style={{ color: '#91d5ff', maxWidth: '350px', textAlign: 'right', wordBreak: 'break-all' }}>{nodeInfo.containerRuntimeVersion || 'N/A'}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>Kubelet版本:</span>
+                  <Text style={{ color: '#91d5ff', maxWidth: '350px', textAlign: 'right', wordBreak: 'break-all' }}>{nodeInfo.kubeletVersion || 'N/A'}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', flexWrap: 'wrap' }}>
+                  <span>架构:</span>
+                  <Text style={{ color: '#91d5ff', maxWidth: '350px', textAlign: 'right', wordBreak: 'break-all' }}>{nodeInfo.architecture || 'N/A'}</Text>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Card size="small" style={{ marginBottom: '12px', background: 'rgba(250, 173, 20, 0.1)' }}>
+            <Text strong style={{ color: '#ffd666' }}>⚡ 资源容量</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>CPU:</span>
+                  <Text strong style={{ color: '#ffd666' }}>{cpuCapacity.value.toFixed(1)} {cpuCapacity.unit}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '11px', color: '#bbb' }}>
+                  <span>可分配:</span>
+                  <span>{cpuAllocatable.value.toFixed(1)} {cpuAllocatable.unit}</span>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(90deg, #faad14, #ffc53d)', height: '100%', width: `${cpuUsagePercent * 100}%`, transition: 'width 0.3s ease' }}></div>
+                </div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(cpuUsagePercent * 100).toFixed(1)}%</div>
+              </div>
+              
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>内存:</span>
+                  <Text strong style={{ color: '#ffd666' }}>{memoryCapacity.value.toFixed(1)} {memoryCapacity.unit}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '11px', color: '#bbb' }}>
+                  <span>可分配:</span>
+                  <span>{memoryAllocatable.value.toFixed(1)} {memoryAllocatable.unit}</span>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(90deg, #52c41a, #73d13d)', height: '100%', width: `${memoryUsagePercent * 100}%`, transition: 'width 0.3s ease' }}></div>
+                </div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(memoryUsagePercent * 100).toFixed(1)}%</div>
+              </div>
+              
+              <div style={{ margin: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>Pod容量:</span>
+                  <Text strong style={{ color: '#ffd666' }}>{data.podsCapacity || 'N/A'}</Text>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '11px', color: '#bbb' }}>
+                  <span>可分配:</span>
+                  <span>{data.podsAllocatable || 'N/A'}</span>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(90deg, #1890ff, #40a9ff)', height: '100%', width: `${podUsagePercent * 100}%`, transition: 'width 0.3s ease' }}></div>
+                </div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>
+                  已分配: {allocatedPods} / {totalPods} pods ({(podUsagePercent * 100).toFixed(1)}%)
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card size="small" style={{ background: 'rgba(19, 194, 194, 0.1)' }}>
+            <Text strong style={{ color: '#5cdbd3' }}>🔍 健康状态</Text>
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0' }}>
+                <span>Ready:</span>
+                <Text strong style={{ color: readyCondition?.status === 'True' ? '#52c41a' : '#ff4d4f' }}>
+                  {readyCondition?.status === 'True' ? '✅ True' : '❌ False'}
+                </Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0' }}>
+                <span>内存压力:</span>
+                <Text strong style={{ color: memoryCondition?.status === 'False' ? '#52c41a' : '#ff4d4f' }}>
+                  {memoryCondition?.status === 'False' ? '✅ 正常' : '⚠️ 有压力'}
+                </Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0' }}>
+                <span>磁盘压力:</span>
+                <Text strong style={{ color: diskCondition?.status === 'False' ? '#52c41a' : '#ff4d4f' }}>
+                  {diskCondition?.status === 'False' ? '✅ 正常' : '⚠️ 有压力'}
+                </Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0' }}>
+                <span>PID压力:</span>
+                <Text strong style={{ color: pidCondition?.status === 'False' ? '#52c41a' : '#ff4d4f' }}>
+                  {pidCondition?.status === 'False' ? '✅ 正常' : '⚠️ 有压力'}
+                </Text>
+              </div>
+              {readyCondition?.lastTransitionTime && (
+                <div style={{ margin: '8px 0 4px 0', paddingTop: '8px', borderTop: '1px solid #444', color: '#bbb', fontSize: '11px' }}>
+                  最后状态变更: {new Date(readyCondition.lastTransitionTime).toLocaleString('zh-CN')}
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      );
+    }
+    return null;
   };
 
   // 预加载图片
@@ -936,149 +1024,370 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
   }, []);
 
   return (
-    <Card
-      style={{
-        borderRadius: '16px',
-        border: '1px solid #f0f0f0',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        height: '600px',
-        marginBottom: '24px',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
-      }}
-      bodyStyle={{ 
-        padding: '20px',
-        height: '100%',
-      }}
-    >
-      {/* 添加tooltip样式 */}
+    <>
+      {/* 添加滑动条样式 */}
       <style>{`
-        .g6-tooltip-custom {
-          background: rgba(0, 0, 0, 0.9) !important;
-          color: white !important;
-          border: none !important;
-          border-radius: 12px !important;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-          padding: 0 !important;
-          z-index: 9999 !important;
-          pointer-events: auto !important;
-          max-width: min(750px, 90vw) !important;
-          min-width: 280px !important;
-          word-wrap: break-word !important;
-          overflow: visible !important;
-          white-space: normal !important;
-          position: absolute !important;
-        }
-        
-        /* 当tooltip在右侧边界时，调整位置 */
-        .g6-tooltip-custom.tooltip-right {
-          transform: translateX(-100%) translateY(-50%) !important;
-        }
-        
-        /* 当tooltip在左侧边界时，调整位置 */
-        .g6-tooltip-custom.tooltip-left {
-          transform: translateX(0%) translateY(-50%) !important;
-        }
-        
-        /* 当tooltip在底部边界时，调整位置 */
-        .g6-tooltip-custom.tooltip-bottom {
-          transform: translateX(-50%) translateY(0%) !important;
-        }
-        
-        /* 确保tooltip在拖拽时隐藏 */
-        .g6-element-dragging .g6-tooltip-custom {
-          display: none !important;
-        }
-        
-        /* 确保tooltip内容不会被截断 */
-        .g6-tooltip-custom * {
-          box-sizing: border-box !important;
+        /* 滑动条样式 */
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          cursor: pointer;
         }
 
-        .g6-tooltip-custom .tooltip-content {
-          padding: 16px;
-          max-width: min(750px, 90vw);
-          min-width: 280px;
-          line-height: 1.4;
-          overflow: visible;
-          word-wrap: break-word;
+        input[type="range"]::-webkit-slider-track {
+          background: linear-gradient(to right, #1890ff, #722ed1);
+          height: 4px;
+          border-radius: 2px;
         }
-        
-        /* 确保tooltip在拖拽时隐藏 */
-        .g6-element-dragging .g6-tooltip-custom {
-          display: none !important;
+
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          background: #ffffff;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          border: 2px solid #1890ff;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          transition: all 0.2s ease;
         }
-        
-        /* 确保tooltip内容不会被截断 */
-        .g6-tooltip-custom * {
-          box-sizing: border-box !important;
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+          background: #f0f8ff;
+          border-color: #40a9ff;
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
         }
-        
-        /* 响应式设计 - 在小屏幕上进一步限制宽度 */
-        @media (max-width: 768px) {
-          .g6-tooltip-custom {
-            max-width: 95vw !important;
-            min-width: 250px !important;
-          }
+
+        input[type="range"]::-moz-range-track {
+          background: linear-gradient(to right, #1890ff, #722ed1);
+          height: 4px;
+          border-radius: 2px;
+          border: none;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+          background: #ffffff;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          border: 2px solid #1890ff;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+          background: #f0f8ff;
+          border-color: #40a9ff;
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        /* 滚动条样式 */
+        .sidebar-content::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #1890ff, #722ed1);
+          border-radius: 3px;
+          transition: all 0.2s ease;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #40a9ff, #9254de);
         }
       `}</style>
 
-      {/* 标题 */}
-      <div style={{
-        textAlign: 'center',
-        marginBottom: '20px',
-      }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          background: 'rgba(255, 255, 255, 0.9)',
-          borderRadius: '20px',
-          padding: '12px 24px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-        }}>
-          <ClusterOutlined style={{ fontSize: '24px', color: '#1890ff', marginRight: '12px' }} />
-          <Text style={{ 
-            fontSize: '20px', 
-            fontWeight: 'bold',
-            background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            Karmada 集群拓扑图
-          </Text>
-        </div>
-      </div>
-
-      {/* 拓扑图容器 */}
-      <div style={{ position: 'relative', height: 'calc(100% - 80px)' }}>
-        {(isLoading || !imagesLoaded) ? (
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center',
+      <div style={{ position: 'relative', display: 'flex', height: '800px', gap: '8px' }}>
+        {/* 主要拓扑图区域 */}
+        <Card
+          style={{
+            borderRadius: '16px',
+            border: '1px solid #f0f0f0',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            flex: showSidebar ? `1 1 calc(100% - ${sidebarWidth + 20}px)` : '1 1 100%',
+            marginBottom: '24px',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            transition: 'flex 0.3s ease',
+          }}
+          bodyStyle={{ 
+            padding: '20px',
             height: '100%',
-            gap: '16px'
+          }}
+        >
+          {/* 标题 */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '20px',
           }}>
-            <Spin size="large" />
-            <Text type="secondary">
-              {isLoading ? '加载集群数据中...' : '加载节点图标中...'}
-            </Text>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.9)',
+              borderRadius: '20px',
+              padding: '12px 24px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            }}>
+              <ClusterOutlined style={{ fontSize: '24px', color: '#1890ff', marginRight: '12px' }} />
+              <Text style={{ 
+                fontSize: '20px', 
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                Karmada 集群拓扑图
+              </Text>
+            </div>
           </div>
-        ) : (
-          <div 
-            ref={containerRef} 
-            style={{ 
-              width: '100%', 
-              height: '100%',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(10px)',
-            }} 
-          />
+
+          {/* 拓扑图容器 */}
+          <div style={{ position: 'relative', height: 'calc(100% - 80px)' }}>
+            {(isLoading || !imagesLoaded) ? (
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'center', 
+                alignItems: 'center',
+                height: '100%',
+                gap: '16px'
+              }}>
+                <Spin size="large" />
+                <Text type="secondary">
+                  {isLoading ? '加载集群数据中...' : '加载节点图标中...'}
+                </Text>
+              </div>
+            ) : (
+              <div 
+                ref={containerRef} 
+                style={{ 
+                  width: '100%', 
+                  height: '100%',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  backdropFilter: 'blur(10px)',
+                }} 
+              />
+            )}
+          </div>
+        </Card>
+
+        {/* 侧边栏数据看板 */}
+        {showSidebar && (
+          <div style={{ position: 'relative', display: 'flex', width: `${sidebarWidth}px` }}>
+            {/* 拖拽调整宽度的分隔条 */}
+            <div
+              style={{
+                width: '4px',
+                background: 'linear-gradient(to bottom, #1890ff, #722ed1)',
+                cursor: 'col-resize',
+                position: 'relative',
+                borderRadius: '2px',
+                marginRight: '4px',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                const startX = e.clientX;
+                const startWidth = sidebarWidth;
+                
+                const handleMouseMove = (e: MouseEvent) => {
+                  const deltaX = startX - e.clientX;
+                  const newWidth = Math.max(300, Math.min(800, startWidth + deltaX));
+                  setSidebarWidth(newWidth);
+                };
+                
+                const handleMouseUp = () => {
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                };
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(to bottom, #40a9ff, #9254de)';
+                e.currentTarget.style.width = '6px';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(to bottom, #1890ff, #722ed1)';
+                e.currentTarget.style.width = '4px';
+              }}
+            >
+              {/* 拖拽指示器 */}
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '2px',
+                height: '20px',
+                background: 'rgba(255, 255, 255, 0.8)',
+                borderRadius: '1px'
+              }} />
+            </div>
+
+            <Card
+              style={{
+                borderRadius: '16px',
+                border: '1px solid #f0f0f0',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                flex: 1,
+                marginBottom: '24px',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                position: 'relative'
+              }}
+              bodyStyle={{ 
+                padding: '0',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              {/* 侧边栏头部 */}
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid #f0f0f0',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '16px 16px 0 0'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Text style={{ fontSize: '16px', fontWeight: 'bold', color: '#1890ff' }}>
+                    📊 节点详情
+                  </Text>
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    background: '#f5f5f5',
+                    padding: '2px 8px',
+                    borderRadius: '10px'
+                  }}>
+                    宽度: {sidebarWidth}px
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSidebar(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '18px',
+                    cursor: 'pointer',
+                    color: '#999',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#f5f5f5';
+                    e.currentTarget.style.color = '#666';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none';
+                    e.currentTarget.style.color = '#999';
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* 宽度调整滑动条 */}
+              <div style={{
+                padding: '12px 20px',
+                borderBottom: '1px solid #f0f0f0',
+                background: 'rgba(248, 249, 250, 0.8)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Text style={{ fontSize: '12px', color: '#666', minWidth: '60px' }}>
+                    面板宽度:
+                  </Text>
+                  <input
+                    type="range"
+                    min="300"
+                    max="800"
+                    value={sidebarWidth}
+                    onChange={(e) => setSidebarWidth(parseInt(e.target.value))}
+                    style={{
+                      flex: 1,
+                      height: '4px',
+                      background: 'linear-gradient(to right, #1890ff, #722ed1)',
+                      borderRadius: '2px',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <Text style={{ fontSize: '12px', color: '#666', minWidth: '40px' }}>
+                    {sidebarWidth}px
+                  </Text>
+                </div>
+              </div>
+
+              {/* 侧边栏内容区域 - 可滚动 */}
+              <div 
+                className="sidebar-content"
+                style={{
+                  flex: 1,
+                  padding: '20px',
+                  overflowY: 'auto',
+                  overflowX: 'hidden'
+                }}
+              >
+                {generateSidebarContent(selectedNode)}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* 当侧边栏关闭时显示的打开按钮 */}
+        {!showSidebar && (
+          <div
+            style={{
+              position: 'absolute',
+              right: '20px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'linear-gradient(135deg, #1890ff, #722ed1)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50%',
+              width: '48px',
+              height: '48px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
+              transition: 'all 0.3s ease',
+              zIndex: 1000
+            }}
+            onClick={() => setShowSidebar(true)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(24, 144, 255, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(24, 144, 255, 0.3)';
+            }}
+          >
+            📊
+          </div>
         )}
       </div>
-    </Card>
+    </>
   );
 };
 

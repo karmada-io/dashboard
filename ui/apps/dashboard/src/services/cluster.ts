@@ -71,8 +71,12 @@ export interface ClusterNode {
   ready: string;
   allocatedResources?: {
     cpuCapacity: number;
+    cpuFraction: number;
     memoryCapacity: number;
+    memoryFraction: number;
     podCapacity: number;
+    podFraction: number;
+    allocatedPods: number;
   };
   status?: {
     capacity?: {
@@ -96,6 +100,18 @@ export interface ClusterNode {
       type: string;
       address: string;
     }>;
+    nodeInfo?: {
+      machineID: string;
+      systemUUID: string;
+      bootID: string;
+      kernelVersion: string;
+      osImage: string;
+      containerRuntimeVersion: string;
+      kubeletVersion: string;
+      kubeProxyVersion: string;
+      operatingSystem: string;
+      architecture: string;
+    };
   };
 }
 
