@@ -78,6 +78,26 @@ export interface ClusterNode {
     podFraction: number;
     allocatedPods: number;
   };
+  resourceSummary?: {
+    cpu?: {
+      capacity: string;
+      allocatable: string;
+      allocated: string;
+      utilization: string;
+    };
+    memory?: {
+      capacity: string;
+      allocatable: string;
+      allocated: string;
+      utilization: string;
+    };
+    pods?: {
+      capacity: string;
+      allocatable: string;
+      allocated: string;
+      utilization: string;
+    };
+  };
   status?: {
     capacity?: {
       cpu: string;

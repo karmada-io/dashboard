@@ -168,8 +168,18 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
    * 格式化资源量
    */
   const formatResource = (value: string): { value: number; unit: string } => {
+    if (!value || value === '0' || value === '') {
+      return { value: 0, unit: '' };
+    }
+    
+    // 处理CPU资源 (例如: "2000m" -> 2 cores, "2" -> 2 cores)
+    if (value.endsWith('m')) {
+      return { value: parseInt(value.slice(0, -1)) / 1000, unit: 'cores' };
+    }
+    
+    // 处理内存资源
     if (value.endsWith('Ki')) {
-      return { value: parseInt(value.slice(0, -2)) / 1024 / 1024, unit: 'GB' };
+      return { value: parseInt(value.slice(0, -2)) / (1024 * 1024), unit: 'GB' };
     }
     if (value.endsWith('Mi')) {
       return { value: parseInt(value.slice(0, -2)) / 1024, unit: 'GB' };
@@ -177,10 +187,17 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
     if (value.endsWith('Gi')) {
       return { value: parseInt(value.slice(0, -2)), unit: 'GB' };
     }
-    if (value.endsWith('m')) {
-      return { value: parseInt(value.slice(0, -1)) / 1000, unit: 'cores' };
+    if (value.endsWith('Ti')) {
+      return { value: parseInt(value.slice(0, -2)) * 1024, unit: 'GB' };
     }
-    return { value: parseInt(value) || 0, unit: '' };
+    
+    // 处理纯数字 (CPU cores)
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      return { value: numValue, unit: 'cores' };
+    }
+    
+    return { value: 0, unit: '' };
   };
 
   /**
@@ -261,29 +278,29 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
 
         return {
           id: clusterName,
-        data: {
-          type: 'cluster',
+          data: {
+            type: 'cluster',
             name: clusterName,
-          status: cluster.ready ? 'ready' : 'notReady',
-          version: cluster.kubernetesVersion,
-          syncMode: cluster.syncMode,
-          nodeCount: cluster.nodeSummary.totalNum,
-          readyNodes: cluster.nodeSummary.readyNum,
-          // 集群资源使用情况
-          cpuFraction: cluster.allocatedResources?.cpuFraction || 0,
-          memoryFraction: cluster.allocatedResources?.memoryFraction || 0,
-          podFraction: cluster.allocatedResources?.podFraction || 0,
-          allocatedPods: cluster.allocatedResources?.allocatedPods || 0,
-          podCapacity: cluster.allocatedResources?.podCapacity || 0
-        },
+            status: cluster.ready ? 'ready' : 'notReady',
+            version: cluster.kubernetesVersion,
+            syncMode: cluster.syncMode,
+            nodeCount: cluster.nodeSummary.totalNum,
+            readyNodes: cluster.nodeSummary.readyNum,
+            // 集群资源使用情况 - 使用原始分数值，在显示时再转换为百分比
+            cpuFraction: cluster.allocatedResources?.cpuFraction || 0,
+            memoryFraction: cluster.allocatedResources?.memoryFraction || 0,
+            podFraction: cluster.allocatedResources?.podFraction || 0,
+            allocatedPods: cluster.allocatedResources?.allocatedPods || 0,
+            podCapacity: cluster.allocatedResources?.podCapacity || 0
+          },
           children: nodes.length > 0 ? nodes.map((node) => ({
             id: `${clusterName}-${node.objectMeta.name}`,
-          data: {
-            type: 'worker-node',
+            data: {
+              type: 'worker-node',
               name: node.objectMeta.name,
               status: getNodeStatus(node),
               parentCluster: clusterName,
-            version: cluster.kubernetesVersion,
+              version: cluster.kubernetesVersion,
               nodeDetail: node,
               roles: getNodeRoles(node),
               internalIP: node.status?.addresses?.find(addr => addr.type === 'InternalIP')?.address,
@@ -294,11 +311,8 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               cpuAllocatable: node.status?.allocatable?.cpu,
               memoryAllocatable: node.status?.allocatable?.memory,
               podsAllocatable: node.status?.allocatable?.pods,
-              // 资源使用情况
-              cpuFraction: node.allocatedResources?.cpuFraction || 0,
-              memoryFraction: node.allocatedResources?.memoryFraction || 0,
-              podFraction: node.allocatedResources?.podFraction || 0,
-              allocatedPods: node.allocatedResources?.allocatedPods || 0
+              // 传递resourceSummary数据（如果存在）
+              resourceSummary: node.resourceSummary
             }
           })) : Array.from({ length: cluster.nodeSummary.totalNum }, (_, index) => ({
             id: `${clusterName}-loading-node-${index + 1}`,
@@ -647,12 +661,13 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
       );
     } else if (data?.type === 'cluster') {
       const cluster = clusterListData?.clusters?.find(c => c.objectMeta.name === data.name);
-      const cpuUsagePercent = data.cpuFraction || 0;
-      const memoryUsagePercent = data.memoryFraction || 0;
-      const podUsagePercent = data.podFraction || 0;
       
-      const getCpuCores = (capacity: number) => capacity || 0;
-      const getMemoryGB = (bytes: number) => (bytes / (1024 * 1024 * 1024)).toFixed(1);
+      // 修正资源使用率计算 - API返回的fraction已经是百分比，不需要乘以100
+      const cpuUsagePercent = cluster?.allocatedResources?.cpuFraction || 0;
+      const memoryUsagePercent = cluster?.allocatedResources?.memoryFraction || 0;
+      const podCapacity = cluster?.allocatedResources?.podCapacity || 0;
+      const allocatedPods = cluster?.allocatedResources?.allocatedPods || 0;
+      const podUsagePercent = cluster?.allocatedResources?.podFraction || 0;
       
       return (
         <div>
@@ -727,56 +742,54 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
               <div style={{ margin: '8px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span>CPU使用率:</span>
-                  <Text strong style={{ color: cpuUsagePercent > 0.8 ? '#ff4d4f' : cpuUsagePercent > 0.6 ? '#faad14' : '#52c41a' }}>
-                    {(cpuUsagePercent * 100).toFixed(1)}%
+                  <Text strong style={{ color: cpuUsagePercent > 80 ? '#ff4d4f' : cpuUsagePercent > 60 ? '#faad14' : '#52c41a' }}>
+                    {cpuUsagePercent.toFixed(1)}%
                   </Text>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
                   <div style={{ 
-                    background: `linear-gradient(90deg, ${cpuUsagePercent > 0.8 ? '#ff4d4f' : cpuUsagePercent > 0.6 ? '#faad14' : '#52c41a'}, ${cpuUsagePercent > 0.8 ? '#ff7875' : cpuUsagePercent > 0.6 ? '#ffc53d' : '#73d13d'})`, 
+                    background: `linear-gradient(90deg, ${cpuUsagePercent > 80 ? '#ff4d4f' : cpuUsagePercent > 60 ? '#faad14' : '#52c41a'}, ${cpuUsagePercent > 80 ? '#ff7875' : cpuUsagePercent > 60 ? '#ffc53d' : '#73d13d'})`, 
                     height: '100%', 
-                    width: `${cpuUsagePercent * 100}%`, 
+                    width: `${Math.min(cpuUsagePercent, 100)}%`, 
                     transition: 'width 0.3s ease' 
                   }}></div>
                 </div>
-                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(cpuUsagePercent * 100).toFixed(1)}%</div>
               </div>
               
               <div style={{ margin: '8px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span>内存使用率:</span>
-                  <Text strong style={{ color: memoryUsagePercent > 0.8 ? '#ff4d4f' : memoryUsagePercent > 0.6 ? '#faad14' : '#52c41a' }}>
-                    {(memoryUsagePercent * 100).toFixed(1)}%
+                  <Text strong style={{ color: memoryUsagePercent > 80 ? '#ff4d4f' : memoryUsagePercent > 60 ? '#faad14' : '#52c41a' }}>
+                    {memoryUsagePercent.toFixed(1)}%
                   </Text>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
                   <div style={{ 
-                    background: `linear-gradient(90deg, ${memoryUsagePercent > 0.8 ? '#ff4d4f' : memoryUsagePercent > 0.6 ? '#faad14' : '#52c41a'}, ${memoryUsagePercent > 0.8 ? '#ff7875' : memoryUsagePercent > 0.6 ? '#ffc53d' : '#73d13d'})`, 
+                    background: `linear-gradient(90deg, ${memoryUsagePercent > 80 ? '#ff4d4f' : memoryUsagePercent > 60 ? '#faad14' : '#52c41a'}, ${memoryUsagePercent > 80 ? '#ff7875' : memoryUsagePercent > 60 ? '#ffc53d' : '#73d13d'})`, 
                     height: '100%', 
-                    width: `${memoryUsagePercent * 100}%`, 
+                    width: `${Math.min(memoryUsagePercent, 100)}%`, 
                     transition: 'width 0.3s ease' 
                   }}></div>
                 </div>
-                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(memoryUsagePercent * 100).toFixed(1)}%</div>
               </div>
               
               <div style={{ margin: '8px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span>Pod使用率:</span>
-                  <Text strong style={{ color: podUsagePercent > 0.8 ? '#ff4d4f' : podUsagePercent > 0.6 ? '#faad14' : '#52c41a' }}>
-                    {(podUsagePercent * 100).toFixed(1)}%
+                  <Text strong style={{ color: podUsagePercent > 80 ? '#ff4d4f' : podUsagePercent > 60 ? '#faad14' : '#52c41a' }}>
+                    {podUsagePercent.toFixed(1)}%
                   </Text>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
                   <div style={{ 
-                    background: `linear-gradient(90deg, ${podUsagePercent > 0.8 ? '#ff4d4f' : podUsagePercent > 0.6 ? '#faad14' : '#52c41a'}, ${podUsagePercent > 0.8 ? '#ff7875' : podUsagePercent > 0.6 ? '#ffc53d' : '#73d13d'})`, 
+                    background: `linear-gradient(90deg, ${podUsagePercent > 80 ? '#ff4d4f' : podUsagePercent > 60 ? '#faad14' : '#52c41a'}, ${podUsagePercent > 80 ? '#ff7875' : podUsagePercent > 60 ? '#ffc53d' : '#73d13d'})`, 
                     height: '100%', 
-                    width: `${podUsagePercent * 100}%`, 
+                    width: `${Math.min(podUsagePercent, 100)}%`, 
                     transition: 'width 0.3s ease' 
                   }}></div>
                 </div>
                 <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>
-                  已分配: {data.allocatedPods} / {data.podCapacity || 'N/A'} pods ({(podUsagePercent * 100).toFixed(1)}%)
+                  已分配: {allocatedPods} / {podCapacity || 'N/A'} pods
                 </div>
               </div>
             </div>
@@ -813,14 +826,22 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
       const diskCondition = conditions.find((c: any) => c.type === 'DiskPressure');
       const pidCondition = conditions.find((c: any) => c.type === 'PIDPressure');
       
-      // 计算真实的资源使用百分比
-      const cpuUsagePercent = data.cpuFraction || 0;
-      const memoryUsagePercent = data.memoryFraction || 0;
-      const podUsagePercent = data.podFraction || 0;
+      // 修正资源使用百分比计算 - 使用正确的resourceSummary字段
+      // resourceSummary.utilization已经是字符串格式的百分比（如"91.9%"）
+      const resourceSummary = node?.resourceSummary;
+      const hasResourceData = resourceSummary != null;
       
-      // 获取已分配的Pod数量
-      const allocatedPods = data.allocatedPods || 0;
-      const totalPods = parseInt(data.podsCapacity || '0') || 0;
+      // 解析百分比字符串为数值（去除%符号）
+      const cpuUsagePercent = hasResourceData ? 
+        parseFloat(resourceSummary.cpu?.utilization?.replace('%', '') || '0') : 0;
+      const memoryUsagePercent = hasResourceData ? 
+        parseFloat(resourceSummary.memory?.utilization?.replace('%', '') || '0') : 0;
+      const podUsagePercent = hasResourceData ? 
+        parseFloat(resourceSummary.pods?.utilization?.replace('%', '') || '0') : 0;
+      
+      // 获取已分配的资源数量
+      const allocatedPods = hasResourceData ? 
+        parseInt(resourceSummary.pods?.allocated || '0') : 0;
 
       return (
         <div>
@@ -908,9 +929,17 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                   <span>{cpuAllocatable.value.toFixed(1)} {cpuAllocatable.unit}</span>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(90deg, #faad14, #ffc53d)', height: '100%', width: `${cpuUsagePercent * 100}%`, transition: 'width 0.3s ease' }}></div>
+                  <div style={{ 
+                    background: cpuUsagePercent > 0 ? 'linear-gradient(90deg, #faad14, #ffc53d)' : 'rgba(255,255,255,0.2)', 
+                    height: '100%', 
+                    width: `${Math.max(Math.min(cpuUsagePercent, 100), 2)}%`, 
+                    transition: 'width 0.3s ease',
+                    minWidth: cpuUsagePercent > 0 ? 'auto' : '2px'
+                  }}></div>
                 </div>
-                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(cpuUsagePercent * 100).toFixed(1)}%</div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>
+                  使用率: {hasResourceData ? `${cpuUsagePercent.toFixed(1)}%` : '数据不可用'}
+                </div>
               </div>
               
               <div style={{ margin: '8px 0' }}>
@@ -923,9 +952,17 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                   <span>{memoryAllocatable.value.toFixed(1)} {memoryAllocatable.unit}</span>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(90deg, #52c41a, #73d13d)', height: '100%', width: `${memoryUsagePercent * 100}%`, transition: 'width 0.3s ease' }}></div>
+                  <div style={{ 
+                    background: memoryUsagePercent > 0 ? 'linear-gradient(90deg, #52c41a, #73d13d)' : 'rgba(255,255,255,0.2)', 
+                    height: '100%', 
+                    width: `${Math.max(Math.min(memoryUsagePercent, 100), 2)}%`, 
+                    transition: 'width 0.3s ease',
+                    minWidth: memoryUsagePercent > 0 ? 'auto' : '2px'
+                  }}></div>
                 </div>
-                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>使用率: {(memoryUsagePercent * 100).toFixed(1)}%</div>
+                <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>
+                  使用率: {hasResourceData ? `${memoryUsagePercent.toFixed(1)}%` : '数据不可用'}
+                </div>
               </div>
               
               <div style={{ margin: '8px 0' }}>
@@ -938,14 +975,34 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                   <span>{data.podsAllocatable || 'N/A'}</span>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(90deg, #1890ff, #40a9ff)', height: '100%', width: `${podUsagePercent * 100}%`, transition: 'width 0.3s ease' }}></div>
+                  <div style={{ 
+                    background: podUsagePercent > 0 ? 'linear-gradient(90deg, #1890ff, #40a9ff)' : 'rgba(255,255,255,0.2)', 
+                    height: '100%', 
+                    width: `${Math.max(Math.min(podUsagePercent, 100), 2)}%`, 
+                    transition: 'width 0.3s ease',
+                    minWidth: podUsagePercent > 0 ? 'auto' : '2px'
+                  }}></div>
                 </div>
                 <div style={{ marginTop: '2px', color: '#bbb', fontSize: '11px' }}>
-                  已分配: {allocatedPods} / {totalPods} pods ({(podUsagePercent * 100).toFixed(1)}%)
+                  {hasResourceData ? 
+                    `已分配: ${allocatedPods} / ${data.podsCapacity || 'N/A'} pods (${podUsagePercent.toFixed(1)}%)` : 
+                    `容量: ${data.podsCapacity || 'N/A'} pods (使用率数据不可用)`}
                 </div>
               </div>
             </div>
           </Card>
+
+          {!hasResourceData && (
+            <Card size="small" style={{ marginBottom: '12px', background: 'rgba(24, 144, 255, 0.1)' }}>
+              <Text strong style={{ color: '#69c0ff' }}>💡 说明</Text>
+              <div style={{ marginTop: '8px' }}>
+                <Text style={{ color: '#91d5ff', fontSize: '12px' }}>
+                  此节点API暂不提供资源使用率数据。显示的是节点的总容量和可分配容量信息。
+                  如需查看详细的资源使用情况，请通过其他监控工具（如Prometheus、Grafana）查看。
+                </Text>
+              </div>
+            </Card>
+          )}
 
           <Card size="small" style={{ background: 'rgba(19, 194, 194, 0.1)' }}>
             <Text strong style={{ color: '#5cdbd3' }}>🔍 健康状态</Text>
@@ -1109,7 +1166,7 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
 
       <div style={{ position: 'relative', display: 'flex', height: '800px', gap: '8px' }}>
         {/* 主要拓扑图区域 */}
-        <Card
+        <div
           style={{
             borderRadius: '16px',
             border: '1px solid #f0f0f0',
@@ -1117,74 +1174,92 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
             flex: showSidebar ? `1 1 calc(100% - ${sidebarWidth + 20}px)` : '1 1 100%',
             marginBottom: '24px',
             background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-            transition: 'flex 0.3s ease',
-          }}
-          bodyStyle={{ 
-            padding: '20px',
-            height: '100%',
+            transition: 'all 0.3s ease',
+            minWidth: '300px',
+            maxWidth: showSidebar ? `calc(100% - ${sidebarWidth + 20}px)` : '100%',
           }}
         >
-          {/* 标题 */}
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '20px',
-          }}>
+          <Card
+            style={{
+              height: '100%',
+              borderRadius: '16px',
+              border: 'none',
+              background: 'transparent',
+            }}
+            bodyStyle={{ 
+              padding: '20px',
+              height: '100%',
+            }}
+          >
+            {/* 标题 */}
             <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              background: 'rgba(255, 255, 255, 0.9)',
-              borderRadius: '20px',
-              padding: '12px 24px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+              textAlign: 'center',
+              marginBottom: '20px',
             }}>
-              <ClusterOutlined style={{ fontSize: '24px', color: '#1890ff', marginRight: '12px' }} />
-              <Text style={{ 
-                fontSize: '20px', 
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}>
-                Karmada 集群拓扑图
-              </Text>
-            </div>
-          </div>
-
-          {/* 拓扑图容器 */}
-          <div style={{ position: 'relative', height: 'calc(100% - 80px)' }}>
-            {(isLoading || !imagesLoaded) ? (
-              <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column',
-                justifyContent: 'center', 
+              <div style={{
+                display: 'inline-flex',
                 alignItems: 'center',
-                height: '100%',
-                gap: '16px'
+                background: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '20px',
+                padding: '12px 24px',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
               }}>
-                <Spin size="large" />
-                <Text type="secondary">
-                  {isLoading ? '加载集群数据中...' : '加载节点图标中...'}
+                <ClusterOutlined style={{ fontSize: '24px', color: '#1890ff', marginRight: '12px' }} />
+                <Text style={{ 
+                  fontSize: '20px', 
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>
+                  Karmada 集群拓扑图
                 </Text>
               </div>
-            ) : (
-              <div 
-                ref={containerRef} 
-                style={{ 
-                  width: '100%', 
+            </div>
+
+            {/* 拓扑图容器 */}
+            <div style={{ position: 'relative', height: 'calc(100% - 80px)' }}>
+              {(isLoading || !imagesLoaded) ? (
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  justifyContent: 'center', 
+                  alignItems: 'center',
                   height: '100%',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                }} 
-              />
-            )}
-          </div>
-        </Card>
+                  gap: '16px'
+                }}>
+                  <Spin size="large" />
+                  <Text type="secondary">
+                    {isLoading ? '加载集群数据中...' : '加载节点图标中...'}
+                  </Text>
+                </div>
+              ) : (
+                <div 
+                  ref={containerRef} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                  }} 
+                />
+              )}
+            </div>
+          </Card>
+        </div>
 
         {/* 侧边栏数据看板 */}
         {showSidebar && (
-          <div style={{ position: 'relative', display: 'flex', width: `${sidebarWidth}px` }}>
+          <div style={{ 
+            position: 'relative', 
+            display: 'flex', 
+            width: `${sidebarWidth}px`,
+            minWidth: `${sidebarWidth}px`,
+            maxWidth: `${sidebarWidth}px`,
+            flexShrink: 0,
+          }}>
             {/* 拖拽调整宽度的分隔条 */}
             <div
               style={{
@@ -1194,7 +1269,8 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                 position: 'relative',
                 borderRadius: '2px',
                 marginRight: '4px',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                flexShrink: 0,
               }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -1210,8 +1286,12 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                 const handleMouseUp = () => {
                   document.removeEventListener('mousemove', handleMouseMove);
                   document.removeEventListener('mouseup', handleMouseUp);
+                  document.body.style.cursor = '';
+                  document.body.style.userSelect = '';
                 };
                 
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
                 document.addEventListener('mousemove', handleMouseMove);
                 document.addEventListener('mouseup', handleMouseUp);
               }}
@@ -1245,7 +1325,10 @@ const G6ClusterTopology: React.FC<G6ClusterTopologyProps> = ({
                 flex: 1,
                 marginBottom: '24px',
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                position: 'relative'
+                position: 'relative',
+                width: `${sidebarWidth - 12}px`,
+                minWidth: `${sidebarWidth - 12}px`,
+                maxWidth: `${sidebarWidth - 12}px`,
               }}
               bodyStyle={{ 
                 padding: '0',
