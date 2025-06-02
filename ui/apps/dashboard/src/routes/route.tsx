@@ -16,7 +16,7 @@ limitations under the License.
 
 import i18nInstance from '@/utils/i18n';
 import React, { ReactNode } from 'react';
-import { NonIndexRouteObject, redirect } from 'react-router-dom';
+import { NonIndexRouteObject, redirect, Outlet } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import _ from 'lodash';
 import { MainLayout } from '@/layout';
@@ -42,6 +42,7 @@ import {
 import { Failover, Permission, Reschedule } from '@/pages/advanced-config';
 import { BuildInAddon, ThridPartyAddon } from '@/pages/addon';
 import ClusterManage from '@/pages/cluster-manage';
+import ClusterDetail from '@/pages/cluster-manage/cluster-detail';
 import Login from '@/pages/login';
 import { Icons } from '@/components/icons';
 
@@ -164,13 +165,33 @@ export function getRoutes() {
         },
         {
           path: '/cluster-manage',
-          element: <ClusterManage />,
+          element: <Outlet />,
           handle: {
             sidebarKey: 'CLUSTER-MANAGE',
             sidebarName: i18nInstance.t('74ea72bbd64d8251bbc2642cc38e7bb1'),
             icon: <Icons.clusters {...IconStyles} />,
             isPage: false,
           },
+          children: [
+            {
+              index: true,
+              element: <ClusterManage />,
+              handle: {
+                sidebarKey: 'CLUSTER-LIST',
+                sidebarName: '集群列表',
+                isPage: true,
+              },
+            },
+            {
+              path: ':clusterName',
+              element: <ClusterDetail />,
+              handle: {
+                sidebarKey: 'CLUSTER-DETAIL',
+                sidebarName: '集群详情',
+                isPage: true,
+              },
+            },
+          ],
         },
         {
           path: '/basic-config',

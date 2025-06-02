@@ -45,7 +45,7 @@ export interface AllocatedResources {
 export interface Cluster {
   objectMeta: ObjectMeta;
   typeMeta: TypeMeta;
-  ready: boolean;
+  ready: string;
   kubernetesVersion: string;
   syncMode: 'Pull' | 'Push';
   nodeSummary: NodeSummary;
@@ -68,7 +68,7 @@ export interface ClusterDetail extends Cluster {
 export interface ClusterNode {
   objectMeta: ObjectMeta;
   typeMeta: TypeMeta;
-  ready: string;
+  ready: boolean;
   allocatedResources?: {
     cpuCapacity: number;
     cpuFraction: number;

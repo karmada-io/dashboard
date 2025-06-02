@@ -68,7 +68,7 @@ const ClusterManagePage = () => {
   const transformClusterData = (clusters: Cluster[]) => {
     return clusters.map(cluster => ({
       name: cluster.objectMeta.name,
-      status: cluster.ready ? 'ready' as const : 'notReady' as const,
+      status: cluster.ready === 'True' ? 'ready' as const : 'notReady' as const,
       kubernetesVersion: cluster.kubernetesVersion,
       syncMode: cluster.syncMode as 'Push' | 'Pull',
       nodeStatus: {
@@ -297,9 +297,9 @@ const ClusterManagePage = () => {
                     nodeStatus={cluster.nodeStatus}
                     resources={cluster.resources}
                     createTime={cluster.createTime}
-                    onView={() => navigate(`/cluster-manage/clusters/${cluster.name}`)}
+                    onView={() => navigate(`/cluster-manage/${cluster.name}`)}
                     onEdit={() => handleEditCluster(cluster.name)}
-                    onManage={() => navigate(`/cluster-manage/clusters/${cluster.name}/nodes`)}
+                    onManage={() => navigate(`/cluster-manage/${cluster.name}`)}
                     onDelete={() => handleDeleteCluster(cluster.name)}
                   />
                 </Col>
