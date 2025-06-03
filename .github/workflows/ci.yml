@@ -42,6 +42,7 @@ jobs:
           node-version: 20
       - uses: pnpm/action-setup@v4
         with:
+          # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
       - name: Build dashboard
         run: |
