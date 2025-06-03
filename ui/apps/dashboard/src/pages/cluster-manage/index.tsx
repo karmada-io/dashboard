@@ -30,9 +30,10 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters, DeleteCluster, GetClusterDetail } from '@/services/cluster';
 import { ClusterCard } from '@/components/cluster';
-import { PlusOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ReloadOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import NewClusterModal from './new-cluster-modal';
+import ClusterDeployModal from './cluster-deploy-modal';
 import type { Cluster, ClusterDetail } from '@/services/cluster';
 import '@/styles/tech-theme.css';
 import ScrollContainer from '@/components/common/ScrollContainer';
@@ -55,6 +56,8 @@ const ClusterManagePage = () => {
     mode: 'create',
     open: false,
   });
+
+  const [deployModalOpen, setDeployModalOpen] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetClusters'],
@@ -120,6 +123,10 @@ const ClusterManagePage = () => {
       mode: 'create',
       open: true,
     });
+  };
+
+  const handleDeployCluster = () => {
+    setDeployModalOpen(true);
   };
 
   const handleEditCluster = async (clusterName: string) => {
@@ -192,13 +199,22 @@ const ClusterManagePage = () => {
                   当前管理 {stats.total} 个集群，{stats.ready} 个正常运行
                 </Text>
               </div>
-              <button 
-                className="tech-btn-primary flex items-center space-x-2"
-                onClick={handleCreateCluster}
-              >
-                <PlusOutlined />
-                <span>添加集群</span>
-              </button>
+              <Flex gap={12}>
+                <button 
+                  className="tech-btn-secondary flex items-center space-x-2"
+                  onClick={handleDeployCluster}
+                >
+                  <DeploymentUnitOutlined />
+                  <span>集群部署</span>
+                </button>
+                <button 
+                  className="tech-btn-primary flex items-center space-x-2"
+                  onClick={handleCreateCluster}
+                >
+                  <PlusOutlined />
+                  <span>添加集群</span>
+                </button>
+              </Flex>
             </Flex>
 
             {/* 搜索和过滤栏 */}
@@ -333,6 +349,18 @@ const ClusterManagePage = () => {
             </div>
           )}
         </div>
+
+        {/* 集群部署模态框 */}
+        <ClusterDeployModal
+          open={deployModalOpen}
+          onOk={() => {
+            messageApi.success('集群部署配置已保存');
+            setDeployModalOpen(false);
+          }}
+          onCancel={() => {
+            setDeployModalOpen(false);
+          }}
+        />
 
         {/* 新建/编辑集群模态框 */}
         <NewClusterModal

@@ -566,7 +566,7 @@ const ClusterDetailPage = () => {
                       </div>
                     </Card>
 
-                    <Card title="标签信息" size="small" className="mb-4" style={{ height: '120px' }}>
+                    <Card title="集群标签信息" size="small" className="mb-4" style={{ height: '120px' }}>
                       <div style={{ padding: '8px 0', maxHeight: '80px', overflowY: 'auto' }}>
                         {clusterDetail.objectMeta.labels && Object.keys(clusterDetail.objectMeta.labels).length > 0 ? (
                           <Space wrap size="small">

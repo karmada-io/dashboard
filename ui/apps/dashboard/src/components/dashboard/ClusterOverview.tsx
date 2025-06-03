@@ -16,7 +16,7 @@ limitations under the License.
 
 import React from 'react';
 import { Table, Tag, Progress, Button, Space, Badge, Typography } from 'antd';
-import { EyeOutlined, SettingOutlined } from '@ant-design/icons';
+import { SettingOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 
@@ -221,26 +221,15 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({
       key: 'action',
       width: 120,
       render: (_, record) => (
-        <Space>
-          <Button 
-            type="link" 
-            size="middle" 
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/cluster-manage/clusters/${record.name}`)}
-            style={{ fontSize: '14px' }}
-          >
-            查看
-          </Button>
-          <Button 
-            type="link" 
-            size="middle" 
-            icon={<SettingOutlined />}
-            onClick={() => navigate(`/cluster-manage/clusters/${record.name}/nodes`)}
-            style={{ fontSize: '14px' }}
-          >
-            管理
-          </Button>
-        </Space>
+        <Button 
+          type="link" 
+          size="middle" 
+          icon={<SettingOutlined />}
+          onClick={() => navigate(`/cluster-manage/${record.name}`)}
+          style={{ fontSize: '14px' }}
+        >
+          管理
+        </Button>
       ),
     },
   ];

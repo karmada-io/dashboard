@@ -57,6 +57,36 @@ const Overview = () => {
     },
   });
 
+  // 转换集群列表数据为G6ClusterTopology组件需要的格式
+  const transformClusterDataForTopology = () => {
+    if (!clusterListData?.clusters) return null;
+    
+    return {
+      clusters: clusterListData.clusters
+        .filter(cluster => 
+          cluster?.objectMeta?.name && // 必须有名称
+          cluster.objectMeta.name.trim() !== '' // 名称不能为空
+        )
+        .map(cluster => ({
+          objectMeta: cluster.objectMeta,
+          ready: String(cluster.ready) === 'True', // 转换为布尔值
+          kubernetesVersion: cluster.kubernetesVersion || 'Unknown',
+          syncMode: cluster.syncMode || 'Push',
+          nodeSummary: cluster.nodeSummary || { totalNum: 0, readyNum: 0 },
+          allocatedResources: cluster.allocatedResources || {
+            cpuCapacity: 0,
+            cpuFraction: 0,
+            memoryCapacity: 0,
+            memoryFraction: 0,
+            allocatedPods: 0,
+            podCapacity: 0,
+          },
+        }))
+    };
+  };
+
+  const topologyData = transformClusterDataForTopology();
+
   // 转换集群列表数据为组件需要的格式
   const transformClusterData = () => {
     if (!clusterListData?.clusters) return [];
@@ -68,7 +98,7 @@ const Overview = () => {
       )
       .map(cluster => ({
         name: cluster.objectMeta.name,
-        status: cluster.ready ? 'ready' as const : 'notReady' as const,
+        status: (String(cluster.ready) === 'True') ? 'ready' as const : 'notReady' as const,
         nodes: {
           ready: cluster.nodeSummary?.readyNum || 0,
           total: cluster.nodeSummary?.totalNum || 0,
@@ -172,7 +202,7 @@ const Overview = () => {
                   <Col span={12}>
                     <div style={{ textAlign: 'center' }}>
                       <Text style={{ fontSize: '20px', fontWeight: 'bold', color: '#52c41a', display: 'block' }}>
-                        {clusterListData?.clusters?.filter(c => String(c.ready) === 'True' || c.ready === true).length || 0}
+                        {clusterListData?.clusters?.filter(c => String(c.ready) === 'True').length || 0}
                       </Text>
                       <Text style={{ fontSize: '11px', color: '#666' }}>就绪集群</Text>
                     </div>
@@ -256,7 +286,7 @@ const Overview = () => {
 
           {/* 集群拓扑图 */}
           <G6ClusterTopology 
-            clusterListData={clusterListData}
+            clusterListData={topologyData}
             isLoading={clusterListLoading}
           />
 

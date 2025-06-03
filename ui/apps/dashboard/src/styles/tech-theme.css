@@ -224,6 +224,54 @@
   transform: translateY(0);
 }
 
+.tech-btn-secondary {
+  background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(248,254,255,0.8) 100%);
+  border: 2px solid var(--tech-primary);
+  color: var(--tech-primary);
+  border-radius: var(--border-radius-md);
+  padding: 12px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 8px rgba(64, 158, 255, 0.1),
+    0 4px 15px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.tech-btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(64, 158, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.tech-btn-secondary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, #409eff 0%, #40a9ff 50%, #73b3ff 100%);
+  color: #ffffff;
+  box-shadow: 
+    0 0 25px rgba(0, 212, 255, 0.4),
+    0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.tech-btn-secondary:hover::before {
+  left: 100%;
+}
+
+.tech-btn-secondary:active {
+  transform: translateY(0);
+}
+
 /* ========== 状态徽章 ========== */
 .tech-status-badge {
   display: inline-flex;
