@@ -23,7 +23,8 @@ jobs:
       - name: install node dependencies
         uses: pnpm/action-setup@v4
         with:
-          version: 8.15.6
+          # keep in sync with the packageManager version in `ui/package.json`
+          version: 9.1.2
       - name: build dashboard
         run: |
           echo "Start build"
