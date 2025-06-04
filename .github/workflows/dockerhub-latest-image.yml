@@ -46,6 +46,7 @@ jobs:
     env:
       IMAGE_NAME: karmada/karmada-dashboard-web
       BINARY_NAME: karmada-dashboard-web
+      PLATFORMS: linux/amd64,linux/arm64
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -53,6 +54,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - name: setup QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v3
       - name: detect misc info
         id: misc
         run: |
@@ -60,32 +65,33 @@ jobs:
           echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
       - name: login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build karmada-dashboard-web binary
-        run: make karmada-dashboard-web
+        run: BUILD_PLATFORMS=${{ steps.misc.outputs.platforms }} make karmada-dashboard-web
       - name: download artifact
         uses: actions/download-artifact@v4
         with:
           name: dashboard_artifact
-          path: _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+          path: _output/bin/dist
       - name: display artifact
         run: |
           ls -al _output/bin
-          ls -al _output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}/dist
+          ls -al _output/bin/dist
       - name: build and push image
         uses: docker/build-push-action@v6
         with:
           file: "cluster/images/build-web.Dockerfile"
-          context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
+          context: "_output/bin/"
           push: true
           tags: ${{ steps.misc.outputs.image_name }}:latest
+          platforms: ${{ steps.misc.outputs.platforms }}
           build-args: |
             BINARY=${{ steps.misc.outputs.binary_name }}
-            BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}
 
   build-and-push-api:
     name: build and push api image
@@ -94,6 +100,7 @@ jobs:
     env:
       IMAGE_NAME: karmada/karmada-dashboard-api
       BINARY_NAME: karmada-dashboard-api
+      PLATFORMS: linux/amd64,linux/arm64
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -101,6 +108,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - name: setup QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v3
       - name: detect misc info
         id: misc
         run: |
@@ -108,20 +119,21 @@ jobs:
           echo "arch=$(go env GOHOSTARCH)" >> $GITHUB_OUTPUT
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
       - name: login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build karmada-dashboard-api binary
-        run: make karmada-dashboard-api
+        run: BUILD_PLATFORMS=${{ steps.misc.outputs.platforms }} make karmada-dashboard-api
       - name: build and push image
         uses: docker/build-push-action@v6
         with:
           file: "cluster/images/Dockerfile"
-          context: "_output/bin/${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}"
+          context: "_output/bin/"
           push: true
           tags: ${{ steps.misc.outputs.image_name }}:latest
+          platforms: ${{ steps.misc.outputs.platforms }}
           build-args: |
             BINARY=${{ steps.misc.outputs.binary_name }}
-            BUILD_PLATFORMS=${{ steps.misc.outputs.os }}/${{ steps.misc.outputs.arch }}
