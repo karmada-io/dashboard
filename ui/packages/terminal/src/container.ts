@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SockJS from 'sockjs-client/dist/sockjs';
+import SockJS from 'sockjs-client';
 import BaseTerminal from './base.ts';
 import { BaseTerminalOptions } from './typing';
 import { getDebugger } from './utils.ts';
@@ -24,6 +24,7 @@ interface ContainerTerminalOptions {
   pod: string;
   container: string;
   sessionIdUrl: string;
+  wsUrl?: string;
 }
 
 export interface SockJSSimpleEvent {
@@ -100,7 +101,8 @@ class ContainerTerminal extends BaseTerminal {
     this.connecting = true;
     this.connectionClosed = false;
 
-    this.socket = new SockJS(`/api/sockjs?${this.sessionId}`);
+    const wsUrl = this.containerOptions.wsUrl ?? '/api/sockjs';
+    this.socket = new SockJS(`${wsUrl}?${this.sessionId}`);
     const { socket } = this;
     socket.onopen = this.onConnectionOpen.bind(this, this.sessionId);
     socket.onmessage = this.onConnectionMessage.bind(this);

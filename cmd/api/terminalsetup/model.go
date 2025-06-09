@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Navigation from '@/components/navigation';
-interface HeaderProps {
-  onTerminalClick?: () => void;
+package terminalsetup
+
+// TerminalInfo represents the information required for terminal operations.
+type TerminalInfo struct {
+	Shell         string
+	Namespace     string
+	PodName       string
+	ContainerName string
 }
-const Header : React.FC<HeaderProps> = ({ onTerminalClick })  => {
-  return (
-    <>
-      <Navigation onTerminalClick={onTerminalClick}/>
-    </>
-  );
-};
-export default Header;

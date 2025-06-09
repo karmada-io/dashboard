@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@types/sockjs-client": "^1.5.4"
+  }
+}

@@ -48,6 +48,7 @@ import (
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/service"                  // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/statefulset"              // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/unstructured"             // Importing route packages forces route registration
+	"github.com/karmada-io/dashboard/cmd/api/terminalsetup"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
@@ -109,6 +110,7 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
 	)
 	ensureAPIServerConnectionOrDie()
+	webterminal()
 	serve(opts)
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	<-ctx.Done()
@@ -140,4 +142,9 @@ func serve(opts *options.Options) {
 	go func() {
 		klog.Fatal(router.Router().Run(insecureAddress))
 	}()
+}
+
+// Custom function to initialize the application
+func webterminal() {
+	terminalsetup.Init() // Call the init function
 }
