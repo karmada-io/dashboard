@@ -1,0 +1,62 @@
+// Copyright 2017 The Kubernetes Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@use 'sass:math';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+%kd-logs-element-base {
+  font-family: $font-family-monospace;
+  padding: 0 (2 * $baseline-grid);
+  word-break: break-word;
+}
+
+:host {
+  height: calc(100% - 40px);
+}
+
+.kd-logs-element {
+  @extend %kd-logs-element-base;
+
+  font-size: $body-font-size-base;
+}
+
+.kd-logs-element-compact {
+  @extend %kd-logs-element-base;
+
+  font-size: $caption-font-size-base;
+}
+
+.kd-log-line-container {
+  height: 100%;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+}
+
+kd-card {
+  display: flex;
+  max-height: 100%;
+
+  /* stylelint-disable scss/no-global-function-names */
+  min-height: max(100%, 550px);
+  /* stylelint-enable scss/no-global-function-names */
+}
+
+.footer {
+  font-size: $body-font-size-base;
+  padding: (0.5 * $baseline-grid) (2 * $baseline-grid);
+}
