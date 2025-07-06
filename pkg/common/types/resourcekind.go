@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+//revive:disable:var-naming
 package types
 
 // ResourceKind is an unique name for each resource. It can used for API discovery and generic
