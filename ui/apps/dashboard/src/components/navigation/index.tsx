@@ -25,6 +25,7 @@ import {
   getLangTitle,
 } from '@/utils/i18n';
 import { Dropdown } from 'antd';
+import { Icons } from '@/components/icons';
 
 export interface IUserInfo {
   id: number;
@@ -37,6 +38,7 @@ interface INavigationProps {
   usePlaceholder?: boolean;
   brandText?: string;
   userInfo?: IUserInfo;
+  onTerminalClick?: () => void;
 }
 
 const Navigation: FC<INavigationProps> = (props) => {
@@ -45,6 +47,7 @@ const Navigation: FC<INavigationProps> = (props) => {
     usePlaceholder = true,
     brandText = 'Karmada Dashboard',
     userInfo,
+    onTerminalClick,
   } = props;
   return (
     <>
@@ -63,6 +66,16 @@ const Navigation: FC<INavigationProps> = (props) => {
           </div>
           <div className={styles.right}>
             {/* extra components */}
+
+            {/* karmada web-terminal */}
+            <Icons.terminal
+              width={20}
+              height={20}
+              className={styles.terminalIcon}
+              onClick={() => onTerminalClick?.()}
+            />
+
+            {/* i18n switch */}
             <div className={styles.extra}>
               <Dropdown
                 menu={{
@@ -84,6 +97,7 @@ const Navigation: FC<INavigationProps> = (props) => {
                 <div>{getLangIcon(getLang())}</div>
               </Dropdown>
             </div>
+
             {/* user info */}
             {userInfo && (
               <div className={styles.userWrap}>
