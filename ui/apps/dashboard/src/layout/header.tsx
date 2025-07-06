@@ -14,11 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { FC } from 'react';
 import Navigation from '@/components/navigation';
-const Header = () => {
+interface HeaderProps {
+  onTerminalClick?: () => void;
+}
+const Header: FC<HeaderProps> = ({ onTerminalClick }) => {
   return (
     <>
-      <Navigation />
+      <Navigation onTerminalClick={onTerminalClick} />
     </>
   );
 };
