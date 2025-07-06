@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
@@ -31,6 +32,11 @@ import (
 const (
 	tokenServiceAccountKey = "serviceaccount"
 )
+
+// GetCurrentUser returns the current user from the context .
+func GetCurrentUser(c *gin.Context) (*v1.User, int, error) {
+	return me(c.Request)
+}
 
 func me(request *http.Request) (*v1.User, int, error) {
 	karmadaClient, err := client.GetKarmadaClientFromRequest(request)
