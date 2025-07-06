@@ -14,4 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { default as KarmadaTerminal } from './karmada-terminal.tsx';
+import { create } from 'zustand';
+
+type GlobalState = {
+  karmadaTerminalOpen: boolean;
+  toggleKarmadaTerminal: () => void;
+  setKarmadaTerminalOpen: (isOpen: boolean) => void;
+};
+
+export const useGlobalStore = create<GlobalState>((set) => ({
+  karmadaTerminalOpen: false,
+  toggleKarmadaTerminal: () =>
+    set((state) => ({ karmadaTerminalOpen: !state.karmadaTerminalOpen })),
+  setKarmadaTerminalOpen: (isOpen) => set({ karmadaTerminalOpen: isOpen }),
+}));
