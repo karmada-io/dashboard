@@ -28,9 +28,12 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
+	karmadaclient "github.com/karmada-io/dashboard/pkg/client"
 	"k8s.io/dashboard/client/args"
 	cacheclient "k8s.io/dashboard/client/cache/client"
 )
+
+const MemberClusterHeaderName = "X-Member-ClusterName"
 
 func InClusterClient() client.Interface {
 	if !isInitialized() {
@@ -54,20 +57,33 @@ func InClusterClient() client.Interface {
 }
 
 func Client(request *http.Request) (client.Interface, error) {
-	if !isInitialized() {
-		return nil, fmt.Errorf("client package not initialized")
-	}
+	/*
+		if !isInitialized() {
+			return nil, fmt.Errorf("client package not initialized")
+		}
 
-	config, err := configFromRequest(request)
-	if err != nil {
-		return nil, err
-	}
+		config, err := configFromRequest(request)
+		if err != nil {
+			return nil, err
+		}
 
-	if args.CacheEnabled() {
-		return cacheclient.New(config, GetBearerToken(request))
-	}
+		if args.CacheEnabled() {
+			return cacheclient.New(config, GetBearerToken(request))
+		}
 
-	return client.NewForConfig(config)
+		return client.NewForConfig(config)
+
+	*/
+	memberClusterName := request.Header.Get(MemberClusterHeaderName)
+	if memberClusterName == "" {
+		return nil, fmt.Errorf("member cluster name is empty")
+	}
+	memberClusterClient := karmadaclient.InClusterClientForMemberCluster(memberClusterName)
+	if memberClusterClient == nil {
+		return nil, fmt.Errorf("memberCluster client is not initialized")
+
+	}
+	return memberClusterClient, nil
 }
 
 func APIExtensionsClient(request *http.Request) (apiextensionsclientset.Interface, error) {
