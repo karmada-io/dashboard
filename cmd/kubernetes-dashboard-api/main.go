@@ -17,13 +17,15 @@ package main
 import (
 	"crypto/elliptic"
 	"crypto/tls"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"k8s.io/dashboard/certificates"
+	"k8s.io/dashboard/certificates/ecdsa"
 	"net/http"
 	"time"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/go-openapi/spec"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"k8s.io/klog/v2"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/args"
@@ -31,21 +33,29 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/handler"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration"
 	integrationapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/api"
-	"k8s.io/dashboard/certificates"
-	"k8s.io/dashboard/certificates/ecdsa"
-	"k8s.io/dashboard/client"
+	karmadaclient "github.com/karmada-io/dashboard/pkg/client"
 )
 
 func main() {
 	klog.InfoS("Starting Kubernetes Dashboard API", "version", environment.Version)
-
-	client.Init(
-		client.WithUserAgent(environment.UserAgent()),
-		client.WithKubeconfig(args.KubeconfigPath()),
-		client.WithMasterUrl(args.ApiServerHost()),
-		client.WithInsecureTLSSkipVerify(args.ApiServerSkipTLSVerify()),
+	// Instead of initialization of client for kubernetes apiserver,
+	// we init client for karmada apiserver, when request come in, the server will read X-Member-ClusterName in
+	// http request header, and create client for member cluster kubernetes apiserver, which will communicate with
+	// member cluster based on aggregate apiserver
+	/*
+		client.Init(
+			client.WithUserAgent(environment.UserAgent()),
+			client.WithKubeconfig(args.KubeconfigPath()),
+			client.WithMasterUrl(args.ApiServerHost()),
+			client.WithInsecureTLSSkipVerify(args.ApiServerSkipTLSVerify()),
+		)
+	*/
+	karmadaclient.InitKarmadaConfig(
+		karmadaclient.WithUserAgent(environment.UserAgent()),
+		karmadaclient.WithKubeconfig(args.KarmadaKubeConfigPath()),
+		karmadaclient.WithKubeContext(args.KarmadaContext()),
+		karmadaclient.WithInsecureTLSSkipVerify(args.KarmadaApiserverSkipTLSVerify()),
 	)
-
 	if !args.IsProxyEnabled() {
 		ensureAPIServerConnectionOrDie()
 	} else {
@@ -110,12 +120,21 @@ func serveTLS(certificates []tls.Certificate) {
 }
 
 func ensureAPIServerConnectionOrDie() {
-	versionInfo, err := client.InClusterClient().Discovery().ServerVersion()
+	/*
+		versionInfo, err := client.InClusterClient().Discovery().ServerVersion()
+		if err != nil {
+			handleFatalInitError(err)
+		}
+
+		klog.InfoS("Successful initial request to the apiserver", "version", versionInfo.String())
+	*/
+	// Correspond to the initialization, here we just need to check the connectivity fo karmada apiserver
+	// instead of kubernetes apiserver
+	karmadaVersionInfo, err := karmadaclient.InClusterKarmadaClient().Discovery().ServerVersion()
 	if err != nil {
 		handleFatalInitError(err)
 	}
-
-	klog.InfoS("Successful initial request to the apiserver", "version", versionInfo.String())
+	klog.InfoS("Successful initial request to the Karmada apiserver", "version", karmadaVersionInfo.String())
 }
 
 func configureMetricsProvider(integrationManager integration.Manager) {
