@@ -35,3 +35,5 @@ cmd/ops
 
 # local api pid
 .api.pid
+tmp
+
