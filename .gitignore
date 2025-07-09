@@ -37,3 +37,11 @@ cmd/ops
 .api.pid
 .tmp
 
+reports
+
+test-results/
+
+# Playwright
+playwright-report/
+playwright/.cache/
+
