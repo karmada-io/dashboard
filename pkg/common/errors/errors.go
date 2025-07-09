@@ -167,7 +167,7 @@ func NewGenericResponse(code int, serverMessage string) *k8serrors.StatusError {
 
 	return &k8serrors.StatusError{ErrStatus: metav1.Status{
 		Status:  metav1.StatusFailure,
-		Code:    int32(code),
+		Code:    int32(code), // #nosec G115: integer overflow conversion int -> int32
 		Reason:  reason,
 		Message: message,
 	}}
