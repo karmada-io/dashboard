@@ -54,7 +54,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	}
 	allocatableCPU := cluster.Status.ResourceSummary.Allocatable.Cpu()
 	allocatedCPU := cluster.Status.ResourceSummary.Allocated.Cpu()
-	var cpuCapacity int64 = allocatableCPU.Value()
+	var cpuCapacity = allocatableCPU.Value()
 	var cpuFraction float64
 	if cpuCapacity > 0 {
 		cpuFraction = float64(allocatedCPU.ScaledValue(resource.Micro)) / float64(allocatableCPU.ScaledValue(resource.Micro)) * 100
@@ -64,7 +64,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	allocatedMemory := cluster.Status.ResourceSummary.Allocated.Memory()
 	fmt.Println(allocatableMemory.String())
 	fmt.Println(allocatedMemory.Value())
-	var memoryCapacity int64 = allocatableMemory.Value()
+	var memoryCapacity = allocatableMemory.Value()
 	var memoryFraction float64
 	if memoryCapacity > 0 {
 		memoryFraction = float64(allocatedMemory.ScaledValue(resource.Micro)) / float64(allocatableMemory.ScaledValue(resource.Micro)) * 100
@@ -73,7 +73,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	allocatablePod := cluster.Status.ResourceSummary.Allocatable.Pods()
 	allocatedPod := cluster.Status.ResourceSummary.Allocated.Pods()
 
-	var podCapacity int64 = allocatablePod.Value()
+	var podCapacity = allocatablePod.Value()
 	var podFraction float64
 	if podCapacity > 0 {
 		podFraction = float64(allocatedPod.Value()) / float64(podCapacity) * 100
