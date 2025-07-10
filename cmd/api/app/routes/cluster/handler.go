@@ -76,7 +76,8 @@ func handlePostCluster(c *gin.Context) {
 	clusterRequest.MemberClusterEndpoint = memberClusterEndpoint
 	karmadaClient := client.InClusterKarmadaClient()
 
-	if clusterRequest.SyncMode == v1alpha1.Pull {
+	switch clusterRequest.SyncMode {
+	case v1alpha1.Pull:
 		memberClusterClient, err := client.KubeClientSetFromKubeConfig(clusterRequest.MemberClusterKubeConfig)
 		if err != nil {
 			klog.ErrorS(err, "Generate kubeclient from memberClusterKubeconfig failed")
@@ -104,7 +105,7 @@ func handlePostCluster(c *gin.Context) {
 			klog.Infof("accessClusterInPullMode success")
 			common.Success(c, "ok")
 		}
-	} else if clusterRequest.SyncMode == v1alpha1.Push {
+	case v1alpha1.Push:
 		memberClusterRestConfig, err := client.LoadRestConfigFromKubeConfig(clusterRequest.MemberClusterKubeConfig)
 		if err != nil {
 			klog.ErrorS(err, "Generate rest config from memberClusterKubeconfig failed")
@@ -130,7 +131,7 @@ func handlePostCluster(c *gin.Context) {
 		}
 		klog.Infof("accessClusterInPushMode success")
 		common.Success(c, "ok")
-	} else {
+	default:
 		klog.Errorf("Unknown sync mode %s", clusterRequest.SyncMode)
 		common.Fail(c, fmt.Errorf("unknown sync mode %s", clusterRequest.SyncMode))
 	}

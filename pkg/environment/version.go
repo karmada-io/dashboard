@@ -26,7 +26,8 @@ const (
 )
 
 var (
-	Version      = dev             // Version of this binary
+	// Version is the version of this binary.
+	Version      = dev
 	gitVersion   = "v0.0.0-master" // nolint:unused
 	gitCommit    = "unknown"       // nolint:unused // sha1 from git, output of $(git rev-parse HEAD)
 	gitTreeState = "unknown"       // nolint:unused // state of git tree, either "clean" or "dirty"
