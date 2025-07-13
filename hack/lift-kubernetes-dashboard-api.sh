@@ -29,7 +29,7 @@ usage() {
   exit 0
 }
 
-TMP_DIR=${REPO_ROOT}/tmp
+TMP_DIR=${REPO_ROOT}/.tmp
 BRANCH_NAME="release/7.10.1"
 FORCE=false
 DEBUG=false
