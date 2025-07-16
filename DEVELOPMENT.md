@@ -20,7 +20,7 @@ Make sure the following software is installed and added to your path:
 Local development of the Karmada dashboard requires an existing Karmada environment. You can set up a minimal environment by running the [hack/local-up-karmada.sh script in the karmada repository](https://github.com/karmada-io/karmada/blob/master/hack/local-up-karmada.sh).
 
 ```shell
-cd <path-to-karmada-repo>
+git clone https://github.com/karmada-io/karmada.git <path-to-karmada-repo>
 bash hack/local-up-karmada.sh
 ```
 
@@ -30,12 +30,15 @@ The minimal environment consists of one host cluster and three member cluster, t
 _output/bin/${os name}/${os arch}/karmada-dashboard-api \
   --karmada-kubeconfig=${path/to/karmada.config} \
   --karmada-context=karmada-apiserver \
+  --skip-karmada-apiserver-tls-verify \
   --kubeconfig=${path/to/karmada.config} \
   --context=karmada-host \
   --insecure-port=8000
 ```
 
-After that, you can start the dashboard fronted project, install frontend dependencies with `cd ui && pnpm install` firstly. And then start the dashboard fronted project by executing:
+> Note: if the `karmada-dashboard-api` failed to start because of the following error: `"Could not init karmada in-cluster client" err="specifying a root certificates file with the insecure flag is not allowed`, remove the `--skip-karmada-apiserver-tls-verify` argument and try again.
+
+After that, you can start the dashboard frontend project, install frontend dependencies with `cd ui && pnpm install` firstly. And then start the dashboard frontend project by executing:
 
 ```shell
 cd ui
