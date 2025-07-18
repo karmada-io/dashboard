@@ -1,0 +1,112 @@
+// Copyright 2017 The Kubernetes Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@use '../../../variables' as *;
+@use '../../../mixins' as *;
+
+:host {
+  div {
+    &.kd-inner-content {
+      display: flex;
+      flex-direction: column;
+
+      // Reserve 70px for the footer
+      height: calc(100% - 70px);
+      max-height: calc(100% - 70px);
+      min-height: 50 * $baseline-grid;
+
+      .kd-card-content {
+        > div {
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  .mat-card {
+    min-width: $min-content-width;
+    padding: 0;
+
+    &.kd-flex {
+      min-width: fit-content;
+    }
+
+    &.kd-inner-content {
+      height: auto;
+      width: 100%;
+
+      .mat-card-content {
+        flex-grow: 1;
+        overflow: auto;
+        padding: 0;
+      }
+    }
+
+    &.kd-inner-table {
+      box-shadow: none;
+      margin: 0;
+
+      .mat-card-content {
+        padding: 0;
+      }
+    }
+
+    &.kd-graph {
+      min-width: unset;
+    }
+  }
+
+  .mat-card-title {
+    margin: 0;
+  }
+
+  .mat-card-footer {
+    display: inline;
+    margin: 0;
+  }
+}
+
+.kd-card-actions {
+  display: block;
+  padding: 0 (2 * $baseline-grid);
+}
+
+.kd-card-toggle {
+  margin-right: (3 * $baseline-grid);
+}
+
+.kd-card-content {
+  margin: 0;
+  padding: 2 * $baseline-grid;
+}
+
+.kd-card-content-table {
+  padding: 0;
+}
+
+.kd-card-title {
+  font-size: $title-font-size-base;
+  font-weight: $regular-font-weight;
+  margin-right: $baseline-grid;
+  padding: (2 * $baseline-grid) 0 (2 * $baseline-grid) (2 * $baseline-grid);
+}
+
+.kd-card-description {
+  font-size: $subhead-font-size-base-lg;
+}
+
+.kd-card-footer {
+  font-size: $footer-font-size-base;
+  padding: 0 (2 * $baseline-grid) $baseline-grid;
+}
