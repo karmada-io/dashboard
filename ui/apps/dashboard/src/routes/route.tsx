@@ -42,6 +42,7 @@ import {
 import { Failover, Permission, Reschedule } from '@/pages/advanced-config';
 import { BuildInAddon, ThridPartyAddon } from '@/pages/addon';
 import ClusterManage from '@/pages/cluster-manage';
+import AssistantPage from '@/pages/assistant';
 import Login from '@/pages/login';
 import { Icons } from '@/components/icons';
 
@@ -294,6 +295,11 @@ export function getRoutes() {
       path: '/login',
       errorElement: <ErrorBoundary />,
       element: <Login />,
+    },
+    {
+      path: '/assistant',
+      errorElement: <ErrorBoundary />,
+      element: <AssistantPage />,
     },
   ];
 
