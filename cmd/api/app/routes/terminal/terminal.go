@@ -35,12 +35,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/remotecommand"
+	"k8s.io/klog/v2"
 	"k8s.io/utils/ptr"
 
 	"github.com/karmada-io/dashboard/cmd/api/app/routes/auth"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
 	"github.com/karmada-io/dashboard/pkg/client"
+	"github.com/karmada-io/dashboard/pkg/environment"
 )
 
 // waitForPodReady polls until the Pod is Running and Ready, or times out.
@@ -115,8 +117,8 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface, user *v1
 					ImagePullPolicy: corev1.PullIfNotPresent,
 					//  ◀️ Set this per‑container
 					SecurityContext: &corev1.SecurityContext{
-						RunAsUser:  ptr.To(int64(0)),
-						RunAsGroup: ptr.To(int64(0)),
+						RunAsUser:  ptr.To(int64(1000)),
+						RunAsGroup: ptr.To(int64(1000)),
 					},
 
 					Ports: []corev1.ContainerPort{
@@ -142,6 +144,7 @@ func createTTYdPod(ctx context.Context, clientset kubernetes.Interface, user *v1
 						SuccessThreshold:    1,
 						FailureThreshold:    3,
 					},
+					WorkingDir: "/home/ttyd",
 					VolumeMounts: []corev1.VolumeMount{
 						{
 							Name:      "kube-api-access",
@@ -194,7 +197,7 @@ func GenerateKubeConfig(token string) ([]byte, error) {
 		Clusters: map[string]*clientcmdapi.Cluster{
 			"karmada-apiserver": {
 				Server:                "https://karmada-apiserver.karmada-system.svc.cluster.local:5443",
-				InsecureSkipTLSVerify: true,
+				InsecureSkipTLSVerify: environment.IsDev(),
 			},
 		},
 		AuthInfos: map[string]*clientcmdapi.AuthInfo{
@@ -264,7 +267,7 @@ func ExecIntoPodWithInput(
 	}
 
 	if stderrBuf.Len() > 0 {
-		fmt.Printf("⚠️ stderr during exec: %s\n", stderrBuf.String())
+		klog.Warningf("stderr during exec: %s", stderrBuf.String())
 	}
 
 	return nil
@@ -359,8 +362,6 @@ func handleExecShell(c *gin.Context) {
 		sizeChan: make(chan remotecommand.TerminalSize),
 	})
 
-	//restfulRequest := restful.NewRequest(c.Request)
-	//go WaitForTerminal(client.InClusterClient(), cfg, restfulRequest, sessionID)
 	info := TerminalInfo{
 		Shell:         c.Query("shell"),
 		Namespace:     c.Param("namespace"),

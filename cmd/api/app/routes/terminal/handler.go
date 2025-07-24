@@ -166,12 +166,19 @@ func (sm *SessionMap) Set(sessionID string, session TerminalSession) {
 func (sm *SessionMap) Close(sessionID string, status uint32, reason string) {
 	sm.Lock.Lock()
 	defer sm.Lock.Unlock()
-	ses := sm.Sessions[sessionID]
-	err := ses.sockJSSession.Close(status, reason)
-	if err != nil {
-		klog.Error(err)
+	ses, ok := sm.Sessions[sessionID]
+	if !ok {
+		return
 	}
-	close(ses.sizeChan)
+	if ses.sockJSSession != nil {
+		err := ses.sockJSSession.Close(status, reason)
+		if err != nil {
+			klog.Error(err)
+		}
+	}
+	if ses.sizeChan != nil {
+		close(ses.sizeChan)
+	}
 	delete(sm.Sessions, sessionID)
 }
 
@@ -330,10 +337,17 @@ func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, terminalI
 
 	case <-time.After(20 * time.Minute):
 		// Close chan and delete session when sockjs connection was timeout
-		if terminalSessions.Get(sessionID).bound != nil {
-			close(terminalSessions.Get(sessionID).bound)
+		terminalSessions.Lock.Lock()
+		defer terminalSessions.Lock.Unlock()
+		session, ok := terminalSessions.Sessions[sessionID]
+		if ok {
+			// The session has not been bound if sockJSSession is nil.
+			// In that case, we can safely clean it up.
+			if session.sockJSSession == nil && session.bound != nil {
+				close(session.bound)
+				delete(terminalSessions.Sessions, sessionID)
+			}
 		}
-		delete(terminalSessions.Sessions, sessionID)
 		return
 	}
 }
