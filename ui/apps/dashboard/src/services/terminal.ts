@@ -14,16 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { FC } from 'react';
-import Navigation from '@/components/navigation';
-interface HeaderProps {
-  onTerminalClick?: () => void;
+import { IResponse, karmadaClient } from '@/services/base.ts';
+
+export async function CreateKarmadaTerminal() {
+  const resp = await karmadaClient.post<
+    IResponse<{
+      namespace: string;
+      podName: string;
+      container: string;
+    }>
+  >('/terminal');
+  return resp.data;
 }
-const Header: FC<HeaderProps> = ({ onTerminalClick }) => {
-  return (
-    <>
-      <Navigation onTerminalClick={onTerminalClick} />
-    </>
-  );
-};
-export default Header;

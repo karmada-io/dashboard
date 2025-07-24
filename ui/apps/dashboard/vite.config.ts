@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     base: process.env.NODE_ENV === 'development' ? '' : '/static',
+
     plugins: [
       banner(license) as Plugin,
       react(),
@@ -56,6 +57,12 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
+        '^/api/v1/terminal/sockjs*': {
+          target: 'ws://localhost:8000',
+          changeOrigin: false,
+          secure: false,
+          ws: true,
+        },
         '^/api/v1.*': {
           target: 'http://localhost:8000',
           changeOrigin: true,

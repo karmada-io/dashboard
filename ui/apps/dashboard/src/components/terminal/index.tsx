@@ -14,16 +14,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { FC } from 'react';
-import Navigation from '@/components/navigation';
-interface HeaderProps {
-  onTerminalClick?: () => void;
-}
-const Header: FC<HeaderProps> = ({ onTerminalClick }) => {
-  return (
-    <>
-      <Navigation onTerminalClick={onTerminalClick} />
-    </>
-  );
-};
-export default Header;
+export { default as KarmadaTerminal } from './karmada-terminal.tsx';

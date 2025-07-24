@@ -14,16 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { FC } from 'react';
-import Navigation from '@/components/navigation';
-interface HeaderProps {
-  onTerminalClick?: () => void;
-}
-const Header: FC<HeaderProps> = ({ onTerminalClick }) => {
-  return (
-    <>
-      <Navigation onTerminalClick={onTerminalClick} />
-    </>
-  );
+import { create } from 'zustand';
+
+type GlobalState = {
+  karmadaTerminalOpen: boolean;
+  toggleKarmadaTerminal: () => void;
+  setKarmadaTerminalOpen: (isOpen: boolean) => void;
 };
-export default Header;
+
+export const useGlobalStore = create<GlobalState>((set) => ({
+  karmadaTerminalOpen: false,
+  toggleKarmadaTerminal: () =>
+    set((state) => ({ karmadaTerminalOpen: !state.karmadaTerminalOpen })),
+  setKarmadaTerminalOpen: (isOpen) => set({ karmadaTerminalOpen: isOpen }),
+}));

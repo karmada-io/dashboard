@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { FC ,ReactNode} from 'react';
+import { FC, ReactNode } from 'react';
 import { Layout as AntdLayout } from 'antd';
 import { Outlet, Navigate } from 'react-router-dom';
 import Header from './header';
@@ -22,7 +22,9 @@ import Sidebar from './sidebar';
 import { cn } from '@/utils/cn.ts';
 import { useAuth } from '@/components/auth';
 import { getSidebarWidth } from '@/utils/i18n';
-import { useWindowSize } from "@uidotdev/usehooks";
+import { useWindowSize } from '@uidotdev/usehooks';
+import { KarmadaTerminal } from '@/components/terminal';
+import { useGlobalStore } from '@/store/global';
 
 const { Sider: AntdSider, Content: AntdContent } = AntdLayout;
 
@@ -30,6 +32,8 @@ export const MainLayout: FC = () => {
   const { authenticated } = useAuth();
   const { width } = useWindowSize();
   const isSmallScreen = width !== null && width <= 768;
+  const { karmadaTerminalOpen, toggleKarmadaTerminal, setKarmadaTerminalOpen } =
+    useGlobalStore();
 
   if (!authenticated) {
     return <Navigate to="/login" />;
@@ -37,8 +41,10 @@ export const MainLayout: FC = () => {
 
   return (
     <>
-      <Header />
-      <AntdLayout className={cn('h-[calc(100vh-48px)]', 'overflow-hidden', 'flex')}>
+      <Header onTerminalClick={toggleKarmadaTerminal} />
+      <AntdLayout
+        className={cn('h-[calc(100vh-48px)]', 'overflow-hidden', 'flex')}
+      >
         <AntdSider
           width={getSidebarWidth()}
           collapsible
@@ -48,10 +54,17 @@ export const MainLayout: FC = () => {
         >
           <Sidebar collapsed={isSmallScreen} />
         </AntdSider>
-        <AntdContent >
+        <AntdContent>
           <Outlet />
         </AntdContent>
       </AntdLayout>
+
+      <KarmadaTerminal
+        isOpen={karmadaTerminalOpen}
+        onClose={() => {
+          setKarmadaTerminalOpen(false);
+        }}
+      />
     </>
   );
 };
