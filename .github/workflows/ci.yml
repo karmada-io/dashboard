@@ -67,3 +67,68 @@ jobs:
           go-version-file: go.mod
       - name: compile
         run: make all
+  e2e-frontend:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # Here support the latest three minor releases of Kubernetes, this can be considered to be roughly
+        # the same as the End of Life of the Kubernetes release: https://kubernetes.io/releases/
+        # Please remember to update the CI Schedule Workflow when we add a new version.
+        k8s: [ v1.31.0, v1.32.0, v1.33.0 ]
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed, if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+      - name: Checkout karmada repo
+        uses: actions/checkout@v4
+        with:
+          repository: karmada-io/karmada
+          path: karmada
+      - name: setup e2e test environment
+        run: |
+          cd karmada
+          export CLUSTER_VERSION=kindest/node:${{ matrix.k8s }}
+          hack/local-up-karmada.sh
+      - name: Checkout dashboard repo
+        uses: actions/checkout@v4
+        with:
+          path: karmada-dashboard
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          # keep in sync with the packageManager version in `ui/package.json`
+          version: 9.1.2
+      - name: Install dependencies
+        run: |
+          echo "Start build"
+          pnpm --version
+          cd karmada-dashboard/ui
+          pnpm install
+          pnpm turbo build
+      - name: Install Playwright Browsers
+        run: |
+          cd karmada-dashboard/ui/apps/dashboard
+          pnpm exec playwright install --with-deps
+      - name: Run Playwright tests
+        run: |
+          cd karmada-dashboard/ui/apps/dashboard
+          pnpm exec playwright test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.k8s }}
+          path: karmada-dashboard/ui/apps/dashboard/playwright-report/
+          retention-days: 30
