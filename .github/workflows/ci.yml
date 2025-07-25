@@ -131,4 +131,3 @@ jobs:
         with:
           name: playwright-report-${{ matrix.k8s }}
           path: karmada-dashboard/ui/apps/dashboard/playwright-report/
-          retention-days: 30
