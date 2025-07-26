@@ -72,6 +72,7 @@ KARMADA_GO_PACKAGE="github.com/karmada-io/dashboard"
 KARMADA_TARGET_SOURCE=(
   karmada-dashboard-api=cmd/api
   karmada-dashboard-web=cmd/web
+  kubernetes-dashboard-api=cmd/kubernetes-dashboard-api
 )
 
 
