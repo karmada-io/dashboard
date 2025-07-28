@@ -289,7 +289,7 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 
 	controlPlaneKubeClient := kubeclient.NewForConfigOrDie(opts.karmadaRestConfig)
 	memberClusterKubeClient := kubeclient.NewForConfigOrDie(opts.memberClusterRestConfig)
-	
+
 	// Fix 1: Use separate variable assignment, then assign to struct field
 	clusterID, err := karmadautil.ObtainClusterID(memberClusterKubeClient)
 	if err != nil {
@@ -300,7 +300,7 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 
 	// Fix 2: Create karmadaClient from the control plane config
 	karmadaClient := karmadaclientset.NewForConfigOrDie(opts.karmadaRestConfig)
-	
+
 	if err = registerOption.Validate(karmadaClient, true); err != nil {
 		return err
 	}
@@ -310,7 +310,7 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 		klog.ErrorS(err, "ObtainCredentialsFromMemberCluster failed")
 		return err
 	}
-	
+
 	if clusterSecret != nil {
 		registerOption.Secret = *clusterSecret
 	}
