@@ -294,7 +294,7 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 		klog.ErrorS(err, "ObtainClusterID failed")
 		return err
 	}
-	exist, name, err := karmadautil.IsClusterIdentifyUnique(opts.karmadaClient, id)
+	exist, name, err := registerOption.Validate(karmadaClient, true)
 	if err != nil {
 		klog.ErrorS(err, "Check ClusterIdentify failed")
 		return err
