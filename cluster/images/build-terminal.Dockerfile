@@ -18,27 +18,37 @@ FROM tsl0922/ttyd:1.7.7
 ARG KARMADACTL_VERSION=v1.13.0
 ARG KUBECTL_VERSION=v1.32.0
 ARG TARGETARCH
+ARG TRZSZ_VERSION=1.1.8
 
 # Switch to root so we can install packages or make changes
 USER root
 
-# (Optional) Install packages if needed
-# For example, if you need bash on Alpine:
-# RUN apk update && apk add --no-cache bash
-# RUN apt-get update && apt-get install -y curl
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
+# Install required packages
+RUN apt-get update && apt-get install -y curl wget && rm -rf /var/lib/apt/lists/*
 
 # Download and install kubectl
 RUN curl -fLo /usr/local/bin/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" \
   && chmod +x /usr/local/bin/kubectl
 
-
-
 # Download and install karmadactl using the version ARG
 RUN curl -fL "https://github.com/karmada-io/karmada/releases/download/${KARMADACTL_VERSION}/karmadactl-linux-${TARGETARCH}.tgz" \
     | tar -xzf - -C /usr/local/bin karmadactl \
     && chmod +x /usr/local/bin/karmadactl
+
+# Install trzsz (server-side component)
+# Map TARGETARCH to trzsz binary naming convention  
+RUN case "${TARGETARCH}" in \
+        "amd64") TRZSZ_ARCH="x86_64" ;; \
+        "arm64") TRZSZ_ARCH="aarch64" ;; \
+        "arm") TRZSZ_ARCH="arm" ;; \
+        *) TRZSZ_ARCH="${TARGETARCH}" ;; \
+    esac \
+    && wget -O /tmp/trzsz.tar.gz "https://github.com/trzsz/trzsz-go/releases/download/v${TRZSZ_VERSION}/trzsz_${TRZSZ_VERSION}_linux_${TRZSZ_ARCH}.tar.gz" \
+    && tar -xzf /tmp/trzsz.tar.gz -C /tmp \
+    && find /tmp -name "trz" -exec mv {} /usr/local/bin/ \; \
+    && find /tmp -name "tsz" -exec mv {} /usr/local/bin/ \; \
+    && chmod +x /usr/local/bin/trz /usr/local/bin/tsz \
+    && rm -rf /tmp/trzsz*
 
 # Create a new non-root user 'ttyd'
 RUN useradd -m ttyd
@@ -46,7 +56,5 @@ RUN useradd -m ttyd
 # Switch to the ttyd user
 USER ttyd
 
-
-# Override the entrypoint if you prefer bash over sh
-# (Only do this if bash is installed in the container)
-# ENTRYPOINT ["ttyd", "bash"]
+# CRITICAL FIX: Add -W flag to enable writable mode and trzsz support
+CMD ["ttyd", "-W", "-t", "enableTrzsz=true", "/bin/bash"]
