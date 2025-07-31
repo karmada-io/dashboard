@@ -265,7 +265,7 @@ func accessClusterInPullMode(opts *pullModeOption) error {
 	// TODO: deployment ready cannot exactly express that cluster is ready
 	// It should also check cluster resource on karmada control-plane
 	// maybe karmadactl should optimized it
-	if err = cmdutil.WaitForDeploymentRollout(opts.memberClusterClient, karmadaAgentDeployment, time.Duration(timeout)); err != nil {
+	if err = cmdutil.WaitForDeploymentRollout(opts.memberClusterClient, karmadaAgentDeployment, timeout); err != nil {
 		return err
 	}
 	return nil
