@@ -20,8 +20,6 @@ test('should navigate to the login page', async ({ page }) => {
   // Navigate to the home page
   await page.goto('/');
 
-  await page.waitForTimeout(2 * 1000);
-
   await expect(page.getByText('Sign in')).toBeVisible({
     timeout: 10000,
   });
