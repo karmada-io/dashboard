@@ -34,12 +34,12 @@ test('should navigate to overview after login', async ({ page }) => {
 
   await page.waitForTimeout(2 * 1000);
 
-  await page.getByTestId('login-input').fill('{token placeholder}')
+  await page.getByTestId('login-input').fill('{token placeholder}');
 
-  await page.getByTestId('login-button').click()
+  await page.getByTestId('login-button').click();
   await expect(page).toHaveURL(/overview/, {
-    timeout: 5* 1000
-  })
+    timeout: 5 * 1000,
+  });
 });
 */
 EOF && cat > ui/apps/dashboard/playwright.config.ts << 'EOF'
