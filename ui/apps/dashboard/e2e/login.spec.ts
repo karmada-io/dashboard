@@ -16,8 +16,6 @@ test('should navigate to overview after login', async ({ page }) => {
   // Navigate to the home page
   await page.goto('/');
 
-  await page.waitForTimeout(2 * 1000);
-
   await page.getByTestId('login-input').fill('{token placeholder}')
 
   await page.getByTestId('login-button').click()
