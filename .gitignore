@@ -35,12 +35,5 @@ cmd/ops
 
 # local api pid
 .api.pid
-
-reports
-
-test-results/
-
-# Playwright
-playwright-report/
-playwright/.cache/
+.tmp
 
