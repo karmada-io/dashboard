@@ -298,10 +298,8 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 	}
 	registerOption.ClusterID = clusterID
 
-	// Fix 2: Create karmadaClient from the control plane config
-	karmadaClient := karmadaclientset.NewForConfigOrDie(opts.karmadaRestConfig)
-
-	if err = registerOption.Validate(karmadaClient, true); err != nil {
+	// BETTER FIX 2: Use the existing client from opts
+	if err = registerOption.Validate(opts.karmadaClient, true); err != nil {
 		return err
 	}
 

@@ -2,8 +2,6 @@ module github.com/karmada-io/dashboard
 
 go 1.23.8
 
-toolchain go1.24.5
-
 require (
 	github.com/distribution/reference v0.6.0
 	github.com/emicklei/go-restful-openapi/v2 v2.11.0
