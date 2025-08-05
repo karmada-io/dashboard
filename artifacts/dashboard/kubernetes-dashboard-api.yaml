@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karmada-dashboard-kubernetes-dashboard-api
+  namespace: karmada-system
+  labels:
+    app: karmada-dashboard-kubernetes-dashboard-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: karmada-dashboard-kubernetes-dashboard-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: karmada-dashboard-kubernetes-dashboard-api
+    spec:
+      serviceAccountName: karmada-dashboard
+      automountServiceAccountToken: true
+      containers:
+        - command:
+            - kubernetes-dashboard-api
+            - --bind-address=0.0.0.0
+            - --insecure-bind-address=0.0.0.0
+            - --karmada-kubeconfig=/etc/kubeconfig
+            - --karmada-context=karmada-apiserver
+            - --openapi-enabled
+            - --metrics-provider=none
+          name: kubernetes-dashboard-api
+          image: karmada/kubernetes-dashboard-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8000
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          resources:
+            requests:
+              cpu: 250m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - name: kubeconfig
+              subPath: kubeconfig
+              mountPath: /etc/kubeconfig
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: kubeconfig
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: karmada-dashboard-kubernetes-dashboard-api
+  namespace: karmada-system
+  labels:
+    app: karmada-dashboard-kubernetes-dashboard-api
+spec:
+  ports:
+    - name: karmada-dashboard-kubernetes-dashboard-api
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app: karmada-dashboard-kubernetes-dashboard-api
+  type: ClusterIP
