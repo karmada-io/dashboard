@@ -10,7 +10,9 @@
     "lint": "eslint . --ext ts,tsx,js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "i18n:init": "i18n-tool init",
-    "i18n:scan": "i18n-tool scan"
+    "i18n:scan": "i18n-tool scan",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "keywords": [],
   "author": "",
@@ -51,7 +53,9 @@
   },
   "devDependencies": {
     "@karmada/eslint-config-ts-react": "workspace:*",
+    "@playwright/test": "^1.53.2",
     "@types/lodash": "^4.17.10",
+    "@types/node": "^20.12.11",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",

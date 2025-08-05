@@ -69,6 +69,7 @@ const LoginPage = () => {
           />
 
           <Input.TextArea
+            data-testid="login-input"
             className={'mt-4'}
             rows={6}
             value={authToken}
@@ -80,6 +81,7 @@ const LoginPage = () => {
           <div className={'mt-4'}>
             <Button
               type="primary"
+              data-testid="login-button"
               onClick={async () => {
                 try {
                   const ret = await Login(authToken);

@@ -1,0 +1,21 @@
+# Dockerfile for Karmada Dashboard UI - Development Mode
+FROM node:18-alpine
+WORKDIR /app
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 复制 hack 目录（包含许可证文件）
+COPY hack/ ./hack/
+
+# 复制 UI 代码
+COPY ui/ ./
+
+# 安装依赖
+RUN pnpm install
+
+# 暴露端口
+EXPOSE 5173
+
+# 使用开发模式启动，绑定到所有接口
+CMD ["pnpm", "run", "dashboard:dev", "--", "--host", "0.0.0.0"]

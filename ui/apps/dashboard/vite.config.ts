@@ -58,13 +58,13 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '^/api/v1/terminal/sockjs*': {
-          target: 'ws://localhost:8000',
+          target: 'ws://karmada-dashboard-api:8000',
           changeOrigin: false,
           secure: false,
           ws: true,
         },
         '^/api/v1.*': {
-          target: 'http://localhost:8000',
+          target: 'http://karmada-dashboard-api:8000',
           changeOrigin: true,
           headers: {
             // cookie: env.VITE_COOKIES,
