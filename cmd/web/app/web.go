@@ -90,6 +90,25 @@ func run(ctx context.Context, opts *options.Options) error {
 	return nil
 }
 
+func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Context)) (gin.HandlerFunc, error) {
+	remoteEndpoint, err := url.Parse(remoteURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return func(c *gin.Context) {
+		proxy := httputil.NewSingleHostReverseProxy(remoteEndpoint)
+		originalDirector := proxy.Director
+		proxy.Director = func(req *http.Request) {
+			originalDirector(req)
+			req.Header = c.Request.Header.Clone()
+			req.Host = remoteEndpoint.Host
+			director(req, c)
+		}
+		proxy.ServeHTTP(c.Writer, c.Request)
+	}, nil
+}
+
 func serve(opts *options.Options) {
 	insecureAddress := fmt.Sprintf("%s:%d", opts.InsecureBindAddress, opts.InsecurePort)
 	klog.V(1).InfoS("Listening and serving on", "address", insecureAddress)
@@ -100,23 +119,25 @@ func serve(opts *options.Options) {
 		g := r.Group(pathPrefix)
 		g.StaticFS("/static", http.Dir(opts.StaticDir))
 		if opts.EnableAPIProxy {
-			//	https://karmada-apiserver.karmada-system.svc.cluster.local:5443
-			g.Any("/api/*path", func(c *gin.Context) {
-				remote, _ := url.Parse(opts.APIProxyEndpoint)
-				proxy := httputil.NewSingleHostReverseProxy(remote)
-				proxy.Director = func(req *http.Request) {
-					req.Header = c.Request.Header
-					req.Host = remote.Host
-					req.URL.Scheme = remote.Scheme
-					req.URL.Host = remote.Host
-					req.URL.Path = strings.TrimPrefix(req.URL.Path, pathPrefix)
-				}
-				proxy.ServeHTTP(c.Writer, c.Request)
-			})
+			if apiProxyFunc, err := generateAPIProxy(opts.APIProxyEndpoint, func(req *http.Request, _ *gin.Context) {
+				req.URL.Path = strings.TrimPrefix(req.URL.Path, pathPrefix)
+			}); err == nil {
+				g.Any("/api/*path", apiProxyFunc)
+			} else {
+				klog.Fatalf("failed to parse api-proxy-endpoint: %v", err)
+			}
 		}
-		// TODO:
-		// currently we only mock the return i18n json, this feature will be implemented by ospp2024
-		// https://summer-ospp.ac.cn/org/prodetail/245c40338?lang=zh&list=pro
+		if opts.EnableKubernetesDashboardAPIProxy {
+			if kubernetesDashboardAPIProxyFunc, err := generateAPIProxy(opts.KubernetesDashboardAPIProxyEndpoint, func(req *http.Request, c *gin.Context) {
+				memberClusterName := c.Param("memberClusterName")
+				req.Header.Add("X-Member-ClusterName", memberClusterName)
+				req.URL.Path = c.Param("path")
+			}); err == nil {
+				g.Any("/clusterapi/:memberClusterName/*path", kubernetesDashboardAPIProxyFunc)
+			} else {
+				klog.Fatalf("failed to parse kubernetes-dashboard-api-proxy-endpoint: %v", err)
+			}
+		}
 		g.GET("/i18n/*path", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{})
 		})

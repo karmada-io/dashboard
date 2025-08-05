@@ -24,15 +24,17 @@ import (
 
 // Options contains everything necessary to create and run api.
 type Options struct {
-	BindAddress         net.IP
-	Port                int
-	InsecureBindAddress net.IP
-	InsecurePort        int
-	StaticDir           string
-	I18nDir             string
-	EnableAPIProxy      bool
-	APIProxyEndpoint    string
-	DashboardConfigPath string
+	BindAddress                         net.IP
+	Port                                int
+	InsecureBindAddress                 net.IP
+	InsecurePort                        int
+	StaticDir                           string
+	I18nDir                             string
+	EnableAPIProxy                      bool
+	APIProxyEndpoint                    string
+	EnableKubernetesDashboardAPIProxy   bool
+	KubernetesDashboardAPIProxyEndpoint string
+	DashboardConfigPath                 string
 }
 
 // NewOptions creates a new Options object with default parameters.
@@ -51,7 +53,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&o.InsecurePort, "insecure-port", 8000, "port to listen to for incoming HTTP requests")
 	fs.StringVar(&o.StaticDir, "static-dir", "./static", "directory to serve static files")
 	fs.StringVar(&o.I18nDir, "i18n-dir", "./i18n", "directory to serve i18n files")
-	fs.BoolVar(&o.EnableAPIProxy, "enable-api-proxy", true, "whether enable proxy to karmada-dashboard-api, if set true, all requests with /api prefix will be proxyed to karmada-dashboard-api.karmada-system.svc.cluster.local")
+	fs.BoolVar(&o.EnableAPIProxy, "enable-api-proxy", true, "whether enable proxy to karmada-dashboard-api, if set true, all requests with /api prefix will be proxied to karmada-dashboard-api.karmada-system.svc.cluster.local")
 	fs.StringVar(&o.APIProxyEndpoint, "api-proxy-endpoint", "http://karmada-dashboard-api.karmada-system.svc.cluster.local:8000", "karmada-dashboard-api endpoint")
+	fs.BoolVar(&o.EnableKubernetesDashboardAPIProxy, "enable-kubernetes-dashboard-api-proxy", true, "whether enable proxy to kubernetes-dashboard-api, if set true, all requests with /clusterapi prefix will be proxied to kubernetes-dashboard-api.karmada-system.svc.cluster.local")
+	fs.StringVar(&o.KubernetesDashboardAPIProxyEndpoint, "kubernetes-dashboard-api-proxy-endpoint", "http://kubernetes-dashboard-api.karmada-system.svc.cluster.local:8000", "kubernetes-dashboard-api endpoint")
 	fs.StringVar(&o.DashboardConfigPath, "dashboard-config-path", "./config/dashboard-config.yaml", "path to dashboard config file")
 }
