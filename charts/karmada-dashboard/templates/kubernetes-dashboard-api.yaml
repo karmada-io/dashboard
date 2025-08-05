@@ -1,0 +1,104 @@
+{{- $name := include "karmada-dashboard.name" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-kubernetes-dashboard-api
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.kubernetes-dashboard-api.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "karmada-dashboard.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.kubernetes_dashboard_api.replicaCount }}
+  {{- with .Values.kubernetes_dashboard_api.strategy }}
+  strategy:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with .Values.kubernetes_dashboard_api.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "karmada-dashboard.kubernetes-dashboard-api.labels" . | nindent 8 }}
+        {{- with .Values.kubernetes_dashboard_api.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: karmada-dashboard
+      {{- include "karmada-dashboard.imagePullSecrets" . | nindent 6 }}
+      securityContext:
+        {{- toYaml .Values.kubernetes_dashboard_api.podSecurityContext | nindent 8 }}
+      containers:
+        - name: kubernetes-dashboard-api
+          securityContext:
+            {{- toYaml .Values.kubernetes_dashboard_api.securityContext | nindent 12 }}
+          image: {{ template "karmada-dashboard.kubernetes-dashboard-api.image" . }}
+          imagePullPolicy: {{ .Values.kubernetes_dashboard_api.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.kubernetes_dashboard_api.service.port }}
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+          resources:
+            {{- toYaml .Values.kubernetes_dashboard_api.resources | nindent 12 }}
+          volumeMounts:
+            - name: kubeconfig-secret
+              subPath: kubeconfig
+              mountPath: /etc/kubeconfig
+          command:
+            - kubernetes-dashboard-api
+            - --karmada-kubeconfig=/etc/kubeconfig
+            - --karmada-context={{ .Values.kubernetes_dashboard_api.kubeconfigContext }}
+            - --insecure-bind-address=0.0.0.0
+            - --bind-address=0.0.0.0
+            - --openapi-enabled
+            - --metrics-provider=none
+      volumes:
+        - name: kubeconfig-secret
+          secret:
+            secretName: {{ .Values.kubernetes_dashboard_api.kubeconfigName }}
+      {{- with .Values.kubernetes_dashboard_api.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kubernetes_dashboard_api.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kubernetes_dashboard_api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+{{ if .Values.kubernetes_dashboard_api.podDisruptionBudget }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}-kubernetes-dashboard-api
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.kubernetes-dashboard-api.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "karmada-dashboard.kubernetes-dashboard-api.labels" . | nindent 6 }}
+  {{ toYaml .Values.kubernetes_dashboard_api.podDisruptionBudget | nindent 2 }}
+{{- end -}}

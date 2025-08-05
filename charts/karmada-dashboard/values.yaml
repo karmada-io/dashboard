@@ -177,3 +177,72 @@ web:
     type: ClusterIP
     port: 8000
     # nodePort: 32000
+
+kubernetes_dashboard_api:
+  ## @param kubernetes_dashboard_api.labels labels of the kubernetes-dashboard-api deployment
+  labels: {}
+  replicaCount: 1
+  ## @param kubernetes_dashboard_api.podAnnotations annotations of the kubernetes-dashboard-api pods
+  podAnnotations: { }
+  ## @param kubernetes_dashboard_api.podLabels labels of the kubernetes-dashboard-api pods
+  podLabels: { }
+  ## @param kubernetes_dashboard_api.image.registry kubernetes-dashboard-api image registry
+  ## @param kubernetes_dashboard_api.image.repository kubernetes-dashboard-api image repository
+  ## @param kubernetes_dashboard_api.image.tag karmada kubernetes-dashboard-api image tag (immutable tags are recommended)
+  ## @param kubernetes_dashboard_api.image.pullPolicy kubernetes-dashboard-api image pull policy
+  ## @param kubernetes_dashboard_api.image.pullSecrets Specify docker-registry secret names as an array
+  ##
+  image:
+    registry: docker.io
+    repository: karmada/kubernetes-dashboard-api
+    tag: *karmadaDashboardImageVersion
+    pullPolicy: *karmadaDashboardImagePullPolicy
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: [ ]
+  ## @param kubernetes_dashboard_api.resources resource quota of the kubernetes-dashboard-api
+  resources: { }
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 1000m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  ## @param kubernetes_dashboard_api.nodeSelector node selector of the kubernetes-dashboard-api
+  nodeSelector: { }
+  ## @param kubernetes_dashboard_api.affinity affinity of the kubernetes-dashboard-api
+  affinity: { }
+  ## @param kubernetes_dashboard_api.tolerations tolerations of the kubernetes-dashboard-api
+  tolerations: [ ]
+  # - key: node-role.kubernetes.io/master
+  #   operator: Exists
+  ## @param kubernetes_dashboard_api.strategy strategy of the kubernetes-dashboard-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 50%
+  ## @param kubernetes_dashboard_api.kubeconfigName secret name of the Karmada kubeconfig
+  kubeconfigName: karmada-kubeconfig
+  ## @param kubernetes_dashboard_api.kubeconfigContext context name used in the Karmada kubeconfig
+  kubeconfigContext: karmada-apiserver
+  ## @param kubernetes_dashboard_api.podDisruptionBudget
+  podDisruptionBudget: *podDisruptionBudget
+  podSecurityContext: { }
+  # fsGroup: 2000
+  securityContext: { }
+    # capabilities:
+    #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  service:
+    type: ClusterIP
+    port: 8000

@@ -41,7 +41,7 @@ spec:
               containerPort: {{ .Values.web.service.port }}
               protocol: TCP
           livenessProbe:
-            failureThreshold: 8
+            failureThreshold: 3
             httpGet:
               path: /livez
               port: 8000

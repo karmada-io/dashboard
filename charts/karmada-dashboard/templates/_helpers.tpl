@@ -96,8 +96,28 @@ app: {{ include "karmada-dashboard.name" . }}-web
 
 
 {{/*
+Return the proper kubernetes-dashboard-api image name
+*/}}
+{{- define "karmada-dashboard.kubernetes-dashboard-api.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.kubernetes_dashboard_api.image "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+kubernetes-dashboard-api labels
+*/}}
+{{- define "karmada-dashboard.kubernetes-dashboard-api.labels" -}}
+{{ include "karmada-dashboard.labels" . }}
+app: {{ include "karmada-dashboard.name" . }}-kubernetes-dashboard-api
+{{- if .Values.kubernetes_dashboard_api.labels }}
+{{- range $key, $value := .Values.kubernetes_dashboard_api.labels }}
+{{ $key }}: {{ $value }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "karmada-dashboard.imagePullSecrets" -}}
-{{ include "common.images.pullSecrets" (dict "images" (list .Values.api.image .Values.web.image) "global" .Values.global) }}
+{{ include "common.images.pullSecrets" (dict "images" (list .Values.api.image .Values.web.image .Values.kubernetes_dashboard_api.image) "global" .Values.global) }}
 {{- end -}}
