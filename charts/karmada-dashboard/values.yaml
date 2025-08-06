@@ -19,7 +19,7 @@ global:
 ## See https://yaml.org/spec/1.2/spec.html#id2765878 and
 ## https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#yaml-anchors-and-aliases-sharing-variable-values
 ## for more details about yaml anchors and aliases.
-karmadaDashboardImageVersion: &karmadaDashboardImageVersion main
+karmadaDashboardImageVersion: &karmadaDashboardImageVersion latest
 
 ## Specify the imagePullPolicy of karmada-dashboard images
 ## Defaults to 'IfNotPresent', you can set to 'Always' in cases of special needs
