@@ -27,7 +27,7 @@
     "lint-staged": "^15.2.7",
     "tsup": "^8.1.0",
     "tsx": "^4.15.6",
-    "turbo": "^2.0.6"
+    "turbo": "^2.5.5"
   },
   "dependencies": {
     "dayjs": "^1.11.11"
