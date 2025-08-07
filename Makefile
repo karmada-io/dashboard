@@ -8,7 +8,8 @@ VERSION 				?= $(shell hack/version.sh)
 
 # Build targets
 TARGETS := karmada-dashboard-api \
-		   karmada-dashboard-web
+		   karmada-dashboard-web \
+		   kubernetes-dashboard-api
 
 # Docker image related variables
 REGISTRY				?= docker.io/karmada
