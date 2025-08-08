@@ -17,7 +17,6 @@ limitations under the License.
 package assistant
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -133,7 +132,7 @@ func addMCPToolsToRequest(chatReq *openai.ChatCompletionRequest, mcpClient *MCPC
 }
 
 func handleChatCompletion(c *gin.Context, client *openai.Client, chatReq openai.ChatCompletionRequest, enableMCP bool, mcpClient *MCPClient) {
-	resp, err := client.CreateChatCompletionStream(context.Background(), chatReq)
+	resp, err := client.CreateChatCompletionStream(c.Request.Context(), chatReq)
 	if err != nil {
 		klog.Errorf("Failed to create chat completion stream: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get response from LLM"})
@@ -288,7 +287,7 @@ func makeFinalCall(c *gin.Context, client *openai.Client, messages []openai.Chat
 		Stream:   true,
 	}
 
-	finalResp, err := client.CreateChatCompletionStream(context.Background(), finalChatReq)
+	finalResp, err := client.CreateChatCompletionStream(c.Request.Context(), finalChatReq)
 	if err != nil {
 		klog.Errorf("Failed to create final chat completion stream: %v", err)
 		return

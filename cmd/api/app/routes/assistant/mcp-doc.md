@@ -61,7 +61,6 @@ karmada-mcp-server --help
 # Test MCP server (optional)
 ./karmada-mcp-server stdio \
   --karmada-kubeconfig=/path/to/karmada.config \
-  --karmada-context=karmada-apiserver \
   --karmada-context=karmada-apiserver
 ```
 
@@ -80,8 +79,8 @@ export KARMADA_CONTEXT="karmada-apiserver"
 # === MCP Integration ===
 export ENABLE_MCP=true
 export MCP_TRANSPORT_MODE="sse" # Optional, defaults to stdio 
-export KARMADA_MCP_SERVER_PATH="/usr/local/bin/karmada-mcp-server" # 在STDIO模式下必需
-export MCP_SSE_ENDPOINT="http://localhost:1234/mcp/sse" # 在SSE模式下必需。
+export KARMADA_MCP_SERVER_PATH="/usr/local/bin/karmada-mcp-server" # Required in STDIO mode 
+export MCP_SSE_ENDPOINT="http://localhost:1234/mcp/sse" # Required in SSE mode
 ```
 
 
@@ -97,6 +96,5 @@ go run ./cmd/karmada-mcp-server/main.go
 ```
 
 2. **Setup Environment Variables**
-  
-
-3. **Run Development Server**
+3. 
+4. **Run Development Server**
