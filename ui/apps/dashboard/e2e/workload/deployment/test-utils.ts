@@ -23,16 +23,17 @@ import { createKarmadaApiClient, setupDashboardAuthentication } from '../../test
 export { setupDashboardAuthentication };
 
 /**
- * Generate test DaemonSet YAML with timestamp
+ * Generate test YAML with timestamp
  */
-export function generateTestDaemonSetYaml() {
+export function generateTestDeploymentYaml() {
     const timestamp = Date.now();
     return `apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
-  name: test-daemonset-${timestamp}
+  name: test-deployment-${timestamp}
   namespace: default
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: test-app
@@ -49,15 +50,15 @@ spec:
 }
 
 /**
- * Creates a Kubernetes DaemonSet using the Kubernetes JavaScript client.
+ * Creates a Kubernetes Deployment using the Kubernetes JavaScript client.
  * This is a more robust way to set up test data than UI interaction.
- * @param yamlContent The YAML content of the daemonset.
- * @returns A Promise that resolves when the daemonset is created.
+ * @param yamlContent The YAML content of the deployment.
+ * @returns A Promise that resolves when the deployment is created.
  */
-export async function createK8sDaemonSet(yamlContent: string): Promise<void> {
+export async function createK8sDeployment(yamlContent: string): Promise<void> {
     try {
         const k8sApi = createKarmadaApiClient();
-        const yamlObject = parse(yamlContent) as k8s.V1DaemonSet;
+        const yamlObject = parse(yamlContent) as k8s.V1Deployment;
         
         // Ensure namespace is always defined
         const namespace = yamlObject.metadata?.namespace || 'default';
@@ -68,57 +69,58 @@ export async function createK8sDaemonSet(yamlContent: string): Promise<void> {
         }
         yamlObject.metadata.namespace = namespace;
 
-        await k8sApi.createNamespacedDaemonSet({
+        await k8sApi.createNamespacedDeployment({
             namespace: namespace,
             body: yamlObject
         });
         
     } catch (error: any) {
-        throw new Error(`Failed to create daemonset: ${(error as Error).message}`);
+        throw new Error(`Failed to create deployment: ${(error as Error).message}`);
     }
 }
 
 /**
- * Deletes a Kubernetes DaemonSet using the Kubernetes JavaScript client.
- * @param daemonSetName The name of the daemonset to delete.
- * @param namespace The namespace of the daemonset (default: 'default').
- * @returns A Promise that resolves when the daemonset is deleted.
+ * Deletes a Kubernetes Deployment using the Kubernetes JavaScript client.
+ * @param deploymentName The name of the deployment to delete.
+ * @param namespace The namespace of the deployment (default: 'default').
+ * @returns A Promise that resolves when the deployment is deleted.
  */
-export async function deleteK8sDaemonSet(daemonSetName: string, namespace: string = 'default'): Promise<void> {
+export async function deleteK8sDeployment(deploymentName: string, namespace: string = 'default'): Promise<void> {
     try {
         const k8sApi = createKarmadaApiClient();
         
-        // Assert parameters are valid for test daemonset
-        expect(daemonSetName).toBeTruthy();
-        expect(daemonSetName).not.toBe('');
+        // Assert parameters are valid for test deployment
+        expect(deploymentName).toBeTruthy();
+        expect(deploymentName).not.toBe('');
         expect(namespace).toBeTruthy();
 
-        await k8sApi.deleteNamespacedDaemonSet({
-            name: daemonSetName,
+        // await k8sApi.deleteNamespacedDeployment(deploymentName, namespace);
+        await k8sApi.deleteNamespacedDeployment({
+            name: deploymentName,
             namespace: namespace
         });
         
     } catch (error: any) {
         if (error.code === 404) {
-            // DaemonSet not found - already deleted, this is fine
+            // Deployment not found - already deleted, this is fine
             return;
         }
-        throw new Error(`Failed to delete daemonset: ${(error as Error).message}`);
+        throw new Error(`Failed to delete deployment: ${(error as Error).message}`);
     }
 }
 
 /**
- * Gets daemonset name from YAML content using proper YAML parsing.
+ * Gets deployment name from YAML content using proper YAML parsing.
  * @param yamlContent The YAML content.
- * @returns The daemonset name.
+ * @returns The deployment name.
  */
-export function getDaemonSetNameFromYaml(yamlContent: string): string {
+export function getDeploymentNameFromYaml(yamlContent: string): string {
     const yamlObject = parse(yamlContent) as Record<string, string>;
-    const daemonSetName = _.get(yamlObject, 'metadata.name');
+    const deploymentName = _.get(yamlObject, 'metadata.name');
 
-    if (!daemonSetName) {
-        throw new Error('Could not extract daemonset name from YAML');
+    if (!deploymentName) {
+        throw new Error('Could not extract deployment name from YAML');
     }
 
-    return daemonSetName;
+    return deploymentName;
 }
