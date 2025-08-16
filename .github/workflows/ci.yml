@@ -89,16 +89,46 @@ jobs:
           large-packages: false
           docker-images: false
           swap-storage: false
+
       - name: Checkout karmada repo
         uses: actions/checkout@v4
         with:
           repository: karmada-io/karmada
           path: karmada
+
       - name: setup e2e test environment
         run: |
           cd karmada
           export CLUSTER_VERSION=kindest/node:${{ matrix.k8s }}
           hack/local-up-karmada.sh
+          echo "KUBECONFIG=/home/runner/.kube/karmada.config" >> $GITHUB_ENV
+
+      - name: Debug cluster status
+        run: |
+          echo "=== Debug Info ==="
+          echo "Current directory: $(pwd)"
+          echo "KUBECONFIG: $KUBECONFIG"
+          kubectl config get-contexts || echo "No contexts available"
+          kubectl cluster-info || echo "Cluster info failed"
+          docker ps || echo "Docker ps failed" 
+          kind get clusters || echo "Kind get clusters failed"
+          ls -la $HOME/.kube/ || echo "No .kube directory"
+          cat $HOME/.kube/config || echo "No standard config"
+          cat $HOME/.kube/karmada.config || echo "No karmada config"
+          cat $HOME/.kube/members.config || echo "No members config"
+          echo "=================="
+
+      - name: Generate KARMADA_TOKEN for CI
+        run: |
+          kubectl create sa e2e-test -n kube-system
+          kubectl create clusterrolebinding e2e-test-binding \
+            --clusterrole=cluster-admin \
+            --serviceaccount=kube-system:e2e-test
+          
+          # 使用 kubectl create token 命令生成临时 token
+          TOKEN=$(kubectl create token e2e-test -n kube-system --duration=3600s)
+          echo "KARMADA_TOKEN=$TOKEN" >> $GITHUB_ENV
+
       - name: Checkout dashboard repo
         uses: actions/checkout@v4
         with:
@@ -111,6 +141,7 @@ jobs:
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
+
       - name: Install dependencies
         run: |
           echo "Start build"
@@ -118,18 +149,88 @@ jobs:
           cd karmada-dashboard/ui
           pnpm install
           pnpm turbo build
+
+      - name: Build API binary
+        run: |
+          cd karmada-dashboard
+          make build
+
+      - name: Start API server
+        run: |
+          cd karmada-dashboard
+          make run-api &
+          echo $! > .api.pid
+          sleep 5
+
+      # ===== 添加API服务器健康检查 =====
+      - name: Wait for API server to be ready
+        run: |
+          echo "Waiting for API server to be ready..."
+          timeout 60s bash -c 'while ! nc -z localhost 8000; do echo "Waiting for API server port..."; sleep 5; done' || {
+            echo "API server failed to start within 60 seconds"
+            echo "=== API Server Debug ==="
+            if [ -f karmada-dashboard/.api.pid ]; then
+              API_PID=$(cat karmada-dashboard/.api.pid)
+              ps aux | grep $API_PID || echo "API process not found"
+            fi
+            ss -tuln | grep 8000 || echo "Port 8000 not listening"
+            exit 1
+          }
+          echo "API server is ready!"
+
       - name: Install Playwright Browsers
         run: |
           cd karmada-dashboard/ui/apps/dashboard
           pnpm exec playwright install --with-deps
-      - name: Run Playwright tests
+
+      - name: Debug environment before starting dashboard
         run: |
-          cd karmada-dashboard/ui/apps/dashboard
+          echo "=== Environment Debug ==="
+          echo "KARMADA_TOKEN is set: ${{ env.KARMADA_TOKEN != '' }}"
+          echo "KUBECONFIG: $KUBECONFIG"
+          echo "Current directory: $(pwd)"
+          echo "Dashboard directory contents:"
+          ls -la karmada-dashboard/ || echo "No dashboard directory"
+          echo "Check if Makefile exists:"
+          ls -la karmada-dashboard/Makefile || echo "No Makefile found"
+          echo "========================="
+
+      - name: Build frontend (for e2e)
+        working-directory: karmada-dashboard/ui/apps/dashboard
+        run: |
+          pnpm build
+
+      - name: Test API connectivity before running tests
+        run: |
+          echo "Testing API connectivity..."
+          # 测试几个关键的API端点
+          curl -f http://localhost:8000/api/v1/cluster && echo "✓ Cluster API works" || echo "✗ Cluster API failed"
+          curl -f http://localhost:8000/api/v1/namespace && echo "✓ Namespace API works" || echo "✗ Namespace API failed"
+          echo "API tests completed"
+
+      - name: Debug working dir
+        run: |
+          pwd
+          ls -al
+
+      - name: Run Playwright tests
+        working-directory: karmada-dashboard/ui/apps/dashboard
+        run: |
           pnpm exec playwright test
+
+      # ===== 添加进程清理 =====
+      - name: Cleanup processes
+        if: always()
+        run: |
+          echo "Cleaning up processes..."
+          if [ -f karmada-dashboard/.api.pid ]; then
+            API_PID=$(cat karmada-dashboard/.api.pid)
+            kill $API_PID 2>/dev/null || echo "API process already stopped"
+          fi
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-${{ matrix.k8s }}
           path: karmada-dashboard/ui/apps/dashboard/playwright-report/
           retention-days: 30
-
