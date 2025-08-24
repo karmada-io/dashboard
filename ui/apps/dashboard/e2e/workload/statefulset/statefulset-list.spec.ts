@@ -30,23 +30,28 @@ test.beforeEach(async ({ page }) => {
     await page.goto(`${baseURL}${basePath}`, { waitUntil: 'networkidle' });
     await page.evaluate((t) => localStorage.setItem('token', t), token);
     await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForSelector('text=Dashboard', { timeout: 30000 });
+    await page.waitForSelector('text=Overview', { timeout: 30000 });
 });
 
-test('should display namespace list', async ({ page }) => {
-    // 打开 Namespaces 页面
-    await page.waitForSelector('text=Namespaces', { timeout: 60000 });
-    await page.click('text=Namespaces');
+test('should display statefulset list', async ({ page }) => {
+    // 打开 Workloads 菜单
+    await page.click('text=Workloads');
 
-    // 获取表格元素并验证可见
+    // 点击可见的 Statefulset tab
+    const statefulsetTab = page.locator('role=option[name="Statefulset"]');
+    await statefulsetTab.waitFor({ state: 'visible', timeout: 30000 });
+    await statefulsetTab.click();
+
+    // 验证选中状态
+    await expect(statefulsetTab).toHaveAttribute('aria-selected', 'true');
+
+
+    // 验证 StatefulSet 列表表格可见
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
-    // 验证表格中包含默认 namespace
-    await expect(table).toContainText('default');
-
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-namespace-list.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-statefulset-list.png', fullPage: true });
     }
 });

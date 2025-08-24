@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// apps/dashboard/e2e/namespace-create.spec.ts
+// apps/dashboard/e2e/namespace-list.spec.ts
 import { test, expect } from '@playwright/test';
 
 // Set webServer.url and use.baseURL with the location of the WebServer
@@ -30,35 +30,28 @@ test.beforeEach(async ({ page }) => {
     await page.goto(`${baseURL}${basePath}`, { waitUntil: 'networkidle' });
     await page.evaluate((t) => localStorage.setItem('token', t), token);
     await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForSelector('text=Dashboard', { timeout: 30000 });
+    await page.waitForSelector('text=Overview', { timeout: 30000 });
 });
 
-test('should create a new namespace', async ({ page }) => {
-    // 打开 Namespaces 页面
-    await page.waitForSelector('text=Namespaces', { timeout: 60000 });
-    await page.click('text=Namespaces');
+test('should display cronjob list', async ({ page }) => {
+    // 打开 Workloads 菜单
+    await page.click('text=Workloads');
 
-    // 点击 "Add" 创建新 namespace
-    await page.waitForSelector('button:has-text("Add")', { timeout: 30000 });
-    await page.click('button:has-text("Add")');
+    // 点击可见的 Statefulset tab
+    const statefulsetTab = page.locator('role=option[name="Cronjob"]');
+    await statefulsetTab.waitFor({ state: 'visible', timeout: 30000 });
+    await statefulsetTab.click();
 
-    // 填写唯一 namespace 名称
-    const namespaceName = `test-${Date.now()}`;
-    await page.waitForSelector('#name', { timeout: 30000 });
-    await page.fill('#name', namespaceName);
+    // 验证选中状态
+    await expect(statefulsetTab).toHaveAttribute('aria-selected', 'true');
 
-    // 提交创建
-    await page.click('label:has-text("No")');
-    await page.click('button:has-text("Submit")');
 
-    // 搜索并验证 namespace 已创建
-    const searchBox = page.getByPlaceholder('Search by Name');
-    await searchBox.fill(namespaceName);
-    await searchBox.press('Enter');
-    await expect(page.locator('table')).toContainText(namespaceName);
+    // 验证 StatefulSet 列表表格可见
+    const table = page.locator('table');
+    await expect(table).toBeVisible({ timeout: 30000 });
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-namespace-create.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-cronjob-list.png', fullPage: true });
     }
 });
