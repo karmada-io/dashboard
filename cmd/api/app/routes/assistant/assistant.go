@@ -121,11 +121,7 @@ func newAnsweringSession(c *gin.Context) (*answeringSession, error) {
 func (s *answeringSession) run() error {
 	setupSSEHeaders(s.writer)
 
-	systemMessage := "You are a helpful assistant for Karmada cluster management." +
-		"You can provide guidance about Karmada concepts, best practices, and configuration help."
-
 	messages := []openai.ChatCompletionMessage{
-		{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
 		{Role: openai.ChatMessageRoleUser, Content: s.userInput},
 	}
 

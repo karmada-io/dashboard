@@ -60,10 +60,9 @@ export const getAssistantStream = (
   onMessage: (data: string) => void,
   onError: (error: any) => void,
   onClose: () => void,
+  signal?: AbortSignal, // Add optional abort signal parameter
 ) => {
   console.log('Sending message to assistant:', message); // debug log
-  
-  const controller = new AbortController();
   
   fetchEventSource('/api/v1/assistant', {
     method: 'POST',
@@ -71,7 +70,7 @@ export const getAssistantStream = (
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ prompt: message }),
-    signal: controller.signal,
+    signal, // Use the passed signal instead of creating a new one
     onmessage(ev: { data: string }) {
       console.log('Received message:', ev.data); // debug log
       try {
@@ -88,7 +87,6 @@ export const getAssistantStream = (
     },
     onerror(err: any) {
       console.error('Stream error:', err);
-      controller.abort(); // abort connection
       onError(err);
     },
     onclose() {
@@ -96,9 +94,6 @@ export const getAssistantStream = (
       onClose();
     },
   });
-  
-  // return the controller, so that the external can abort the connection
-  return controller;
 };
 
 // new: get MCP tool list
@@ -124,10 +119,9 @@ export const getChatStream = (
   onToolCall: (toolCall: ToolCall) => void,
   onError: (error: any) => void,
   onClose: () => void,
+  signal?: AbortSignal, // Add optional abort signal parameter
 ) => {
   console.log('Sending message to chat with MCP:', { message, enableMCP, historyLength: history.length });
-  
-  const controller = new AbortController();
   
   fetchEventSource('/api/v1/chat', {
     method: 'POST',
@@ -139,7 +133,7 @@ export const getChatStream = (
       history,
       enableMcp: enableMCP,
     }),
-    signal: controller.signal,
+    signal, // Use the passed signal instead of creating a new one
     onmessage(ev: { data: string }) {
       console.log('Received chat message:', ev.data);
       try {
@@ -156,6 +150,18 @@ export const getChatStream = (
               onToolCall(response.toolCall);
             }
             break;
+          case 'tool_call_start':
+            // Tool execution started - we can ignore this or handle if needed
+            console.log('Tool execution started:', response.toolCall?.toolName);
+            break;
+          case 'tool_processing':
+            // Tool processing notification - we can ignore this
+            console.log('Tool processing:', response.content);
+            break;
+          case 'tool_processing_complete':
+            // Tool processing completed - we can ignore this
+            console.log('Tool processing complete:', response.content);
+            break;
           case 'completion':
             // ignore completion signal
             break;
@@ -170,7 +176,6 @@ export const getChatStream = (
     },
     onerror(err: any) {
       console.error('Chat stream error:', err);
-      controller.abort();
       onError(err);
     },
     onclose() {
@@ -178,6 +183,4 @@ export const getChatStream = (
       onClose();
     },
   });
-  
-  return controller;
 };
