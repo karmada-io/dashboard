@@ -1,0 +1,177 @@
+.floating-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.chat-ball {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.chat-ball:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.chat-ball.active {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+}
+
+.chat-container {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 360px;
+  height: 480px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chat-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-body {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Override ChatUI styles - 固定输入框在底部 */
+.chat-body .chatui-chat {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-body .chatui-chat .chatui-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.chat-body .chatui-chat .chatui-composer {
+  flex-shrink: 0;
+  padding: 12px;
+  border-top: 1px solid #f0f0f0;
+  background: white;
+  position: sticky;
+  bottom: 0;
+}
+
+/* 确保消息容器可以正确滚动 */
+.chat-body .chatui-scroll-view {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 消息列表样式 */
+.chat-body .chatui-message-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 12px;
+}
+
+/* Custom bubble styles */
+.chat-body .chatui-bubble {
+  max-width: 280px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.chat-body .chatui-bubble-right {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.chat-body .chatui-bubble-left {
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .floating-chat {
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .chat-ball {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+  
+  .chat-container {
+    width: calc(100vw - 30px);
+    height: 400px;
+    right: -15px;
+    bottom: 65px;
+  }
+}
+
+@media (max-width: 360px) {
+  .chat-container {
+    width: calc(100vw - 20px);
+    right: -10px;
+  }
+}
