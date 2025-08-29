@@ -41,12 +41,109 @@ test('should view deployment details', async ({ page }) => {
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
-    // 等待至少有一个deployment行存在
-    await page.waitForSelector('table tbody tr', { timeout: 30000 });
+    // 检查是否有deployment数据，如果没有则创建一个
+    const deploymentRows = page.locator('table tbody tr');
+    const rowCount = await deploymentRows.count();
+    
+    if (rowCount === 0) {
+        console.log('No deployments found, creating one first...');
+        
+        // 创建一个deployment
+        await page.click('button:has-text("Add")');
+        await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
+        
+        const testDeploymentYaml = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deployment-for-view-${Date.now()}
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80`;
+        
+        // 设置YAML内容
+        await page.evaluate((yaml) => {
+            const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
+            if (textarea) {
+                textarea.value = yaml;
+                textarea.focus();
+            }
+        }, testDeploymentYaml);
+        
+        // 触发React onChange回调
+        await page.evaluate((yaml) => {
+            const findReactFiber = (element: any) => {
+                const keys = Object.keys(element);
+                return keys.find(key => key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance'));
+            };
+            
+            const monacoContainer = document.querySelector('.monaco-editor');
+            if (monacoContainer) {
+                const fiberKey = findReactFiber(monacoContainer);
+                if (fiberKey) {
+                    let fiber = (monacoContainer as any)[fiberKey];
+                    while (fiber) {
+                        if (fiber.memoizedProps && fiber.memoizedProps.onChange) {
+                            fiber.memoizedProps.onChange(yaml);
+                            return;
+                        }
+                        fiber = fiber.return;
+                    }
+                }
+            }
 
-    // 点击第一个deployment的View按钮
-    const firstViewButton = page.locator('table tr:not(:first-child)').first().getByText('View');
-    await firstViewButton.click();
+            const dialog = document.querySelector('[role="dialog"]');
+            if (dialog) {
+                const fiberKey = findReactFiber(dialog);
+                if (fiberKey) {
+                    let fiber = (dialog as any)[fiberKey];
+                    const traverse = (node: any, depth = 0) => {
+                        if (!node || depth > 20) return false;
+                        if (node.memoizedProps && node.memoizedProps.onChange) {
+                            node.memoizedProps.onChange(yaml);
+                            return true;
+                        }
+                        if (node.child && traverse(node.child, depth + 1)) return true;
+                        if (node.sibling && traverse(node.sibling, depth + 1)) return true;
+                        return false;
+                    };
+                    traverse(fiber);
+                }
+            }
+        }, testDeploymentYaml);
+        
+        // 等待提交按钮变为可用状态并点击
+        await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
+        await page.click('[role="dialog"] button:has-text("Submit")');
+        
+        // 等待对话框关闭
+        await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 10000 }).catch(() => {});
+        
+        // 等待表格重新加载并显示新数据
+        await page.reload();
+        await page.click('text=Workloads');
+        await expect(table).toBeVisible({ timeout: 30000 });
+        await expect(table.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
+    }
+
+    // 等待View按钮出现
+    const viewButton = page.locator('table tbody tr').first().getByText('View');
+    
+    // 等待View按钮可见并点击
+    await expect(viewButton).toBeVisible({ timeout: 15000 });
+    await viewButton.click();
 
     // 验证详情页已显示
     await page.waitForLoadState('networkidle');
