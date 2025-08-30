@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: install Go
         uses: actions/setup-go@v5
         with:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags.
           # We need to guess version via git tags.
@@ -95,7 +95,7 @@ jobs:
           swap-storage: false
 
       - name: Checkout karmada repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: karmada-io/karmada
           path: karmada
@@ -109,27 +109,17 @@ jobs:
       - name: Debug cluster status
         if: ${{ env.DEBUG == 'true' }}
         run: |
-          echo "=== Debug Info ==="
           kubectl cluster-info || echo "Cluster info failed"
           kubectl get nodes -o wide || echo "Get nodes failed"
           kubectl get pods -A || echo "Get pods failed"
           kind get clusters || echo "Kind get clusters failed"
-          echo "=================="
       - name: Checkout dashboard repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: karmada-dashboard
 
       - name: Generate KARMADA_TOKEN for CI
         run: |
-          # kubectl --context=karmada-apiserver create sa e2e-test -n kube-system
-          # kubectl --context=karmada-apiserver create clusterrolebinding e2e-test-binding \
-          #  --clusterrole=cluster-admin \
-          #  --serviceaccount=kube-system:e2e-test
-          
-          # 使用 kubectl create token 命令生成临时 token
-          #TOKEN=$(kubectl --context=karmada-apiserver create token e2e-test -n kube-system --duration=3600s)
-          # kubectl --context=karmada-apiserver apply -f karmada-dashboard/artifacts/dashboard
           kubectl --context=karmada-host apply -k karmada-dashboard/artifacts/overlays/nodeport-mode
           kubectl --context=karmada-apiserver apply -f karmada-dashboard/artifacts/dashboard/karmada-dashboard-sa.yaml
           TOKEN=$(kubectl --context=karmada-apiserver -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}")
@@ -160,7 +150,6 @@ jobs:
           make run-api &
           echo $! > .api.pid
           sleep 5
-      # ===== 添加API服务器健康检查 =====
       - name: Wait for API server to be ready
         run: |
           echo "Waiting for API server to be ready..."
@@ -182,7 +171,6 @@ jobs:
       - name: Debug environment before starting dashboard
         if: ${{ env.DEBUG == 'true' }}
         run: |
-          echo "=== Environment Debug ==="
           echo "KARMADA_TOKEN is set: ${{ env.KARMADA_TOKEN != '' }}"
           echo "KUBECONFIG: $KUBECONFIG"
           echo "Current directory: $(pwd)"
@@ -190,7 +178,6 @@ jobs:
           ls -la karmada-dashboard/ || echo "No dashboard directory"
           echo "Check if Makefile exists:"
           ls -la karmada-dashboard/Makefile || echo "No Makefile found"
-          echo "========================="
       - name: Build frontend (for e2e)
         working-directory: karmada-dashboard/ui/apps/dashboard
         run: |
@@ -198,7 +185,6 @@ jobs:
       - name: Test API connectivity before running tests
         run: |
           echo "Testing API connectivity..."
-          # 测试几个关键的API端点
           curl -f http://localhost:8000/api/v1/cluster && echo "✓ Cluster API works" || echo "✗ Cluster API failed"
           curl -f http://localhost:8000/api/v1/namespace && echo "✓ Namespace API works" || echo "✗ Namespace API failed"
           echo "API tests completed"
@@ -211,7 +197,6 @@ jobs:
         working-directory: karmada-dashboard/ui/apps/dashboard
         run: |
           pnpm exec playwright test
-      # ===== 添加进程清理 =====
       - name: Cleanup processes
         if: always()
         run: |
