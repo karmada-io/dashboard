@@ -265,7 +265,7 @@ func accessClusterInPullMode(opts *pullModeOption) error {
 	// TODO: deployment ready cannot exactly express that cluster is ready
 	// It should also check cluster resource on karmada control-plane
 	// maybe karmadactl should optimized it
-	if err = cmdutil.WaitForDeploymentRollout(opts.memberClusterClient, karmadaAgentDeployment, int(timeout)); err != nil {
+	if err = cmdutil.WaitForDeploymentRollout(opts.memberClusterClient, karmadaAgentDeployment, timeout); err != nil {
 		return err
 	}
 	return nil
@@ -289,32 +289,32 @@ func accessClusterInPushMode(opts *pushModeOption) error {
 
 	controlPlaneKubeClient := kubeclient.NewForConfigOrDie(opts.karmadaRestConfig)
 	memberClusterKubeClient := kubeclient.NewForConfigOrDie(opts.memberClusterRestConfig)
-	id, err := karmadautil.ObtainClusterID(memberClusterKubeClient)
+	clusterID, err := karmadautil.ObtainClusterID(memberClusterKubeClient)
 	if err != nil {
 		klog.ErrorS(err, "ObtainClusterID failed")
 		return err
 	}
-	exist, name, err := karmadautil.IsClusterIdentifyUnique(opts.karmadaClient, id)
-	if err != nil {
-		klog.ErrorS(err, "Check ClusterIdentify failed")
+	registerOption.ClusterID = clusterID
+
+	if err = registerOption.Validate(opts.karmadaClient, true); err != nil {
 		return err
 	}
-	if !exist {
-		return fmt.Errorf("the same cluster has been registered with name %s", name)
-	}
-	registerOption.ClusterID = id
 
 	clusterSecret, impersonatorSecret, err := karmadautil.ObtainCredentialsFromMemberCluster(memberClusterKubeClient, registerOption)
 	if err != nil {
 		klog.ErrorS(err, "ObtainCredentialsFromMemberCluster failed")
 		return err
 	}
-	registerOption.Secret = *clusterSecret
-	registerOption.ImpersonatorSecret = *impersonatorSecret
+	if clusterSecret != nil {
+		registerOption.Secret = *clusterSecret
+	}
+	if impersonatorSecret != nil {
+		registerOption.ImpersonatorSecret = *impersonatorSecret
+	}
 
 	err = karmadautil.RegisterClusterInControllerPlane(registerOption, controlPlaneKubeClient, generateClusterInControllerPlane)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to register with karmada control plane: %w", err)
 	}
 	klog.Infof("cluster(%s) is joined successfully\n", opts.clusterName)
 	return nil
