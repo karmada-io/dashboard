@@ -28,6 +28,8 @@ type EndpointList struct {
 }
 
 // toEndpointList converts array of api events to endpoint List structure
+//
+//nolint:staticcheck // SA1019 ignore deprecated Kubernetes API Endpoints.
 func toEndpointList(endpoints []v1.Endpoints) *EndpointList {
 	endpointList := EndpointList{
 		Endpoints: make([]Endpoint, 0),
