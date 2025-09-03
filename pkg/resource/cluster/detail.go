@@ -18,7 +18,6 @@ package cluster
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
@@ -62,8 +61,6 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 
 	allocatableMemory := cluster.Status.ResourceSummary.Allocatable.Memory()
 	allocatedMemory := cluster.Status.ResourceSummary.Allocated.Memory()
-	fmt.Println(allocatableMemory.String())
-	fmt.Println(allocatedMemory.Value())
 	var memoryCapacity = allocatableMemory.Value()
 	var memoryFraction float64
 	if memoryCapacity > 0 {

@@ -186,12 +186,12 @@ func (v *resourceVerber) Create(object *unstructured.Unstructured) (*unstructure
 }
 
 // VerberClient returns a resourceVerber client.
-func VerberClient(_ *http.Request) (ResourceVerber, error) {
-	// todo currently ignore rest.config from http.Request
-	restConfig, _, err := GetKarmadaConfig()
+func VerberClient(request *http.Request) (ResourceVerber, error) {
+	restConfig, err := restConfigFromRequest(request)
 	if err != nil {
 		return nil, err
 	}
+
 	discoveryClient, err := discovery.NewDiscoveryClientForConfig(restConfig)
 	if err != nil {
 		return nil, err

@@ -18,6 +18,7 @@ package overview
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/karmada-io/dashboard/pkg/client"
 
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
@@ -31,13 +32,24 @@ func handleGetOverview(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
-	memberClusterStatus, err := GetMemberClusterInfo(dataSelect)
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
+	kubeClient, err := router.GetKubeClientFromContext(c)
 	if err != nil {
 		common.Fail(c, err)
 		return
 	}
 
-	clusterResourceStatus, err := GetClusterResourceStatus()
+	memberClusterStatus, err := GetMemberClusterInfo(karmadaClient, dataSelect)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
+
+	clusterResourceStatus, err := GetClusterResourceStatus(karmadaClient, kubeClient)
 	if err != nil {
 		common.Fail(c, err)
 		return
