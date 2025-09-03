@@ -10,7 +10,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-// apps/dashboard/e2e/deployment-view.spec.ts
 import { test, expect } from '@playwright/test';
 
 // Set webServer.url and use.baseURL with the location of the WebServer
@@ -30,25 +29,25 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should view deployment details', async ({ page }) => {
-    // 打开 Workloads 菜单
+    // Open Workloads menu
     await page.click('text=Workloads');
 
-    // 等待页面加载并验证 Deployment 已选中
+    // Wait for page to load and verify Deployment is selected
     const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
     await expect(deploymentTab).toBeChecked();
 
-    // 等待表格加载
+    // Wait for table to load
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
-    // 检查是否有deployment数据，如果没有则创建一个
+    // Check if there's deployment data, create one if none exists
     const deploymentRows = page.locator('table tbody tr');
     const rowCount = await deploymentRows.count();
     
     if (rowCount === 0) {
         console.log('No deployments found, creating one first...');
         
-        // 创建一个deployment
+        // Create a deployment
         await page.click('button:has-text("Add")');
         await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
         
@@ -73,7 +72,7 @@ spec:
           ports:
             - containerPort: 80`;
         
-        // 设置YAML内容
+        // Set YAML content
         await page.evaluate((yaml) => {
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             if (textarea) {
@@ -82,7 +81,7 @@ spec:
             }
         }, testDeploymentYaml);
         
-        // 触发React onChange回调
+        // Trigger React onChange callback
         await page.evaluate((yaml) => {
             const findReactFiber = (element: any) => {
                 const keys = Object.keys(element);
@@ -124,28 +123,28 @@ spec:
             }
         }, testDeploymentYaml);
         
-        // 等待提交按钮变为可用状态并点击
+        // Wait for submit button to become enabled and click
         await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
         await page.click('[role="dialog"] button:has-text("Submit")');
         
-        // 等待对话框关闭
+        // Wait for dialog to close
         await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 10000 }).catch(() => {});
         
-        // 等待表格重新加载并显示新数据
+        // Wait for table to reload and show new data
         await page.reload();
         await page.click('text=Workloads');
         await expect(table).toBeVisible({ timeout: 30000 });
         await expect(table.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
     }
 
-    // 等待View按钮出现
+    // Wait for View button to appear
     const viewButton = page.locator('table tbody tr').first().getByText('View');
     
-    // 等待View按钮可见并点击
+    // Wait for View button to be visible and click
     await expect(viewButton).toBeVisible({ timeout: 15000 });
     await viewButton.click();
 
-    // 验证详情页已显示
+    // Verify details page is displayed
     await page.waitForLoadState('networkidle');
 
     // Debug

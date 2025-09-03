@@ -53,30 +53,30 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should edit deployment successfully', async ({ page }) => {
-    // 打开 Workloads 菜单
+    // Open Workloads menu
     await page.click('text=Workloads');
 
-    // 等待页面加载并验证 Deployment 已选中
+    // Wait for page to load and verify Deployment is selected
     const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
     await expect(deploymentTab).toBeChecked();
 
-    // 等待表格加载
+    // Wait for table to load
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
-    // 检查是否有deployment数据，如果没有则创建一个
+    // Check if there's deployment data, create one if none exists
     const deploymentRows = page.locator('table tbody tr');
     const rowCount = await deploymentRows.count();
     
     if (rowCount === 0) {
         
-        // 创建一个deployment
+        // Create a deployment
         await page.click('button:has-text("Add")');
         await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
         
         const testDeploymentYaml = generateTestDeploymentYaml();
         
-        // 设置YAML内容
+        // Set YAML content
         await page.evaluate((yaml) => {
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             if (textarea) {
@@ -85,7 +85,7 @@ test('should edit deployment successfully', async ({ page }) => {
             }
         }, testDeploymentYaml);
         
-        // 触发React onChange回调
+        // Trigger React onChange callback
         await page.evaluate((yaml) => {
             const findReactFiber = (element: any) => {
                 const keys = Object.keys(element);
@@ -127,25 +127,25 @@ test('should edit deployment successfully', async ({ page }) => {
             }
         }, testDeploymentYaml);
         
-        // 等待提交按钮变为可用状态并点击
+        // Wait for submit button to become enabled and click
         await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
         await page.click('[role="dialog"] button:has-text("Submit")');
         
-        // 等待对话框关闭
+        // Wait for dialog to close
         await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 10000 }).catch(() => {});
         
-        // 等待表格重新加载并显示新数据
+        // Wait for table to reload and show new data
         await page.reload();
         await page.click('text=Workloads');
         await expect(table).toBeVisible({ timeout: 30000 });
         await expect(table.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
     }
 
-    // 等待Edit按钮出现并点击
+    // Wait for Edit button to appear and click
     const editButton = page.locator('table tbody tr').first().getByText('Edit');
     await expect(editButton).toBeVisible({ timeout: 15000 });
     
-    // 监听编辑相关的网络请求
+    // Listen for edit-related network requests
     const apiRequestPromise = page.waitForResponse(response => {
         const url = response.url();
         return (url.includes('/api/v1/_raw/') || 
@@ -155,20 +155,20 @@ test('should edit deployment successfully', async ({ page }) => {
     
     await editButton.click();
 
-    // 等待编辑对话框出现
+    // Wait for edit dialog to appear
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
     
-    // 等待网络请求完成并获取响应数据
+    // Wait for network request to complete and get response data
     const apiResponse = await apiRequestPromise;
     const responseData = await apiResponse.json();
     
-    // 给React一些时间来处理state更新
+    // Give React some time to process state updates
     await page.waitForTimeout(2000);
     
-    // 验证Monaco编辑器已加载
+    // Verify Monaco editor is loaded
     await expect(page.locator('.monaco-editor')).toBeVisible({ timeout: 10000 });
     
-    // 等待编辑器内容加载
+    // Wait for editor content to load
     let yamlContent = '';
     let attempts = 0;
     const maxAttempts = 30;
@@ -195,7 +195,7 @@ test('should edit deployment successfully', async ({ page }) => {
         attempts++;
     }
     
-    // 如果内容仍为空，从API响应手动设置内容
+    // If content is still empty, manually set content from API response
     if (!yamlContent || yamlContent.length === 0) {
         yamlContent = await page.evaluate((apiData) => {
             const data = apiData.data;
@@ -231,22 +231,22 @@ spec:
         }, responseData);
     }
     
-    // 如果仍然无法获取内容，报告错误
+    // If still unable to get content, report error
     if (!yamlContent || yamlContent.length === 0) {
         throw new Error(`Edit feature error: Monaco editor does not load deployment YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
     }
     
-    // 修改YAML内容（replicas: 1 → 2，如果不是1则改为3）
+    // Modify YAML content (replicas: 1 → 2, if not 1 then change to 3)
     let modifiedYaml = yamlContent.replace(/replicas:\s*1/, 'replicas: 2');
     
-    // 验证修改是否生效
+    // Verify modification took effect
     if (modifiedYaml === yamlContent) {
-        // 尝试其他修改方式
+        // Try other modification methods
         const alternativeModified = yamlContent.replace(/replicas:\s*\d+/, 'replicas: 3');
         if (alternativeModified !== yamlContent) {
             modifiedYaml = alternativeModified;
         } else {
-            // 如果还是不能修改，尝试修改镜像名称
+            // If still can't modify, try changing image name
             const imageModified = yamlContent.replace(/image:\s*nginx:1\.20/, 'image: nginx:1.21');
             if (imageModified !== yamlContent) {
                 modifiedYaml = imageModified;
@@ -254,7 +254,7 @@ spec:
         }
     }
     
-    // 设置修改后的YAML内容
+    // Set modified YAML content
     await page.evaluate((yaml) => {
         const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
         if (textarea) {
@@ -263,7 +263,7 @@ spec:
         }
     }, modifiedYaml);
     
-    // 触发React onChange回调
+    // Trigger React onChange callback
     await page.evaluate((yaml) => {
         const findReactFiber = (element: any) => {
             const keys = Object.keys(element);
@@ -305,20 +305,20 @@ spec:
         }
     }, modifiedYaml);
     
-    // 等待提交按钮变为可用状态并点击
+    // Wait for submit button to become enabled and click
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
     await page.click('[role="dialog"] button:has-text("Submit")');
     
-    // 等待编辑成功的提示信息或对话框关闭
+    // Wait for edit success message or dialog to close
     try {
-        // 尝试等待成功提示信息
+        // Try waiting for success message
         await expect(page.locator('text=Updated')).toBeVisible({ timeout: 3000 });
     } catch (e) {
         try {
-            // 如果没有成功消息，等待对话框关闭
+            // If no success message, wait for dialog to close
             await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 3000 });
         } catch (e2) {
-            // 如果对话框关闭也失败了，检查页面是否还存在
+            // If dialog close also failed, check if page still exists
             try {
                 const isPageActive = await page.evaluate(() => document.readyState);
                 

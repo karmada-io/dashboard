@@ -13,14 +13,14 @@ limitations under the License.
 
 import { test, expect } from '@playwright/test';
 
-// 设置服务器地址和基础路径
+// Set server address and base path
 const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 5173;
 const baseURL = `http://${HOST}:${PORT}`;
 const basePath = '/multicloud-resource-manage';
 const token = process.env.KARMADA_TOKEN || '';
 
-// 生成带时间戳的测试YAML
+// Generate test YAML with timestamp
 function generateTestDeploymentYaml() {
     const timestamp = Date.now();
     return `apiVersion: apps/v1
@@ -55,21 +55,21 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should create a new deployment', async ({ page }) => {
-    // 导航到工作负载页面
+    // Navigate to workload page
     await page.click('text=Workloads');
     await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
     await page.click('button:has-text("Add")');
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
     
-    // 监听API调用
+    // Listen for API calls
     const apiRequestPromise = page.waitForResponse(response => {
         return response.url().includes('/api/v1/_raw/Deployment') && response.status() === 200;
     }, { timeout: 15000 });
     
     const testDeploymentYaml = generateTestDeploymentYaml();
     
-    // 设置Monaco编辑器的DOM内容
+    // Set Monaco editor DOM content
     await page.evaluate((yaml) => {
         const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
         if (textarea) {
@@ -78,7 +78,7 @@ test('should create a new deployment', async ({ page }) => {
         }
     }, testDeploymentYaml);
     
-    // 调用React的onChange回调来更新组件状态
+    // Call React onChange callback to update component state
     await page.evaluate((yaml) => {
 
         const findReactFiber = (element: any) => {
@@ -127,20 +127,20 @@ test('should create a new deployment', async ({ page }) => {
         }
     }, testDeploymentYaml);
     
-    // 等待提交按钮变为可用状态
+    // Wait for submit button to become enabled
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
     await page.click('[role="dialog"] button:has-text("Submit")');
     
-    // 等待API调用成功
+    // Wait for API call to succeed
     const response = await apiRequestPromise;
     expect(response.status()).toBe(200);
     
-    // 等待对话框关闭
+    // Wait for dialog to close
     await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 5000 }).catch(() => {
-        // 对话框可能已经关闭
+        // Dialog may already be closed
     });
     
-    // 验证新创建的deployment出现在列表中
+    // Verify new deployment appears in list
     const deploymentName = testDeploymentYaml.match(/name: (.+)/)?.[1];
     if (deploymentName) {
         try {
@@ -148,8 +148,8 @@ test('should create a new deployment', async ({ page }) => {
                 timeout: 15000 
             });
         } catch {
-            // 如果列表中没有立即显示，可能是由于缓存或刷新延迟
-            // 但API成功表示deployment已创建
+            // If not shown immediately in list, may be due to cache or refresh delay
+            // But API success indicates deployment was created
         }
     }
 });

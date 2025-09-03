@@ -13,14 +13,14 @@ limitations under the License.
 
 import { test, expect } from '@playwright/test';
 
-// 设置服务器地址和基础路径
+// Set server address and base path
 const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 5173;
 const baseURL = `http://${HOST}:${PORT}`;
 const basePath = '/multicloud-resource-manage';
 const token = process.env.KARMADA_TOKEN || '';
 
-// 生成带时间戳的测试YAML
+// Generate test YAML with timestamp
 function generateTestDeploymentYaml() {
     const timestamp = Date.now();
     return `apiVersion: apps/v1
@@ -55,23 +55,23 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should delete deployment successfully', async ({ page }) => {
-    // 导航到工作负载页面
+    // Navigate to workload page
     await page.click('text=Workloads');
     await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
     
-    // 创建一个测试用的deployment
+    // Create a test deployment
     await page.click('button:has-text("Add")');
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
     
-    // 监听API调用
+    // Listen for API calls
     const apiRequestPromise = page.waitForResponse(response => {
         return response.url().includes('/api/v1/_raw/Deployment') && response.status() === 200;
     }, { timeout: 15000 });
     
     const testDeploymentYaml = generateTestDeploymentYaml();
     
-    // 设置Monaco编辑器的DOM内容
+    // Set Monaco editor DOM content
     await page.evaluate((yaml) => {
         const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
         if (textarea) {
@@ -80,7 +80,7 @@ test('should delete deployment successfully', async ({ page }) => {
         }
     }, testDeploymentYaml);
     
-    // 调用React的onChange回调来更新组件状态
+    // Call React onChange callback to update component state
     await page.evaluate((yaml) => {
         const findReactFiber = (element: any) => {
             const keys = Object.keys(element);
@@ -128,35 +128,35 @@ test('should delete deployment successfully', async ({ page }) => {
         }
     }, testDeploymentYaml);
     
-    // 等待提交按钮变为可用状态
+    // Wait for submit button to become enabled
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
     await page.click('[role="dialog"] button:has-text("Submit")');
     
-    // 等待API调用成功
+    // Wait for API call to succeed
     const response = await apiRequestPromise;
     expect(response.status()).toBe(200);
     
-    // 获取创建的deployment名称
+    // Get the created deployment name
     const deploymentName = testDeploymentYaml.match(/name: (.+)/)?.[1];
     if (!deploymentName) {
         throw new Error('Could not extract deployment name from YAML');
     }
     
-    // 等待成功消息出现
+    // Wait for success message to appear
     try {
         await expect(page.locator('text=Workloads Newly Added Success')).toBeVisible({ timeout: 5000 });
     } catch (e) {
-        // 成功消息可能没有出现，继续执行
+        // Success message may not appear, continue execution
     }
     
-    // 等待对话框关闭
+    // Wait for dialog to close
     await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 10000 }).catch(() => {});
     
-    // 等待deployment出现在列表中
+    // Wait for deployment to appear in list
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
     
-    // 尝试多次查找deployment，使用更灵活的选择器
+    // Try multiple times to find deployment with more flexible selector
     let deploymentFound = false;
     for (let i = 0; i < 10; i++) {
         try {
@@ -165,7 +165,7 @@ test('should delete deployment successfully', async ({ page }) => {
             deploymentFound = true;
             break;
         } catch (e) {
-            await page.waitForTimeout(2000); // 等待2秒后重试
+            await page.waitForTimeout(2000); // Wait 2 seconds then retry
         }
     }
     
@@ -173,15 +173,15 @@ test('should delete deployment successfully', async ({ page }) => {
         throw new Error(`Deployment ${deploymentName} not found in the table after multiple attempts`);
     }
     
-    // 查找包含测试deployment名称的行
+    // Find row containing test deployment name
     const targetRow = page.locator(`table tbody tr:has-text("${deploymentName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
     
-    // 找到该行的Delete按钮并点击
+    // Find Delete button in that row and click
     const deleteButton = targetRow.locator('button[type="button"]').filter({ hasText: /^(删除|Delete)$/ });
     await expect(deleteButton).toBeVisible({ timeout: 10000 });
     
-    // 监听删除API调用
+    // Listen for delete API call
     const deleteApiPromise = page.waitForResponse(response => {
         return response.url().includes('/_raw/deployment') && 
                response.url().includes(`name/${deploymentName}`) &&
@@ -191,22 +191,22 @@ test('should delete deployment successfully', async ({ page }) => {
     
     await deleteButton.click();
     
-    // 等待删除确认tooltip出现
+    // Wait for delete confirmation tooltip to appear
     await page.waitForSelector('[role="tooltip"]', { timeout: 10000 });
     
-    // 点击Confirm按钮确认删除
+    // Click Confirm button to confirm deletion
     const confirmButton = page.locator('[role="tooltip"] button').filter({ hasText: /^(Confirm)$/ });
     await expect(confirmButton).toBeVisible({ timeout: 5000 });
     await confirmButton.click();
     
-    // 等待删除API调用成功
+    // Wait for delete API call to succeed
     const deleteResponse = await deleteApiPromise;
     expect(deleteResponse.status()).toBe(200);
     
-    // 等待tooltip关闭
+    // Wait for tooltip to close
     await page.waitForSelector('[role="tooltip"]', { state: 'detached', timeout: 10000 }).catch(() => {});
     
-    // 验证deployment不再存在于表格中
+    // Verify deployment no longer exists in table
     await expect(table.locator(`text=${deploymentName}`)).toHaveCount(0, { timeout: 10000 });
 
     // Debug

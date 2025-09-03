@@ -34,14 +34,14 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should display deployment list', async ({ page }) => {
-    // 打开 Workloads 菜单
+    // Open Workloads menu
     await page.click('text=Workloads');
 
-    // 等待页面加载并验证 Deployment 已选中
+    // Wait for page to load and verify Deployment is selected
     const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
     await expect(deploymentTab).toBeChecked();
 
-    // 验证 Deployment 列表表格可见
+    // Verify Deployment list table is visible
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
