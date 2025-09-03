@@ -70,7 +70,11 @@ func handlerCreateDeployment(c *gin.Context) {
 func handleGetDeployments(c *gin.Context) {
 	namespace := common.ParseNamespacePathParameter(c)
 	dataSelect := common.ParseDataSelectPathParameter(c)
-	k8sClient := client.InClusterClientForKarmadaAPIServer()
+	k8sClient, err := router.GetKubeClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	result, err := deployment.GetDeploymentList(k8sClient, namespace, dataSelect)
 	if err != nil {
 		common.Fail(c, err)
@@ -82,7 +86,11 @@ func handleGetDeployments(c *gin.Context) {
 func handleGetDeploymentDetail(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("deployment")
-	k8sClient := client.InClusterClientForKarmadaAPIServer()
+	k8sClient, err := router.GetKubeClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	result, err := deployment.GetDeploymentDetail(k8sClient, namespace, name)
 	if err != nil {
 		common.Fail(c, err)
@@ -94,7 +102,11 @@ func handleGetDeploymentDetail(c *gin.Context) {
 func handleGetDeploymentEvents(c *gin.Context) {
 	namespace := c.Param("namespace")
 	name := c.Param("deployment")
-	k8sClient := client.InClusterClientForKarmadaAPIServer()
+	k8sClient, err := router.GetKubeClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	result, err := event.GetResourceEvents(k8sClient, dataSelect, namespace, name)
 	if err != nil {

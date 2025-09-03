@@ -37,7 +37,11 @@ import (
 )
 
 func handleGetClusterList(c *gin.Context) {
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	result, err := cluster.GetClusterList(karmadaClient, dataSelect)
 	if err != nil {
@@ -49,7 +53,11 @@ func handleGetClusterList(c *gin.Context) {
 }
 
 func handleGetClusterDetail(c *gin.Context) {
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	name := c.Param("name")
 	result, err := cluster.GetClusterDetail(karmadaClient, name)
 	if err != nil {
@@ -74,7 +82,11 @@ func handlePostCluster(c *gin.Context) {
 		return
 	}
 	clusterRequest.MemberClusterEndpoint = memberClusterEndpoint
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 
 	switch clusterRequest.SyncMode {
 	case v1alpha1.Pull:
@@ -145,7 +157,11 @@ func handlePutCluster(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	memberCluster, err := karmadaClient.ClusterV1alpha1().Clusters().Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		klog.ErrorS(err, "Get cluster failed")
@@ -191,10 +207,14 @@ func handleDeleteCluster(c *gin.Context) {
 		return
 	}
 	clusterName := clusterRequest.MemberClusterName
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	waitDuration := time.Second * 60
 
-	err := karmadaClient.ClusterV1alpha1().Clusters().Delete(ctx, clusterName, metav1.DeleteOptions{})
+	err = karmadaClient.ClusterV1alpha1().Clusters().Delete(ctx, clusterName, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		common.Fail(c, fmt.Errorf("no cluster object %s found in karmada control Plane", clusterName))
 		return
