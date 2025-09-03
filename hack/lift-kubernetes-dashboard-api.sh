@@ -83,6 +83,7 @@ cp -R ${REPO_ROOT}/tmp/modules/common/ ${REPO_ROOT}/pkg/kubernetes-dashboard-com
 
 
 rm -rf ${REPO_ROOT}/cmd/kubernetes-dashboard-api/go.{mod,sum}
+rm -rf ${REPO_ROOT}/pkg/kubernetes-dashboard-common/tools
 for file in $(find "${REPO_ROOT}/cmd/kubernetes-dashboard-api/" -type f -name "*.go"); do
   sed -i "" "s|k8s.io/dashboard/api/pkg/|github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/|g" "$file"
 done
