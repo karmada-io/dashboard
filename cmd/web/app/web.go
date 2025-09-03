@@ -97,6 +97,11 @@ func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Contex
 	}
 
 	return func(c *gin.Context) {
+		if c.Request.Header.Get("Authorization") == "" {
+			c.String(http.StatusForbidden, "Forbidden")
+			c.Abort()
+			return
+		}
 		proxy := httputil.NewSingleHostReverseProxy(remoteEndpoint)
 		originalDirector := proxy.Director
 		proxy.Director = func(req *http.Request) {
