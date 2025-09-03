@@ -63,6 +63,8 @@ func GetServiceEndpoints(client k8sClient.Interface, namespace, name string) (*E
 }
 
 // GetEndpoints gets endpoints associated to resource with given name.
+//
+//nolint:staticcheck // SA1019 ignore deprecated Kubernetes API Endpoints.
 func GetEndpoints(client k8sClient.Interface, namespace, name string) ([]v1.Endpoints, error) {
 	fieldSelector, err := fields.ParseSelector("metadata.name" + "=" + name)
 	if err != nil {
