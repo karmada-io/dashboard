@@ -11,21 +11,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { test, expect } from '@playwright/test';
-
-// Set webServer.url and use.baseURL with the location of the WebServer
-const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 5173;
-const baseURL = `http://${HOST}:${PORT}`;
-const basePath = '/multicloud-resource-manage';
-const token = process.env.KARMADA_TOKEN || '';
+import { setupDashboardAuthentication } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
-    await page.goto(`${baseURL}/login`, { waitUntil: 'networkidle' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.goto(`${baseURL}${basePath}`, { waitUntil: 'networkidle' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForSelector('text=Overview', { timeout: 30000 });
+    await setupDashboardAuthentication(page);
 });
 
 test('should view deployment details', async ({ page }) => {

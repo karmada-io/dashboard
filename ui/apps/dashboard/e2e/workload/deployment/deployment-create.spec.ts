@@ -12,13 +12,7 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-
-// Set server address and base path
-const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 5173;
-const baseURL = `http://${HOST}:${PORT}`;
-const basePath = '/multicloud-resource-manage';
-const token = process.env.KARMADA_TOKEN || '';
+import { setupDashboardAuthentication } from './test-utils';
 
 // Generate test YAML with timestamp
 function generateTestDeploymentYaml() {
@@ -46,12 +40,7 @@ spec:
 }
 
 test.beforeEach(async ({ page }) => {
-    await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.goto(`${baseURL}${basePath}`, { waitUntil: 'domcontentloaded' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('text=Overview', { timeout: 30000 });
+    await setupDashboardAuthentication(page);
 });
 
 test('should create a new deployment', async ({ page }) => {
