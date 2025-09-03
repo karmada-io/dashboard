@@ -20,6 +20,33 @@ const basePath = '/multicloud-resource-manage';
 const token = process.env.KARMADA_TOKEN || '';
 
 /**
+ * Generate test YAML with timestamp
+ */
+export function generateTestDeploymentYaml() {
+    const timestamp = Date.now();
+    return `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deployment-${timestamp}
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80`;
+}
+
+/**
  * Setup dashboard authentication and navigate to workload page
  */
 export async function setupDashboardAuthentication(page: Page) {

@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication } from './test-utils';
+import { setupDashboardAuthentication, generateTestDeploymentYaml } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
@@ -40,26 +40,7 @@ test('should view deployment details', async ({ page }) => {
         await page.click('button:has-text("Add")');
         await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
         
-        const testDeploymentYaml = `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test-deployment-for-view-${Date.now()}
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: test-app
-  template:
-    metadata:
-      labels:
-        app: test-app
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          ports:
-            - containerPort: 80`;
+        const testDeploymentYaml = generateTestDeploymentYaml();
         
         // Set YAML content
         await page.evaluate((yaml) => {
