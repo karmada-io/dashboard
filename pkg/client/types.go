@@ -40,6 +40,8 @@ const (
 	// ImpersonateUserExtraHeader is the header name used to associate extra fields with the user.
 	// It is optional, and it requires ImpersonateUserHeader to be set.
 	ImpersonateUserExtraHeader = "Impersonate-Extra-"
+	// MemberClusterHeaderName is the header name to identify member cluster name
+	MemberClusterHeaderName = "X-Member-ClusterName"
 )
 
 // ResourceVerber is responsible for performing generic CRUD operations on all supported resources.

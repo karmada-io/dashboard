@@ -118,10 +118,62 @@ func GetKarmadaClientFromRequest(request *http.Request) (karmadaclientset.Interf
 }
 
 func karmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface, error) {
-	config, err := karmadaConfigFromRequest(request)
+	config, err := restConfigFromRequest(request)
 	if err != nil {
 		return nil, err
 	}
 
 	return karmadaclientset.NewForConfig(config)
+}
+
+func GetKarmadaClientFromRequestForKarmadaAPIServer(request *http.Request) (kubeclient.Interface, error) {
+	if !isKarmadaInitialized() {
+		return nil, fmt.Errorf("client package not initialized")
+	}
+	return karmadaClientForKarmadaAPIServerFromRequest(request)
+}
+
+func karmadaClientForKarmadaAPIServerFromRequest(request *http.Request) (kubeclient.Interface, error) {
+	config, err := restConfigFromRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return kubeclient.NewForConfig(config)
+}
+
+func GetClientForMemberClusterFromRequest(request *http.Request) (kubeclient.Interface, error) {
+	if !isKarmadaInitialized() {
+		return nil, fmt.Errorf("client package not initialized")
+	}
+
+	memberClusterName := request.Header.Get(MemberClusterHeaderName)
+	if memberClusterName == "" {
+		return nil, fmt.Errorf("member cluster name is empty")
+	}
+
+	// Load and return Interface for member apiserver if already exist
+	if value, ok := memberClients.Load(memberClusterName); ok {
+		if clientForMemberAPIServer, ok := value.(kubeclient.Interface); ok {
+			return clientForMemberAPIServer, nil
+		}
+		return nil, fmt.Errorf("Load client for member apiserver error")
+	}
+	clientForMemberAPIServer, err := clientForMemberClusterAPIServer(request, memberClusterName)
+	if err != nil {
+		klog.ErrorS(err, "Could not init kubernetes in-cluster client for member apiserver")
+		return nil, fmt.Errorf("Could not init kubernetes in-cluster client for member apiserver")
+	}
+	memberClients.Store(memberClusterName, clientForMemberAPIServer)
+	return clientForMemberAPIServer, nil
+}
+
+func clientForMemberClusterAPIServer(request *http.Request, memberClusterName string) (kubeclient.Interface, error) {
+	config, err := restConfigFromRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	config.Host = config.Host + fmt.Sprintf(proxyURL, memberClusterName)
+	return kubeclient.NewForConfig(config)
 }
