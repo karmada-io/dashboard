@@ -78,7 +78,11 @@ func Client(request *http.Request) (client.Interface, error) {
 	if memberClusterName == "" {
 		return nil, fmt.Errorf("member cluster name is empty")
 	}
-	memberClusterClient := karmadaclient.InClusterClientForMemberCluster(memberClusterName)
+	memberClusterClient, err := karmadaclient.GetClientForMemberClusterFromRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
 	if memberClusterClient == nil {
 		return nil, fmt.Errorf("memberCluster client is not initialized")
 
