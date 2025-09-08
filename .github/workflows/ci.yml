@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Use Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
       - uses: pnpm/action-setup@v4
@@ -125,7 +125,7 @@ jobs:
           TOKEN=$(kubectl --context=karmada-apiserver -n karmada-system get secret/karmada-dashboard-secret -o go-template="{{.data.token | base64decode}}")
           echo "KARMADA_TOKEN=$TOKEN" >> $GITHUB_ENV
       - name: Use Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
       - uses: pnpm/action-setup@v4
