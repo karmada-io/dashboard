@@ -51,7 +51,7 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v5
       - name: install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: setup QEMU
@@ -105,7 +105,7 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v5
       - name: install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: setup QEMU
@@ -195,7 +195,7 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v5
       - name: install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: setup QEMU
