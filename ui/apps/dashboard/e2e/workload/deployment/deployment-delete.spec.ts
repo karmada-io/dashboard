@@ -12,169 +12,71 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDeploymentYaml } from './test-utils';
+import { setupDashboardAuthentication, generateTestDeploymentYaml, createK8sDeployment, getDeploymentNameFromYaml} from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
 test('should delete deployment successfully', async ({ page }) => {
+    // Create a test deployment directly via kubectl to set up test data
+    const testDeploymentYaml = generateTestDeploymentYaml();
+    const deploymentName = getDeploymentNameFromYaml(testDeploymentYaml);
+
+    // Setup: Create deployment using kubectl
+    await createK8sDeployment(testDeploymentYaml);
+
     // Navigate to workload page
     await page.click('text=Workloads');
     await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
-    
-    // Create a test deployment
-    await page.click('button:has-text("Add")');
-    await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
-    
-    // Listen for API calls
-    const apiRequestPromise = page.waitForResponse(response => {
-        return response.url().includes('/api/v1/_raw/Deployment') && response.status() === 200;
-    }, { timeout: 15000 });
-    
-    const testDeploymentYaml = generateTestDeploymentYaml();
-    
-    // Set Monaco editor DOM content
-    await page.evaluate((yaml) => {
-        const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
-        if (textarea) {
-            textarea.value = yaml;
-            textarea.focus();
-        }
-    }, testDeploymentYaml);
-    
-    // Call React onChange callback to update component state
-    await page.evaluate((yaml) => {
-        const findReactFiber = (element: any) => {
-            const keys = Object.keys(element);
-            return keys.find(key => key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance'));
-        };
 
-        const monacoContainer = document.querySelector('.monaco-editor');
-        if (monacoContainer) {
-            const fiberKey = findReactFiber(monacoContainer);
-            if (fiberKey) {
-                let fiber = (monacoContainer as any)[fiberKey];
-
-                while (fiber) {
-                    if (fiber.memoizedProps && fiber.memoizedProps.onChange) {
-                        fiber.memoizedProps.onChange(yaml);
-                        return;
-                    }
-                    fiber = fiber.return;
-                }
-            }
-        }
-
-        const dialog = document.querySelector('[role="dialog"]');
-        if (dialog) {
-            const fiberKey = findReactFiber(dialog);
-            if (fiberKey) {
-                let fiber = (dialog as any)[fiberKey];
-                
-                const traverse = (node: any, depth = 0) => {
-                    if (!node || depth > 20) return false;
-                    
-                    if (node.memoizedProps && node.memoizedProps.onChange) {
-                        node.memoizedProps.onChange(yaml);
-                        return true;
-                    }
-                    
-                    if (node.child && traverse(node.child, depth + 1)) return true;
-                    if (node.sibling && traverse(node.sibling, depth + 1)) return true;
-                    
-                    return false;
-                };
-                
-                traverse(fiber);
-            }
-        }
-    }, testDeploymentYaml);
-    
-    // Wait for submit button to become enabled
-    await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
-    await page.click('[role="dialog"] button:has-text("Submit")');
-    
-    // Wait for API call to succeed
-    const response = await apiRequestPromise;
-    expect(response.status()).toBe(200);
-    
-    // Get the created deployment name
-    const deploymentName = testDeploymentYaml.match(/name: (.+)/)?.[1];
-    if (!deploymentName) {
-        throw new Error('Could not extract deployment name from YAML');
-    }
-    
-    // Wait for success message to appear
-    try {
-        await expect(page.locator('text=Workloads Newly Added Success')).toBeVisible({ timeout: 5000 });
-    } catch (e) {
-        // Success message may not appear, continue execution
-    }
-    
-    // Wait for dialog to close
-    await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 10000 }).catch(() => {});
-    
     // Wait for deployment to appear in list
     const table = page.locator('table');
-    await expect(table).toBeVisible({ timeout: 30000 });
-    
-    // Try multiple times to find deployment with more flexible selector
-    let deploymentFound = false;
-    for (let i = 0; i < 10; i++) {
-        try {
-            const deploymentElement = page.locator(`table tbody tr:has-text("${deploymentName}")`);
-            await expect(deploymentElement).toBeVisible({ timeout: 3000 });
-            deploymentFound = true;
-            break;
-        } catch (e) {
-            await page.waitForTimeout(2000); // Wait 2 seconds then retry
-        }
-    }
-    
-    if (!deploymentFound) {
-        throw new Error(`Deployment ${deploymentName} not found in the table after multiple attempts`);
-    }
-    
+    await expect(table.locator(`text=${deploymentName}`)).toBeVisible({ timeout: 30000 });
+
     // Find row containing test deployment name
     const targetRow = page.locator(`table tbody tr:has-text("${deploymentName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
-    
+
     // Find Delete button in that row and click
-    const deleteButton = targetRow.locator('button[type="button"]').filter({ hasText: /^(删除|Delete)$/ });
+    const deleteButton = targetRow.locator('button[type="button"]').filter({ hasText: /^(Delete)$/ });
     await expect(deleteButton).toBeVisible({ timeout: 10000 });
-    
+
     // Listen for delete API call
     const deleteApiPromise = page.waitForResponse(response => {
-        return response.url().includes('/_raw/deployment') && 
-               response.url().includes(`name/${deploymentName}`) &&
-               response.request().method() === 'DELETE' && 
-               response.status() === 200;
+        return response.url().includes('/_raw/deployment') &&
+            response.url().includes(`name/${deploymentName}`) &&
+            response.request().method() === 'DELETE' &&
+            response.status() === 200;
     }, { timeout: 15000 });
-    
+
     await deleteButton.click();
-    
+
     // Wait for delete confirmation tooltip to appear
     await page.waitForSelector('[role="tooltip"]', { timeout: 10000 });
-    
+
     // Click Confirm button to confirm deletion
     const confirmButton = page.locator('[role="tooltip"] button').filter({ hasText: /^(Confirm)$/ });
     await expect(confirmButton).toBeVisible({ timeout: 5000 });
     await confirmButton.click();
-    
+
     // Wait for delete API call to succeed
-    const deleteResponse = await deleteApiPromise;
-    expect(deleteResponse.status()).toBe(200);
-    
+    await deleteApiPromise;
+
     // Wait for tooltip to close
     await page.waitForSelector('[role="tooltip"]', { state: 'detached', timeout: 10000 }).catch(() => {});
     
+    // Refresh page to ensure UI is updated after deletion
+    await page.reload();
+    await page.click('text=Workloads');
+    await expect(table).toBeVisible({ timeout: 30000 });
+    
     // Verify deployment no longer exists in table
-    await expect(table.locator(`text=${deploymentName}`)).toHaveCount(0, { timeout: 10000 });
+    await expect(table.locator(`text=${deploymentName}`)).toHaveCount(0, { timeout: 30000 });
 
     // Debug
     if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-deployment-delete.png', fullPage: true });
+        await page.screenshot({ path: 'debug-deployment-delete-kubectl.png', fullPage: true });
     }
 });

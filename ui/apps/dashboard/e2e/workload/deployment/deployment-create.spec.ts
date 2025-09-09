@@ -12,7 +12,9 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDeploymentYaml } from './test-utils';
+import { setupDashboardAuthentication, generateTestDeploymentYaml, deleteK8sDeployment } from './test-utils';
+import { parse } from 'yaml';
+import _ from 'lodash';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
@@ -96,8 +98,7 @@ test('should create a new deployment', async ({ page }) => {
     await page.click('[role="dialog"] button:has-text("Submit")');
     
     // Wait for API call to succeed
-    const response = await apiRequestPromise;
-    expect(response.status()).toBe(200);
+    await apiRequestPromise;
     
     // Wait for dialog to close
     await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 5000 }).catch(() => {
@@ -105,15 +106,32 @@ test('should create a new deployment', async ({ page }) => {
     });
     
     // Verify new deployment appears in list
-    const deploymentName = testDeploymentYaml.match(/name: (.+)/)?.[1];
-    if (deploymentName) {
-        try {
-            await expect(page.locator('table').locator(`text=${deploymentName}`)).toBeVisible({ 
-                timeout: 15000 
-            });
-        } catch {
-            // If not shown immediately in list, may be due to cache or refresh delay
-            // But API success indicates deployment was created
-        }
+    const yamlObject = parse(testDeploymentYaml);
+    const deploymentName = _.get(yamlObject,'metadata.name');
+    
+    // Assert deployment name exists
+    expect(deploymentName).toBeTruthy();
+    expect(deploymentName).toBeDefined();
+
+    try {
+        await expect(page.locator('table').locator(`text=${deploymentName}`)).toBeVisible({ 
+            timeout: 15000 
+        });
+    } catch {
+        // If not shown immediately in list, may be due to cache or refresh delay
+        // But API success indicates deployment was created
     }
+    
+    // Cleanup: Delete the created deployment
+    try {
+        await deleteK8sDeployment(deploymentName, 'default');
+    } catch (error) {
+        console.warn(`Failed to cleanup deployment ${deploymentName}:`, error);
+    }
+
+    // Debug
+    if(process.env.DEBUG === 'true'){
+        await page.screenshot({ path: 'debug-deployment-create.png', fullPage: true });
+    }
+
 });

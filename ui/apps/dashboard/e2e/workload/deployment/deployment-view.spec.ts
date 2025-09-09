@@ -11,111 +11,47 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDeploymentYaml } from './test-utils';
+import { setupDashboardAuthentication, generateTestDeploymentYaml, createK8sDeployment, getDeploymentNameFromYaml, deleteK8sDeployment } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
 test('should view deployment details', async ({ page }) => {
-    // Open Workloads menu
+    // Create a test deployment directly via API to set up test data
+    const testDeploymentYaml = generateTestDeploymentYaml();
+    const deploymentName = getDeploymentNameFromYaml(testDeploymentYaml);
+    
+    // Setup: Create deployment using kubectl
+    await createK8sDeployment(testDeploymentYaml);
+    
+    // Navigate to workload page
     await page.click('text=Workloads');
-
-    // Wait for page to load and verify Deployment is selected
-    const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
-    await expect(deploymentTab).toBeChecked();
-
-    // Wait for table to load
+    await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
+    await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
+    
+    // Wait for deployment to appear in list
     const table = page.locator('table');
-    await expect(table).toBeVisible({ timeout: 30000 });
-
-    // Check if there's deployment data, create one if none exists
-    const deploymentRows = page.locator('table tbody tr');
-    const rowCount = await deploymentRows.count();
+    await expect(table.locator(`text=${deploymentName}`)).toBeVisible({ timeout: 30000 });
     
-    if (rowCount === 0) {
-        console.log('No deployments found, creating one first...');
-        
-        // Create a deployment
-        await page.click('button:has-text("Add")');
-        await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
-        
-        const testDeploymentYaml = generateTestDeploymentYaml();
-        
-        // Set YAML content
-        await page.evaluate((yaml) => {
-            const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
-            if (textarea) {
-                textarea.value = yaml;
-                textarea.focus();
-            }
-        }, testDeploymentYaml);
-        
-        // Trigger React onChange callback
-        await page.evaluate((yaml) => {
-            const findReactFiber = (element: any) => {
-                const keys = Object.keys(element);
-                return keys.find(key => key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance'));
-            };
-            
-            const monacoContainer = document.querySelector('.monaco-editor');
-            if (monacoContainer) {
-                const fiberKey = findReactFiber(monacoContainer);
-                if (fiberKey) {
-                    let fiber = (monacoContainer as any)[fiberKey];
-                    while (fiber) {
-                        if (fiber.memoizedProps && fiber.memoizedProps.onChange) {
-                            fiber.memoizedProps.onChange(yaml);
-                            return;
-                        }
-                        fiber = fiber.return;
-                    }
-                }
-            }
-
-            const dialog = document.querySelector('[role="dialog"]');
-            if (dialog) {
-                const fiberKey = findReactFiber(dialog);
-                if (fiberKey) {
-                    let fiber = (dialog as any)[fiberKey];
-                    const traverse = (node: any, depth = 0) => {
-                        if (!node || depth > 20) return false;
-                        if (node.memoizedProps && node.memoizedProps.onChange) {
-                            node.memoizedProps.onChange(yaml);
-                            return true;
-                        }
-                        if (node.child && traverse(node.child, depth + 1)) return true;
-                        if (node.sibling && traverse(node.sibling, depth + 1)) return true;
-                        return false;
-                    };
-                    traverse(fiber);
-                }
-            }
-        }, testDeploymentYaml);
-        
-        // Wait for submit button to become enabled and click
-        await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
-        await page.click('[role="dialog"] button:has-text("Submit")');
-        
-        // Wait for dialog to close
-        await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 10000 }).catch(() => {});
-        
-        // Wait for table to reload and show new data
-        await page.reload();
-        await page.click('text=Workloads');
-        await expect(table).toBeVisible({ timeout: 30000 });
-        await expect(table.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
-    }
-
-    // Wait for View button to appear
-    const viewButton = page.locator('table tbody tr').first().getByText('View');
+    // Find row containing test deployment name
+    const targetRow = page.locator(`table tbody tr:has-text("${deploymentName}")`);
+    await expect(targetRow).toBeVisible({ timeout: 15000 });
     
-    // Wait for View button to be visible and click
+    // Find View button in that row and click
+    const viewButton = targetRow.getByText('View');
     await expect(viewButton).toBeVisible({ timeout: 15000 });
     await viewButton.click();
 
     // Verify details page is displayed
     await page.waitForLoadState('networkidle');
+    
+    // Cleanup: Delete the created deployment
+    try {
+        await deleteK8sDeployment(deploymentName, 'default');
+    } catch (error) {
+        console.warn(`Failed to cleanup deployment ${deploymentName}:`, error);
+    }
 
     // Debug
     if(process.env.DEBUG === 'true'){
