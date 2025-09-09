@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// apps/dashboard/e2e/namespace/namespace-network-error.spec.ts
+// apps/dashboard/e2e/daemonset-list.spec.ts
 import { test, expect } from '@playwright/test';
 
 // Set webServer.url and use.baseURL with the location of the WebServer
@@ -24,30 +24,34 @@ const baseURL = `http://${HOST}:${PORT}`;
 const basePath = '/multicloud-resource-manage';
 const token = process.env.KARMADA_TOKEN || '';
 
-test('Namespace network failure with refresh', async ({ page }) => {
-    // 阻塞 Namespace API 请求
-    await page.route('**/api/v1/namespaces', route => route.abort());
-
+test.beforeEach(async ({ page }) => {
     await page.goto(`${baseURL}/login`, { waitUntil: 'networkidle' });
     await page.evaluate((t) => localStorage.setItem('token', t), token);
-
-    // 导航到页面
     await page.goto(`${baseURL}${basePath}`, { waitUntil: 'networkidle' });
-
-    // 设置 token 并刷新，保证登录状态
     await page.evaluate((t) => localStorage.setItem('token', t), token);
     await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForSelector('text=Overview', { timeout: 30000 });
+});
 
-    // 等待关键元素加载完成，宽松等待 Namespaces 文字
-    await page.waitForSelector('text=Namespaces', { timeout: 15000 });
+test('should display daemonset list', async ({ page }) => {
+    // 打开 Workloads 菜单
+    await page.click('text=Workloads');
 
-    // 验证表格
-    const tableRows = page.locator('table tbody tr');
-    // 最终断言：网络错误时表格应该为空
-    await expect(tableRows).toHaveCount(0);
+    // 点击可见的 Daemonset tab
+    const statefulsetTab = page.locator('role=option[name="Daemonset"]');
+    await statefulsetTab.waitFor({ state: 'visible', timeout: 30000 });
+    await statefulsetTab.click();
+
+    // 验证选中状态
+    await expect(statefulsetTab).toHaveAttribute('aria-selected', 'true');
+
+
+    // 验证 StatefulSet 列表表格可见
+    const table = page.locator('table');
+    await expect(table).toBeVisible({ timeout: 30000 });
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-namespace-network-failure.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-daemonset-list.png', fullPage: true });
     }
 });
