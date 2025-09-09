@@ -15,8 +15,13 @@ limitations under the License.
 */
 
 import { test } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestIngressYaml, createK8sIngress, getIngressNameFromYaml } from './test-utils';
-import { deleteServiceResourceTest } from '../test-utils';
+import {
+    setupDashboardAuthentication,
+    generateTestIngressYaml,
+    createK8sIngress,
+    getIngressNameFromYaml,
+    deleteServiceResourceTest
+} from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);

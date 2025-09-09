@@ -17,26 +17,26 @@ limitations under the License.
 import { test } from '@playwright/test';
 import {
     setupDashboardAuthentication,
-    generateTestCronJobYaml,
-    getCronJobNameFromYaml,
-    deleteK8sCronJob,
-    createWorkloadResourceTest
+    generateTestConfigMapYaml,
+    createK8sConfigMap,
+    getConfigMapNameFromYaml,
+    deleteK8sConfigMap,
+    viewConfigMapSecretResourceTest
 } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should create a new cronjob', async ({ page }) => {
-    const testCronJobYaml = generateTestCronJobYaml();
-
-    await createWorkloadResourceTest(page, {
-        resourceType: 'cronjob',
-        tabName: 'Cronjob',
-        apiEndpoint: '/api/v1/_raw/CronJob',
-        yamlContent: testCronJobYaml,
-        getResourceName: getCronJobNameFromYaml,
-        deleteResource: deleteK8sCronJob,
-        screenshotName: 'debug-cronjob-create.png'
+test('should view configmap details', async ({ page }) => {
+    const testConfigMapYaml = generateTestConfigMapYaml();
+    await viewConfigMapSecretResourceTest(page, {
+        resourceType: 'configmap',
+        tabName: 'ConfigMap',
+        yamlContent: testConfigMapYaml,
+        getResourceName: getConfigMapNameFromYaml,
+        createResource: createK8sConfigMap,
+        deleteResource: deleteK8sConfigMap,
+        screenshotName: 'debug-configmap-view.png'
     });
 });

@@ -20,12 +20,12 @@ import { V1ObjectMeta } from '@kubernetes/client-node';
 import { parse } from 'yaml';
 import { expect } from '@playwright/test';
 import {
-    setupDashboardAuthentication,
+    createKarmadaApiClient,
     setMonacoEditorContent,
     debugScreenshot,
     waitForResourceInList,
-    getResourceNameFromYaml,
-    createKarmadaApiClient
+    setupDashboardAuthentication,
+    getResourceNameFromYaml
 } from '../test-utils';
 import type { DeepRequired } from '../test-utils';
 
@@ -42,26 +42,26 @@ export {
 // Re-export types separately
 export type { DeepRequired };
 
-// Service Resource Configurations
+// ConfigMap & Secret Resource Configurations
 export const RESOURCE_CONFIGS = {
-    service: {
-        kind: 'Service',
+    configmap: {
+        kind: 'ConfigMap',
         apiClientConstructor: k8s.CoreV1Api,
-        yamlType: k8s.V1Service,
-        createMethod: 'createNamespacedService' as const,
-        deleteMethod: 'deleteNamespacedService' as const,
+        yamlType: k8s.V1ConfigMap,
+        createMethod: 'createNamespacedConfigMap' as const,
+        deleteMethod: 'deleteNamespacedConfigMap' as const,
     },
-    ingress: {
-        kind: 'Ingress',
-        apiClientConstructor: k8s.NetworkingV1Api,
-        yamlType: k8s.V1Ingress,
-        createMethod: 'createNamespacedIngress' as const,
-        deleteMethod: 'deleteNamespacedIngress' as const,
+    secret: {
+        kind: 'Secret',
+        apiClientConstructor: k8s.CoreV1Api,
+        yamlType: k8s.V1Secret,
+        createMethod: 'createNamespacedSecret' as const,
+        deleteMethod: 'deleteNamespacedSecret' as const,
     }
 } as const;
 
 /**
- * Generic function to create K8s service resources
+ * Generic function to create K8s configmap & secret resources
  */
 export async function createK8sResource<ResourceType extends keyof typeof RESOURCE_CONFIGS>(
     resourceType: ResourceType,
@@ -83,19 +83,13 @@ export async function createK8sResource<ResourceType extends keyof typeof RESOUR
         }
         yamlObject.metadata.namespace = namespace;
 
-        if (resourceType === 'service') {
-            const k8sApi = createKarmadaApiClient(k8s.CoreV1Api);
-            await k8sApi.createNamespacedService({
-                namespace: namespace,
-                body: yamlObject
-            });
-        } else if (resourceType === 'ingress') {
-            const k8sApi = createKarmadaApiClient(k8s.NetworkingV1Api);
-            await k8sApi.createNamespacedIngress({
-                namespace: namespace,
-                body: yamlObject
-            });
-        }
+        const k8sApi = createKarmadaApiClient(config.apiClientConstructor);
+
+        // Use the configured createMethod to create the resource
+        await (k8sApi[config.createMethod])({
+            namespace: namespace,
+            body: yamlObject
+        });
 
     } catch (error: any) {
         throw new Error(`Failed to create ${config.kind.toLowerCase()}: ${(error as Error).message}`);
@@ -103,7 +97,7 @@ export async function createK8sResource<ResourceType extends keyof typeof RESOUR
 }
 
 /**
- * Generic function to delete K8s service resources
+ * Generic function to delete K8s configmap & secret resources
  */
 export async function deleteK8sResource<ResourceType extends keyof typeof RESOURCE_CONFIGS>(
     resourceType: ResourceType,
@@ -117,19 +111,13 @@ export async function deleteK8sResource<ResourceType extends keyof typeof RESOUR
         expect(resourceName).not.toBe('');
         expect(namespace).toBeTruthy();
 
-        if (resourceType === 'service') {
-            const k8sApi = createKarmadaApiClient(k8s.CoreV1Api);
-            await k8sApi.deleteNamespacedService({
-                name: resourceName,
-                namespace: namespace
-            });
-        } else if (resourceType === 'ingress') {
-            const k8sApi = createKarmadaApiClient(k8s.NetworkingV1Api);
-            await k8sApi.deleteNamespacedIngress({
-                name: resourceName,
-                namespace: namespace
-            });
-        }
+        const k8sApi = createKarmadaApiClient(config.apiClientConstructor);
+
+        // Use the configured deleteMethod to delete the resource
+        await (k8sApi[config.deleteMethod])({
+            name: resourceName,
+            namespace: namespace
+        });
 
     } catch (error: any) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -141,7 +129,7 @@ export async function deleteK8sResource<ResourceType extends keyof typeof RESOUR
     }
 }
 
-// Service Resource Test Templates
+// ConfigMap & Secret Resource Test Templates
 
 interface ResourceTestConfig<T extends keyof typeof RESOURCE_CONFIGS> {
     resourceType: T;
@@ -154,15 +142,15 @@ interface ResourceTestConfig<T extends keyof typeof RESOURCE_CONFIGS> {
 }
 
 /**
- * Generic test template for creating service resources
+ * Generic test template for creating configmap & secret resources
  * This template maintains the exact same structure and flow as the original create tests
  */
-export async function createServiceResourceTest<T extends keyof typeof RESOURCE_CONFIGS>(
+export async function createConfigMapSecretResourceTest<T extends keyof typeof RESOURCE_CONFIGS>(
     page: Page,
     config: ResourceTestConfig<T>
 ): Promise<void> {
-    // Navigate to service page/menu
-    await page.click('text=Services');
+    // Navigate to configmap & secret page/menu
+    await page.click('text=ConfigMaps & Secrets');
 
     // Click visible resource tab
     const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
@@ -234,10 +222,10 @@ interface ResourceDeleteTestConfig<T extends keyof typeof RESOURCE_CONFIGS> {
 }
 
 /**
- * Generic test template for deleting service resources
+ * Generic test template for deleting configmap & secret resources
  * This template maintains the exact same structure and flow as the original delete tests
  */
-export async function deleteServiceResourceTest<T extends keyof typeof RESOURCE_CONFIGS>(
+export async function deleteConfigMapSecretResourceTest<T extends keyof typeof RESOURCE_CONFIGS>(
     page: Page,
     config: ResourceDeleteTestConfig<T>
 ): Promise<void> {
@@ -247,8 +235,8 @@ export async function deleteServiceResourceTest<T extends keyof typeof RESOURCE_
     // Setup: Create resource using kubectl
     await config.createResource(config.yamlContent);
 
-    // Navigate to service page
-    await page.click('text=Services');
+    // Navigate to configmap & secret page
+    await page.click('text=ConfigMaps & Secrets');
 
     // Click visible resource tab
     const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
@@ -293,7 +281,7 @@ export async function deleteServiceResourceTest<T extends keyof typeof RESOURCE_
 
     // Refresh page to ensure UI is updated after deletion
     await page.reload();
-    await page.click('text=Services');
+    await page.click('text=ConfigMaps & Secrets');
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
@@ -310,15 +298,15 @@ interface ResourceListTestConfig {
 }
 
 /**
- * Generic test template for displaying service resource lists
+ * Generic test template for displaying configmap & secret resource lists
  * This template maintains the exact same structure and flow as the original list tests
  */
-export async function displayServiceResourceListTest(
+export async function displayConfigMapSecretResourceListTest(
     page: Page,
     config: ResourceListTestConfig
 ): Promise<void> {
-    // Open Services menu
-    await page.click('text=Services');
+    // Open ConfigMaps & Secrets menu
+    await page.click('text=ConfigMaps & Secrets');
 
     // Click visible resource tab
     const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
@@ -347,10 +335,10 @@ interface ResourceViewTestConfig<T extends keyof typeof RESOURCE_CONFIGS> {
 }
 
 /**
- * Generic test template for viewing service resource details
+ * Generic test template for viewing configmap & secret resource details
  * This template maintains the exact same structure and flow as the original view tests
  */
-export async function viewServiceResourceTest<T extends keyof typeof RESOURCE_CONFIGS>(
+export async function viewConfigMapSecretResourceTest<T extends keyof typeof RESOURCE_CONFIGS>(
     page: Page,
     config: ResourceViewTestConfig<T>
 ): Promise<void> {
@@ -360,8 +348,8 @@ export async function viewServiceResourceTest<T extends keyof typeof RESOURCE_CO
     // Setup: Create resource using kubectl
     await config.createResource(config.yamlContent);
 
-    // Navigate to service page
-    await page.click('text=Services');
+    // Navigate to configmap & secret page
+    await page.click('text=ConfigMaps & Secrets');
 
     // Click visible resource tab
     const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);

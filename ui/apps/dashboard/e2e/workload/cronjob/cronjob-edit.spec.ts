@@ -18,8 +18,17 @@ import { test, expect } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
 import { parse, stringify } from 'yaml';
 import _ from 'lodash';
-import { setupDashboardAuthentication, generateTestCronJobYaml, createK8sCronJob, getCronJobNameFromYaml, deleteK8sCronJob } from './test-utils';
-import { setMonacoEditorContent, waitForResourceInList, debugScreenshot, DeepRequired } from '../../test-utils';
+import {
+    setupDashboardAuthentication,
+    generateTestCronJobYaml,
+    createK8sCronJob,
+    getCronJobNameFromYaml,
+    deleteK8sCronJob,
+    setMonacoEditorContent,
+    waitForResourceInList,
+    debugScreenshot,
+    DeepRequired
+} from './test-utils';
 import { IResponse } from '@/services/base.ts';
 
 test.beforeEach(async ({ page }) => {
