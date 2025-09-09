@@ -17,16 +17,26 @@ limitations under the License.
 import { test } from '@playwright/test';
 import {
     setupDashboardAuthentication,
-    displayWorkloadResourceListTest
+    generateTestSecretYaml,
+    deleteK8sSecret,
+    getSecretNameFromYaml,
+    createConfigMapSecretResourceTest
 } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display job list', async ({ page }) => {
-    await displayWorkloadResourceListTest(page, {
-        tabName: 'Job',
-        screenshotName: 'debug-job-list.png'
+test('should create a new secret', async ({ page }) => {
+    const testSecretYaml = generateTestSecretYaml();
+
+    await createConfigMapSecretResourceTest(page, {
+        resourceType: 'secret',
+        tabName: 'Secret',
+        apiEndpoint: '/api/v1/_raw/Secret',
+        yamlContent: testSecretYaml,
+        getResourceName: getSecretNameFromYaml,
+        deleteResource: deleteK8sSecret,
+        screenshotName: 'debug-secret-create.png'
     });
 });
