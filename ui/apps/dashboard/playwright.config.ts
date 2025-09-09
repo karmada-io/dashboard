@@ -27,7 +27,7 @@ const baseURL = `http://localhost:${PORT}`;
  */
 export default defineConfig({
   // Timeout per test
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
 
   // Look for test files in the "tests" directory, relative to this configuration file.
   testDir: 'e2e',

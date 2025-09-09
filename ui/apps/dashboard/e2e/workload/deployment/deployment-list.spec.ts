@@ -14,28 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// apps/dashboard/e2e/namespace-list.spec.ts
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { setupDashboardAuthentication } from './test-utils';
+import { displayWorkloadResourceListTest } from '../../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
 test('should display deployment list', async ({ page }) => {
-    // Open Workloads menu
-    await page.click('text=Workloads');
-
-    // Wait for page to load and verify Deployment is selected
-    const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
-    await expect(deploymentTab).toBeChecked();
-
-    // Verify Deployment list table is visible
-    const table = page.locator('table');
-    await expect(table).toBeVisible({ timeout: 30000 });
-
-    // Debug
-    if (process.env.DEBUG === 'true') {
-        await page.screenshot({ path: 'debug-deployment-list.png', fullPage: true });
-    }
+    await displayWorkloadResourceListTest(page, {
+        screenshotName: 'debug-deployment-list.png'
+    });
 });
