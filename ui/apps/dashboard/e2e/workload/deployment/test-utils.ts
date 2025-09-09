@@ -57,7 +57,7 @@ spec:
  */
 export async function createK8sDeployment(yamlContent: string): Promise<void> {
     try {
-        const k8sApi = createKarmadaApiClient();
+        const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
         const yamlObject = parse(yamlContent) as k8s.V1Deployment;
         
         // Ensure namespace is always defined
@@ -87,7 +87,7 @@ export async function createK8sDeployment(yamlContent: string): Promise<void> {
  */
 export async function deleteK8sDeployment(deploymentName: string, namespace: string = 'default'): Promise<void> {
     try {
-        const k8sApi = createKarmadaApiClient();
+        const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
         
         // Assert parameters are valid for test deployment
         expect(deploymentName).toBeTruthy();

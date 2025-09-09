@@ -16,6 +16,8 @@ limitations under the License.
 
 import { Page } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
+import { ApiConstructor } from '@kubernetes/client-node';
+
 
 // Set webServer.url and use.baseURL with the location of the WebServer
 const HOST = process.env.HOST || 'localhost';
@@ -31,9 +33,9 @@ const KARMADA_API_SERVER = `https://${KARMADA_HOST}:${KARMADA_PORT}`;
 
 /**
  * Creates a configured Kubernetes API client for Karmada
- * @returns Kubernetes AppsV1Api client
+ * @returns Kubernetes API client instance
  */
-export function createKarmadaApiClient(): k8s.AppsV1Api {
+export function createKarmadaApiClient<ApiType extends k8s.ApiType>(apiClientType: ApiConstructor<ApiType>): ApiType{
     const kc = new k8s.KubeConfig();
 
     // Try to use existing kubeconfig first (for CI)
@@ -46,7 +48,7 @@ export function createKarmadaApiClient(): k8s.AppsV1Api {
             if (karmadaContext) {
                 kc.setCurrentContext('karmada-apiserver');
             }
-            return kc.makeApiClient(k8s.AppsV1Api);
+            return kc.makeApiClient(apiClientType);
         } catch (error) {
             console.error('Failed to load kubeconfig:', error);
         }
@@ -74,7 +76,7 @@ users:
 `;
 
     kc.loadFromString(kubeConfigYaml);
-    return kc.makeApiClient(k8s.AppsV1Api);
+    return kc.makeApiClient(apiClientType);
 }
 
 /**
