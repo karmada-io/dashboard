@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { setupDashboardAuthentication, createK8sResource, deleteK8sResource, getResourceNameFromYaml } from '../../test-utils';
+import { setupDashboardAuthentication, getResourceNameFromYaml } from '../../test-utils';
+import { createK8sResource, deleteK8sResource} from '../test-utils';
 
 export { setupDashboardAuthentication };
 
