@@ -1,0 +1,76 @@
+/*
+Copyright 2025 The Karmada Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import {
+    getResourceNameFromYaml,
+    createK8sResource,
+    deleteK8sResource
+} from '../test-utils';
+
+// Re-export ALL utilities from parent test-utils for single-point import
+export * from '../test-utils';
+
+/**
+ * Generate test PropagationPolicy YAML with timestamp
+ */
+export function generateTestPropagationPolicyYaml() {
+    const timestamp = Date.now();
+    return `apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: test-propagationpolicy-${timestamp}
+  namespace: default
+  labels:
+    app: test-app
+spec:
+  resourceSelectors:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: nginx-deployment
+  placement:
+    clusterAffinity:
+      clusterNames:
+        - member1
+        - member2`;
+}
+
+/**
+ * Creates a Kubernetes PropagationPolicy using the shared K8s utility.
+ * @param yamlContent The YAML content of the propagationpolicy.
+ * @returns A Promise that resolves when the propagationpolicy is created.
+ */
+export async function createK8sPropagationPolicy(yamlContent: string): Promise<void> {
+    return createK8sResource('propagationpolicy', yamlContent);
+}
+
+/**
+ * Deletes a Kubernetes PropagationPolicy using the shared K8s utility.
+ * @param propagationPolicyName The name of the propagationpolicy to delete.
+ * @param namespace The namespace of the propagationpolicy (default: 'default').
+ * @returns A Promise that resolves when the propagationpolicy is deleted.
+ */
+export async function deleteK8sPropagationPolicy(propagationPolicyName: string, namespace: string = 'default'): Promise<void> {
+    return deleteK8sResource('propagationpolicy', propagationPolicyName, namespace);
+}
+
+/**
+ * Gets propagationpolicy name from YAML content using shared utility.
+ * @param yamlContent The YAML content.
+ * @returns The propagationpolicy name.
+ */
+export function getPropagationPolicyNameFromYaml(yamlContent: string): string {
+    return getResourceNameFromYaml(yamlContent, 'propagationpolicy');
+}
