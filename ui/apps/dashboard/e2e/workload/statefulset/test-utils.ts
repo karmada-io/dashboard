@@ -34,7 +34,23 @@ const KARMADA_API_SERVER = `https://${KARMADA_HOST}:${KARMADA_PORT}`;
 function createKarmadaApiClient(): k8s.AppsV1Api {
     const kc = new k8s.KubeConfig();
     
-    // Use loadFromString with proper YAML format for Karmada API server
+    // Try to use existing kubeconfig first (for CI)
+    if (process.env.KUBECONFIG) {
+        try {
+            kc.loadFromFile(process.env.KUBECONFIG);
+            // Set context to karmada-apiserver if available
+            const contexts = kc.getContexts();
+            const karmadaContext = contexts.find(c => c.name === 'karmada-apiserver');
+            if (karmadaContext) {
+                kc.setCurrentContext('karmada-apiserver');
+            }
+            return kc.makeApiClient(k8s.AppsV1Api);
+        } catch (error) {
+            console.error('Failed to load kubeconfig:', error);
+        }
+    }
+    
+    // Fallback to custom config for local development
     const kubeConfigYaml = `
 apiVersion: v1
 kind: Config
@@ -96,15 +112,7 @@ spec:
         - name: nginx
           image: nginx:latest
           ports:
-            - containerPort: 80
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 1Gi`;
+            - containerPort: 80`;
 }
 
 /**
