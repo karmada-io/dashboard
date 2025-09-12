@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// apps/dashboard/e2e/statefulset-list.spec.ts
+// apps/dashboard/e2e/service-list.spec.ts
 import { test, expect } from '@playwright/test';
 import { setupDashboardAuthentication } from './test-utils';
 
@@ -22,24 +22,24 @@ test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display statefulset list', async ({ page }) => {
-    // Open Workloads menu
-    await page.click('text=Workloads');
+test('should display service list', async ({ page }) => {
+    // Open Services menu
+    await page.click('text=Services');
 
-    // Click visible Statefulset tab
-    const statefulsetTab = page.locator('role=option[name="Statefulset"]');
-    await statefulsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await statefulsetTab.click();
+    // Click visible Service tab
+    const serviceTab = page.locator('role=option[name="Service"]');
+    await serviceTab.waitFor({ state: 'visible', timeout: 30000 });
+    await serviceTab.click();
 
     // Verify selected state
-    await expect(statefulsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(serviceTab).toHaveAttribute('aria-selected', 'true');
 
-    // Verify Statefulset list table is visible
+    // Verify Service list table is visible
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
     // Debug
     if (process.env.DEBUG === 'true') {
-        await page.screenshot({ path: 'debug-statefulset-list.png', fullPage: true });
+        await page.screenshot({ path: 'debug-service-list.png', fullPage: true });
     }
 });

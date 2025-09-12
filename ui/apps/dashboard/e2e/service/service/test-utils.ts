@@ -29,9 +29,9 @@ const KARMADA_API_SERVER = `https://${KARMADA_HOST}:${KARMADA_PORT}`;
 
 /**
  * Creates a configured Kubernetes API client for Karmada
- * @returns Kubernetes AppsV1Api client
+ * @returns Kubernetes CoreV1Api client
  */
-function createKarmadaApiClient(): k8s.AppsV1Api {
+function createKarmadaApiClient(): k8s.CoreV1Api {
     const kc = new k8s.KubeConfig();
     
     // Try to use existing kubeconfig first (for CI)
@@ -44,7 +44,7 @@ function createKarmadaApiClient(): k8s.AppsV1Api {
             if (karmadaContext) {
                 kc.setCurrentContext('karmada-apiserver');
             }
-            return kc.makeApiClient(k8s.AppsV1Api);
+            return kc.makeApiClient(k8s.CoreV1Api);
         } catch (error) {
             console.error('Failed to load kubeconfig:', error);
         }
@@ -72,11 +72,11 @@ users:
 `;
     
     kc.loadFromString(kubeConfigYaml);
-    return kc.makeApiClient(k8s.AppsV1Api);
+    return kc.makeApiClient(k8s.CoreV1Api);
 }
 
 /**
- * Setup dashboard authentication and navigate to workload page
+ * Setup dashboard authentication and navigate to service page
  */
 export async function setupDashboardAuthentication(page: Page) {
     await page.goto(`${baseURL}/login`, { waitUntil: 'networkidle' });
@@ -88,43 +88,38 @@ export async function setupDashboardAuthentication(page: Page) {
 }
 
 /**
- * Generate test StatefulSet YAML with timestamp
+ * Generate test Service YAML with timestamp
  */
-export function generateTestStatefulSetYaml() {
+export function generateTestServiceYaml() {
     const timestamp = Date.now();
-    return `apiVersion: apps/v1
-kind: StatefulSet
+    return `apiVersion: v1
+kind: Service
 metadata:
-  name: test-statefulset-${timestamp}
+  name: test-service-${timestamp}
   namespace: default
+  labels:
+    app: test-app
 spec:
-  serviceName: test-service
-  replicas: 1
+  type: ClusterIP
   selector:
-    matchLabels:
-      app: test-app
-  template:
-    metadata:
-      labels:
-        app: test-app
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          ports:
-            - containerPort: 80`;
+    app: test-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP`;
 }
 
 /**
- * Creates a Kubernetes StatefulSet using the Kubernetes JavaScript client.
+ * Creates a Kubernetes Service using the Kubernetes JavaScript client.
  * This is a more robust way to set up test data than UI interaction.
- * @param yamlContent The YAML content of the statefulset.
- * @returns A Promise that resolves when the statefulset is created.
+ * @param yamlContent The YAML content of the service.
+ * @returns A Promise that resolves when the service is created.
  */
-export async function createK8sStatefulSet(yamlContent: string): Promise<void> {
+export async function createK8sService(yamlContent: string): Promise<void> {
     try {
         const k8sApi = createKarmadaApiClient();
-        const yamlObject = parse(yamlContent) as k8s.V1StatefulSet;
+        const yamlObject = parse(yamlContent) as k8s.V1Service;
         
         // Ensure namespace is always defined
         const namespace = yamlObject.metadata?.namespace || 'default';
@@ -135,57 +130,57 @@ export async function createK8sStatefulSet(yamlContent: string): Promise<void> {
         }
         yamlObject.metadata.namespace = namespace;
 
-        await k8sApi.createNamespacedStatefulSet({
+        await k8sApi.createNamespacedService({
             namespace: namespace,
             body: yamlObject
         });
         
     } catch (error: any) {
-        throw new Error(`Failed to create statefulset: ${error.message}`);
+        throw new Error(`Failed to create service: ${error.message}`);
     }
 }
 
 /**
- * Deletes a Kubernetes StatefulSet using the Kubernetes JavaScript client.
- * @param statefulSetName The name of the statefulset to delete.
- * @param namespace The namespace of the statefulset (default: 'default').
- * @returns A Promise that resolves when the statefulset is deleted.
+ * Deletes a Kubernetes Service using the Kubernetes JavaScript client.
+ * @param serviceName The name of the service to delete.
+ * @param namespace The namespace of the service (default: 'default').
+ * @returns A Promise that resolves when the service is deleted.
  */
-export async function deleteK8sStatefulSet(statefulSetName: string, namespace: string = 'default'): Promise<void> {
+export async function deleteK8sService(serviceName: string, namespace: string = 'default'): Promise<void> {
     try {
         const k8sApi = createKarmadaApiClient();
         
-        // Assert parameters are valid for test statefulset
-        expect(statefulSetName).toBeTruthy();
-        expect(statefulSetName).not.toBe('');
+        // Assert parameters are valid for test service
+        expect(serviceName).toBeTruthy();
+        expect(serviceName).not.toBe('');
         expect(namespace).toBeTruthy();
 
-        await k8sApi.deleteNamespacedStatefulSet({
-            name: statefulSetName,
+        await k8sApi.deleteNamespacedService({
+            name: serviceName,
             namespace: namespace
         });
         
     } catch (error: any) {
         if (error.response?.status === 404 || error.statusCode === 404)  {
-            // StatefulSet not found - already deleted, this is fine
+            // Service not found - already deleted, this is fine
             return;
         }
-        throw new Error(`Failed to delete statefulset: ${error.message}`);
+        throw new Error(`Failed to delete service: ${error.message}`);
     }
 }
 
 /**
- * Gets statefulset name from YAML content using proper YAML parsing.
+ * Gets service name from YAML content using proper YAML parsing.
  * @param yamlContent The YAML content.
- * @returns The statefulset name.
+ * @returns The service name.
  */
-export function getStatefulSetNameFromYaml(yamlContent: string): string {
+export function getServiceNameFromYaml(yamlContent: string): string {
     const yamlObject = parse(yamlContent);
-    const statefulSetName = _.get(yamlObject, 'metadata.name');
+    const serviceName = _.get(yamlObject, 'metadata.name');
     
-    if (!statefulSetName) {
-        throw new Error('Could not extract statefulset name from YAML');
+    if (!serviceName) {
+        throw new Error('Could not extract service name from YAML');
     }
     
-    return statefulSetName;
+    return serviceName;
 }
