@@ -12,38 +12,38 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestStatefulSetYaml, createK8sStatefulSet, getStatefulSetNameFromYaml, deleteK8sStatefulSet } from './test-utils';
+import { setupDashboardAuthentication, generateTestCronJobYaml, createK8sCronJob, getCronJobNameFromYaml, deleteK8sCronJob } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should edit statefulset successfully', async ({ page }) => {
-    // Create a test statefulset directly via API to set up test data
-    const testStatefulSetYaml = generateTestStatefulSetYaml();
-    const statefulSetName = getStatefulSetNameFromYaml(testStatefulSetYaml);
+test('should edit cronjob successfully', async ({ page }) => {
+    // Create a test cronjob directly via API to set up test data
+    const testCronJobYaml = generateTestCronJobYaml();
+    const cronJobName = getCronJobNameFromYaml(testCronJobYaml);
 
-    // Setup: Create statefulset using kubectl
-    await createK8sStatefulSet(testStatefulSetYaml);
+    // Setup: Create cronjob using kubectl
+    await createK8sCronJob(testCronJobYaml);
 
     // Navigate to workload page
     await page.click('text=Workloads');
     
-    // Click visible Statefulset tab
-    const statefulsetTab = page.locator('role=option[name="Statefulset"]');
-    await statefulsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await statefulsetTab.click();
+    // Click visible Cronjob tab
+    const cronjobTab = page.locator('role=option[name="Cronjob"]');
+    await cronjobTab.waitFor({ state: 'visible', timeout: 30000 });
+    await cronjobTab.click();
     
     // Verify selected state
-    await expect(statefulsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(cronjobTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for statefulset to appear in list
+    // Wait for cronjob to appear in list
     const table = page.locator('table');
-    await expect(table.locator(`text=${statefulSetName}`)).toBeVisible({ timeout: 30000 });
+    await expect(table.locator(`text=${cronJobName}`)).toBeVisible({ timeout: 30000 });
 
-    // Find row containing test statefulset name
-    const targetRow = page.locator(`table tbody tr:has-text("${statefulSetName}")`);
+    // Find row containing test cronjob name
+    const targetRow = page.locator(`table tbody tr:has-text("${cronJobName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
 
     // Find Edit button in that row and click
@@ -54,7 +54,7 @@ test('should edit statefulset successfully', async ({ page }) => {
     const apiRequestPromise = page.waitForResponse(response => {
         const url = response.url();
         return (url.includes('/api/v1/_raw/') ||
-                url.includes('/api/v1/namespaces/') && (url.includes('/deployments/') || url.includes('/statefulsets/') || url.includes('/daemonsets/'))) &&
+                url.includes('/api/v1/namespaces/') && (url.includes('/deployments/') || url.includes('/cronjobs/') || url.includes('/daemonsets/'))) &&
             response.status() === 200;
     }, { timeout: 15000 });
 
@@ -107,20 +107,16 @@ metadata:
   name: ${data.metadata.name}
   namespace: ${data.metadata.namespace}
 spec:
-  replicas: ${data.spec.replicas}
-  selector:
-    matchLabels:
-      app: ${data.spec.selector.matchLabels.app}
-  template:
-    metadata:
-      labels:
-        app: ${data.spec.template.metadata.labels.app}
+  schedule: "${data.spec.schedule}"
+  jobTemplate:
     spec:
-      containers:
-        - name: ${data.spec.template.spec.containers[0].name}
-          image: ${data.spec.template.spec.containers[0].image}
-          ports:
-            - containerPort: ${data.spec.template.spec.containers[0].ports[0].containerPort}`;
+      template:
+        spec:
+          containers:
+            - name: ${data.spec.jobTemplate.spec.template.spec.containers[0].name}
+              image: ${data.spec.jobTemplate.spec.template.spec.containers[0].image}
+              command: ${JSON.stringify(data.spec.jobTemplate.spec.template.spec.containers[0].command)}
+          restartPolicy: ${data.spec.jobTemplate.spec.template.spec.restartPolicy}`;
 
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             if (textarea) {
@@ -135,21 +131,21 @@ spec:
 
     // If still unable to get content, report error
     if (!yamlContent || yamlContent.length === 0) {
-        throw new Error(`Edit feature error: Monaco editor does not load statefulset YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
+        throw new Error(`Edit feature error: Monaco editor does not load cronjob YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
     }
 
-    // Modify YAML content (replicas: 1 → 2, if not 1 then change to 3)
-    let modifiedYaml = yamlContent.replace(/replicas:\s*1/, 'replicas: 2');
+    // Modify YAML content (change schedule from every 5 minutes to every 10 minutes)
+    let modifiedYaml = yamlContent.replace(/schedule:\s*"\*\/5\s+\*\s+\*\s+\*\s+\*"/, 'schedule: "*/10 * * * *"');
 
     // Verify modification took effect
     if (modifiedYaml === yamlContent) {
         // Try other modification methods
-        const alternativeModified = yamlContent.replace(/replicas:\s*\d+/, 'replicas: 3');
+        const alternativeModified = yamlContent.replace(/schedule:\s*"[^"]+"/, 'schedule: "0 */2 * * *"');
         if (alternativeModified !== yamlContent) {
             modifiedYaml = alternativeModified;
         } else {
             // If still can't modify, try changing image name
-            const imageModified = yamlContent.replace(/image:\s*nginx:1\.20/, 'image: nginx:1.21');
+            const imageModified = yamlContent.replace(/image:\s*busybox:latest/, 'image: busybox:1.35');
             if (imageModified !== yamlContent) {
                 modifiedYaml = imageModified;
             }
@@ -233,16 +229,16 @@ spec:
         }
     }
 
-    // Cleanup: Delete the created statefulset
+    // Cleanup: Delete the created cronjob
     try {
-        await deleteK8sStatefulSet(statefulSetName, 'default');
+        await deleteK8sCronJob(cronJobName, 'default');
     } catch (error) {
-        console.warn(`Failed to cleanup statefulset ${statefulSetName}:`, error);
+        console.warn(`Failed to cleanup cronjob ${cronJobName}:`, error);
     }
 
     // Debug
     if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-statefulset-edit.png', fullPage: true });
+        await page.screenshot({ path: 'debug-cronjob-edit.png', fullPage: true });
     }
 
 });
