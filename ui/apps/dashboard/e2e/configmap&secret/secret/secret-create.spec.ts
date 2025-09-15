@@ -21,7 +21,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should create a new secret', async ({ page }) => {
-    // Navigate to secret menu
+    // Open ConfigMaps & Secrets menu
     await page.click('text=ConfigMaps & Secrets');
 
     // Click visible Secret tab
