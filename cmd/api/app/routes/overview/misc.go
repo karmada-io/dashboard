@@ -21,15 +21,15 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
-	kubeclient "k8s.io/client-go/kubernetes"
 	"math/big"
 	"strings"
 
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	"github.com/karmada-io/karmada/pkg/version"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/remotecommand"
 
