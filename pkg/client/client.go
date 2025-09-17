@@ -126,6 +126,8 @@ func karmadaClientFromRequest(request *http.Request) (karmadaclientset.Interface
 	return karmadaclientset.NewForConfig(config)
 }
 
+// GetKarmadaClientFromRequestForKarmadaAPIServer creates a Kubernetes clientset from an HTTP request
+// for the Karmada APIServer, based on `Authorization` header
 func GetKarmadaClientFromRequestForKarmadaAPIServer(request *http.Request) (kubeclient.Interface, error) {
 	if !isKarmadaInitialized() {
 		return nil, fmt.Errorf("client package not initialized")
@@ -142,6 +144,8 @@ func karmadaClientForKarmadaAPIServerFromRequest(request *http.Request) (kubecli
 	return kubeclient.NewForConfig(config)
 }
 
+// GetClientForMemberClusterFromRequest creates a Kubernetes clientset from an HTTP request
+// for a member cluster APIServer, based on `Authorization` header
 func GetClientForMemberClusterFromRequest(request *http.Request) (kubeclient.Interface, error) {
 	if !isKarmadaInitialized() {
 		return nil, fmt.Errorf("client package not initialized")
@@ -157,12 +161,12 @@ func GetClientForMemberClusterFromRequest(request *http.Request) (kubeclient.Int
 		if clientForMemberAPIServer, ok := value.(kubeclient.Interface); ok {
 			return clientForMemberAPIServer, nil
 		}
-		return nil, fmt.Errorf("Load client for member apiserver error")
+		return nil, fmt.Errorf("load client for member apiserver error")
 	}
 	clientForMemberAPIServer, err := clientForMemberClusterAPIServer(request, memberClusterName)
 	if err != nil {
 		klog.ErrorS(err, "Could not init kubernetes in-cluster client for member apiserver")
-		return nil, fmt.Errorf("Could not init kubernetes in-cluster client for member apiserver")
+		return nil, fmt.Errorf("could not init kubernetes in-cluster client for member apiserver")
 	}
 	memberClients.Store(memberClusterName, clientForMemberAPIServer)
 	return clientForMemberAPIServer, nil
