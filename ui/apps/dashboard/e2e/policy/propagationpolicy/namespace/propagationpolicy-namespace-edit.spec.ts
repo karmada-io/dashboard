@@ -12,44 +12,69 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import * as k8s from '@kubernetes/client-node';
-import { setupDashboardAuthentication, generateTestDaemonSetYaml, createK8sDaemonSet, getDaemonSetNameFromYaml, deleteK8sDaemonSet } from './test-utils';
+import { setupDashboardAuthentication, generateTestPropagationPolicyYaml, createK8sPropagationPolicy, getPropagationPolicyNameFromYaml, deleteK8sPropagationPolicy } from './test-utils';
 import { IResponse } from '@/services/base.ts';
 
 type DeepRequired<T> = {
     [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
 };
 
+interface PropagationPolicy {
+    apiVersion: string;
+    kind: string;
+    metadata: {
+        name: string;
+        namespace: string;
+    };
+    spec: {
+        resourceSelectors?: Array<{
+            apiVersion: string;
+            kind: string;
+            name?: string;
+        }>;
+        placement?: {
+            clusterAffinity?: {
+                clusterNames?: string[];
+            };
+        };
+    };
+}
+
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should edit daemonset successfully', async ({ page }) => {
-    // Create a test daemonset directly via API to set up test data
-    const testDaemonSetYaml = generateTestDaemonSetYaml();
-    const daemonSetName = getDaemonSetNameFromYaml(testDaemonSetYaml);
+test('should edit propagationpolicy successfully', async ({ page }) => {
+    // Create a test propagationpolicy directly via API to set up test data
+    const testPropagationPolicyYaml = generateTestPropagationPolicyYaml();
+    const propagationPolicyName = getPropagationPolicyNameFromYaml(testPropagationPolicyYaml);
 
-    // Setup: Create daemonset using kubectl
-    await createK8sDaemonSet(testDaemonSetYaml);
+    // Setup: Create propagationpolicy using kubectl
+    await createK8sPropagationPolicy(testPropagationPolicyYaml);
 
-    // Navigate to workload page
-    await page.click('text=Workloads');
-    
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
-    
+    // Open Policies menu
+    await page.click('text=Policies');
+
+    // Click Propagation Policy menu item
+    const propagationPolicyMenuItem = page.locator('text=Propagation Policy');
+    await propagationPolicyMenuItem.waitFor({ state: 'visible', timeout: 30000 });
+    await propagationPolicyMenuItem.click();
+
+    // Click Namespace level tab
+    const namespaceLevelTab = page.locator('role=option[name="Namespace level"]');
+    await namespaceLevelTab.waitFor({ state: 'visible', timeout: 30000 });
+    await namespaceLevelTab.click();
+
     // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(namespaceLevelTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for daemonset to appear in list
+    // Wait for propagationpolicy to appear in list
     const table = page.locator('table');
-    await expect(table.locator(`text=${daemonSetName}`)).toBeVisible({ timeout: 30000 });
+    await expect(table.locator(`text=${propagationPolicyName}`)).toBeVisible({ timeout: 30000 });
 
-    // Find row containing test daemonset name
-    const targetRow = page.locator(`table tbody tr:has-text("${daemonSetName}")`);
+    // Find row containing test propagationpolicy name
+    const targetRow = page.locator(`table tbody tr:has-text("${propagationPolicyName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
 
     // Find Edit button in that row and click
@@ -58,10 +83,7 @@ test('should edit daemonset successfully', async ({ page }) => {
 
     // Listen for edit API call
     const apiRequestPromise = page.waitForResponse(response => {
-        const url = response.url();
-        return (url.includes('/api/v1/_raw/') ||
-                url.includes('/api/v1/namespaces/') && (url.includes('/deployments/') || url.includes('/statefulsets/') || url.includes('/daemonsets/'))) &&
-            response.status() === 200;
+        return response.url().includes('_raw/propagationpolicy') && response.status() === 200;
     }, { timeout: 15000 });
 
     await editButton.click();
@@ -71,7 +93,7 @@ test('should edit daemonset successfully', async ({ page }) => {
 
     // Wait for network request to complete and get response data
     const apiResponse = await apiRequestPromise;
-    const responseData = (await apiResponse.json()) as IResponse<DeepRequired<k8s.V1DaemonSet>>;
+    const responseData = (await apiResponse.json()) as IResponse<DeepRequired<PropagationPolicy>>;
 
     // Verify Monaco editor is loaded
     await expect(page.locator('.monaco-editor')).toBeVisible({ timeout: 10000 });
@@ -110,22 +132,18 @@ test('should edit daemonset successfully', async ({ page }) => {
             const yaml = `apiVersion: ${data.apiVersion}
 kind: ${data.kind}
 metadata:
-  name: ${data.metadata?.name || 'test-daemonset'}
+  name: ${data.metadata?.name || 'test-propagationpolicy'}
   namespace: ${data.metadata?.namespace || 'default'}
 spec:
-  selector:
-    matchLabels:
-      app: ${data.spec?.selector?.matchLabels?.app || 'test-app'}
-  template:
-    metadata:
-      labels:
-        app: ${data.spec?.template?.metadata?.labels?.app || 'test-app'}
-    spec:
-      containers:
-        - name: ${data.spec?.template?.spec?.containers?.[0]?.name || 'container'}
-          image: ${data.spec?.template?.spec?.containers?.[0]?.image || 'nginx:latest'}
-          ports:
-            - containerPort: ${data.spec?.template?.spec?.containers?.[0]?.ports?.[0]?.containerPort || 80}`;
+  resourceSelectors:
+    - apiVersion: ${data.spec?.resourceSelectors?.[0]?.apiVersion || 'apps/v1'}
+      kind: ${data.spec?.resourceSelectors?.[0]?.kind || 'Deployment'}
+      name: ${data.spec?.resourceSelectors?.[0]?.name || 'nginx-deployment'}
+  placement:
+    clusterAffinity:
+      clusterNames:
+        - ${data.spec?.placement?.clusterAffinity?.clusterNames?.[0] || 'member1'}
+        - ${data.spec?.placement?.clusterAffinity?.clusterNames?.[1] || 'member2'}`;
 
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             if (textarea) {
@@ -140,23 +158,23 @@ spec:
 
     // If still unable to get content, report error
     if (!yamlContent || yamlContent.length === 0) {
-        throw new Error(`Edit feature error: Monaco editor does not load daemonset YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
+        throw new Error(`Edit feature error: Monaco editor does not load propagationpolicy YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
     }
 
-    // Modify YAML content (change image version)
-    let modifiedYaml = yamlContent.replace(/image:\s*nginx:latest/, 'image: nginx:1.21');
+    // Modify YAML content (change cluster name)
+    let modifiedYaml = yamlContent.replace(/- member1/, '- member3');
 
     // Verify modification took effect
     if (modifiedYaml === yamlContent) {
-        // Try alternative modification - change image name
-        const alternativeModified = yamlContent.replace(/image:\s*nginx/, 'image: httpd');
+        // Try alternative modification - change deployment name
+        const alternativeModified = yamlContent.replace(/nginx-deployment/, 'httpd-deployment');
         if (alternativeModified !== yamlContent) {
             modifiedYaml = alternativeModified;
         } else {
-            // If still can't modify, try changing container name
-            const nameModified = yamlContent.replace(/name:\s*nginx/, 'name: web-server');
-            if (nameModified !== yamlContent) {
-                modifiedYaml = nameModified;
+            // If still can't modify, try changing resource selector kind
+            const kindModified = yamlContent.replace(/kind: Deployment/, 'kind: StatefulSet');
+            if (kindModified !== yamlContent) {
+                modifiedYaml = kindModified;
             }
         }
     }
@@ -239,16 +257,16 @@ spec:
         }
     }
 
-    // Cleanup: Delete the created daemonset
+    // Cleanup: Delete the created propagationpolicy
     try {
-        await deleteK8sDaemonSet(daemonSetName, 'default');
+        await deleteK8sPropagationPolicy(propagationPolicyName, 'default');
     } catch (error) {
-        console.warn(`Failed to cleanup daemonset ${daemonSetName}:`, error);
+        console.warn(`Failed to cleanup propagationpolicy ${propagationPolicyName}:`, error);
     }
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-daemonset-edit.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-propagationpolicy-namespace-edit.png', fullPage: true });
     }
 
 });

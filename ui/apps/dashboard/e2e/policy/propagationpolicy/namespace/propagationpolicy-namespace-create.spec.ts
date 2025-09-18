@@ -12,33 +12,38 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDaemonSetYaml, getDaemonSetNameFromYaml, deleteK8sDaemonSet } from './test-utils';
+import { setupDashboardAuthentication, generateTestPropagationPolicyYaml, deleteK8sPropagationPolicy, getPropagationPolicyNameFromYaml } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should create a new daemonset', async ({ page }) => {
-    // Navigate to workload menu
-    await page.click('text=Workloads');
-    
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
-    
+test('should create a new propagationpolicy', async ({ page }) => {
+    // Open Policies menu
+    await page.click('text=Policies');
+
+    // Click Propagation Policy menu item
+    const propagationPolicyMenuItem = page.locator('text=Propagation Policy');
+    await propagationPolicyMenuItem.waitFor({ state: 'visible', timeout: 30000 });
+    await propagationPolicyMenuItem.click();
+
+    // Click Namespace level tab
+    const namespaceLevelTab = page.locator('role=option[name="Namespace level"]');
+    await namespaceLevelTab.waitFor({ state: 'visible', timeout: 30000 });
+    await namespaceLevelTab.click();
+
     // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(namespaceLevelTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
     await page.click('button:has-text("Add")');
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
 
     // Listen for API calls
     const apiRequestPromise = page.waitForResponse(response => {
-        return response.url().includes('/api/v1/_raw/DaemonSet') && response.status() === 200;
+        return response.url().includes('/api/v1/propagationpolicy') && response.status() === 200;
     }, { timeout: 15000 });
 
-    const testDaemonSetYaml = generateTestDaemonSetYaml();
+    const testPropagationPolicyYaml = generateTestPropagationPolicyYaml();
 
     // Set Monaco editor DOM content
     await page.evaluate((yaml) => {
@@ -47,7 +52,7 @@ test('should create a new daemonset', async ({ page }) => {
             textarea.value = yaml;
             textarea.focus();
         }
-    }, testDaemonSetYaml);
+    }, testPropagationPolicyYaml);
 
     /* eslint-disable */
     // Call React onChange callback to update component state
@@ -80,7 +85,7 @@ test('should create a new daemonset', async ({ page }) => {
             if (fiberKey) {
                 let fiber = (dialog as any)[fiberKey];
 
-                const traverse = (node: any, depth = 0): boolean => {
+                const traverse = (node: any, depth = 0) => {
                     if (!node || depth > 20) return false;
 
                     if (node.memoizedProps && node.memoizedProps.onChange) {
@@ -89,13 +94,15 @@ test('should create a new daemonset', async ({ page }) => {
                     }
 
                     if (node.child && traverse(node.child, depth + 1)) return true;
-                    return node.sibling && traverse(node.sibling, depth + 1);
+                    if (node.sibling && traverse(node.sibling, depth + 1)) return true;
+
+                    return false;
                 };
 
                 traverse(fiber);
             }
         }
-    }, testDaemonSetYaml);
+    }, testPropagationPolicyYaml);
     /* eslint-enable */
 
     // Wait for submit button to become enabled
@@ -110,32 +117,32 @@ test('should create a new daemonset', async ({ page }) => {
         // Dialog may already be closed
     });
 
-    // Verify new daemonset appears in list
-    const daemonSetName = getDaemonSetNameFromYaml(testDaemonSetYaml);
+    // Verify new propagationpolicy appears in list
+    const propagationPolicyName = getPropagationPolicyNameFromYaml(testPropagationPolicyYaml);
 
-    // Assert daemonset name exists
-    expect(daemonSetName).toBeTruthy();
-    expect(daemonSetName).toBeDefined();
+    // Assert propagationpolicy name exists
+    expect(propagationPolicyName).toBeTruthy();
+    expect(propagationPolicyName).toBeDefined();
 
     try {
-        await expect(page.locator('table').locator(`text=${daemonSetName}`)).toBeVisible({
+        await expect(page.locator('table').locator(`text=${propagationPolicyName}`)).toBeVisible({
             timeout: 15000
         });
     } catch {
         // If not shown immediately in list, may be due to cache or refresh delay
-        // But API success indicates daemonset was created
+        // But API success indicates propagationpolicy was created
     }
 
-    // Cleanup: Delete the created daemonset
+    // Cleanup: Delete the created propagationpolicy
     try {
-        await deleteK8sDaemonSet(daemonSetName, 'default');
+        await deleteK8sPropagationPolicy(propagationPolicyName, 'default');
     } catch (error) {
-        console.warn(`Failed to cleanup daemonset ${daemonSetName}:`, error);
+        console.warn(`Failed to cleanup propagationpolicy ${propagationPolicyName}:`, error);
     }
 
     // Debug
     if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-daemonset-create.png', fullPage: true });
+        await page.screenshot({ path: 'debug-propagationpolicy-create.png', fullPage: true });
     }
 
 });

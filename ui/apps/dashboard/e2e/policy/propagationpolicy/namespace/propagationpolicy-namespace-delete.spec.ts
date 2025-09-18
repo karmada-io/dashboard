@@ -12,38 +12,43 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDaemonSetYaml, createK8sDaemonSet, getDaemonSetNameFromYaml} from './test-utils';
+import { setupDashboardAuthentication, generateTestPropagationPolicyYaml, createK8sPropagationPolicy, getPropagationPolicyNameFromYaml} from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should delete daemonset successfully', async ({ page }) => {
-    // Create a test daemonset directly via kubectl to set up test data
-    const testDaemonSetYaml = generateTestDaemonSetYaml();
-    const daemonSetName = getDaemonSetNameFromYaml(testDaemonSetYaml);
+test('should delete propagationpolicy successfully', async ({ page }) => {
+    // Create a test propagationpolicy directly via kubectl to set up test data
+    const testPropagationPolicyYaml = generateTestPropagationPolicyYaml();
+    const propagationPolicyName = getPropagationPolicyNameFromYaml(testPropagationPolicyYaml);
 
-    // Setup: Create daemonset using kubectl
-    await createK8sDaemonSet(testDaemonSetYaml);
+    // Setup: Create propagationpolicy using kubectl
+    await createK8sPropagationPolicy(testPropagationPolicyYaml);
 
-    // Navigate to workload page
-    await page.click('text=Workloads');
-    
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
-    
+    // Open Policies menu
+    await page.click('text=Policies');
+
+    // Click Propagation Policy menu item
+    const propagationPolicyMenuItem = page.locator('text=Propagation Policy');
+    await propagationPolicyMenuItem.waitFor({ state: 'visible', timeout: 30000 });
+    await propagationPolicyMenuItem.click();
+
+    // Click Namespace level tab
+    const namespaceLevelTab = page.locator('role=option[name="Namespace level"]');
+    await namespaceLevelTab.waitFor({ state: 'visible', timeout: 30000 });
+    await namespaceLevelTab.click();
+
     // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(namespaceLevelTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for daemonset to appear in list
+    // Wait for propagationpolicy to appear in list
     const table = page.locator('table');
-    await expect(table.locator(`text=${daemonSetName}`)).toBeVisible({ timeout: 30000 });
+    await expect(table.locator(`text=${propagationPolicyName}`)).toBeVisible({ timeout: 30000 });
 
-    // Find row containing test daemonset name
-    const targetRow = page.locator(`table tbody tr:has-text("${daemonSetName}")`);
+    // Find row containing test propagationpolicy name
+    const targetRow = page.locator(`table tbody tr:has-text("${propagationPolicyName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
 
     // Find Delete button in that row and click
@@ -52,8 +57,7 @@ test('should delete daemonset successfully', async ({ page }) => {
 
     // Listen for delete API call
     const deleteApiPromise = page.waitForResponse(response => {
-        return response.url().includes('/_raw/daemonset') &&
-            response.url().includes(`name/${daemonSetName}`) &&
+        return response.url().includes('/propagationpolicy') &&
             response.request().method() === 'DELETE' &&
             response.status() === 200;
     }, { timeout: 15000 });
@@ -76,14 +80,14 @@ test('should delete daemonset successfully', async ({ page }) => {
 
     // Refresh page to ensure UI is updated after deletion
     await page.reload();
-    await page.click('text=Workloads');
+    await page.click('text=Policies');
     await expect(table).toBeVisible({ timeout: 30000 });
 
-    // Verify daemonset no longer exists in table
-    await expect(table.locator(`text=${daemonSetName}`)).toHaveCount(0, { timeout: 30000 });
+    // Verify propagationpolicy no longer exists in table
+    await expect(table.locator(`text=${propagationPolicyName}`)).toHaveCount(0, { timeout: 30000 });
 
     // Debug
     if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-daemonset-delete-kubectl.png', fullPage: true });
+        await page.screenshot({ path: 'debug-propagationpolicy-delete-kubectl.png', fullPage: true });
     }
 });

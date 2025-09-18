@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// apps/dashboard/e2e/daemonset-list.spec.ts
+// apps/dashboard/e2e/propagationpolicy-namespace-list.spec.ts
 import { test, expect } from '@playwright/test';
 import { setupDashboardAuthentication } from './test-utils';
 
@@ -19,24 +19,29 @@ test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display daemonset list', async ({ page }) => {
-    // Open Workloads menu
-    await page.click('text=Workloads');
+test('should display propagationpolicy namespace list', async ({ page }) => {
+    // Open Policies menu
+    await page.click('text=Policies');
 
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
+    // Click Propagation Policy menu item
+    const propagationPolicyMenuItem = page.locator('text=Propagation Policy');
+    await propagationPolicyMenuItem.waitFor({ state: 'visible', timeout: 30000 });
+    await propagationPolicyMenuItem.click();
+
+    // Click Namespace level tab
+    const namespaceLevelTab = page.locator('role=option[name="Namespace level"]');
+    await namespaceLevelTab.waitFor({ state: 'visible', timeout: 30000 });
+    await namespaceLevelTab.click();
 
     // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(namespaceLevelTab).toHaveAttribute('aria-selected', 'true');
 
-    // Verify Daemonset list table is visible
+    // Verify PropagationPolicy list table is visible
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
     // Debug
     if (process.env.DEBUG === 'true') {
-        await page.screenshot({ path: 'debug-daemonset-list.png', fullPage: true });
+        await page.screenshot({ path: 'debug-propagationpolicy-namespace-list.png', fullPage: true });
     }
 });

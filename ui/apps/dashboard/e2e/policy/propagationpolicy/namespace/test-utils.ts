@@ -30,9 +30,9 @@ const KARMADA_API_SERVER = `https://${KARMADA_HOST}:${KARMADA_PORT}`;
 
 /**
  * Creates a configured Kubernetes API client for Karmada
- * @returns Kubernetes AppsV1Api client
+ * @returns Kubernetes CustomObjectsApi client
  */
-function createKarmadaApiClient(): k8s.AppsV1Api {
+function createKarmadaApiClient(): k8s.CustomObjectsApi {
     const kc = new k8s.KubeConfig();
     
     // Try to use existing kubeconfig first (for CI)
@@ -45,7 +45,7 @@ function createKarmadaApiClient(): k8s.AppsV1Api {
             if (karmadaContext) {
                 kc.setCurrentContext('karmada-apiserver');
             }
-            return kc.makeApiClient(k8s.AppsV1Api);
+            return kc.makeApiClient(k8s.CustomObjectsApi);
         } catch (error) {
             console.error('Failed to load kubeconfig:', error);
         }
@@ -73,11 +73,11 @@ users:
 `;
     
     kc.loadFromString(kubeConfigYaml);
-    return kc.makeApiClient(k8s.AppsV1Api);
+    return kc.makeApiClient(k8s.CustomObjectsApi);
 }
 
 /**
- * Setup dashboard authentication and navigate to workload page
+ * Setup dashboard authentication and navigate to dashboard page
  */
 export async function setupDashboardAuthentication(page: Page) {
     await page.goto(`${baseURL}/login`, { waitUntil: 'networkidle' });
@@ -89,102 +89,106 @@ export async function setupDashboardAuthentication(page: Page) {
 }
 
 /**
- * Generate test DaemonSet YAML with timestamp
+ * Generate test PropagationPolicy YAML with timestamp
  */
-export function generateTestDaemonSetYaml() {
+export function generateTestPropagationPolicyYaml() {
     const timestamp = Date.now();
-    return `apiVersion: apps/v1
-kind: DaemonSet
+    return `apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
 metadata:
-  name: test-daemonset-${timestamp}
+  name: test-propagationpolicy-${timestamp}
   namespace: default
+  labels:
+    app: test-app
 spec:
-  selector:
-    matchLabels:
-      app: test-app
-  template:
-    metadata:
-      labels:
-        app: test-app
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          ports:
-            - containerPort: 80`;
+  resourceSelectors:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: nginx-deployment
+  placement:
+    clusterAffinity:
+      clusterNames:
+        - member1
+        - member2`;
 }
 
 /**
- * Creates a Kubernetes DaemonSet using the Kubernetes JavaScript client.
+ * Creates a Kubernetes PropagationPolicy using the Kubernetes JavaScript client.
  * This is a more robust way to set up test data than UI interaction.
- * @param yamlContent The YAML content of the daemonset.
- * @returns A Promise that resolves when the daemonset is created.
+ * @param yamlContent The YAML content of the propagationpolicy.
+ * @returns A Promise that resolves when the propagationpolicy is created.
  */
-export async function createK8sDaemonSet(yamlContent: string): Promise<void> {
+export async function createK8sPropagationPolicy(yamlContent: string): Promise<void> {
     try {
         const k8sApi = createKarmadaApiClient();
-        const yamlObject = parse(yamlContent) as k8s.V1DaemonSet;
-        
+        const yamlObject = parse(yamlContent) as any;
+
         // Ensure namespace is always defined
         const namespace = yamlObject.metadata?.namespace || 'default';
-        
+
         // Ensure metadata object exists
         if (!yamlObject.metadata) {
             yamlObject.metadata = {};
         }
         yamlObject.metadata.namespace = namespace;
 
-        await k8sApi.createNamespacedDaemonSet({
+        await k8sApi.createNamespacedCustomObject({
+            group: 'policy.karmada.io',
+            version: 'v1alpha1',
             namespace: namespace,
+            plural: 'propagationpolicies',
             body: yamlObject
         });
-        
+
     } catch (error: any) {
-        throw new Error(`Failed to create daemonset: ${(error as Error).message}`);
+        throw new Error(`Failed to create propagationpolicy: ${error.message}`);
     }
 }
 
 /**
- * Deletes a Kubernetes DaemonSet using the Kubernetes JavaScript client.
- * @param daemonSetName The name of the daemonset to delete.
- * @param namespace The namespace of the daemonset (default: 'default').
- * @returns A Promise that resolves when the daemonset is deleted.
+ * Deletes a Kubernetes PropagationPolicy using the Kubernetes JavaScript client.
+ * @param propagationPolicyName The name of the propagationpolicy to delete.
+ * @param namespace The namespace of the propagationpolicy (default: 'default').
+ * @returns A Promise that resolves when the propagationpolicy is deleted.
  */
-export async function deleteK8sDaemonSet(daemonSetName: string, namespace: string = 'default'): Promise<void> {
+export async function deleteK8sPropagationPolicy(propagationPolicyName: string, namespace: string = 'default'): Promise<void> {
     try {
         const k8sApi = createKarmadaApiClient();
-        
-        // Assert parameters are valid for test daemonset
-        expect(daemonSetName).toBeTruthy();
-        expect(daemonSetName).not.toBe('');
+
+        // Assert parameters are valid for test propagationpolicy
+        expect(propagationPolicyName).toBeTruthy();
+        expect(propagationPolicyName).not.toBe('');
         expect(namespace).toBeTruthy();
 
-        await k8sApi.deleteNamespacedDaemonSet({
-            name: daemonSetName,
-            namespace: namespace
+        await k8sApi.deleteNamespacedCustomObject({
+            group: 'policy.karmada.io',
+            version: 'v1alpha1',
+            namespace: namespace,
+            plural: 'propagationpolicies',
+            name: propagationPolicyName
         });
-        
+
     } catch (error: any) {
-        if (error.code === 404) {
-            // DaemonSet not found - already deleted, this is fine
+        if (error.response?.status === 404 || error.statusCode === 404)  {
+            // PropagationPolicy not found - already deleted, this is fine
             return;
         }
-        throw new Error(`Failed to delete daemonset: ${(error as Error).message}`);
+        throw new Error(`Failed to delete propagationpolicy: ${error.message}`);
     }
 }
 
 /**
- * Gets daemonset name from YAML content using proper YAML parsing.
+ * Gets propagationpolicy name from YAML content using proper YAML parsing.
  * @param yamlContent The YAML content.
- * @returns The daemonset name.
+ * @returns The propagationpolicy name.
  */
-export function getDaemonSetNameFromYaml(yamlContent: string): string {
-    const yamlObject = parse(yamlContent) as Record<string, string>;
-    const daemonSetName = _.get(yamlObject, 'metadata.name');
+export function getPropagationPolicyNameFromYaml(yamlContent: string): string {
+    const yamlObject = parse(yamlContent);
+    const propagationPolicyName = _.get(yamlObject, 'metadata.name');
 
-    if (!daemonSetName) {
-        throw new Error('Could not extract daemonset name from YAML');
+    if (!propagationPolicyName) {
+        throw new Error('Could not extract propagationpolicy name from YAML');
     }
 
-    return daemonSetName;
+    return propagationPolicyName;
 }
