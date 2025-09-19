@@ -24,10 +24,12 @@ import (
 	"math/big"
 	"strings"
 
+	karmadaclientset "github.com/karmada-io/karmada/pkg/generated/clientset/versioned"
 	"github.com/karmada-io/karmada/pkg/version"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/remotecommand"
 
@@ -161,8 +163,7 @@ func GetControllerManagerInfo() (*v1.KarmadaInfo, error) {
 }
 
 // GetMemberClusterInfo returns the status of member clusters.
-func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStatus, error) {
-	karmadaClient := client.InClusterKarmadaClient()
+func GetMemberClusterInfo(karmadaClient karmadaclientset.Interface, ds *dataselect.DataSelectQuery) (*v1.MemberClusterStatus, error) {
 	result, err := cluster.GetClusterList(karmadaClient, ds)
 	if err != nil {
 		return nil, err
@@ -194,10 +195,9 @@ func GetMemberClusterInfo(ds *dataselect.DataSelectQuery) (*v1.MemberClusterStat
 }
 
 // GetClusterResourceStatus returns the status of cluster resources.
-func GetClusterResourceStatus() (*v1.ClusterResourceStatus, error) {
+func GetClusterResourceStatus(karmadaClient karmadaclientset.Interface, kubeClient kubeclient.Interface) (*v1.ClusterResourceStatus, error) {
 	clusterResourceStatus := &v1.ClusterResourceStatus{}
 	ctx := context.TODO()
-	karmadaClient := client.InClusterKarmadaClient()
 	// handle pp num
 	clusterPPRet, err := karmadaClient.PolicyV1alpha1().ClusterPropagationPolicies().List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -226,7 +226,6 @@ func GetClusterResourceStatus() (*v1.ClusterResourceStatus, error) {
 
 	// handle cluster resources
 	// handler namespace num
-	kubeClient := client.InClusterClientForKarmadaAPIServer()
 	nsRet, err := kubeClient.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, err

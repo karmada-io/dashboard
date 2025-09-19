@@ -28,12 +28,15 @@ import (
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	v1 "github.com/karmada-io/dashboard/cmd/api/app/types/api/v1"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
-	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/resource/clusteroverridepolicy"
 )
 
 func handleGetClusterOverridePolicyList(c *gin.Context) {
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	clusterOverrideList, err := clusteroverridepolicy.GetClusterOverridePolicyList(karmadaClient, dataSelect)
 	if err != nil {
@@ -45,7 +48,11 @@ func handleGetClusterOverridePolicyList(c *gin.Context) {
 }
 
 func handleGetClusterOverridePolicyDetail(c *gin.Context) {
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	name := c.Param("clusterOverridePolicyName")
 	result, err := clusteroverridepolicy.GetClusterOverridePolicyDetail(karmadaClient, name)
 	if err != nil {
@@ -65,7 +72,11 @@ func handlePostClusterOverridePolicy(c *gin.Context) {
 	}
 
 	var err error
-	karmadaClient := client.InClusterKarmadaClient()
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	if overridepolicyRequest.IsClusterScope {
 		clusterOverridePolicy := v1alpha1.ClusterOverridePolicy{}
 		if err = yaml.Unmarshal([]byte(overridepolicyRequest.OverrideData), &clusterOverridePolicy); err != nil {

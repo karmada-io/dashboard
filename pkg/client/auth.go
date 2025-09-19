@@ -33,7 +33,7 @@ const (
 	authorizationTokenPrefix = "Bearer "
 )
 
-func karmadaConfigFromRequest(request *http.Request) (*rest.Config, error) {
+func restConfigFromRequest(request *http.Request) (*rest.Config, error) {
 	authInfo, err := buildAuthInfo(request)
 	if err != nil {
 		return nil, err
