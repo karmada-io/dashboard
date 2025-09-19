@@ -15,38 +15,31 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDaemonSetYaml, createK8sDaemonSet, getDaemonSetNameFromYaml} from './test-utils';
+import { setupDashboardAuthentication, generateTestDeploymentYaml, createK8sDeployment, getDeploymentNameFromYaml} from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should delete daemonset successfully', async ({ page }) => {
-    // Create a test daemonset directly via kubectl to set up test data
-    const testDaemonSetYaml = generateTestDaemonSetYaml();
-    const daemonSetName = getDaemonSetNameFromYaml(testDaemonSetYaml);
+test('should delete deployment successfully', async ({ page }) => {
+    // Create a test deployment directly via kubectl to set up test data
+    const testDeploymentYaml = generateTestDeploymentYaml();
+    const deploymentName = getDeploymentNameFromYaml(testDeploymentYaml);
 
-    // Setup: Create daemonset using kubectl
-    await createK8sDaemonSet(testDaemonSetYaml);
+    // Setup: Create deployment using kubectl
+    await createK8sDeployment(testDeploymentYaml);
 
     // Navigate to workload page
     await page.click('text=Workloads');
-    
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
-    
-    // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for daemonset to appear in list
+    // Wait for deployment to appear in list
     const table = page.locator('table');
-    await expect(table.locator(`text=${daemonSetName}`)).toBeVisible({ timeout: 30000 });
+    await expect(table.locator(`text=${deploymentName}`)).toBeVisible({ timeout: 30000 });
 
-    // Find row containing test daemonset name
-    const targetRow = page.locator(`table tbody tr:has-text("${daemonSetName}")`);
+    // Find row containing test deployment name
+    const targetRow = page.locator(`table tbody tr:has-text("${deploymentName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
 
     // Find Delete button in that row and click
@@ -55,8 +48,8 @@ test('should delete daemonset successfully', async ({ page }) => {
 
     // Listen for delete API call
     const deleteApiPromise = page.waitForResponse(response => {
-        return response.url().includes('/_raw/daemonset') &&
-            response.url().includes(`name/${daemonSetName}`) &&
+        return response.url().includes('/_raw/deployment') &&
+            response.url().includes(`name/${deploymentName}`) &&
             response.request().method() === 'DELETE' &&
             response.status() === 200;
     }, { timeout: 15000 });
@@ -76,17 +69,17 @@ test('should delete daemonset successfully', async ({ page }) => {
 
     // Wait for tooltip to close
     await page.waitForSelector('[role="tooltip"]', { state: 'detached', timeout: 10000 }).catch(() => {});
-
+    
     // Refresh page to ensure UI is updated after deletion
     await page.reload();
     await page.click('text=Workloads');
     await expect(table).toBeVisible({ timeout: 30000 });
-
-    // Verify daemonset no longer exists in table
-    await expect(table.locator(`text=${daemonSetName}`)).toHaveCount(0, { timeout: 30000 });
+    
+    // Verify deployment no longer exists in table
+    await expect(table.locator(`text=${deploymentName}`)).toHaveCount(0, { timeout: 30000 });
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-daemonset-delete-kubectl.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-deployment-delete-kubectl.png', fullPage: true });
     }
 });
