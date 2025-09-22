@@ -15,34 +15,27 @@ limitations under the License.
 */
 
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDaemonSetYaml, getDaemonSetNameFromYaml, deleteK8sDaemonSet } from './test-utils';
+import { setupDashboardAuthentication, generateTestDeploymentYaml, deleteK8sDeployment, getDeploymentNameFromYaml } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should create a new daemonset', async ({ page }) => {
-    // Navigate to workload menu
+test('should create a new deployment', async ({ page }) => {
+    // Navigate to workload page
     await page.click('text=Workloads');
-    
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
-    
-    // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
     await page.click('button:has-text("Add")');
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
-
+    
     // Listen for API calls
     const apiRequestPromise = page.waitForResponse(response => {
-        return response.url().includes('/api/v1/_raw/DaemonSet') && response.status() === 200;
+        return response.url().includes('/api/v1/_raw/Deployment') && response.status() === 200;
     }, { timeout: 15000 });
-
-    const testDaemonSetYaml = generateTestDaemonSetYaml();
-
+    
+    const testDeploymentYaml = generateTestDeploymentYaml();
+    
     // Set Monaco editor DOM content
     await page.evaluate((yaml) => {
         const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
@@ -50,8 +43,8 @@ test('should create a new daemonset', async ({ page }) => {
             textarea.value = yaml;
             textarea.focus();
         }
-    }, testDaemonSetYaml);
-
+    }, testDeploymentYaml);
+    
     /* eslint-disable */
     // Call React onChange callback to update component state
     await page.evaluate((yaml) => {
@@ -83,7 +76,7 @@ test('should create a new daemonset', async ({ page }) => {
             if (fiberKey) {
                 let fiber = (dialog as any)[fiberKey];
 
-                const traverse = (node: any, depth = 0): boolean => {
+                const traverse = (node: any, depth = 0) => {
                     if (!node || depth > 20) return false;
 
                     if (node.memoizedProps && node.memoizedProps.onChange) {
@@ -92,53 +85,55 @@ test('should create a new daemonset', async ({ page }) => {
                     }
 
                     if (node.child && traverse(node.child, depth + 1)) return true;
-                    return node.sibling && traverse(node.sibling, depth + 1);
+                    if (node.sibling && traverse(node.sibling, depth + 1)) return true;
+
+                    return false;
                 };
 
                 traverse(fiber);
             }
         }
-    }, testDaemonSetYaml);
+    }, testDeploymentYaml);
     /* eslint-enable */
-
+    
     // Wait for submit button to become enabled
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
     await page.click('[role="dialog"] button:has-text("Submit")');
-
+    
     // Wait for API call to succeed
     await apiRequestPromise;
-
+    
     // Wait for dialog to close
     await page.waitForSelector('[role="dialog"]', { state: 'detached', timeout: 5000 }).catch(() => {
         // Dialog may already be closed
     });
-
-    // Verify new daemonset appears in list
-    const daemonSetName = getDaemonSetNameFromYaml(testDaemonSetYaml);
-
-    // Assert daemonset name exists
-    expect(daemonSetName).toBeTruthy();
-    expect(daemonSetName).toBeDefined();
+    
+    // Verify new deployment appears in list
+    const deploymentName = getDeploymentNameFromYaml(testDeploymentYaml);
+    
+    // Assert deployment name exists
+    expect(deploymentName).toBeTruthy();
+    expect(deploymentName).toBeDefined();
 
     try {
-        await expect(page.locator('table').locator(`text=${daemonSetName}`)).toBeVisible({
-            timeout: 15000
+        await expect(page.locator('table').locator(`text=${deploymentName}`)).toBeVisible({ 
+            timeout: 15000 
         });
     } catch {
         // If not shown immediately in list, may be due to cache or refresh delay
-        // But API success indicates daemonset was created
+        // But API success indicates deployment was created
     }
-
-    // Cleanup: Delete the created daemonset
+    
+    // Cleanup: Delete the created deployment
     try {
-        await deleteK8sDaemonSet(daemonSetName, 'default');
+        await deleteK8sDeployment(deploymentName, 'default');
     } catch (error) {
-        console.warn(`Failed to cleanup daemonset ${daemonSetName}:`, error);
+        console.warn(`Failed to cleanup deployment ${deploymentName}:`, error);
     }
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-daemonset-create.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-deployment-create.png', fullPage: true });
     }
 
 });

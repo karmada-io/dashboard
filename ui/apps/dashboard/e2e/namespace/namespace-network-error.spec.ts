@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Karmada Authors.
+Copyright 2025 The Karmada Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,34 +16,20 @@ limitations under the License.
 
 // apps/dashboard/e2e/namespace/namespace-network-error.spec.ts
 import { test, expect } from '@playwright/test';
-
-// Set webServer.url and use.baseURL with the location of the WebServer
-const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 5173;
-const baseURL = `http://${HOST}:${PORT}`;
-const basePath = '/multicloud-resource-manage';
-const token = process.env.KARMADA_TOKEN || '';
+import { setupDashboardAuthentication } from '../test-utils';
 
 test('Namespace network failure with refresh', async ({ page }) => {
-    // 阻塞 Namespace API 请求
+    // Block Namespace API requests
     await page.route('**/api/v1/namespaces', route => route.abort());
 
-    await page.goto(`${baseURL}/login`, { waitUntil: 'networkidle' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
+    await setupDashboardAuthentication(page);
 
-    // 导航到页面
-    await page.goto(`${baseURL}${basePath}`, { waitUntil: 'networkidle' });
-
-    // 设置 token 并刷新，保证登录状态
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.reload({ waitUntil: 'networkidle' });
-
-    // 等待关键元素加载完成，宽松等待 Namespaces 文字
+    // Wait for key elements to load
     await page.waitForSelector('text=Namespaces', { timeout: 15000 });
 
-    // 验证表格
+    // Verify table
     const tableRows = page.locator('table tbody tr');
-    // 最终断言：网络错误时表格应该为空
+    // Final assertion: table should be empty when network error occurs
     await expect(tableRows).toHaveCount(0);
 
     // Debug

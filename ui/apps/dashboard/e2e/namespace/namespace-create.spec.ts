@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Karmada Authors.
+Copyright 2025 The Karmada Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,42 +16,31 @@ limitations under the License.
 
 // apps/dashboard/e2e/namespace-create.spec.ts
 import { test, expect } from '@playwright/test';
-
-// Set webServer.url and use.baseURL with the location of the WebServer
-const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 5173;
-const baseURL = `http://${HOST}:${PORT}`;
-const basePath = '/multicloud-resource-manage';
-const token = process.env.KARMADA_TOKEN || '';
+import { setupDashboardAuthentication } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
-    await page.goto(`${baseURL}/login`, { waitUntil: 'networkidle' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.goto(`${baseURL}${basePath}`, { waitUntil: 'networkidle' });
-    await page.evaluate((t) => localStorage.setItem('token', t), token);
-    await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForSelector('text=Dashboard', { timeout: 30000 });
+    await setupDashboardAuthentication(page);
 });
 
 test('should create a new namespace', async ({ page }) => {
-    // 打开 Namespaces 页面
+    // Open Namespaces page
     await page.waitForSelector('text=Namespaces', { timeout: 60000 });
     await page.click('text=Namespaces');
 
-    // 点击 "Add" 创建新 namespace
+    // Click "Add" to create new namespace
     await page.waitForSelector('button:has-text("Add")', { timeout: 30000 });
     await page.click('button:has-text("Add")');
 
-    // 填写唯一 namespace 名称
+    // Fill unique namespace name
     const namespaceName = `test-${Date.now()}`;
     await page.waitForSelector('#name', { timeout: 30000 });
     await page.fill('#name', namespaceName);
 
-    // 提交创建
+    // Submit creation
     await page.click('label:has-text("No")');
     await page.click('button:has-text("Submit")');
 
-    // 搜索并验证 namespace 已创建
+    // Search and verify namespace is created
     const searchBox = page.getByPlaceholder('Search by Name');
     await searchBox.fill(namespaceName);
     await searchBox.press('Enter');

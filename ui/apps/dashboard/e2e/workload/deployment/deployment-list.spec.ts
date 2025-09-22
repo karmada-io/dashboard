@@ -16,26 +16,26 @@ limitations under the License.
 
 // apps/dashboard/e2e/namespace-list.spec.ts
 import { test, expect } from '@playwright/test';
-import { setupDashboardAuthentication } from '../test-utils';
+import { setupDashboardAuthentication } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display namespace list', async ({ page }) => {
-    // Open Namespaces page
-    await page.waitForSelector('text=Namespaces', { timeout: 60000 });
-    await page.click('text=Namespaces');
+test('should display deployment list', async ({ page }) => {
+    // Open Workloads menu
+    await page.click('text=Workloads');
 
-    // Get table element and verify visibility
+    // Wait for page to load and verify Deployment is selected
+    const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
+    await expect(deploymentTab).toBeChecked();
+
+    // Verify Deployment list table is visible
     const table = page.locator('table');
     await expect(table).toBeVisible({ timeout: 30000 });
 
-    // Verify table contains default namespace
-    await expect(table).toContainText('default');
-
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-namespace-list.png', fullPage: true });
+    if (process.env.DEBUG === 'true') {
+        await page.screenshot({ path: 'debug-deployment-list.png', fullPage: true });
     }
 });
