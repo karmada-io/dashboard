@@ -31,13 +31,24 @@ func handleGetOverview(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
-	memberClusterStatus, err := GetMemberClusterInfo(dataSelect)
+	karmadaClient, err := router.GetKarmadaClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
+	kubeClient, err := router.GetKubeClientFromContext(c)
 	if err != nil {
 		common.Fail(c, err)
 		return
 	}
 
-	clusterResourceStatus, err := GetClusterResourceStatus()
+	memberClusterStatus, err := GetMemberClusterInfo(karmadaClient, dataSelect)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
+
+	clusterResourceStatus, err := GetClusterResourceStatus(karmadaClient, kubeClient)
 	if err != nil {
 		common.Fail(c, err)
 		return

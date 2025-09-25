@@ -21,12 +21,15 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	"github.com/karmada-io/dashboard/cmd/api/app/types/common"
-	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/resource/secret"
 )
 
 func handleGetSecrets(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaAPIServer()
+	k8sClient, err := router.GetKubeClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	dataSelect := common.ParseDataSelectPathParameter(c)
 	nsQuery := common.ParseNamespacePathParameter(c)
 	result, err := secret.GetSecretList(k8sClient, nsQuery, dataSelect)
@@ -38,7 +41,11 @@ func handleGetSecrets(c *gin.Context) {
 }
 
 func handleGetSecretDetail(c *gin.Context) {
-	k8sClient := client.InClusterClientForKarmadaAPIServer()
+	k8sClient, err := router.GetKubeClientFromContext(c)
+	if err != nil {
+		common.Fail(c, err)
+		return
+	}
 	namespace := c.Param("namespace")
 	name := c.Param("service")
 	result, err := secret.GetSecretDetail(k8sClient, namespace, name)
