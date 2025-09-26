@@ -14,9 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
 import { test, expect } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
-import { setupDashboardAuthentication, generateTestDeploymentYaml, createK8sDeployment, getDeploymentNameFromYaml, deleteK8sDeployment } from './test-utils';
+import { setupDashboardAuthentication, generateTestCronJobYaml, createK8sCronJob, getCronJobNameFromYaml, deleteK8sCronJob } from './test-utils';
 import { setMonacoEditorContent, waitForResourceInList, debugScreenshot } from '../../test-utils';
 import { IResponse } from '@/services/base.ts';
 
@@ -28,73 +29,80 @@ test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should edit deployment successfully', async ({ page }) => {
-    // Create a test deployment directly via API to set up test data
-    const testDeploymentYaml = generateTestDeploymentYaml();
-    const deploymentName = getDeploymentNameFromYaml(testDeploymentYaml);
-    
-    // Setup: Create deployment using kubectl
-    await createK8sDeployment(testDeploymentYaml);
-    
+test('should edit cronjob successfully', async ({ page }) => {
+    // Create a test cronjob directly via API to set up test data
+    const testCronJobYaml = generateTestCronJobYaml();
+    const cronJobName = getCronJobNameFromYaml(testCronJobYaml);
+
+    // Setup: Create cronjob using kubectl
+    await createK8sCronJob(testCronJobYaml);
+
     // Navigate to workload page
     await page.click('text=Workloads');
-    await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
+
+    // Click visible Cronjob tab
+    const cronjobTab = page.locator('role=option[name="Cronjob"]');
+    await cronjobTab.waitFor({ state: 'visible', timeout: 30000 });
+    await cronjobTab.click();
+
+    // Verify selected state
+    await expect(cronjobTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for deployment to appear in list and get target row
-    const targetRow = await waitForResourceInList(page, deploymentName);
-    
+    // Wait for cronjob to appear in list and get target row
+    const targetRow = await waitForResourceInList(page, cronJobName);
+
     // Find Edit button in that row and click
     const editButton = targetRow.getByText('Edit');
     await expect(editButton).toBeVisible({ timeout: 15000 });
-    
+
     // Listen for edit API call
     const apiRequestPromise = page.waitForResponse(response => {
         const url = response.url();
-        return (url.includes('/api/v1/_raw/') || 
-                url.includes('/api/v1/namespaces/') && (url.includes('/deployments/') || url.includes('/statefulsets/') || url.includes('/daemonsets/'))) && 
-               response.status() === 200;
+        return (url.includes('/api/v1/_raw/') ||
+                url.includes('/api/v1/namespaces/') && (url.includes('/deployments/') || url.includes('/cronjobs/') || url.includes('/daemonsets/'))) &&
+            response.status() === 200;
     }, { timeout: 15000 });
-    
+
     await editButton.click();
 
     // Wait for edit dialog to appear
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
-    
+
     // Wait for network request to complete and get response data
     const apiResponse = await apiRequestPromise;
-    const responseData = (await apiResponse.json()) as IResponse<DeepRequired<k8s.V1Deployment>>;
-    
+    const responseData = (await apiResponse.json()) as IResponse<DeepRequired<k8s.V1CronJob>>;
+
     // Verify Monaco editor is loaded
     await expect(page.locator('.monaco-editor')).toBeVisible({ timeout: 10000 });
-    
+
     // Wait for editor content to load
     let yamlContent = '';
     let attempts = 0;
     const maxAttempts = 30;
-    
+
     const expectedName = responseData?.data?.metadata?.name || '';
     const expectedKind = responseData?.data?.kind || '';
-    
+
     while (attempts < maxAttempts) {
         yamlContent = await page.evaluate(() => {
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             return textarea ? textarea.value : '';
         });
-        
+
         if (yamlContent && yamlContent.length > 0) {
             const containsExpectedName = !expectedName || yamlContent.includes(expectedName);
             const containsExpectedKind = !expectedKind || yamlContent.includes(expectedKind);
-            
+
             if (containsExpectedName && containsExpectedKind) {
                 break;
             }
         }
-        
+
         await page.waitForSelector('.monaco-editor textarea[value*="apiVersion"]', { timeout: 500 }).catch(() => {});
         attempts++;
     }
-    
+
     // If content is still empty, manually set content from API response
     if (!yamlContent || yamlContent.length === 0) {
         yamlContent = await page.evaluate((apiData) => {
@@ -102,24 +110,20 @@ test('should edit deployment successfully', async ({ page }) => {
             const yaml = `apiVersion: ${data.apiVersion}
 kind: ${data.kind}
 metadata:
-  name: ${data.metadata?.name || 'test-deployment'}
-  namespace: ${data.metadata?.namespace || 'default'}
+  name: ${data.metadata.name || 'test-cronjob'}
+  namespace: ${data.metadata.namespace || 'default'}
 spec:
-  replicas: ${data.spec?.replicas || 1}
-  selector:
-    matchLabels:
-      app: ${data.spec?.selector?.matchLabels?.app || 'test-app'}
-  template:
-    metadata:
-      labels:
-        app: ${data.spec?.template?.metadata?.labels?.app || 'test-app'}
+  schedule: "${data.spec.schedule || '0 2 * * *'}"
+  jobTemplate:
     spec:
-      containers:
-        - name: ${data.spec?.template?.spec?.containers?.[0]?.name || 'container'}
-          image: ${data.spec?.template?.spec?.containers?.[0]?.image || 'nginx:latest'}
-          ports:
-            - containerPort: ${data.spec?.template?.spec?.containers?.[0]?.ports?.[0]?.containerPort || 80}`;
-            
+      template:
+        spec:
+          containers:
+            - name: ${data.spec?.jobTemplate?.spec?.template?.spec?.containers?.[0]?.name || 'container'}
+              image: ${data.spec?.jobTemplate?.spec?.template?.spec?.containers?.[0]?.image || 'busybox:latest'}
+              command: ${JSON.stringify(data.spec?.jobTemplate?.spec?.template?.spec?.containers?.[0]?.command || ['echo', 'Hello from CronJob'])}
+          restartPolicy: ${data.spec?.jobTemplate?.spec?.template?.spec?.restartPolicy || 'OnFailure'}`;
+
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             if (textarea) {
                 textarea.value = yaml;
@@ -130,37 +134,37 @@ spec:
             return '';
         }, responseData);
     }
-    
+
     // If still unable to get content, report error
     if (!yamlContent || yamlContent.length === 0) {
-        throw new Error(`Edit feature error: Monaco editor does not load deployment YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
+        throw new Error(`Edit feature error: Monaco editor does not load cronjob YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
     }
-    
-    // Modify YAML content (replicas: 1 → 2, if not 1 then change to 3)
-    let modifiedYaml = yamlContent.replace(/replicas:\s*1/, 'replicas: 2');
-    
+
+    // Modify YAML content (change schedule from every 5 minutes to every 10 minutes)
+    let modifiedYaml = yamlContent.replace(/schedule:\s*"\*\/5\s+\*\s+\*\s+\*\s+\*"/, 'schedule: "*/10 * * * *"');
+
     // Verify modification took effect
     if (modifiedYaml === yamlContent) {
         // Try other modification methods
-        const alternativeModified = yamlContent.replace(/replicas:\s*\d+/, 'replicas: 3');
+        const alternativeModified = yamlContent.replace(/schedule:\s*"[^"]+"/, 'schedule: "0 */2 * * *"');
         if (alternativeModified !== yamlContent) {
             modifiedYaml = alternativeModified;
         } else {
             // If still can't modify, try changing image name
-            const imageModified = yamlContent.replace(/image:\s*nginx:1\.20/, 'image: nginx:1.21');
+            const imageModified = yamlContent.replace(/image:\s*busybox:latest/, 'image: busybox:1.35');
             if (imageModified !== yamlContent) {
                 modifiedYaml = imageModified;
             }
         }
     }
-    
+
     // Set modified YAML content and trigger React onChange callback
     await setMonacoEditorContent(page, modifiedYaml);
-    
+
     // Wait for submit button to become enabled and click
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
     await page.click('[role="dialog"] button:has-text("Submit")');
-    
+
     // Wait for edit success message or dialog to close
     try {
         // Try waiting for success message
@@ -173,7 +177,7 @@ spec:
             // If dialog close also failed, check if page still exists
             try {
                 const isPageActive = await page.evaluate(() => document.readyState);
-                
+
                 if (isPageActive === 'complete') {
                     // Edit operation may have succeeded
                 }
@@ -182,15 +186,15 @@ spec:
             }
         }
     }
-    
-    // Cleanup: Delete the created deployment
+
+    // Cleanup: Delete the created cronjob
     try {
-        await deleteK8sDeployment(deploymentName, 'default');
+        await deleteK8sCronJob(cronJobName, 'default');
     } catch (error) {
-        console.warn(`Failed to cleanup deployment ${deploymentName}:`, error);
+        console.warn(`Failed to cleanup cronjob ${cronJobName}:`, error);
     }
 
     // Debug
-    await debugScreenshot(page, 'debug-deployment-edit.png');
+    await debugScreenshot(page, 'debug-cronjob-edit.png');
 
 });

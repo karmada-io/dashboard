@@ -14,23 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
 import { test } from '@playwright/test';
-import { setupDashboardAuthentication, generateTestDeploymentYaml, deleteK8sDeployment, getDeploymentNameFromYaml } from './test-utils';
-import { createWorkloadResourceTest } from '../../test-utils';
+import { setupDashboardAuthentication, generateTestCronJobYaml, createK8sCronJob, getCronJobNameFromYaml, deleteK8sCronJob } from './test-utils';
+import { viewWorkloadResourceTest } from '../../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should create a new deployment', async ({ page }) => {
-    const testDeploymentYaml = generateTestDeploymentYaml();
+test('should view cronjob details', async ({ page }) => {
+    const testCronJobYaml = generateTestCronJobYaml();
 
-    await createWorkloadResourceTest(page, {
-        resourceType: 'deployment',
-        apiEndpoint: '/api/v1/_raw/Deployment',
-        yamlContent: testDeploymentYaml,
-        getResourceName: getDeploymentNameFromYaml,
-        deleteResource: deleteK8sDeployment,
-        screenshotName: 'debug-deployment-create.png'
+    await viewWorkloadResourceTest(page, {
+        resourceType: 'cronjob',
+        tabName: 'Cronjob',
+        yamlContent: testCronJobYaml,
+        getResourceName: getCronJobNameFromYaml,
+        createResource: createK8sCronJob,
+        deleteResource: deleteK8sCronJob,
+        screenshotName: 'debug-cronjob-view.png'
     });
 });
