@@ -28,6 +28,7 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/api/app/options"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/assistant"                // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"                     // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"                  // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusteroverridepolicy"    // Importing route packages forces route registration
@@ -52,6 +53,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
+	"github.com/karmada-io/dashboard/pkg/mcp"
+	openaiconfig "github.com/karmada-io/dashboard/pkg/openai"
 )
 
 // NewAPICommand creates a *cobra.Command object with default parameters
@@ -110,6 +113,13 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
 	)
 	ensureAPIServerConnectionOrDie()
+
+	// Initialize MCP configuration
+	mcp.InitMCPConfig(opts)
+
+	// Initialize OpenAI configuration
+	openaiconfig.InitOpenAIConfig(opts)
+
 	serve(opts)
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	<-ctx.Done()
