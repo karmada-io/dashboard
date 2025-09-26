@@ -243,16 +243,12 @@ func (ts *TestMCPServer) StartStdioServer() error {
 
 // Tool handlers for testing
 func testEchoHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	arguments := request.Params.Arguments
-	message, ok := arguments["message"].(string)
-	if !ok {
+	message, err := request.RequireString("message")
+	if err != nil {
 		return nil, fmt.Errorf("message parameter is required and must be a string")
 	}
 
-	prefix := ""
-	if prefixArg, exists := arguments["prefix"]; exists {
-		prefix, _ = prefixArg.(string)
-	}
+	prefix := request.GetString("prefix", "")
 
 	result := prefix + message
 
@@ -264,13 +260,19 @@ func testEchoHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallT
 }
 
 func testCalculateHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	arguments := request.Params.Arguments
-	a, ok1 := arguments["a"].(float64)
-	b, ok2 := arguments["b"].(float64)
-	operation, ok3 := arguments["operation"].(string)
+	a, err := request.RequireFloat("a")
+	if err != nil {
+		return nil, fmt.Errorf("a parameter is required and must be a number")
+	}
 
-	if !ok1 || !ok2 || !ok3 {
-		return nil, fmt.Errorf("a, b, and operation parameters are required")
+	b, err := request.RequireFloat("b")
+	if err != nil {
+		return nil, fmt.Errorf("b parameter is required and must be a number")
+	}
+
+	operation, err := request.RequireString("operation")
+	if err != nil {
+		return nil, fmt.Errorf("operation parameter is required and must be a string")
 	}
 
 	var result float64
@@ -298,10 +300,13 @@ func testCalculateHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.
 }
 
 func testDelayHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	arguments := request.Params.Arguments
-	milliseconds, ok := arguments["milliseconds"].(float64)
-	if !ok || milliseconds < 0 {
-		return nil, fmt.Errorf("milliseconds parameter is required and must be a positive number")
+	milliseconds, err := request.RequireFloat("milliseconds")
+	if err != nil {
+		return nil, fmt.Errorf("milliseconds parameter is required and must be a number")
+	}
+
+	if milliseconds < 0 {
+		return nil, fmt.Errorf("milliseconds must be a positive number")
 	}
 
 	select {
