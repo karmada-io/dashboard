@@ -1,0 +1,52 @@
+{
+  "name": "@karmada/chatui",
+  "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "A floating chat UI component with MCP (Model Context Protocol) integration for Karmada",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "tsup --config ./tsup.config.ts",
+    "build": "tsup --config ./tsup.config.ts",
+    "dev": "tsup --config ./tsup.config.ts --watch"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "chat",
+    "ui",
+    "react",
+    "chatui",
+    "mcp",
+    "karmada",
+    "floating"
+  ],
+  "author": "Karmada Authors",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@chatui/core": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ]
+}
