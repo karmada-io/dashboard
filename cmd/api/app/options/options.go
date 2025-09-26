@@ -18,6 +18,7 @@ package options
 
 import (
 	"net"
+	"time"
 
 	"github.com/spf13/pflag"
 )
@@ -44,10 +45,11 @@ type Options struct {
 	MCPServerPath    string
 	MCPSSEEndpoint   string
 
-	// OpenAI related options
-	OpenAIAPIKey   string
-	OpenAIModel    string
-	OpenAIEndpoint string
+	// LLM related options
+	LLMAPIKey   string
+	LLMModel    string
+	LLMEndpoint string
+	LLMTimeout  time.Duration
 }
 
 // NewOptions returns initialized Options.
@@ -80,8 +82,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.MCPServerPath, "mcp-server-path", "", "Path to the MCP server binary (required for stdio mode)")
 	fs.StringVar(&o.MCPSSEEndpoint, "mcp-sse-endpoint", "", "MCP SSE endpoint URL (required for sse mode)")
 
-	// OpenAI related flags
-	fs.StringVar(&o.OpenAIAPIKey, "openai-api-key", "", "OpenAI API key for AI assistant functionality")
-	fs.StringVar(&o.OpenAIModel, "openai-model", "gpt-3.5-turbo", "OpenAI model to use for AI assistant")
-	fs.StringVar(&o.OpenAIEndpoint, "openai-endpoint", "https://api.openai.com/v1", "OpenAI API endpoint URL")
+	// LLM related flags
+	fs.StringVar(&o.LLMAPIKey, "llm-api-key", "", "LLM API key for AI assistant functionality")
+	fs.StringVar(&o.LLMModel, "llm-model", "gpt-3.5-turbo", "LLM model to use for AI assistant")
+	fs.StringVar(&o.LLMEndpoint, "llm-endpoint", "https://api.openai.com/v1", "LLM API endpoint URL")
+	fs.DurationVar(&o.LLMTimeout, "llm-timeout", 30*time.Second, "Timeout for LLM API requests")
 }
