@@ -56,7 +56,7 @@ spec:
  */
 export async function createK8sDaemonSet(yamlContent: string): Promise<void> {
     try {
-        const k8sApi = createKarmadaApiClient();
+        const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
         const yamlObject = parse(yamlContent) as k8s.V1DaemonSet;
         
         // Ensure namespace is always defined
@@ -86,7 +86,7 @@ export async function createK8sDaemonSet(yamlContent: string): Promise<void> {
  */
 export async function deleteK8sDaemonSet(daemonSetName: string, namespace: string = 'default'): Promise<void> {
     try {
-        const k8sApi = createKarmadaApiClient();
+        const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
         
         // Assert parameters are valid for test daemonset
         expect(daemonSetName).toBeTruthy();
