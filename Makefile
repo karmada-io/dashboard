@@ -26,6 +26,16 @@ API_HOST ?= http://localhost:8000
 SKIP_TLS_VERIFY ?= false
 KUBECONFIG ?= $(HOME)/.kube/karmada.config
 
+# API server common flags
+API_COMMON_FLAGS = \
+	$(if $(OPENAI_API_KEY),--openai-api-key="$(OPENAI_API_KEY)") \
+	$(if $(OPENAI_MODEL),--openai-model="$(OPENAI_MODEL)",--openai-model="gpt-3.5-turbo") \
+	$(if $(OPENAI_ENDPOINT),--openai-endpoint="$(OPENAI_ENDPOINT)",--openai-endpoint="https://api.openai.com/v1") \
+	$(if $(filter true,$(ENABLE_MCP)),--enable-mcp=true) \
+	$(if $(MCP_TRANSPORT_MODE),--mcp-transport-mode="$(MCP_TRANSPORT_MODE)",--mcp-transport-mode="stdio") \
+	$(if $(KARMADA_MCP_SERVER_PATH),--mcp-server-path="$(KARMADA_MCP_SERVER_PATH)") \
+	$(if $(MCP_SSE_ENDPOINT),--mcp-sse-endpoint="$(MCP_SSE_ENDPOINT)")
+
 ###################
 # Build Targets   #
 ###################
@@ -103,6 +113,7 @@ endif
 		--kubeconfig=$(KUBECONFIG) \
 		--context=$(HOST_CTX) \
 		--insecure-port=$(API_PORT) \
+		$(API_COMMON_FLAGS) \
 		$(if $(filter true,$(SKIP_TLS_VERIFY)),--skip-karmada-apiserver-tls-verify) & echo $$! > .api.pid
 	@echo "Starting Web server..."
 	@cd ui && VITE_API_HOST=$(API_HOST) pnpm run dashboard:dev || (kill `cat .api.pid` && rm .api.pid)
@@ -120,6 +131,7 @@ endif
 		--kubeconfig=$(KUBECONFIG) \
 		--context=$(HOST_CTX) \
 		--insecure-port=$(API_PORT) \
+		$(API_COMMON_FLAGS) \
 		$(if $(filter true,$(SKIP_TLS_VERIFY)),--skip-karmada-apiserver-tls-verify)
 
 # Run Web server only
@@ -188,3 +200,12 @@ help:
 	@echo "  GOOS                  - Target OS for build"
 	@echo "  GOARCH                - Target architecture for build"
 	@echo "  SKIP_TLS_VERIFY       - Skip TLS verification for Karmada API server (default: false)"
+	@echo ""
+	@echo "OpenAI/MCP Configuration Variables:"
+	@echo "  OPENAI_API_KEY        - OpenAI API key (required for AI functionality)"
+	@echo "  OPENAI_MODEL          - OpenAI model (default: gpt-3.5-turbo)"
+	@echo "  OPENAI_ENDPOINT       - OpenAI API endpoint (default: https://api.openai.com/v1)"
+	@echo "  ENABLE_MCP            - Enable MCP integration (default: false)"
+	@echo "  MCP_TRANSPORT_MODE    - MCP transport mode: stdio or sse (default: stdio)"
+	@echo "  KARMADA_MCP_SERVER_PATH - Path to MCP server binary (required for stdio mode)"
+	@echo "  MCP_SSE_ENDPOINT      - MCP SSE endpoint URL (required for sse mode)"

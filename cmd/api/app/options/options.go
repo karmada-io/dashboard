@@ -37,6 +37,17 @@ type Options struct {
 	Namespace                     string
 	DisableCSRFProtection         bool
 	OpenAPIEnabled                bool
+
+	// MCP related options
+	EnableMCP        bool
+	MCPTransportMode string
+	MCPServerPath    string
+	MCPSSEEndpoint   string
+
+	// OpenAI related options
+	OpenAIAPIKey   string
+	OpenAIModel    string
+	OpenAIEndpoint string
 }
 
 // NewOptions returns initialized Options.
@@ -62,4 +73,15 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Namespace, "namespace", "karmada-dashboard", "Namespace to use when accessing Dashboard specific resources, i.e. configmap")
 	fs.BoolVar(&o.DisableCSRFProtection, "disable-csrf-protection", false, "allows disabling CSRF protection")
 	fs.BoolVar(&o.OpenAPIEnabled, "openapi-enabled", false, "enables OpenAPI v2 endpoint under '/apidocs.json'")
+
+	// MCP related flags
+	fs.BoolVar(&o.EnableMCP, "enable-mcp", false, "Enable MCP (Model Context Protocol) integration")
+	fs.StringVar(&o.MCPTransportMode, "mcp-transport-mode", "stdio", "MCP transport mode: stdio or sse")
+	fs.StringVar(&o.MCPServerPath, "mcp-server-path", "", "Path to the MCP server binary (required for stdio mode)")
+	fs.StringVar(&o.MCPSSEEndpoint, "mcp-sse-endpoint", "", "MCP SSE endpoint URL (required for sse mode)")
+
+	// OpenAI related flags
+	fs.StringVar(&o.OpenAIAPIKey, "openai-api-key", "", "OpenAI API key for AI assistant functionality")
+	fs.StringVar(&o.OpenAIModel, "openai-model", "gpt-3.5-turbo", "OpenAI model to use for AI assistant")
+	fs.StringVar(&o.OpenAIEndpoint, "openai-endpoint", "https://api.openai.com/v1", "OpenAI API endpoint URL")
 }
