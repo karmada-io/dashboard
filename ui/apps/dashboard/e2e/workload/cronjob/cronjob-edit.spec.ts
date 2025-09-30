@@ -1,9 +1,12 @@
 /*
 Copyright 2025 The Karmada Authors.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,12 +16,11 @@ limitations under the License.
 
 import { test, expect } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
+import { parse, stringify } from 'yaml';
+import _ from 'lodash';
 import { setupDashboardAuthentication, generateTestCronJobYaml, createK8sCronJob, getCronJobNameFromYaml, deleteK8sCronJob } from './test-utils';
+import { setMonacoEditorContent, waitForResourceInList, debugScreenshot, DeepRequired } from '../../test-utils';
 import { IResponse } from '@/services/base.ts';
-
-type DeepRequired<T> = {
-    [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
-};
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
@@ -34,23 +36,18 @@ test('should edit cronjob successfully', async ({ page }) => {
 
     // Navigate to workload page
     await page.click('text=Workloads');
-    
+
     // Click visible Cronjob tab
     const cronjobTab = page.locator('role=option[name="Cronjob"]');
     await cronjobTab.waitFor({ state: 'visible', timeout: 30000 });
     await cronjobTab.click();
-    
+
     // Verify selected state
     await expect(cronjobTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for cronjob to appear in list
-    const table = page.locator('table');
-    await expect(table.locator(`text=${cronJobName}`)).toBeVisible({ timeout: 30000 });
-
-    // Find row containing test cronjob name
-    const targetRow = page.locator(`table tbody tr:has-text("${cronJobName}")`);
-    await expect(targetRow).toBeVisible({ timeout: 15000 });
+    // Wait for cronjob to appear in list and get target row
+    const targetRow = await waitForResourceInList(page, cronJobName);
 
     // Find Edit button in that row and click
     const editButton = targetRow.getByText('Edit');
@@ -141,74 +138,12 @@ spec:
     }
 
     // Modify YAML content (change schedule from every 5 minutes to every 10 minutes)
-    let modifiedYaml = yamlContent.replace(/schedule:\s*"\*\/5\s+\*\s+\*\s+\*\s+\*"/, 'schedule: "*/10 * * * *"');
+    const yamlObject = parse(yamlContent);
+    _.set(yamlObject, 'spec.schedule', '*/10 * * * *');
+    const modifiedYaml = stringify(yamlObject);
 
-    // Verify modification took effect
-    if (modifiedYaml === yamlContent) {
-        // Try other modification methods
-        const alternativeModified = yamlContent.replace(/schedule:\s*"[^"]+"/, 'schedule: "0 */2 * * *"');
-        if (alternativeModified !== yamlContent) {
-            modifiedYaml = alternativeModified;
-        } else {
-            // If still can't modify, try changing image name
-            const imageModified = yamlContent.replace(/image:\s*busybox:latest/, 'image: busybox:1.35');
-            if (imageModified !== yamlContent) {
-                modifiedYaml = imageModified;
-            }
-        }
-    }
-
-    // Set modified YAML content
-    await page.evaluate((yaml) => {
-        const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
-        if (textarea) {
-            textarea.value = yaml;
-            textarea.focus();
-        }
-    }, modifiedYaml);
-
-    /* eslint-disable */
-    // Trigger React onChange callback
-    await page.evaluate((yaml) => {
-        const findReactFiber = (element: any) => {
-            const keys = Object.keys(element);
-            return keys.find(key => key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance'));
-        };
-
-        const monacoContainer = document.querySelector('.monaco-editor');
-        if (monacoContainer) {
-            const fiberKey = findReactFiber(monacoContainer);
-            if (fiberKey) {
-                let fiber = (monacoContainer as any)[fiberKey];
-                while (fiber) {
-                    if (fiber.memoizedProps && fiber.memoizedProps.onChange) {
-                        fiber.memoizedProps.onChange(yaml);
-                        return;
-                    }
-                    fiber = fiber.return;
-                }
-            }
-        }
-
-        const dialog = document.querySelector('[role="dialog"]');
-        if (dialog) {
-            const fiberKey = findReactFiber(dialog);
-            if (fiberKey) {
-                let fiber = (dialog as any)[fiberKey];
-                const traverse = (node: any, depth = 0): boolean => {
-                    if (!node || depth > 20) return false;
-                    if (node.memoizedProps && node.memoizedProps.onChange) {
-                        node.memoizedProps.onChange(yaml);
-                        return true;
-                    }
-                    if (node.child && traverse(node.child, depth + 1)) return true;
-                    return node.sibling && traverse(node.sibling, depth + 1);
-                };
-                traverse(fiber);
-            }
-        }
-    }, modifiedYaml);
-    /* eslint-enable */
+    // Set modified YAML content and trigger React onChange callback
+    await setMonacoEditorContent(page, modifiedYaml);
 
     // Wait for submit button to become enabled and click
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
@@ -244,8 +179,6 @@ spec:
     }
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-cronjob-edit.png', fullPage: true });
-    }
+    await debugScreenshot(page, 'debug-cronjob-edit.png');
 
 });

@@ -14,11 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { expect } from '@playwright/test';
-import * as k8s from '@kubernetes/client-node';
-import { parse } from 'yaml';
-import _ from 'lodash';
-import { createKarmadaApiClient, setupDashboardAuthentication } from '../../test-utils';
+import { setupDashboardAuthentication, createK8sResource, deleteK8sResource, getResourceNameFromYaml } from '../../test-utils';
 
 export { setupDashboardAuthentication };
 
@@ -49,76 +45,29 @@ spec:
 }
 
 /**
- * Creates a Kubernetes DaemonSet using the Kubernetes JavaScript client.
- * This is a more robust way to set up test data than UI interaction.
+ * Creates a Kubernetes DaemonSet using the shared K8s utility.
  * @param yamlContent The YAML content of the daemonset.
  * @returns A Promise that resolves when the daemonset is created.
  */
 export async function createK8sDaemonSet(yamlContent: string): Promise<void> {
-    try {
-        const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
-        const yamlObject = parse(yamlContent) as k8s.V1DaemonSet;
-        
-        // Ensure namespace is always defined
-        const namespace = yamlObject.metadata?.namespace || 'default';
-        
-        // Ensure metadata object exists
-        if (!yamlObject.metadata) {
-            yamlObject.metadata = {};
-        }
-        yamlObject.metadata.namespace = namespace;
-
-        await k8sApi.createNamespacedDaemonSet({
-            namespace: namespace,
-            body: yamlObject
-        });
-        
-    } catch (error: any) {
-        throw new Error(`Failed to create daemonset: ${(error as Error).message}`);
-    }
+    return createK8sResource('daemonset', yamlContent);
 }
 
 /**
- * Deletes a Kubernetes DaemonSet using the Kubernetes JavaScript client.
+ * Deletes a Kubernetes DaemonSet using the shared K8s utility.
  * @param daemonSetName The name of the daemonset to delete.
  * @param namespace The namespace of the daemonset (default: 'default').
  * @returns A Promise that resolves when the daemonset is deleted.
  */
 export async function deleteK8sDaemonSet(daemonSetName: string, namespace: string = 'default'): Promise<void> {
-    try {
-        const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
-        
-        // Assert parameters are valid for test daemonset
-        expect(daemonSetName).toBeTruthy();
-        expect(daemonSetName).not.toBe('');
-        expect(namespace).toBeTruthy();
-
-        await k8sApi.deleteNamespacedDaemonSet({
-            name: daemonSetName,
-            namespace: namespace
-        });
-        
-    } catch (error: any) {
-        if (error.code === 404) {
-            // DaemonSet not found - already deleted, this is fine
-            return;
-        }
-        throw new Error(`Failed to delete daemonset: ${(error as Error).message}`);
-    }
+    return deleteK8sResource('daemonset', daemonSetName, namespace);
 }
 
 /**
- * Gets daemonset name from YAML content using proper YAML parsing.
+ * Gets daemonset name from YAML content using shared utility.
  * @param yamlContent The YAML content.
  * @returns The daemonset name.
  */
 export function getDaemonSetNameFromYaml(yamlContent: string): string {
-    const yamlObject = parse(yamlContent) as Record<string, string>;
-    const daemonSetName = _.get(yamlObject, 'metadata.name');
-
-    if (!daemonSetName) {
-        throw new Error('Could not extract daemonset name from YAML');
-    }
-
-    return daemonSetName;
+    return getResourceNameFromYaml(yamlContent, 'daemonset');
 }

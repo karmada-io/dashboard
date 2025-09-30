@@ -17,11 +17,8 @@ limitations under the License.
 import { test, expect } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
 import { setupDashboardAuthentication, generateTestDaemonSetYaml, createK8sDaemonSet, getDaemonSetNameFromYaml, deleteK8sDaemonSet } from './test-utils';
+import { setMonacoEditorContent, waitForResourceInList, debugScreenshot, DeepRequired } from '../../test-utils';
 import { IResponse } from '@/services/base.ts';
-
-type DeepRequired<T> = {
-    [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
-};
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
@@ -37,23 +34,18 @@ test('should edit daemonset successfully', async ({ page }) => {
 
     // Navigate to workload page
     await page.click('text=Workloads');
-    
+
     // Click visible Daemonset tab
     const daemonsetTab = page.locator('role=option[name="Daemonset"]');
     await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
     await daemonsetTab.click();
-    
+
     // Verify selected state
     await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for daemonset to appear in list
-    const table = page.locator('table');
-    await expect(table.locator(`text=${daemonSetName}`)).toBeVisible({ timeout: 30000 });
-
-    // Find row containing test daemonset name
-    const targetRow = page.locator(`table tbody tr:has-text("${daemonSetName}")`);
-    await expect(targetRow).toBeVisible({ timeout: 15000 });
+    // Wait for daemonset to appear in list and get target row
+    const targetRow = await waitForResourceInList(page, daemonSetName);
 
     // Find Edit button in that row and click
     const editButton = targetRow.getByText('Edit');
@@ -164,57 +156,8 @@ spec:
         }
     }
 
-    // Set modified YAML content
-    await page.evaluate((yaml) => {
-        const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
-        if (textarea) {
-            textarea.value = yaml;
-            textarea.focus();
-        }
-    }, modifiedYaml);
-
-    /* eslint-disable */
-    // Trigger React onChange callback
-    await page.evaluate((yaml) => {
-        const findReactFiber = (element: any) => {
-            const keys = Object.keys(element);
-            return keys.find(key => key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance'));
-        };
-
-        const monacoContainer = document.querySelector('.monaco-editor');
-        if (monacoContainer) {
-            const fiberKey = findReactFiber(monacoContainer);
-            if (fiberKey) {
-                let fiber = (monacoContainer as any)[fiberKey];
-                while (fiber) {
-                    if (fiber.memoizedProps && fiber.memoizedProps.onChange) {
-                        fiber.memoizedProps.onChange(yaml);
-                        return;
-                    }
-                    fiber = fiber.return;
-                }
-            }
-        }
-
-        const dialog = document.querySelector('[role="dialog"]');
-        if (dialog) {
-            const fiberKey = findReactFiber(dialog);
-            if (fiberKey) {
-                let fiber = (dialog as any)[fiberKey];
-                const traverse = (node: any, depth = 0): boolean => {
-                    if (!node || depth > 20) return false;
-                    if (node.memoizedProps && node.memoizedProps.onChange) {
-                        node.memoizedProps.onChange(yaml);
-                        return true;
-                    }
-                    if (node.child && traverse(node.child, depth + 1)) return true;
-                    return node.sibling && traverse(node.sibling, depth + 1);
-                };
-                traverse(fiber);
-            }
-        }
-    }, modifiedYaml);
-    /* eslint-enable */
+    // Set modified YAML content and trigger React onChange callback
+    await setMonacoEditorContent(page, modifiedYaml);
 
     // Wait for submit button to become enabled and click
     await expect(page.locator('[role="dialog"] button:has-text("Submit")')).toBeEnabled();
@@ -250,8 +193,6 @@ spec:
     }
 
     // Debug
-    if(process.env.DEBUG === 'true'){
-        await page.screenshot({ path: 'debug-daemonset-edit.png', fullPage: true });
-    }
+    await debugScreenshot(page, 'debug-daemonset-edit.png');
 
 });
