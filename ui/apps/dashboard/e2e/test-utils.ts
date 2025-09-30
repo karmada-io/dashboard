@@ -122,6 +122,13 @@ export const RESOURCE_CONFIGS = {
         yamlType: k8s.V1CronJob,
         createMethod: 'createNamespacedCronJob' as const,
         deleteMethod: 'deleteNamespacedCronJob' as const,
+    },
+    job: {
+        kind: 'Job',
+        apiClientConstructor: k8s.BatchV1Api,
+        yamlType: k8s.V1Job,
+        createMethod: 'createNamespacedJob' as const,
+        deleteMethod: 'deleteNamespacedJob' as const,
     }
 } as const;
 
@@ -161,12 +168,19 @@ export async function createK8sResource<ResourceType extends keyof typeof RESOUR
                     body: yamlObject
                 });
             }
-        } else if (resourceType === 'cronjob') {
+        } else if (['cronjob', 'job'].includes(resourceType)) {
             const k8sApi = createKarmadaApiClient(k8s.BatchV1Api);
-            await k8sApi.createNamespacedCronJob({
-                namespace: namespace,
-                body: yamlObject
-            });
+            if (resourceType === 'cronjob') {
+                await k8sApi.createNamespacedCronJob({
+                    namespace: namespace,
+                    body: yamlObject
+                });
+            } else {
+                await k8sApi.createNamespacedJob({
+                    namespace: namespace,
+                    body: yamlObject
+                });
+            }
         }
 
     } catch (error: any) {
@@ -189,7 +203,7 @@ export async function deleteK8sResource<ResourceType extends keyof typeof RESOUR
         expect(resourceName).not.toBe('');
         expect(namespace).toBeTruthy();
 
-        if (resourceType === 'deployment' || resourceType === 'daemonset') {
+        if (['deployment', 'daemonset'].includes(resourceType)) {
             const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
             if (resourceType === 'deployment') {
                 await k8sApi.deleteNamespacedDeployment({
@@ -202,12 +216,19 @@ export async function deleteK8sResource<ResourceType extends keyof typeof RESOUR
                     namespace: namespace
                 });
             }
-        } else if (resourceType === 'cronjob') {
+        } else if (['cronjob', 'job'].includes(resourceType)) {
             const k8sApi = createKarmadaApiClient(k8s.BatchV1Api);
-            await k8sApi.deleteNamespacedCronJob({
-                name: resourceName,
-                namespace: namespace
-            });
+            if (resourceType === 'cronjob') {
+                await k8sApi.deleteNamespacedCronJob({
+                    name: resourceName,
+                    namespace: namespace
+                });
+            } else {
+                await k8sApi.deleteNamespacedJob({
+                    name: resourceName,
+                    namespace: namespace
+                });
+            }
         }
 
     } catch (error: any) {
