@@ -97,7 +97,7 @@ func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Contex
 	}
 
 	return func(c *gin.Context) {
-		if c.Request.Header.Get("Authorization") == "" {
+		if c.Request.Header.Get("Authorization") == "" && c.Query("Authorization") == "" {
 			c.String(http.StatusUnauthorized, "Forbidden")
 			c.Abort()
 			return

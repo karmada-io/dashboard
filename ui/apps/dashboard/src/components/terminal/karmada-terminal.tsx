@@ -19,6 +19,7 @@ import { ContainerTerminal, BaseTerminalOptions } from '@karmada/terminal';
 import { CreateKarmadaTerminal } from '@/services/terminal.ts';
 import { Button, Spin } from 'antd';
 import { Icons } from '@/components/icons';
+import { useAuth } from '@/components/auth';
 
 interface KarmadaTerminalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ const KarmadaTerminal: React.FC<KarmadaTerminalProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const containerTerminalRef = useRef<ContainerTerminal | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const { token } = useAuth();
   useEffect(() => {
     if (!isOpen || !containerRef.current || containerTerminalRef.current) {
       return;
@@ -77,6 +78,9 @@ const KarmadaTerminal: React.FC<KarmadaTerminalProps> = ({
         sessionIdUrl:
           '/api/v1/terminal/pod/{{namespace}}/{{pod}}/shell/{{container}}',
         wsUrl: '/api/v1/terminal/sockjs',
+        extraHeader: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       containerTerminalRef.current = terminal;
       terminal
