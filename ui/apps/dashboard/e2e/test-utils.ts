@@ -109,6 +109,13 @@ export const RESOURCE_CONFIGS = {
         createMethod: 'createNamespacedDeployment' as const,
         deleteMethod: 'deleteNamespacedDeployment' as const,
     },
+    statefulset: {
+        kind: 'StatefulSet',
+        apiClientConstructor: k8s.AppsV1Api,
+        yamlType: k8s.V1StatefulSet,
+        createMethod: 'createNamespacedStatefulSet' as const,
+        deleteMethod: 'deleteNamespacedStatefulSet' as const,
+    },
     daemonset: {
         kind: 'DaemonSet',
         apiClientConstructor: k8s.AppsV1Api,
@@ -155,14 +162,19 @@ export async function createK8sResource<ResourceType extends keyof typeof RESOUR
         }
         yamlObject.metadata.namespace = namespace;
 
-        if(['deployment', 'daemonset'].includes(resourceType)) {
+        if(['deployment', 'statefulset', 'daemonset'].includes(resourceType)) {
             const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
             if (resourceType === 'deployment') {
                 await k8sApi.createNamespacedDeployment({
                     namespace: namespace,
                     body: yamlObject
                 });
-            } else {
+            } else if (resourceType === 'statefulset'){
+                await k8sApi.createNamespacedStatefulSet({
+                    namespace: namespace,
+                    body: yamlObject
+                });
+            } else if (resourceType === 'daemonset'){
                 await k8sApi.createNamespacedDaemonSet({
                     namespace: namespace,
                     body: yamlObject
@@ -203,14 +215,19 @@ export async function deleteK8sResource<ResourceType extends keyof typeof RESOUR
         expect(resourceName).not.toBe('');
         expect(namespace).toBeTruthy();
 
-        if (['deployment', 'daemonset'].includes(resourceType)) {
+        if (['deployment', 'statefulset','daemonset'].includes(resourceType)) {
             const k8sApi = createKarmadaApiClient(k8s.AppsV1Api);
             if (resourceType === 'deployment') {
                 await k8sApi.deleteNamespacedDeployment({
                     name: resourceName,
                     namespace: namespace
                 });
-            } else {
+            } else if (resourceType === 'statefulset'){
+                await k8sApi.deleteNamespacedStatefulSet({
+                    name: resourceName,
+                    namespace: namespace
+                });
+            } else if (resourceType === 'daemonset'){
                 await k8sApi.deleteNamespacedDaemonSet({
                     name: resourceName,
                     namespace: namespace
