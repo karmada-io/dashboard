@@ -16,7 +16,7 @@ limitations under the License.
 
 import { test } from '@playwright/test';
 import { setupDashboardAuthentication, generateTestStatefulSetYaml, createK8sStatefulSet, getStatefulSetNameFromYaml, deleteK8sStatefulSet } from './test-utils';
-import { viewWorkloadResourceTest } from '../../test-utils';
+import { viewWorkloadResourceTest } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);

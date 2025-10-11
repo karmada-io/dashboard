@@ -16,15 +16,15 @@ limitations under the License.
 
 import { test } from '@playwright/test';
 import { setupDashboardAuthentication } from './test-utils';
-import { displayWorkloadResourceListTest } from '../test-utils';
+import { displayServiceResourceListTest } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display statefulset list', async ({ page }) => {
-    await displayWorkloadResourceListTest(page, {
-        tabName: 'Statefulset',
-        screenshotName: 'debug-statefulset-list.png'
+test('should display service list', async ({ page }) => {
+    await displayServiceResourceListTest(page, {
+        tabName: 'Service',
+        screenshotName: 'debug-service-list.png'
     });
 });

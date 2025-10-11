@@ -15,16 +15,23 @@ limitations under the License.
 */
 
 import { test } from '@playwright/test';
-import { setupDashboardAuthentication } from './test-utils';
-import { displayWorkloadResourceListTest } from '../test-utils';
+import { setupDashboardAuthentication, generateTestServiceYaml, createK8sService, getServiceNameFromYaml } from './test-utils';
+import { deleteServiceResourceTest } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display statefulset list', async ({ page }) => {
-    await displayWorkloadResourceListTest(page, {
-        tabName: 'Statefulset',
-        screenshotName: 'debug-statefulset-list.png'
+test('should delete service successfully', async ({ page }) => {
+    const testServiceYaml = generateTestServiceYaml();
+
+    await deleteServiceResourceTest(page, {
+        resourceType: 'service',
+        tabName: 'Service',
+        apiEndpointPattern: '/_raw/service',
+        yamlContent: testServiceYaml,
+        getResourceName: getServiceNameFromYaml,
+        createResource: createK8sService,
+        screenshotName: 'debug-service-delete-kubectl.png'
     });
 });

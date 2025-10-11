@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Karmada Authors.
+Copyright 2025 The Karmada Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ limitations under the License.
 
 import { test } from '@playwright/test';
 import { setupDashboardAuthentication } from './test-utils';
-import { displayWorkloadResourceListTest } from '../../test-utils';
+import { displayWorkloadResourceListTest } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);

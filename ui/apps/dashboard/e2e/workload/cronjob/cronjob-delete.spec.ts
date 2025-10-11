@@ -16,7 +16,7 @@ limitations under the License.
 
 import { test } from '@playwright/test';
 import { setupDashboardAuthentication, generateTestCronJobYaml, createK8sCronJob, getCronJobNameFromYaml} from './test-utils';
-import { deleteWorkloadResourceTest } from '../../test-utils';
+import { deleteWorkloadResourceTest } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
@@ -24,6 +24,7 @@ test.beforeEach(async ({ page }) => {
 
 test('should delete cronjob successfully', async ({ page }) => {
     const testCronJobYaml = generateTestCronJobYaml();
+
     await deleteWorkloadResourceTest(page, {
         resourceType: 'cronjob',
         tabName: 'Cronjob',
