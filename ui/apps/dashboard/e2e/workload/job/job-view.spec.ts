@@ -16,7 +16,7 @@ limitations under the License.
 
 import { test } from '@playwright/test';
 import { setupDashboardAuthentication, generateTestJobYaml, createK8sJob, getJobNameFromYaml, deleteK8sJob } from './test-utils';
-import { viewWorkloadResourceTest } from '../../test-utils';
+import { viewWorkloadResourceTest } from '../test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
