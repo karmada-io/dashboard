@@ -56,10 +56,11 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
     },
   });
   const filteredMenuItems = useMemo(() => {
-    if (!data) return menuItems;
+    if (!data || !data.menu_configs || data.menu_configs.length === 0)
+      return menuItems;
     const menuInfo = traverseMenuConfig(data.menu_configs);
     return filterMenuItems(menuItems, menuInfo);
-  }, [data, menuItems]);
+  }, [data]);
   return (
     <div className={cn('w-full', 'h-full', 'overflow-y-auto')}>
       <Menu
@@ -81,8 +82,18 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
 function traverseMenuConfig(
   menu_configs: menuConfig[],
 ): Record<string, boolean> {
+  if (
+    !menu_configs ||
+    !Array.isArray(menu_configs) ||
+    menu_configs.length === 0
+  ) {
+    return {};
+  }
+
   let menuInfo = {} as Record<string, boolean>;
   for (const menu_config of menu_configs) {
+    if (!menu_config || !menu_config.sidebar_key) continue;
+
     menuInfo[menu_config.sidebar_key] = menu_config.enable;
     const childrenMenuInfo = menu_config.children
       ? traverseMenuConfig(menu_config.children)

@@ -25,6 +25,7 @@ import { getSidebarWidth } from '@/utils/i18n';
 import { useWindowSize } from '@uidotdev/usehooks';
 import { KarmadaTerminal } from '@/components/terminal';
 import { useGlobalStore } from '@/store/global';
+import { FloatingChat } from '@karmada/chatui';
 
 const { Sider: AntdSider, Content: AntdContent } = AntdLayout;
 
@@ -64,6 +65,14 @@ export const MainLayout: FC = () => {
         onClose={() => {
           setKarmadaTerminalOpen(false);
         }}
+      />
+      
+      <FloatingChat 
+        apiConfig={{
+          chatEndpoint: '/api/v1/chat',
+          toolsEndpoint: '/api/v1/chat/tools'
+        }}
+        enableMCP={true}
       />
     </>
   );
