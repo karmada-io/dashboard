@@ -15,8 +15,10 @@ limitations under the License.
 */
 
 import { test } from '@playwright/test';
-import { setupDashboardAuthentication } from './test-utils';
-import { displayServiceResourceListTest } from '../test-utils';
+import {
+    setupDashboardAuthentication,
+    displayServiceResourceListTest
+} from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);

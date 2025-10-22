@@ -14,13 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { setupDashboardAuthentication, getResourceNameFromYaml } from '../../test-utils';
-import { createK8sResource, deleteK8sResource} from '../test-utils';
+import {
+    getResourceNameFromYaml,
+    createK8sResource,
+    deleteK8sResource
+} from '../test-utils';
 
-export { setupDashboardAuthentication };
+// Re-export ALL utilities from parent test-utils for single-point import
+export * from '../test-utils';
 
 /**
- * Generate test YAML with timestamp
+ * Generate test Deployment YAML with timestamp
  */
 export function generateTestDeploymentYaml() {
     const timestamp = Date.now();

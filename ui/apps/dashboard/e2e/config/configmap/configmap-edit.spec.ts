@@ -18,10 +18,10 @@ import { test, expect } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
 import {
     setupDashboardAuthentication,
-    generateTestDaemonSetYaml,
-    createK8sDaemonSet,
-    getDaemonSetNameFromYaml,
-    deleteK8sDaemonSet,
+    generateTestConfigMapYaml,
+    createK8sConfigMap,
+    getConfigMapNameFromYaml,
+    deleteK8sConfigMap,
     setMonacoEditorContent,
     waitForResourceInList,
     debugScreenshot,
@@ -33,28 +33,28 @@ test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should edit daemonset successfully', async ({ page }) => {
-    // Create a test daemonset directly via API to set up test data
-    const testDaemonSetYaml = generateTestDaemonSetYaml();
-    const daemonSetName = getDaemonSetNameFromYaml(testDaemonSetYaml);
+test('should edit configmap successfully', async ({ page }) => {
+    // Create a test configmap directly via API to set up test data
+    const testConfigMapYaml = generateTestConfigMapYaml();
+    const configMapName = getConfigMapNameFromYaml(testConfigMapYaml);
 
-    // Setup: Create daemonset using kubectl
-    await createK8sDaemonSet(testDaemonSetYaml);
+    // Setup: Create configmap using kubectl
+    await createK8sConfigMap(testConfigMapYaml);
 
-    // Navigate to workload page
-    await page.click('text=Workloads');
+    // Navigate to configmap page
+    await page.click('text=ConfigMaps & Secrets');
 
-    // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
+    // Click visible ConfigMap tab
+    const configMapTab = page.locator('role=option[name="ConfigMap"]');
+    await configMapTab.waitFor({ state: 'visible', timeout: 30000 });
+    await configMapTab.click();
 
     // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await expect(configMapTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
-    // Wait for daemonset to appear in list and get target row
-    const targetRow = await waitForResourceInList(page, daemonSetName);
+    // Wait for configmap to appear in list and get target row
+    const targetRow = await waitForResourceInList(page, configMapName);
 
     // Find Edit button in that row and click
     const editButton = targetRow.getByText('Edit');
@@ -64,7 +64,7 @@ test('should edit daemonset successfully', async ({ page }) => {
     const apiRequestPromise = page.waitForResponse(response => {
         const url = response.url();
         return (url.includes('/api/v1/_raw/') ||
-                url.includes('/api/v1/namespaces/') && (url.includes('/deployments/') || url.includes('/statefulsets/') || url.includes('/daemonsets/'))) &&
+                url.includes('/api/v1/namespaces/') && (url.includes('/configmaps/'))) &&
             response.status() === 200;
     }, { timeout: 15000 });
 
@@ -75,7 +75,7 @@ test('should edit daemonset successfully', async ({ page }) => {
 
     // Wait for network request to complete and get response data
     const apiResponse = await apiRequestPromise;
-    const responseData = (await apiResponse.json()) as IResponse<DeepRequired<k8s.V1DaemonSet>>;
+    const responseData = (await apiResponse.json()) as IResponse<DeepRequired<k8s.V1ConfigMap>>;
 
     // Verify Monaco editor is loaded
     await expect(page.locator('.monaco-editor')).toBeVisible({ timeout: 10000 });
@@ -114,22 +114,16 @@ test('should edit daemonset successfully', async ({ page }) => {
             const yaml = `apiVersion: ${data.apiVersion}
 kind: ${data.kind}
 metadata:
-  name: ${data.metadata?.name || 'test-daemonset'}
-  namespace: ${data.metadata?.namespace || 'default'}
-spec:
-  selector:
-    matchLabels:
-      app: ${data.spec?.selector?.matchLabels?.app || 'test-app'}
-  template:
-    metadata:
-      labels:
-        app: ${data.spec?.template?.metadata?.labels?.app || 'test-app'}
-    spec:
-      containers:
-        - name: ${data.spec?.template?.spec?.containers?.[0]?.name || 'container'}
-          image: ${data.spec?.template?.spec?.containers?.[0]?.image || 'nginx:latest'}
-          ports:
-            - containerPort: ${data.spec?.template?.spec?.containers?.[0]?.ports?.[0]?.containerPort || 80}`;
+  name: ${data.metadata.name}
+  namespace: ${data.metadata.namespace}
+data:
+  config.yaml: |
+    server:
+      port: 8080
+      host: localhost
+  app.properties: |
+    app.name=test-app
+    app.version=1.0.0`;
 
             const textarea = document.querySelector('.monaco-editor textarea') as HTMLTextAreaElement;
             if (textarea) {
@@ -144,23 +138,23 @@ spec:
 
     // If still unable to get content, report error
     if (!yamlContent || yamlContent.length === 0) {
-        throw new Error(`Edit feature error: Monaco editor does not load daemonset YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
+        throw new Error(`Edit feature error: Monaco editor does not load configmap YAML content. Expected name: "${expectedName}", kind: "${expectedKind}"`);
     }
 
-    // Modify YAML content (change image version)
-    let modifiedYaml = yamlContent.replace(/image:\s*nginx:latest/, 'image: nginx:1.21');
+    // Modify YAML content (port: 80 → 8080, if not 80 then change to 9090)
+    let modifiedYaml = yamlContent.replace(/port:\s*80/, 'port: 8080');
 
     // Verify modification took effect
     if (modifiedYaml === yamlContent) {
-        // Try alternative modification - change image name
-        const alternativeModified = yamlContent.replace(/image:\s*nginx/, 'image: httpd');
+        // Try other modification methods
+        const alternativeModified = yamlContent.replace(/port:\s*\d+/, 'port: 9090');
         if (alternativeModified !== yamlContent) {
             modifiedYaml = alternativeModified;
         } else {
-            // If still can't modify, try changing container name
-            const nameModified = yamlContent.replace(/name:\s*nginx/, 'name: web-server');
-            if (nameModified !== yamlContent) {
-                modifiedYaml = nameModified;
+            // If still can't modify, try changing targetPort
+            const targetPortModified = yamlContent.replace(/targetPort:\s*8080/, 'targetPort: 9090');
+            if (targetPortModified !== yamlContent) {
+                modifiedYaml = targetPortModified;
             }
         }
     }
@@ -194,14 +188,14 @@ spec:
         }
     }
 
-    // Cleanup: Delete the created daemonset
+    // Cleanup: Delete the created configmap
     try {
-        await deleteK8sDaemonSet(daemonSetName, 'default');
+        await deleteK8sConfigMap(configMapName, 'default');
     } catch (error) {
-        console.warn(`Failed to cleanup daemonset ${daemonSetName}:`, error);
+        console.warn(`Failed to cleanup configmap ${configMapName}:`, error);
     }
 
     // Debug
-    await debugScreenshot(page, 'debug-daemonset-edit.png');
+    await debugScreenshot(page, 'debug-configmap-edit.png');
 
 });

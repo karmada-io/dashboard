@@ -20,11 +20,27 @@ import { V1ObjectMeta } from '@kubernetes/client-node';
 import { parse } from 'yaml';
 import { expect } from '@playwright/test';
 import {
-    createKarmadaApiClient,
+    setupDashboardAuthentication,
     setMonacoEditorContent,
     debugScreenshot,
-    waitForResourceInList
+    waitForResourceInList,
+    getResourceNameFromYaml,
+    createKarmadaApiClient
 } from '../test-utils';
+import type { DeepRequired } from '../test-utils';
+
+// Re-export ALL utilities from parent test-utils for single-point import
+export {
+    setupDashboardAuthentication,
+    setMonacoEditorContent,
+    debugScreenshot,
+    waitForResourceInList,
+    getResourceNameFromYaml,
+    createKarmadaApiClient
+};
+
+// Re-export types separately
+export type { DeepRequired };
 
 // Workload Resource Configurations
 export const RESOURCE_CONFIGS = {

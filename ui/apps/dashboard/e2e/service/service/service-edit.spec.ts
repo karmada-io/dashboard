@@ -16,8 +16,17 @@ limitations under the License.
 
 import { test, expect } from '@playwright/test';
 import * as k8s from '@kubernetes/client-node';
-import { setupDashboardAuthentication, generateTestServiceYaml, createK8sService, getServiceNameFromYaml, deleteK8sService } from './test-utils';
-import { setMonacoEditorContent, waitForResourceInList, debugScreenshot, DeepRequired } from '../../test-utils';
+import {
+    setupDashboardAuthentication,
+    generateTestServiceYaml,
+    createK8sService,
+    getServiceNameFromYaml,
+    deleteK8sService,
+    setMonacoEditorContent,
+    waitForResourceInList,
+    debugScreenshot,
+    DeepRequired
+} from './test-utils';
 import { IResponse } from '@/services/base.ts';
 
 test.beforeEach(async ({ page }) => {
