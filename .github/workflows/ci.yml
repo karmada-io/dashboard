@@ -187,16 +187,31 @@ jobs:
           echo "Testing API connectivity..."
           curl -f http://localhost:8000/api/v1/cluster && echo "✓ Cluster API works" || echo "✗ Cluster API failed"
           curl -f http://localhost:8000/api/v1/namespace && echo "✓ Namespace API works" || echo "✗ Namespace API failed"
+          echo ""
+          echo "========== DEBUG: Testing PropagationPolicy API =========="
+          echo "Testing GET /api/v1/propagationpolicy..."
+          echo "Response:"
+          curl -v http://localhost:8000/api/v1/propagationpolicy 2>&1 
+          echo ""
+          echo "Testing GET /api/v1/propagationpolicy/default (with namespace)..."
+          echo "Response:"
+          curl -v http://localhost:8000/api/v1/propagationpolicy/default 2>&1 | head -50
+          echo "========== DEBUG: END =========="
+          echo ""
           echo "API tests completed"
       - name: Debug working dir
         if: ${{ env.DEBUG == 'true' }}
         run: |
           pwd
           ls -al
+#      - name: Run Playwright tests
+#        working-directory: karmada-dashboard/ui/apps/dashboard
+#        run: |
+#          pnpm exec playwright test
       - name: Run Playwright tests
         working-directory: karmada-dashboard/ui/apps/dashboard
         run: |
-          pnpm exec playwright test
+          pnpm test:e2e e2e/policy/*
       - name: Cleanup processes
         if: always()
         run: |

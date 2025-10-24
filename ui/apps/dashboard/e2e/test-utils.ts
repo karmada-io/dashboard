@@ -191,11 +191,24 @@ export async function debugScreenshot(page: Page, filename: string): Promise<voi
  * Waits for a resource to appear in the list and returns the target row
  */
 export async function waitForResourceInList(page: Page, resourceName: string): Promise<Locator> {
+    // ========== DEBUG: START ==========
+    console.log(`[DEBUG] Waiting for resource in list: ${resourceName}`);
+
+    // Check table content before waiting
     const table = page.locator('table');
+    const tableContent = await table.textContent().catch(() => 'Failed to get table content');
+    console.log(`[DEBUG] Current table content:`, tableContent);
+    console.log(`[DEBUG] Looking for text: ${resourceName}`);
+    // ========== DEBUG: END ==========
+
     await expect(table.locator(`text=${resourceName}`)).toBeVisible({ timeout: 30000 });
 
     const targetRow = page.locator(`table tbody tr:has-text("${resourceName}")`);
     await expect(targetRow).toBeVisible({ timeout: 15000 });
+
+    // ========== DEBUG: START ==========
+    console.log(`[DEBUG] Resource found in list: ${resourceName}`);
+    // ========== DEBUG: END ==========
 
     return targetRow;
 }
