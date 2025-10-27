@@ -14,7 +14,7 @@
 
 # Stage 1: Builder
 # Use the Go version specified in go.mod (1.24)
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Install make, git and bash
 # git is used to clone the repository, make is used to execute build commands, and bash is used to execute the build.sh script
