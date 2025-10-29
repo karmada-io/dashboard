@@ -28,9 +28,9 @@ KUBECONFIG ?= $(HOME)/.kube/karmada.config
 
 # API server common flags
 API_COMMON_FLAGS = \
-	$(if $(OPENAI_API_KEY),--openai-api-key="$(OPENAI_API_KEY)") \
-	$(if $(OPENAI_MODEL),--openai-model="$(OPENAI_MODEL)",--openai-model="gpt-3.5-turbo") \
-	$(if $(OPENAI_ENDPOINT),--openai-endpoint="$(OPENAI_ENDPOINT)",--openai-endpoint="https://api.openai.com/v1") \
+	$(if $(LLM_API_KEY),--llm-api-key="$(LLM_API_KEY)") \
+	$(if $(LLM_MODEL),--llm-model="$(LLM_MODEL)",--llm-model="gpt-3.5-turbo") \
+	$(if $(LLM_ENDPOINT),--llm-endpoint="$(LLM_ENDPOINT)",--llm-endpoint="https://api.openai.com/v1") \
 	$(if $(filter true,$(ENABLE_MCP)),--enable-mcp=true) \
 	$(if $(MCP_TRANSPORT_MODE),--mcp-transport-mode="$(MCP_TRANSPORT_MODE)",--mcp-transport-mode="stdio") \
 	$(if $(KARMADA_MCP_SERVER_PATH),--mcp-server-path="$(KARMADA_MCP_SERVER_PATH)") \
