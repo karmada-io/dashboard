@@ -124,8 +124,13 @@ const SecretTable: FC<SecretTableProps> = (props) => {
             <Button
               size={'small'}
               type="link"
-              onClick={() => {
-                onEditSecret(r);
+              onClick={async () => {
+                const ret = await GetResource({
+                  kind: r.typeMeta.kind,
+                  name: r.objectMeta.name,
+                  namespace: r.objectMeta.namespace,
+                });
+                onEditSecret(ret?.data as Secret);
               }}
             >
               {i18nInstance.t('95b351c86267f3aedf89520959bce689', '编辑')}
