@@ -46,7 +46,7 @@ func handleGetPropagationPolicyList(c *gin.Context) {
 		common.Fail(c, err)
 		return
 	}
-	propagationList, err := propagationpolicy.GetPropagationPolicyList(karmadaClient, k8sClient, namespace, dataSelect)
+	propagationList, err := propagationpolicy.GetPropagationPolicyList(karmadaClient, k8sClient, namespace, dataSelect, c.Request)
 	if err != nil {
 		klog.ErrorS(err, "Failed to GetPropagationPolicyList")
 		common.Fail(c, err)
