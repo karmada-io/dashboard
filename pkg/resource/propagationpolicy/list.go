@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
@@ -56,7 +57,7 @@ type PropagationPolicy struct {
 }
 
 // GetPropagationPolicyList returns a list of all propagations in the karmada control-plance.
-func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*PropagationPolicyList, error) {
+func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kubernetes.Interface, nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery, request *http.Request) (*PropagationPolicyList, error) {
 	log.Println("Getting list of namespaces")
 	propagationpolicies, err := client.PolicyV1alpha1().PropagationPolicies(nsQuery.ToRequestParam()).List(context.TODO(), helpers.ListEverything)
 	nonCriticalErrors, criticalError := errors.ExtractErrors(err)
@@ -64,10 +65,10 @@ func GetPropagationPolicyList(client karmadaclientset.Interface, k8sClient kuber
 		return nil, criticalError
 	}
 
-	return toPropagationPolicyList(k8sClient, propagationpolicies.Items, nonCriticalErrors, dsQuery), nil
+	return toPropagationPolicyList(k8sClient, propagationpolicies.Items, nonCriticalErrors, dsQuery, request), nil
 }
 
-func toPropagationPolicyList(_ kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery) *PropagationPolicyList {
+func toPropagationPolicyList(_ kubernetes.Interface, propagationpolicies []v1alpha1.PropagationPolicy, nonCriticalErrors []error, dsQuery *dataselect.DataSelectQuery, request *http.Request) *PropagationPolicyList {
 	propagationpolicyList := &PropagationPolicyList{
 		PropagationPolicys: make([]PropagationPolicy, 0),
 		ListMeta:           types.ListMeta{TotalItems: len(propagationpolicies)},
@@ -77,7 +78,7 @@ func toPropagationPolicyList(_ kubernetes.Interface, propagationpolicies []v1alp
 	propagationpolicyList.ListMeta = types.ListMeta{TotalItems: filteredTotal}
 	propagationpolicyList.Errors = nonCriticalErrors
 
-	verberClient, err := client.VerberClient(nil)
+	verberClient, err := client.VerberClient(request)
 	if err != nil {
 		panic(err)
 	}
