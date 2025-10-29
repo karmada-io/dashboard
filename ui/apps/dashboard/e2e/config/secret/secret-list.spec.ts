@@ -17,16 +17,16 @@ limitations under the License.
 import { test } from '@playwright/test';
 import {
     setupDashboardAuthentication,
-    displayWorkloadResourceListTest
+    displayConfigMapSecretResourceListTest
 } from './test-utils';
 
 test.beforeEach(async ({ page }) => {
     await setupDashboardAuthentication(page);
 });
 
-test('should display job list', async ({ page }) => {
-    await displayWorkloadResourceListTest(page, {
-        tabName: 'Job',
-        screenshotName: 'debug-job-list.png'
+test('should display secret list', async ({ page }) => {
+    await displayConfigMapSecretResourceListTest(page, {
+        tabName: 'Secret',
+        screenshotName: 'debug-secret-list.png'
     });
 });
