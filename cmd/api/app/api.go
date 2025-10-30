@@ -141,7 +141,17 @@ func run(ctx context.Context, opts *options.Options) error {
 		if opts.MCPTransportMode == "sse" {
 			mcpOpts = append(mcpOpts, mcpclient.WithSSEMode(opts.MCPSSEEndpoint))
 		} else {
-			mcpOpts = append(mcpOpts, mcpclient.WithStdioMode(opts.MCPServerPath))
+			karmadaMCPServerArguments := []string{
+				"--karmada-kubeconfig", opts.KarmadaKubeConfig,
+				"--karmada-context", opts.KarmadaContext,
+			}
+			if opts.SkipKarmadaApiserverTLSVerify {
+				karmadaMCPServerArguments = append(karmadaMCPServerArguments, "--skip-karmada-apiserver-tls-verify")
+			}
+			mcpOpts = append(mcpOpts,
+				mcpclient.WithStdioMode(opts.MCPServerPath),
+				mcpclient.WithStdioArguments(karmadaMCPServerArguments...),
+			)
 		}
 
 		var err error

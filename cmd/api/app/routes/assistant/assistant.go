@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Karmada Authors.
+Copyright 2025 The Karmada Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -68,6 +68,9 @@ func Answering(c *gin.Context) {
 
 	if err := session.run(); err != nil {
 		klog.Errorf("Answering session run failed: %v", err)
+		// Send error response to client
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process your request"})
+		return
 	}
 }
 

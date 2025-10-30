@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Karmada Authors.
+Copyright 2025 The Karmada Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,10 +17,6 @@ limitations under the License.
 package assistant
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -31,33 +27,6 @@ import (
 	"github.com/karmada-io/dashboard/pkg/llm"
 	"github.com/karmada-io/dashboard/pkg/mcpclient"
 )
-
-// ChatRequest represents the request payload for chat endpoint
-type ChatRequest struct {
-	Message   string        `json:"message"`
-	History   []ChatMessage `json:"history,omitempty"`
-	EnableMCP bool          `json:"enableMcp,omitempty"`
-}
-
-// ChatMessage represents a message in the conversation
-type ChatMessage struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-}
-
-// ChatResponse represents the response for chat endpoint
-type ChatResponse struct {
-	Type     string        `json:"type"`
-	Content  interface{}   `json:"content"`
-	ToolCall *ToolCallInfo `json:"toolCall,omitempty"`
-}
-
-// ToolCallInfo represents information about a tool call
-type ToolCallInfo struct {
-	ToolName string                 `json:"toolName"`
-	Args     map[string]interface{} `json:"args"`
-	Result   string                 `json:"result"`
-}
 
 // ChatHandler handles chat requests with MCP integration
 func ChatHandler(c *gin.Context) {
@@ -122,6 +91,7 @@ func ChatHandler(c *gin.Context) {
 	handleChatCompletion(c, llmClient, chatReq, enableMCP, mcpClient)
 }
 
+// addMCPToolsToRequest adds MCP tools to the chat completion request
 func addMCPToolsToRequest(chatReq *openai.ChatCompletionRequest, mcpClient *mcpclient.MCPClient) {
 	tools := mcpClient.FormatToolsForOpenAI()
 	if len(tools) > 0 {
@@ -129,6 +99,7 @@ func addMCPToolsToRequest(chatReq *openai.ChatCompletionRequest, mcpClient *mcpc
 	}
 }
 
+// handleChatCompletion handles the chat completion stream with error handling
 func handleChatCompletion(c *gin.Context, client *openai.Client, chatReq openai.ChatCompletionRequest, enableMCP bool, mcpClient *mcpclient.MCPClient) {
 	resp, err := client.CreateChatCompletionStream(c.Request.Context(), chatReq)
 	if err != nil {
@@ -142,182 +113,26 @@ func handleChatCompletion(c *gin.Context, client *openai.Client, chatReq openai.
 	toolCallBuffer := make(map[int]*openai.ToolCall)
 
 	// Stream the response
-	streamResponse(c, resp, toolCallBuffer, enableMCP, mcpClient)
+	if err := streamResponse(c, resp, toolCallBuffer, enableMCP, mcpClient); err != nil {
+		klog.Errorf("Error during streaming: %v", err)
+		sendErrorEvent(c, "An error occurred while streaming the response")
+		return
+	}
 
 	// Process completed tool calls
 	if enableMCP && mcpClient != nil && len(toolCallBuffer) > 0 {
-		processToolCalls(c, client, chatReq.Messages, toolCallBuffer, mcpClient)
+		if err := processToolCalls(c, client, chatReq.Messages, toolCallBuffer, mcpClient); err != nil {
+			klog.Errorf("Error processing tool calls: %v", err)
+			sendErrorEvent(c, "An error occurred while processing tool calls")
+			return
+		}
 	}
 
 	// Send completion signal
 	sendCompletionSignal(c)
 }
 
-func streamResponse(c *gin.Context, resp *openai.ChatCompletionStream, toolCallBuffer map[int]*openai.ToolCall, enableMCP bool, mcpClient *mcpclient.MCPClient) {
-	for {
-		response, err := resp.Recv()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			klog.Errorf("Error receiving stream response: %v", err)
-			break
-		}
-
-		if len(response.Choices) > 0 {
-			choice := response.Choices[0]
-
-			// Handle regular content
-			if choice.Delta.Content != "" {
-				msg := ChatResponse{
-					Type:    "content",
-					Content: choice.Delta.Content,
-				}
-				if data, err := json.Marshal(msg); err == nil {
-					fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-					c.Writer.Flush()
-				}
-			}
-
-			// Handle tool calls - accumulate them
-			if enableMCP && mcpClient != nil && choice.Delta.ToolCalls != nil {
-				accumulateToolCalls(choice.Delta.ToolCalls, toolCallBuffer)
-			}
-		}
-	}
-}
-
-func processToolCalls(c *gin.Context, client *openai.Client, messages []openai.ChatCompletionMessage, toolCallBuffer map[int]*openai.ToolCall, mcpClient *mcpclient.MCPClient) {
-	// Send notification that tool processing is starting
-	processingMsg := ChatResponse{Type: "tool_processing", Content: "Processing tool calls..."}
-	if data, err := json.Marshal(processingMsg); err == nil {
-		fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-		c.Writer.Flush()
-	}
-
-	// Append the assistant's response (tool calls) to the message history
-	assistantMessage := openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleAssistant,
-		Content: "",
-	}
-	for _, toolCall := range toolCallBuffer {
-		assistantMessage.ToolCalls = append(assistantMessage.ToolCalls, *toolCall)
-	}
-
-	// Execute tools and gather results
-	var toolResponses []openai.ChatCompletionMessage
-	for _, toolCall := range toolCallBuffer {
-		if toolCall.Function.Name != "" && toolCall.Function.Arguments != "" {
-			toolResponse := executeTool(toolCall, mcpClient, c)
-			if toolResponse.Role != "" { // Only add valid responses
-				toolResponses = append(toolResponses, toolResponse)
-			}
-		}
-	}
-
-	// Send notification that tool processing is complete
-	completedMsg := ChatResponse{Type: "tool_processing_complete", Content: "Tool processing complete, generating response..."}
-	if data, err := json.Marshal(completedMsg); err == nil {
-		fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-		c.Writer.Flush()
-	}
-
-	// Make a second call to OpenAI with the tool results
-	if len(toolResponses) > 0 {
-		makeFinalCall(c, client, messages, assistantMessage, toolResponses)
-	}
-}
-
-func executeTool(toolCall *openai.ToolCall, mcpClient *mcpclient.MCPClient, c *gin.Context) openai.ChatCompletionMessage {
-	toolName := strings.TrimPrefix(toolCall.Function.Name, "mcp_")
-	var args map[string]interface{}
-	if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err != nil {
-		klog.Errorf("Failed to parse tool arguments: %v, args: %s", err, toolCall.Function.Arguments)
-		return openai.ChatCompletionMessage{}
-	}
-
-	// Send tool call start notification to the client
-	toolStartInfo := ToolCallInfo{
-		ToolName: toolName,
-		Args:     args,
-		Result:   "Executing...",
-	}
-	msg := ChatResponse{Type: "tool_call_start", ToolCall: &toolStartInfo}
-	if data, err := json.Marshal(msg); err == nil {
-		fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-		c.Writer.Flush()
-	}
-
-	result, err := mcpClient.CallTool(toolName, args)
-	if err != nil {
-		klog.Errorf("Failed to execute tool %s: %v", toolName, err)
-		result = fmt.Sprintf("Error executing tool %s: %v", toolName, err)
-	}
-
-	// Send tool call completion info to the client for visibility
-	toolInfo := ToolCallInfo{
-		ToolName: toolName,
-		Args:     args,
-		Result:   result,
-	}
-	msg = ChatResponse{Type: "tool_call", ToolCall: &toolInfo}
-	if data, err := json.Marshal(msg); err == nil {
-		fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-		c.Writer.Flush()
-	}
-
-	// Return tool result for the next AI call
-	return openai.ChatCompletionMessage{
-		Role:       openai.ChatMessageRoleTool,
-		Content:    result,
-		Name:       toolCall.Function.Name,
-		ToolCallID: toolCall.ID,
-	}
-}
-
-func makeFinalCall(c *gin.Context, client *openai.Client, messages []openai.ChatCompletionMessage, assistantMessage openai.ChatCompletionMessage, toolResponses []openai.ChatCompletionMessage) {
-	messages = append(messages, assistantMessage)
-	messages = append(messages, toolResponses...)
-
-	finalChatReq := openai.ChatCompletionRequest{
-		Model:    llm.GetLLMModel(),
-		Messages: messages,
-		Stream:   true,
-	}
-
-	finalResp, err := client.CreateChatCompletionStream(c.Request.Context(), finalChatReq)
-	if err != nil {
-		klog.Errorf("Failed to create final chat completion stream: %v", err)
-		return
-	}
-	defer finalResp.Close()
-
-	for {
-		response, err := finalResp.Recv()
-		if err != nil {
-			break // EOF or error
-		}
-		if len(response.Choices) > 0 && response.Choices[0].Delta.Content != "" {
-			msg := ChatResponse{Type: "content", Content: response.Choices[0].Delta.Content}
-			if data, err := json.Marshal(msg); err == nil {
-				fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-				c.Writer.Flush()
-			}
-		}
-	}
-}
-
-func sendCompletionSignal(c *gin.Context) {
-	completionMsg := ChatResponse{
-		Type:    "completion",
-		Content: nil,
-	}
-	if data, err := json.Marshal(completionMsg); err == nil {
-		fmt.Fprintf(c.Writer, "data: %s\n\n", data)
-		c.Writer.Flush()
-	}
-}
-
+// prepareMessages prepares the message array for the LLM request
 func prepareMessages(request ChatRequest, enableMCP bool) []openai.ChatCompletionMessage {
 	var messages []openai.ChatCompletionMessage
 
@@ -327,7 +142,7 @@ func prepareMessages(request ChatRequest, enableMCP bool) []openai.ChatCompletio
 You can provide guidance about Karmada concepts, best practices, and configuration help.
 You can help with topics like:
 - Cluster management and federation
-- Resource propagation policies  
+- Resource propagation policies
 - Scheduling and placement
 - Multi-cluster applications
 - Karmada installation and configuration
@@ -373,37 +188,6 @@ Available tools will be provided automatically. Use them when relevant to give a
 	})
 
 	return messages
-}
-
-func accumulateToolCalls(toolCalls []openai.ToolCall, toolCallBuffer map[int]*openai.ToolCall) {
-	for _, toolCall := range toolCalls {
-		if toolCall.Index == nil {
-			continue
-		}
-		index := *toolCall.Index
-		if toolCallBuffer[index] == nil {
-			toolCallBuffer[index] = &openai.ToolCall{Index: &index}
-		}
-		if toolCall.ID != "" {
-			toolCallBuffer[index].ID = toolCall.ID
-		}
-		if toolCall.Type != "" {
-			toolCallBuffer[index].Type = toolCall.Type
-		}
-		if toolCall.Function.Name != "" {
-			toolCallBuffer[index].Function.Name = toolCall.Function.Name
-		}
-		if toolCall.Function.Arguments != "" {
-			toolCallBuffer[index].Function.Arguments += toolCall.Function.Arguments
-		}
-	}
-}
-
-func setupSSEHeaders(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 // GetMCPToolsHandler returns available MCP tools
