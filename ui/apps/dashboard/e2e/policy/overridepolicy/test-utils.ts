@@ -61,7 +61,7 @@ export const RESOURCE_CONFIGS = {
 /**
  * Generic function to create Karmada OverridePolicy resources
  */
-export async function createK8sResource<ResourceType extends keyof typeof RESOURCE_CONFIGS>(
+export async function createKarmadaResource<ResourceType extends keyof typeof RESOURCE_CONFIGS>(
     resourceType: ResourceType,
     yamlContent: string
 ): Promise<void> {
@@ -108,7 +108,7 @@ export async function createK8sResource<ResourceType extends keyof typeof RESOUR
 /**
  * Generic function to delete Karmada OverridePolicy resources
  */
-export async function deleteK8sResource<ResourceType extends keyof typeof RESOURCE_CONFIGS>(
+export async function deleteKarmadaResource<ResourceType extends keyof typeof RESOURCE_CONFIGS>(
     resourceType: ResourceType,
     resourceName: string,
     namespace: string = 'default'

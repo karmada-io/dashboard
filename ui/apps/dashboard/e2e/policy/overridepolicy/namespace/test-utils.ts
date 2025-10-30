@@ -16,8 +16,8 @@ limitations under the License.
 
 import {
     getResourceNameFromYaml,
-    createK8sResource,
-    deleteK8sResource
+    createKarmadaResource,
+    deleteKarmadaResource
 } from '../test-utils';
 
 // Re-export ALL utilities from parent test-utils for single-point import
@@ -56,7 +56,7 @@ spec:
  * @returns A Promise that resolves when the overridepolicy is created.
  */
 export async function createK8sOverridePolicy(yamlContent: string): Promise<void> {
-    return createK8sResource('overridepolicy', yamlContent);
+    return createKarmadaResource('overridepolicy', yamlContent);
 }
 
 /**
@@ -66,7 +66,7 @@ export async function createK8sOverridePolicy(yamlContent: string): Promise<void
  * @returns A Promise that resolves when the overridepolicy is deleted.
  */
 export async function deleteK8sOverridePolicy(overridePolicyName: string, namespace: string = 'default'): Promise<void> {
-    return deleteK8sResource('overridepolicy', overridePolicyName, namespace);
+    return deleteKarmadaResource('overridepolicy', overridePolicyName, namespace);
 }
 
 /**
