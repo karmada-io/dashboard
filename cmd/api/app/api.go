@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
 	cliflag "k8s.io/component-base/cli/flag"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/api/app/options"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
+	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/assistant"                // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"                     // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"                  // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusteroverridepolicy"    // Importing route packages forces route registration
@@ -52,6 +54,8 @@ import (
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
 	"github.com/karmada-io/dashboard/pkg/environment"
+	"github.com/karmada-io/dashboard/pkg/llm"
+	"github.com/karmada-io/dashboard/pkg/mcpclient"
 )
 
 // NewAPICommand creates a *cobra.Command object with default parameters
@@ -110,8 +114,63 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
 	)
 	ensureAPIServerConnectionOrDie()
-	serve(opts)
+
+	// Initialize LLM configuration
+	if opts.LLMAPIKey != "" {
+		llmConfig := &llm.Config{
+			LLMAPIKey:   opts.LLMAPIKey,
+			LLMModel:    opts.LLMModel,
+			LLMEndpoint: opts.LLMEndpoint,
+			Timeout:     opts.LLMTimeout,
+		}
+		llm.InitLLMConfig(llmConfig)
+
+		// Verify LLM client can be created
+		if _, err := llm.GetLLMClient(); err != nil {
+			klog.Warningf("LLM client initialization failed: %v", err)
+		} else {
+			klog.Infof("LLM client initialized successfully")
+		}
+	}
+
+	// Initialize MCP client (optional, factory pattern)
+	var mcpClient *mcpclient.MCPClient
+	if opts.EnableMCP {
+		var mcpOpts []mcpclient.MCPConfigOption
+
+		if opts.MCPTransportMode == "sse" {
+			mcpOpts = append(mcpOpts, mcpclient.WithSSEMode(opts.MCPSSEEndpoint))
+		} else {
+			karmadaMCPServerArguments := []string{
+				"--karmada-kubeconfig", opts.KarmadaKubeConfig,
+				"--karmada-context", opts.KarmadaContext,
+			}
+			if opts.SkipKarmadaApiserverTLSVerify {
+				karmadaMCPServerArguments = append(karmadaMCPServerArguments, "--skip-karmada-apiserver-tls-verify")
+			}
+			mcpOpts = append(mcpOpts,
+				mcpclient.WithStdioMode(opts.MCPServerPath),
+				mcpclient.WithStdioArguments(karmadaMCPServerArguments...),
+			)
+		}
+
+		var err error
+		mcpClient, err = mcpclient.NewMCPClientWithOptions(mcpOpts...)
+		if err != nil {
+			klog.Warningf("MCP initialization failed (non-fatal): %v", err)
+		} else {
+			klog.Infof("MCP client initialized successfully")
+		}
+	}
+
+	serve(opts, mcpClient)
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
+
+	// Cleanup on shutdown
+	if mcpClient != nil {
+		defer mcpClient.Close()
+	}
+
 	<-ctx.Done()
 	os.Exit(0)
 	return nil
@@ -135,7 +194,16 @@ func ensureAPIServerConnectionOrDie() {
 	klog.InfoS("Successful initial request to the Karmada apiserver", "version", karmadaVersionInfo.String())
 }
 
-func serve(opts *options.Options) {
+func serve(opts *options.Options, mcpClient *mcpclient.MCPClient) {
+	// Add middleware to inject MCP client into context
+	if mcpClient != nil {
+		router.Router().Use(func(c *gin.Context) {
+			c.Set("mcpClient", mcpClient)
+			c.Next()
+		})
+		klog.Infof("MCP client middleware registered")
+	}
+
 	insecureAddress := fmt.Sprintf("%s:%d", opts.InsecureBindAddress, opts.InsecurePort)
 	klog.V(1).InfoS("Listening and serving on", "address", insecureAddress)
 	go func() {
