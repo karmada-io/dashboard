@@ -200,8 +200,8 @@ export async function createOverridePolicyResourceTest<T extends keyof typeof RE
     await setMonacoEditorContent(page, config.yamlContent);
 
     // Wait for submit button to become enabled
-    await expect(page.locator('[role="dialog"] button:has-text("确 定")')).toBeEnabled();
-    await page.click('[role="dialog"] button:has-text("确 定")');
+    await expect(page.locator('[role="dialog"] button:has-text("submit")')).toBeEnabled();
+    await page.click('[role="dialog"] button:has-text("submit")');
 
     // Wait for API call to succeed
     await apiRequestPromise;

@@ -197,8 +197,8 @@ spec:
     await setMonacoEditorContent(page, modifiedYaml);
 
     // Wait for submit button to become enabled and click
-    await expect(page.locator('[role="dialog"] button:has-text("确 定")')).toBeEnabled();
-    await page.click('[role="dialog"] button:has-text("确 定")');
+    await expect(page.locator('[role="dialog"] button:has-text("submit")')).toBeEnabled();
+    await page.click('[role="dialog"] button:has-text("submit")');
 
     // Wait for edit success message or dialog to close
     try {
