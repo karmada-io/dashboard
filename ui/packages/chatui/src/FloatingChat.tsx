@@ -69,8 +69,8 @@ const STYLES = {
     padding: "12px",
   },
   button: {
-    width: "64px",
-    height: "64px",
+    width: "36px",
+    height: "36px",
     borderRadius: "50%",
     border: "none",
     boxShadow: "0 8px 24px rgba(24, 144, 255, 0.3)",
@@ -415,7 +415,7 @@ export const FloatingChat: React.FC<ChatUIProps> = ({
     const [vertical, horizontal] = position.split("-");
     return {
       position: "fixed" as const,
-      [vertical]: "20px",
+      [vertical]: "60px",
       [horizontal]: "20px",
       zIndex: 9999,
     };
