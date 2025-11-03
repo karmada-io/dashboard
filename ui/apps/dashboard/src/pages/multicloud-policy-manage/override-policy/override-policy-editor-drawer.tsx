@@ -86,7 +86,9 @@ const OverridePolicyEditorDrawer: FC<OverridePolicyEditorDrawerProps> = (
       footer={
         <div className={'flex flex-row justify-end'}>
           <Space>
-            <Button onClick={onClose}>取消</Button>
+            <Button onClick={onClose}>
+              {i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
+            </Button>
             <Button
               type="primary"
               onClick={async () => {
@@ -112,7 +114,7 @@ const OverridePolicyEditorDrawer: FC<OverridePolicyEditorDrawerProps> = (
                 }
               }}
             >
-              确定
+              {i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
             </Button>
           </Space>
         </div>
