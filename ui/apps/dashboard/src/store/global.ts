@@ -14,17 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { create } from 'zustand';
+import { create, StateCreator } from 'zustand';
+import { devtools } from "zustand/middleware";
 
 type GlobalState = {
-  karmadaTerminalOpen: boolean;
-  toggleKarmadaTerminal: () => void;
-  setKarmadaTerminalOpen: (isOpen: boolean) => void;
+    karmadaTerminalOpen: boolean;
+    toggleKarmadaTerminal: () => void;
+    setKarmadaTerminalOpen: (isOpen: boolean) => void;
 };
 
-export const useGlobalStore = create<GlobalState>((set) => ({
-  karmadaTerminalOpen: false,
-  toggleKarmadaTerminal: () =>
-    set((state) => ({ karmadaTerminalOpen: !state.karmadaTerminalOpen })),
-  setKarmadaTerminalOpen: (isOpen) => set({ karmadaTerminalOpen: isOpen }),
-}));
+const createGlobalSlice: StateCreator<
+    GlobalState,
+    [['zustand/devtools', never]],
+    [],
+    GlobalState
+> = (set) => ({
+    karmadaTerminalOpen: false,
+    toggleKarmadaTerminal: () =>
+        set((state) => ({karmadaTerminalOpen: !state.karmadaTerminalOpen}), undefined, 'global/toggleKarmadaTerminal'),
+    setKarmadaTerminalOpen: (isOpen) =>
+        set({karmadaTerminalOpen: isOpen}, undefined, 'global/setKarmadaTerminalOpen')
+})
+
+export const useGlobalStore =
+    process.env.NODE_ENV === 'development' ?
+        create<GlobalState>()(devtools(createGlobalSlice)) :
+        create<GlobalState>(createGlobalSlice)
