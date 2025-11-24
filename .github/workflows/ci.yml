@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: install Go
         uses: actions/setup-go@v6
         with:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Use Node.js 20
         uses: actions/setup-node@v6
         with:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags.
           # We need to guess version via git tags.
@@ -95,7 +95,7 @@ jobs:
           swap-storage: false
 
       - name: Checkout karmada repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: karmada-io/karmada
           path: karmada
@@ -114,7 +114,7 @@ jobs:
           kubectl get pods -A || echo "Get pods failed"
           kind get clusters || echo "Kind get clusters failed"
       - name: Checkout dashboard repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: karmada-dashboard
 
