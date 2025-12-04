@@ -6,8 +6,11 @@
   "scripts": {
     "dashboard:dev": "turbo dev --filter @karmada/dashboard",
     "demos:dev": "turbo dev --filter @karmada/demos",
-    "dashboard:build": "turbo build --filter @karmada/dashboard",
-    "prepare": "cd .. && husky install ui/.husky"
+    "prepare": "cd .. && husky install ui/.husky",
+    "dashboard": "pnpm --filter @karmada/dashboard",
+    "chatui": "pnpm --filter @karmada/chatui",
+    "terminal": "pnpm --filter @karmada/terminal",
+    "translators": "pnpm --filter @karmada/translators"
   },
   "engines": {
     "node": ">=18.14.0"
