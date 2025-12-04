@@ -18,7 +18,7 @@
   "license": "ISC",
   "devDependencies": {
     "tsup": "^8.5.1",
-    "vite": "^5.2.0",
+    "vite": "^7.2.6",
     "vitest": "^2.0.5"
   },
   "dependencies": {
