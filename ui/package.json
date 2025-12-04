@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dashboard:dev": "turbo dev --filter @karmada/dashboard",
+    "dashboard:build": "turbo build --filter @karmada/dashboard",
     "demos:dev": "turbo dev --filter @karmada/demos",
     "prepare": "cd .. && husky install ui/.husky",
     "dashboard": "pnpm --filter @karmada/dashboard",
