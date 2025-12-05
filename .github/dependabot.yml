@@ -23,9 +23,3 @@ updates:
   schedule:
     # Check for updates to npm packages every week
     interval: "weekly"
-
-- package-ecosystem: "npm"
-  directory: "/ui/apps/dashboard"
-  schedule:
-    # Check for updates to npm packages in dashboard app every week
-    interval: "weekly"
