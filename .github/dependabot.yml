@@ -18,14 +18,11 @@ updates:
     # Check for updates to Docker images every week
     interval: "weekly"
 
+# For a monorepo project, Dependabot only needs to be pointed to the root
+# directory that contains the pnpm-lock.yaml file.
+# For more details, see: https://github.com/dependabot/dependabot-core/pull/11487
 - package-ecosystem: "npm"
   directory: "/ui"
   schedule:
     # Check for updates to npm packages every week
-    interval: "weekly"
-
-- package-ecosystem: "npm"
-  directory: "/ui/apps/dashboard"
-  schedule:
-    # Check for updates to npm packages in dashboard app every week
     interval: "weekly"
