@@ -40,7 +40,7 @@ RUN cp /src/_output/bin/${TARGETOS}/${TARGETARCH}/karmada-mcp-server /src/karmad
 
 # Stage 2: Final Image
 # Use the scratch image as the final base image
-FROM alpine:3.22.2
+FROM alpine:3.23.0
 
 # Copy the compiled binary from the builder stage to the final image
 # The binary has been moved to /src/karmada-mcp-server in the previous stage
