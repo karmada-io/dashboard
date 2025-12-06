@@ -6,7 +6,7 @@
     "@babel/generator": "^7.25.6",
     "@babel/parser": "^7.25.6",
     "@babel/traverse": "^7.25.6",
-    "@babel/types": "^7.25.6",
+    "@babel/types": "^7.28.5",
     "@karmada/translators": "workspace:*",
     "chalk": "^4.1.2",
     "commander": "^12.1.0",
