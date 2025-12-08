@@ -268,8 +268,8 @@ importers:
         specifier: ^7.25.6
         version: 7.25.7
       '@babel/parser':
-        specifier: ^7.25.6
-        version: 7.25.7
+        specifier: ^7.28.5
+        version: 7.28.5
       '@babel/traverse':
         specifier: ^7.25.6
         version: 7.25.7
@@ -578,8 +578,8 @@ packages:
     resolution: {integrity: sha512-iYyACpW3iW8Fw+ZybQK+drQre+ns/tKpXbNESfrhNnPLIklLbXr7MYJ6gPEd0iETGLOK+SxMjVvKb/ffmk+FEw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/parser@7.25.7':
-    resolution: {integrity: sha512-aZn7ETtQsjjGG5HruveUK06cU3Hljuhd9Iojm4M8WWv3wLE6OkE5PWbDUkItmMgegmccaITudyuW5RPYrYlgWw==}
+  '@babel/parser@7.28.5':
+    resolution: {integrity: sha512-KKBU1VGYR7ORr3At5HAtUQ+TV3SzRCXmA/8OdDZiLDBIZxVyzXuztPjfLd3BV1PRAQGCMWWSHYhL0F8d5uHBDQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -5225,7 +5225,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.23.6
       '@babel/helper-module-transforms': 7.24.5(@babel/core@7.24.5)
       '@babel/helpers': 7.24.5
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/template': 7.24.0
       '@babel/traverse': 7.25.7
       '@babel/types': 7.28.5
@@ -5245,7 +5245,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.25.7
       '@babel/helper-module-transforms': 7.25.7(@babel/core@7.25.7)
       '@babel/helpers': 7.25.7
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/template': 7.25.7
       '@babel/traverse': 7.25.7
       '@babel/types': 7.28.5
@@ -5364,7 +5364,7 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.1.1
 
-  '@babel/parser@7.25.7':
+  '@babel/parser@7.28.5':
     dependencies:
       '@babel/types': 7.28.5
 
@@ -5393,20 +5393,20 @@ snapshots:
   '@babel/template@7.24.0':
     dependencies:
       '@babel/code-frame': 7.24.2
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
 
   '@babel/template@7.25.7':
     dependencies:
       '@babel/code-frame': 7.25.7
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
 
   '@babel/traverse@7.25.7':
     dependencies:
       '@babel/code-frame': 7.25.7
       '@babel/generator': 7.25.7
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/template': 7.25.7
       '@babel/types': 7.28.5
       debug: 4.3.5
@@ -6347,7 +6347,7 @@ snapshots:
 
   '@types/babel__core@7.20.5':
     dependencies:
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
       '@types/babel__generator': 7.6.8
       '@types/babel__template': 7.4.4
@@ -6359,7 +6359,7 @@ snapshots:
 
   '@types/babel__template@7.4.4':
     dependencies:
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
 
   '@types/babel__traverse@7.20.6':
