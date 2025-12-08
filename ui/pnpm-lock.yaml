@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       dayjs:
-        specifier: ^1.11.11
-        version: 1.11.11
+        specifier: ^1.11.19
+        version: 1.11.19
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.6
@@ -2505,6 +2505,9 @@ packages:
 
   dayjs@1.11.11:
     resolution: {integrity: sha512-okzr3f11N6WuqYtZSvm+F776mB41wRZMhKP+hc34YdW+KmtYYK9iqvHSwo2k9FEH3fhGXvOPV6yz2IcSrfRUDg==}
+
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
@@ -7209,6 +7212,8 @@ snapshots:
       is-data-view: 1.0.1
 
   dayjs@1.11.11: {}
+
+  dayjs@1.11.19: {}
 
   debug@3.2.7:
     dependencies:
