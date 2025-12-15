@@ -33,7 +33,7 @@ jobs:
           pnpm install -w
           pnpm run dashboard:build
       - name: upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           path: ui/apps/dashboard/dist
           name: dashboard_artifact

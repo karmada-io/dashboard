@@ -205,7 +205,7 @@ jobs:
             API_PID=$(cat karmada-dashboard/.api.pid)
             kill $API_PID 2>/dev/null || echo "API process already stopped"
           fi
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-${{ matrix.k8s }}
