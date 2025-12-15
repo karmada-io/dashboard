@@ -74,7 +74,7 @@ jobs:
       - name: build karmada-dashboard-web binary
         run: BUILD_PLATFORMS=${{ steps.misc.outputs.platforms }} make karmada-dashboard-web
       - name: download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: dashboard_artifact
           path: _output/bin/dist
