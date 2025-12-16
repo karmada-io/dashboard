@@ -34,6 +34,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
+
+	karmadaclient "github.com/karmada-io/dashboard/pkg/client"
 )
 
 var (
@@ -219,7 +221,7 @@ func (v *resourceVerber) Get(kind string, namespace string, name string) (runtim
 }
 
 func VerberClient(request *http.Request) (ResourceVerber, error) {
-	config, err := configFromRequest(request)
+	config, err := karmadaclient.ConfigForMemberClusterFromRequest(request)
 	if err != nil {
 		return nil, err
 	}
