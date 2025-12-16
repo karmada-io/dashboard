@@ -18,6 +18,7 @@ import { createInstance } from 'i18next';
 import { Icons } from '@/components/icons';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
+import { ReactNode } from 'react';
 
 const i18nInstance = createInstance({});
 
@@ -32,7 +33,7 @@ export async function setLang(lang: string) {
 
 interface LangConfig {
   title: string;
-  icon: JSX.Element;
+  icon: ReactNode;
   sidebarWidth: number;
 }
 
