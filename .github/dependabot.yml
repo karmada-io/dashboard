@@ -26,3 +26,12 @@ updates:
   schedule:
     # Check for updates to npm packages every week
     interval: "weekly"
+  groups:
+    # https://github.com/karmada-io/dashboard/pull/330
+    # update react related packages together
+    react-related:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "@types/react"
+        - "@types/react-dom"
