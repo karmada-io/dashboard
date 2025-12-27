@@ -68,7 +68,7 @@ func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}
 		configMap, ok := obj.(*v1.ConfigMap)
 		return ok && configMap.Namespace == configNamespace && configMap.Name == configName
 	}
-	onAdd := func(obj interface{}) {
+	onAdd := func(obj interface{}, _ bool) {
 		configMap := obj.(*v1.ConfigMap)
 		klog.Infof("ConfigMap %s Added", configMap.Name)
 		klog.Infof("ConfigMap Data is \n%+v", configMap.Data[GetConfigKey()])
