@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
+import { shallow } from 'zustand/shallow';
 import { ConfigKind } from '@/services/base.ts';
 import { FilterState, EditorState } from './types.ts';
 
@@ -33,7 +34,7 @@ type Actions = {
 
 export type Store = State & Actions;
 
-export const useStore = create<Store>((set) => ({
+export const useStore = createWithEqualityFn<Store>()((set) => ({
   filter: {
     kind: ConfigKind.ConfigMap,
     selectedWorkspace: '',
@@ -91,4 +92,4 @@ export const useStore = create<Store>((set) => ({
       },
     });
   },
-}));
+}),shallow);
