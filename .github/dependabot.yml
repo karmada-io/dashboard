@@ -4,19 +4,29 @@
 # For more information and customization options, please refer to the Dependabot documentation:
 # Documentation: https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically
 # Configuration options: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+# All dependency checks are scheduled for every Monday at 00:00 UTC.
+# This fixed schedule allows maintainers to handle updates at a predictable time,
+# avoiding unexpected interruptions during active development.
 version: 2
 updates:
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
-    # Check for updates to GitHub Actions every week
+    # Check for updates every Monday at 00:00 UTC
     interval: "weekly"
+    day: "monday"
+    time: "00:00"
+    timezone: "UTC"
     
 - package-ecosystem: "docker"
   directory: "/cluster/images/"
   schedule:
-    # Check for updates to Docker images every week
+    # Check for updates every Monday at 00:00 UTC
     interval: "weekly"
+    day: "monday"
+    time: "00:00"
+    timezone: "UTC"
 
 # For a monorepo project, Dependabot only needs to be pointed to the root
 # directory that contains the pnpm-lock.yaml file.
@@ -24,8 +34,11 @@ updates:
 - package-ecosystem: "npm"
   directory: "/ui"
   schedule:
-    # Check for updates to npm packages every week
+    # Check for updates every Monday at 00:00 UTC
     interval: "weekly"
+    day: "monday"
+    time: "00:00"
+    timezone: "UTC"
   groups:
     # https://github.com/karmada-io/dashboard/pull/330
     # update react related packages together
@@ -35,3 +48,18 @@ updates:
         - "react-dom"
         - "@types/react"
         - "@types/react-dom"
+
+- package-ecosystem: "gomod"
+  directory: "/"
+  schedule:
+    # Check for updates every Monday at 00:00 UTC
+    interval: "weekly"
+    day: "monday"
+    time: "00:00"
+    timezone: "UTC"
+  ignore:
+    # k8s.io and sigs.k8s.io dependencies should be kept in sync with
+    # github.com/karmada-io/karmada version. Update these when upgrading
+    # the karmada dependency version.
+    - dependency-name: "k8s.io/*"
+    - dependency-name: "sigs.k8s.io/*"
