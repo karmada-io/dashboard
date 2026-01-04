@@ -322,8 +322,8 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0(@xterm/xterm@5.5.0)
       '@xterm/addon-ligatures':
-        specifier: ^0.9.0
-        version: 0.9.0(@xterm/xterm@5.5.0)
+        specifier: ^0.10.0
+        version: 0.10.0
       '@xterm/addon-search':
         specifier: ^0.15.0
         version: 0.15.0(@xterm/xterm@5.5.0)
@@ -2241,11 +2241,9 @@ packages:
     peerDependencies:
       '@xterm/xterm': ^5.0.0
 
-  '@xterm/addon-ligatures@0.9.0':
-    resolution: {integrity: sha512-zVV1AHV1SIm/rdzR5VDPyg+qUnR1SjH4H75iXiB7r6YDa1yEHIqc/EwnUIwz+yeeZozkh8hjbH80L7luEgtxtQ==}
+  '@xterm/addon-ligatures@0.10.0':
+    resolution: {integrity: sha512-/Few8ZSHMib7sGjRJoc5l7bCtEB9XJfkNofvPpOcWADxKaUl8og8P172j67OoACSNJAXqeCLIuvj8WFCBkcTxg==}
     engines: {node: '>8.0.0'}
-    peerDependencies:
-      '@xterm/xterm': ^5.0.0
 
   '@xterm/addon-search@0.15.0':
     resolution: {integrity: sha512-ZBZKLQ+EuKE83CqCmSSz5y1tx+aNOCUaA7dm6emgOX+8J9H1FWXZyrKfzjwzV+V14TV3xToz1goIeRhXBS5qjg==}
@@ -7096,9 +7094,8 @@ snapshots:
     dependencies:
       '@xterm/xterm': 5.5.0
 
-  '@xterm/addon-ligatures@0.9.0(@xterm/xterm@5.5.0)':
+  '@xterm/addon-ligatures@0.10.0':
     dependencies:
-      '@xterm/xterm': 5.5.0
       font-finder: 1.1.0
       font-ligatures: 1.4.1
 
