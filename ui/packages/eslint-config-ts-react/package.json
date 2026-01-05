@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@karmada/eslint-config-ts": "workspace:*",
-    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.48.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jest": "^27.1.3",
