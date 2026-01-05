@@ -28,7 +28,7 @@
     "@changesets/cli": "^2.29.8",
     "@types/node": "^20.12.11",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.7",
+    "lint-staged": "^16.2.7",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "turbo": "^2.7.2"
