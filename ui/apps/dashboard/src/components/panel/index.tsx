@@ -17,30 +17,22 @@ limitations under the License.
 import { FC, ReactNode, useMemo } from 'react';
 import { useMatches } from 'react-router-dom';
 import { Breadcrumb } from 'antd';
+import type { BreadcrumbProps } from 'antd';
 import { getRoutes, IRouteObjectHandle } from '@/routes/route.tsx';
-import * as React from 'react';
 
 interface IPanelProps {
   children: ReactNode;
 }
 
-interface MenuItem {
-  key?: React.Key;
-  title?: React.ReactNode;
-  label?: React.ReactNode;
-  path?: string;
-  href?: string;
-}
-
 const Panel: FC<IPanelProps> = (props) => {
   const { children } = props;
   const matches = useMatches();
-  const breadcrumbs = useMemo(() => {
-    if (!matches || matches.length === 0) return [] as MenuItem[];
+  const breadcrumbs = useMemo<NonNullable<BreadcrumbProps['items']>>(() => {
+    if (!matches || matches.length === 0) return [];
     const filteredMatches = matches.filter((m) => Boolean(m.handle));
     let idx = 0;
     let ptr = getRoutes()[0];
-    const menuItems: MenuItem[] = [];
+    const menuItems: NonNullable<BreadcrumbProps['items']> = [];
     while (idx < filteredMatches.length) {
       const { isPage, sidebarKey: _sideBarKey } = filteredMatches[idx]
         .handle as IRouteObjectHandle;
