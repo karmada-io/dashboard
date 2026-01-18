@@ -23,6 +23,7 @@ import {
     getSecretNameFromYaml,
     deleteK8sSecret,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -45,12 +46,7 @@ test('should edit secret successfully', async ({ page }) => {
     await page.click('text=ConfigMaps & Secrets');
 
     // Click visible Secret tab
-    const secretTab = page.locator('role=option[name="Secret"]');
-    await secretTab.waitFor({ state: 'visible', timeout: 30000 });
-    await secretTab.click();
-
-    // Verify selected state
-    await expect(secretTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Secret');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for secret to appear in list and get target row

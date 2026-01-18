@@ -25,6 +25,7 @@ import {
     debugScreenshot,
     waitForResourceInList,
     getResourceNameFromYaml,
+    selectSegmentedOption,
     createKarmadaApiClient
 } from '../../test-utils';
 import type { DeepRequired } from '../../test-utils';
@@ -36,6 +37,7 @@ export {
     debugScreenshot,
     waitForResourceInList,
     getResourceNameFromYaml,
+    selectSegmentedOption,
     createKarmadaApiClient
 };
 
@@ -180,12 +182,7 @@ export async function createOverridePolicyResourceTest<T extends keyof typeof RE
     await overridePolicyMenuItem.click();
 
     // Click visible resource tab
-    const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-    await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-    await resourceTab.click();
-
-    // Verify selected state
-    await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, config.tabName);
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
     await page.click('button:has-text("Add")');
@@ -271,12 +268,7 @@ export async function deleteOverridePolicyResourceTest<T extends keyof typeof RE
     await overridePolicyMenuItem.click();
 
     // Click visible resource tab
-    const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-    await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-    await resourceTab.click();
-
-    // Verify selected state
-    await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, config.tabName);
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
@@ -345,12 +337,7 @@ export async function displayOverridePolicyResourceListTest(
     await overridePolicyMenuItem.click();
 
     // Click visible resource tab
-    const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-    await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-    await resourceTab.click();
-
-    // Verify selected state
-    await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, config.tabName);
 
     // Verify resource list table is visible
     const table = page.locator('table');
@@ -393,12 +380,7 @@ export async function viewOverridePolicyResourceTest<T extends keyof typeof RESO
     await overridePolicyMenuItem.click();
 
     // Click visible resource tab
-    const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-    await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-    await resourceTab.click();
-
-    // Verify selected state
-    await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, config.tabName);
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 

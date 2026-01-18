@@ -25,6 +25,7 @@ import {
     getCronJobNameFromYaml,
     deleteK8sCronJob,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -47,12 +48,7 @@ test('should edit cronjob successfully', async ({ page }) => {
     await page.click('text=Workloads');
 
     // Click visible Cronjob tab
-    const cronjobTab = page.locator('role=option[name="Cronjob"]');
-    await cronjobTab.waitFor({ state: 'visible', timeout: 30000 });
-    await cronjobTab.click();
-
-    // Verify selected state
-    await expect(cronjobTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Cronjob');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for cronjob to appear in list and get target row

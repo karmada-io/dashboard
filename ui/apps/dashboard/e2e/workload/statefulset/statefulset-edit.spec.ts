@@ -23,6 +23,7 @@ import {
     getStatefulSetNameFromYaml,
     deleteK8sStatefulSet,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -45,12 +46,7 @@ test('should edit statefulset successfully', async ({ page }) => {
     await page.click('text=Workloads');
     
     // Click visible Statefulset tab
-    const statefulsetTab = page.locator('role=option[name="Statefulset"]');
-    await statefulsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await statefulsetTab.click();
-    
-    // Verify selected state
-    await expect(statefulsetTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Statefulset');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for statefulset to appear in list and get target row
