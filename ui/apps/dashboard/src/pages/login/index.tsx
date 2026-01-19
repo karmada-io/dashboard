@@ -45,7 +45,7 @@ const LoginPage = () => {
         >
           {/*<Alert message="参考文档生成jwt token" type="info"/>*/}
           <Alert
-            message={
+            title={
               <>
                 <Collapse
                   bordered={true}
