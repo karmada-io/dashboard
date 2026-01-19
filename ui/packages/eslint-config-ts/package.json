@@ -19,7 +19,7 @@
     "@typescript-eslint/parser": "^8.48.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-log-filenames": "^1.0.6",
-    "eslint-plugin-prettier": "^5.5.4"
+    "eslint-plugin-prettier": "^5.5.5"
   },
   "devDependencies": {
     "@types/eslint": "^9.6.1"
