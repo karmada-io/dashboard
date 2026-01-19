@@ -33,6 +33,12 @@ test('should delete a namespace', async ({ page }) => {
     await page.click('label:has-text("No")');
     await page.click('button:has-text("Submit")');
 
+
+    const namespaceModal = page.getByText('AddNameSkip automatic')
+    await expect(namespaceModal).toBeHidden({
+        timeout: 60000,
+    });
+
     // Use search box to confirm creation success
     const searchBox = page.getByPlaceholder('Search by Name');
     await searchBox.fill(namespaceName);
