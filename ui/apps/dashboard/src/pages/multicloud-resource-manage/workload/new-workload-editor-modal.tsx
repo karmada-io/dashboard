@@ -52,7 +52,7 @@ const NewWorkloadEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
       width={1000}
       okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
       cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       onOk={async () => {
         // await onOk()
         try {
