@@ -199,3 +199,123 @@ export async function waitForResourceInList(page: Page, resourceName: string): P
 
     return targetRow;
 }
+
+function escapeRegExp(text: string): string {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export async function selectSegmentedOption(page: Page, optionName: string): Promise<void> {
+    const optionNameRegex = new RegExp(`^\\s*${escapeRegExp(optionName)}\\s*$`);
+    const segmentedCandidates = page.locator('.ant-segmented').filter({
+        has: page.locator('.ant-segmented-item', { hasText: optionNameRegex })
+    });
+    const segmentedCandidatesCount = await segmentedCandidates.count();
+
+    let segmented: Locator | null = null;
+    for (let i = 0; i < Math.min(segmentedCandidatesCount, 10); i++) {
+        const candidate = segmentedCandidates.nth(i);
+        if (await candidate.isVisible()) {
+            segmented = candidate;
+            break;
+        }
+    }
+
+    if (!segmented) {
+        const allSegmented = page.locator('.ant-segmented');
+        const allSegmentedCount = await allSegmented.count();
+        for (let i = 0; i < Math.min(allSegmentedCount, 10); i++) {
+            const candidate = allSegmented.nth(i);
+            if (await candidate.isVisible()) {
+                segmented = candidate;
+                break;
+            }
+        }
+    }
+
+    if (segmented) {
+        const item = segmented.locator('.ant-segmented-item').filter({ hasText: optionNameRegex }).first();
+        if ((await item.count()) > 0) {
+            await item.waitFor({ state: 'visible', timeout: 30000 });
+            await item.click();
+            await expectSegmentedOptionSelectedInScope(segmented, optionName);
+            return;
+        }
+
+        const fallback = segmented
+            .getByRole('radio', { name: optionName })
+            .or(segmented.getByRole('tab', { name: optionName }))
+            .or(segmented.getByRole('button', { name: optionName }))
+            .or(segmented.getByText(optionName));
+        await fallback.first().waitFor({ state: 'visible', timeout: 30000 });
+        await fallback.first().click();
+        await expectSegmentedOptionSelectedInScope(segmented, optionName);
+        return;
+    }
+
+    const pageFallback = page
+        .getByRole('radio', { name: optionName })
+        .or(page.getByRole('tab', { name: optionName }))
+        .or(page.getByRole('button', { name: optionName }))
+        .or(page.getByText(optionName));
+    await pageFallback.first().waitFor({ state: 'visible', timeout: 30000 });
+    await pageFallback.first().click();
+    await expectSegmentedOptionSelected(page, optionName);
+}
+
+export async function expectSegmentedOptionSelected(page: Page, optionName: string): Promise<void> {
+    const optionNameRegex = new RegExp(`^\\s*${escapeRegExp(optionName)}\\s*$`);
+    const segmentedCandidates = page.locator('.ant-segmented').filter({
+        has: page.locator('.ant-segmented-item', { hasText: optionNameRegex })
+    });
+    const segmentedCandidatesCount = await segmentedCandidates.count();
+
+    let segmented: Locator | null = null;
+    for (let i = 0; i < Math.min(segmentedCandidatesCount, 10); i++) {
+        const candidate = segmentedCandidates.nth(i);
+        if (await candidate.isVisible()) {
+            segmented = candidate;
+            break;
+        }
+    }
+
+    if (segmented) {
+        await expectSegmentedOptionSelectedInScope(segmented, optionName);
+        return;
+    }
+
+    const radio = page.getByRole('radio', { name: optionName, exact: true });
+    if ((await radio.count()) > 0) {
+        await expect(radio.first()).toBeChecked({ timeout: 30000 });
+        return;
+    }
+
+    const tab = page.getByRole('tab', { name: optionName, exact: true });
+    if ((await tab.count()) > 0) {
+        await expect(tab.first()).toHaveAttribute('aria-selected', 'true', { timeout: 30000 });
+        return;
+    }
+
+    const option = page.getByRole('option', { name: optionName, exact: true });
+    if ((await option.count()) > 0) {
+        await expect(option.first()).toHaveAttribute('aria-selected', 'true', { timeout: 30000 });
+        return;
+    }
+
+    const segmentedItem = page.locator('.ant-segmented-item').filter({ hasText: optionNameRegex }).first();
+    if ((await segmentedItem.count()) > 0) {
+        await expect(segmentedItem).toHaveClass(/ant-segmented-item-selected/, { timeout: 30000 });
+    }
+}
+
+async function expectSegmentedOptionSelectedInScope(scope: Locator, optionName: string): Promise<void> {
+    const optionNameRegex = new RegExp(`^\\s*${escapeRegExp(optionName)}\\s*$`);
+    const selectedItem = scope.locator('.ant-segmented-item-selected').filter({ hasText: optionNameRegex }).first();
+    if ((await selectedItem.count()) > 0) {
+        await expect(selectedItem).toBeVisible({ timeout: 30000 });
+        return;
+    }
+
+    const item = scope.locator('.ant-segmented-item').filter({ hasText: optionNameRegex }).first();
+    await expect(item).toHaveCount(1, { timeout: 30000 });
+    await expect(item).toHaveClass(/ant-segmented-item-selected/, { timeout: 30000 });
+}

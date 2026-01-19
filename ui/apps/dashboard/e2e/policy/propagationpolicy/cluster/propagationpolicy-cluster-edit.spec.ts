@@ -22,6 +22,7 @@ import {
     getClusterPropagationPolicyNameFromYaml,
     deleteK8sClusterPropagationPolicy,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -76,12 +77,7 @@ test('should edit clusterpropagationpolicy successfully', async ({ page }) => {
     await propagationPolicyMenuItem.click();
 
     // Click Cluster level tab
-    const clusterLevelTab = page.locator('role=option[name="Cluster level"]');
-    await clusterLevelTab.waitFor({ state: 'visible', timeout: 30000 });
-    await clusterLevelTab.click();
-
-    // Verify selected state
-    await expect(clusterLevelTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Cluster level');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for clusterpropagationpolicy to appear in list and get target row

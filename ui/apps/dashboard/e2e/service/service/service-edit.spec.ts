@@ -24,6 +24,7 @@ import {
     deleteK8sService,
     setMonacoEditorContent,
     waitForResourceInList,
+    expectSegmentedOptionSelected,
     debugScreenshot,
     DeepRequired
 } from './test-utils';
@@ -43,7 +44,7 @@ test('should edit service successfully', async ({ page }) => {
 
     // Navigate to service page
     await page.click('text=Services');
-    await expect(page.getByRole('radio', { name: 'Service' })).toBeChecked();
+    await expectSegmentedOptionSelected(page, 'Service');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for service to appear in list and get target row

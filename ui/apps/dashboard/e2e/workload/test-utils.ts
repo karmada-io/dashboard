@@ -25,6 +25,8 @@ import {
     debugScreenshot,
     waitForResourceInList,
     getResourceNameFromYaml,
+    selectSegmentedOption,
+    expectSegmentedOptionSelected,
     createKarmadaApiClient
 } from '../test-utils';
 import type { DeepRequired } from '../test-utils';
@@ -36,6 +38,8 @@ export {
     debugScreenshot,
     waitForResourceInList,
     getResourceNameFromYaml,
+    selectSegmentedOption,
+    expectSegmentedOptionSelected,
     createKarmadaApiClient
 };
 
@@ -224,16 +228,9 @@ export async function createWorkloadResourceTest<T extends keyof typeof RESOURCE
     await page.click('text=Workloads');
 
     if (config.tabName) {
-        // Click visible resource tab (for daemonset, cronjob)
-        const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-        await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-        await resourceTab.click();
-
-        // Verify selected state
-        await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+        await selectSegmentedOption(page, config.tabName);
     } else {
-        // For deployment, check the default radio selection
-        await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
+        await expectSegmentedOptionSelected(page, 'Deployment');
     }
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
@@ -315,16 +312,9 @@ export async function deleteWorkloadResourceTest<T extends keyof typeof RESOURCE
     await page.click('text=Workloads');
 
     if (config.tabName) {
-        // Click visible resource tab (for daemonset, cronjob)
-        const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-        await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-        await resourceTab.click();
-
-        // Verify selected state
-        await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+        await selectSegmentedOption(page, config.tabName);
     } else {
-        // For deployment, check the default radio selection
-        await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
+        await expectSegmentedOptionSelected(page, 'Deployment');
     }
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
@@ -390,17 +380,9 @@ export async function displayWorkloadResourceListTest(
     await page.click('text=Workloads');
 
     if (config.tabName) {
-        // Click visible resource tab (for daemonset, cronjob)
-        const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-        await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-        await resourceTab.click();
-
-        // Verify selected state
-        await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+        await selectSegmentedOption(page, config.tabName);
     } else {
-        // Wait for page to load and verify Deployment is selected
-        const deploymentTab = page.getByRole('radio', { name: 'Deployment' });
-        await expect(deploymentTab).toBeChecked();
+        await expectSegmentedOptionSelected(page, 'Deployment');
     }
 
     // Verify resource list table is visible
@@ -439,16 +421,9 @@ export async function viewWorkloadResourceTest<T extends keyof typeof RESOURCE_C
     await page.click('text=Workloads');
 
     if (config.tabName) {
-        // Click visible resource tab (for daemonset, cronjob)
-        const resourceTab = page.locator(`role=option[name="${config.tabName}"]`);
-        await resourceTab.waitFor({ state: 'visible', timeout: 30000 });
-        await resourceTab.click();
-
-        // Verify selected state
-        await expect(resourceTab).toHaveAttribute('aria-selected', 'true');
+        await selectSegmentedOption(page, config.tabName);
     } else {
-        // For deployment, check the default radio selection
-        await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
+        await expectSegmentedOptionSelected(page, 'Deployment');
     }
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });

@@ -23,6 +23,7 @@ import {
     getDaemonSetNameFromYaml,
     deleteK8sDaemonSet,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -45,12 +46,7 @@ test('should edit daemonset successfully', async ({ page }) => {
     await page.click('text=Workloads');
 
     // Click visible Daemonset tab
-    const daemonsetTab = page.locator('role=option[name="Daemonset"]');
-    await daemonsetTab.waitFor({ state: 'visible', timeout: 30000 });
-    await daemonsetTab.click();
-
-    // Verify selected state
-    await expect(daemonsetTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Daemonset');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for daemonset to appear in list and get target row

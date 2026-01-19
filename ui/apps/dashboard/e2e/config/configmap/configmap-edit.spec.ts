@@ -23,6 +23,7 @@ import {
     getConfigMapNameFromYaml,
     deleteK8sConfigMap,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -45,12 +46,7 @@ test('should edit configmap successfully', async ({ page }) => {
     await page.click('text=ConfigMaps & Secrets');
 
     // Click visible ConfigMap tab
-    const configMapTab = page.locator('role=option[name="ConfigMap"]');
-    await configMapTab.waitFor({ state: 'visible', timeout: 30000 });
-    await configMapTab.click();
-
-    // Verify selected state
-    await expect(configMapTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'ConfigMap');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for configmap to appear in list and get target row

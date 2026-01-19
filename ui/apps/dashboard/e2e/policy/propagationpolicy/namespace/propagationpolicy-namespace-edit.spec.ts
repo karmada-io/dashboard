@@ -22,6 +22,7 @@ import {
     getPropagationPolicyNameFromYaml,
     deleteK8sPropagationPolicy,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -77,12 +78,7 @@ test('should edit propagationpolicy successfully', async ({ page }) => {
     await propagationPolicyMenuItem.click();
 
     // Click Namespace level tab
-    const namespaceLevelTab = page.locator('role=option[name="Namespace level"]');
-    await namespaceLevelTab.waitFor({ state: 'visible', timeout: 30000 });
-    await namespaceLevelTab.click();
-
-    // Verify selected state
-    await expect(namespaceLevelTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Namespace level');
 
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 

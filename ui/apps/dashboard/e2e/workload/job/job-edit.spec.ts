@@ -23,6 +23,7 @@ import {
     getJobNameFromYaml,
     deleteK8sJob,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -45,12 +46,7 @@ test('should edit job successfully', async ({ page }) => {
     await page.click('text=Workloads');
     
     // Click visible Job tab
-    const jobTab = page.locator('role=option[name="Job"]');
-    await jobTab.waitFor({ state: 'visible', timeout: 30000 });
-    await jobTab.click();
-    
-    // Verify selected state
-    await expect(jobTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Job');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for job to appear in list and get target row

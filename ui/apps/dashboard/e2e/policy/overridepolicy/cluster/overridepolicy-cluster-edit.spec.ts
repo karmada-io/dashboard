@@ -22,6 +22,7 @@ import {
     getClusterOverridePolicyNameFromYaml,
     deleteK8sClusterOverridePolicy,
     setMonacoEditorContent,
+    selectSegmentedOption,
     waitForResourceInList,
     debugScreenshot,
     DeepRequired
@@ -77,12 +78,7 @@ test('should edit cluster overridepolicy successfully', async ({ page }) => {
     await overridePolicyMenuItem.click();
 
     // Click Cluster level tab
-    const clusterLevelTab = page.locator('role=option[name="Cluster level"]');
-    await clusterLevelTab.waitFor({ state: 'visible', timeout: 30000 });
-    await clusterLevelTab.click();
-
-    // Verify selected state
-    await expect(clusterLevelTab).toHaveAttribute('aria-selected', 'true');
+    await selectSegmentedOption(page, 'Cluster level');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for cluster overridepolicy to appear in list and get target row

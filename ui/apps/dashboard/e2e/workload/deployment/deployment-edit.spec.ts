@@ -24,6 +24,7 @@ import {
     deleteK8sDeployment,
     setMonacoEditorContent,
     waitForResourceInList,
+    expectSegmentedOptionSelected,
     debugScreenshot,
     DeepRequired
 } from './test-utils';
@@ -43,7 +44,7 @@ test('should edit deployment successfully', async ({ page }) => {
     
     // Navigate to workload page
     await page.click('text=Workloads');
-    await expect(page.getByRole('radio', { name: 'Deployment' })).toBeChecked();
+    await expectSegmentedOptionSelected(page, 'Deployment');
     await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
 
     // Wait for deployment to appear in list and get target row
