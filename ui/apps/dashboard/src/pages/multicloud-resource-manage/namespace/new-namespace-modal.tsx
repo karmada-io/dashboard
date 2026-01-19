@@ -55,7 +55,7 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
         form.resetFields();
         onCancel && (await onCancel());
       }}
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Form
         form={form}

@@ -101,7 +101,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
       width={800}
       okText={i18nInstance.t('38cf16f2204ffab8a6e0187070558721', '确定')}
       cancelText={i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       confirmLoading={confirmLoading}
       onOk={async () => {
         try {
