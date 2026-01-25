@@ -30,10 +30,10 @@ import (
 )
 
 // GetDeploymentTopology returns the propagation topology for a Deployment.
-func GetDeploymentTopology(k8sClient client.Interface, karmadaClient karmadaclientset.Interface, namespace, name string) (*ResourceTopology, error) {
+func GetDeploymentTopology(ctx context.Context, k8sClient client.Interface, karmadaClient karmadaclientset.Interface, namespace, name string) (*ResourceTopology, error) {
 	klog.V(4).InfoS("Building topology", "namespace", namespace, "name", name)
 
-	deployment, err := k8sClient.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	deployment, err := k8sClient.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get deployment %s/%s: %w", namespace, name, err)
 	}
@@ -49,12 +49,12 @@ func GetDeploymentTopology(k8sClient client.Interface, karmadaClient karmadaclie
 
 	// Karmada binding naming: "<name>-<kind>"
 	bindingName := name + "-deployment"
-	rb, err := karmadaClient.WorkV1alpha2().ResourceBindings(namespace).Get(context.TODO(), bindingName, metav1.GetOptions{})
+	rb, err := karmadaClient.WorkV1alpha2().ResourceBindings(namespace).Get(ctx, bindingName, metav1.GetOptions{})
 	if err != nil {
 		klog.V(4).InfoS("ResourceBinding not found", "name", bindingName)
 		return topology, nil
 	}
-	topology.Bindings = append(topology.Bindings, *rb)
+	topology.Binding = rb
 
 	// Get policy from binding labels
 	policyName := rb.Labels["propagationpolicy.karmada.io/name"]
@@ -63,19 +63,22 @@ func GetDeploymentTopology(k8sClient client.Interface, karmadaClient karmadaclie
 		policyNS = namespace
 	}
 	if policyName != "" {
-		policy, err := karmadaClient.PolicyV1alpha1().PropagationPolicies(policyNS).Get(context.TODO(), policyName, metav1.GetOptions{})
+		policy, err := karmadaClient.PolicyV1alpha1().PropagationPolicies(policyNS).Get(ctx, policyName, metav1.GetOptions{})
 		if err == nil {
 			topology.Policy = policy
+		} else {
+			klog.V(4).InfoS("Could not retrieve PropagationPolicy", "namespace", policyNS, "name", policyName, "error", err)
 		}
 	}
 
 	// Get Work objects from execution namespaces
 	for _, status := range rb.Status.AggregatedStatus {
 		execNS := "karmada-es-" + status.ClusterName
-		works, err := karmadaClient.WorkV1alpha1().Works(execNS).List(context.TODO(), metav1.ListOptions{
+		works, err := karmadaClient.WorkV1alpha1().Works(execNS).List(ctx, metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("resourcebinding.karmada.io/uid=%s", rb.UID),
 		})
 		if err != nil {
+			klog.Warningf("Failed to list works in execution namespace %s: %v", execNS, err)
 			continue
 		}
 
@@ -93,7 +96,7 @@ func GetDeploymentTopology(k8sClient client.Interface, karmadaClient karmadaclie
 
 func deriveSyncStatus(work *karmadaworkv1alpha1.Work) string {
 	for _, cond := range work.Status.Conditions {
-		if cond.Type == "Applied" {
+		if cond.Type == karmadaworkv1alpha1.WorkApplied {
 			return string(cond.Status)
 		}
 	}

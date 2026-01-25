@@ -34,6 +34,6 @@ type ClusterStatus struct {
 type ResourceTopology struct {
 	Resource        *unstructured.Unstructured               `json:"resource"`
 	Policy          *karmadapolicyv1alpha1.PropagationPolicy `json:"policy,omitempty"`
-	Bindings        []karmadaworkv1alpha2.ResourceBinding    `json:"bindings,omitempty"`
+	Binding         *karmadaworkv1alpha2.ResourceBinding     `json:"binding,omitempty"`
 	ClusterStatuses []ClusterStatus                          `json:"clusterStatuses,omitempty"`
 }

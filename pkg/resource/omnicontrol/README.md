@@ -14,14 +14,16 @@ This enables users to trace exactly where a resource is distributed and identify
 ## Usage
 
 ```go
-topology, err := omnicontrol.GetDeploymentTopology(k8sClient, karmadaClient, "default", "nginx")
+topology, err := omnicontrol.GetDeploymentTopology(ctx, k8sClient, karmadaClient, "default", "nginx")
 if err != nil {
     // handle error
 }
 
-// Access the connected resources
 if topology.Policy != nil {
     fmt.Println("Policy:", topology.Policy.Name)
+}
+if topology.Binding != nil {
+    fmt.Println("Binding:", topology.Binding.Name)
 }
 fmt.Println("Clusters:", len(topology.ClusterStatuses))
 ```
