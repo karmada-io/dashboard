@@ -69,6 +69,9 @@ export const MainLayout: FC = () => {
       
       <FloatingChat 
         apiConfig={{
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
           chatEndpoint: '/api/v1/chat',
           toolsEndpoint: '/api/v1/chat/tools'
         }}
