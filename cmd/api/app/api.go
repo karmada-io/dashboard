@@ -104,6 +104,8 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithUserAgent(environment.UserAgent()),
 		client.WithKubeconfig(opts.KarmadaKubeConfig),
 		client.WithKubeContext(opts.KarmadaContext),
+		client.WithMasterURL(opts.KarmadaAPIServerURL),
+		client.WithToken(opts.KarmadaToken),
 		client.WithInsecureTLSSkipVerify(opts.SkipKarmadaApiserverTLSVerify),
 	)
 
@@ -111,6 +113,8 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithUserAgent(environment.UserAgent()),
 		client.WithKubeconfig(opts.KubeConfig),
 		client.WithKubeContext(opts.KubeContext),
+		client.WithMasterURL(opts.KubeAPIServerURL),
+		client.WithToken(opts.KubeToken),
 		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
 	)
 	ensureAPIServerConnectionOrDie()
