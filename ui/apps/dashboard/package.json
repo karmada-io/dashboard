@@ -60,7 +60,7 @@
     "@playwright/test": "^1.57.0",
     "@types/lodash": "^4.17.10",
     "@types/node": "^20.12.11",
-    "@types/react": "^19.2.8",
+    "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.48.1",
