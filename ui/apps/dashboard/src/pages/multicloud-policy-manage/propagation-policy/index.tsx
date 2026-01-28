@@ -47,6 +47,16 @@ import { useDebounce } from '@uidotdev/usehooks';
 import { PolicyScope } from '@/services/base.ts';
 import useNamespace from '@/hooks/use-namespace.ts';
 
+const getPolicyKey = (
+  policy: PropagationPolicy | ClusterPropagationPolicy,
+  scope: PolicyScope,
+) => {
+  return scope === PolicyScope.Cluster
+    ? policy.objectMeta.name
+    : `${policy.objectMeta.namespace}-${policy.objectMeta.name}`;
+};
+
+
 const PropagationPolicyManage = () => {
   const [filter, setFilter] = useState<{
     policyScope: PolicyScope;
@@ -215,17 +225,13 @@ const PropagationPolicyManage = () => {
                       '删除成功',
                     ),
                   );
-                  if (ret.code === 200) {
-                    setDeletingNames((prev) => {
-                      const next = new Set(prev);
-                      const key =
-                        filter.policyScope === PolicyScope.Cluster
-                          ? r.objectMeta.name
-                          : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
-                      next.add(key);
-                      return next;
-                    });
-                  }
+                  setDeletingNames((prev) => {
+                    const next = new Set(prev);
+                    const key = getPolicyKey(r, filter.policyScope);
+
+                    next.add(key);
+                    return next;
+                  });
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -366,14 +372,16 @@ const PropagationPolicyManage = () => {
       </div>
 
       <Table
-        rowKey={(r: PropagationPolicy) => r.objectMeta.name || ''}
+        rowKey={(r: PropagationPolicy | ClusterPropagationPolicy) =>
+          getPolicyKey(r, filter.policyScope)
+        }
+
         columns={columns}
         loading={isLoading}
-        dataSource={(data || []).filter((r: PropagationPolicy) => {
-          const key =
-            filter.policyScope === PolicyScope.Cluster
-              ? r.objectMeta.name
-              : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+        dataSource={(data || []).filter(
+          (r: PropagationPolicy | ClusterPropagationPolicy) => {
+            const key = getPolicyKey(r, filter.policyScope);
+
           return !deletingNames.has(key);
         })}
       />

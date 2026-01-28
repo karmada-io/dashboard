@@ -197,6 +197,10 @@ const WorkloadPage = () => {
                     return next;
                   });
                   await refetch();
+                } else {
+                  await messageApi.error(
+                    i18nInstance.t('workload-delete-failed-key', '删除工作负载失败')
+                  );
                 }
               }}
               okText={i18nInstance.t(
