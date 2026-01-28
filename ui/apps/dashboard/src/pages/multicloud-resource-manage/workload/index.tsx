@@ -55,7 +55,7 @@ const WorkloadPage = () => {
     selectedWorkSpace: '',
     searchText: '',
   });
-
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetWorkloads', JSON.stringify(filter)],
@@ -191,6 +191,11 @@ const WorkloadPage = () => {
                   namespace: r.objectMeta.namespace,
                 });
                 if (ret.code === 200) {
+                  setDeletingNames((prev) => {
+                    const next = new Set(prev);
+                    next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
+                    return next;
+                  });
                   await refetch();
                 }
               }}
@@ -313,15 +318,17 @@ const WorkloadPage = () => {
         }
         columns={columns}
         loading={isLoading}
-        dataSource={
-          data
-            ? data.deployments ||
-              data.statefulSets ||
-              data.daemonSets ||
-              data.jobs ||
-              data.items
-            : []
-        }
+        dataSource={(
+          data?.deployments ||
+          data?.statefulSets ||
+          data?.daemonSets ||
+          data?.jobs ||
+          data?.items ||
+          []
+        ).filter(
+          (r: DeploymentWorkload) =>
+            !deletingNames.has(`${r.objectMeta.namespace}-${r.objectMeta.name}`),
+        )}
       />
 
       <NewWorkloadEditorModal
