@@ -38,6 +38,7 @@ const ServicePage = () => {
     searchText: '',
     kind: ServiceKind.Service,
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const size = useWindowSize();
   const labelTagNum = size && size.width! > 1800 ? undefined : 1;
@@ -172,6 +173,13 @@ const ServicePage = () => {
                   ),
                 );
               }
+              if (ret.code === 200) {
+                setDeletingNames((prev) => {
+                  const next = new Set(prev);
+                  next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
+                  return next;
+                });
+              }
               await queryClient.invalidateQueries({
                 queryKey: ['GetServices'],
                 exact: false,
@@ -180,6 +188,7 @@ const ServicePage = () => {
               console.log('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
       {filter.kind === ServiceKind.Ingress && (
@@ -209,6 +218,13 @@ const ServicePage = () => {
                   ),
                 );
               }
+              if (ret.code === 200) {
+                setDeletingNames((prev) => {
+                  const next = new Set(prev);
+                  next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
+                  return next;
+                });
+              }
               await queryClient.invalidateQueries({
                 queryKey: ['GetIngress'],
                 exact: false,
@@ -217,6 +233,7 @@ const ServicePage = () => {
               console.log('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
 

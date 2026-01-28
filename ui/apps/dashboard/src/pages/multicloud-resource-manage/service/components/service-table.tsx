@@ -32,6 +32,7 @@ interface ServiceTableProps {
   onViewServiceContent: (r: any) => void;
   onEditServiceContent: (r: any) => void;
   onDeleteServiceContent: (r: Service) => void;
+  deletingNames: Set<string>;
 }
 const ServiceTable: FC<ServiceTableProps> = (props) => {
   const {
@@ -41,6 +42,7 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
     onViewServiceContent,
     onEditServiceContent,
     onDeleteServiceContent,
+    deletingNames,
   } = props;
   const columns: TableColumnProps<Service>[] = [
     {
@@ -169,7 +171,10 @@ const ServiceTable: FC<ServiceTableProps> = (props) => {
       }
       columns={columns}
       loading={isLoading}
-      dataSource={data?.services || []}
+      dataSource={(data?.services || []).filter(
+        (s: Service) =>
+          !deletingNames.has(`${s.objectMeta.namespace}-${s.objectMeta.name}`),
+      )}
     />
   );
 };

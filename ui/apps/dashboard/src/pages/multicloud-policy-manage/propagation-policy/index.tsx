@@ -57,6 +57,7 @@ const PropagationPolicyManage = () => {
     selectedNamespace: '',
     searchText: '',
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const debouncedSearchText = useDebounce(filter.searchText, 300);
   const { data, isLoading, refetch } = useQuery({
     queryKey: [
@@ -214,6 +215,17 @@ const PropagationPolicyManage = () => {
                       '删除成功',
                     ),
                   );
+                  if (ret.code === 200) {
+                    setDeletingNames((prev) => {
+                      const next = new Set(prev);
+                      const key =
+                        filter.policyScope === PolicyScope.Cluster
+                          ? r.objectMeta.name
+                          : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+                      next.add(key);
+                      return next;
+                    });
+                  }
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -357,7 +369,13 @@ const PropagationPolicyManage = () => {
         rowKey={(r: PropagationPolicy) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data || []}
+        dataSource={(data || []).filter((r: PropagationPolicy) => {
+          const key =
+            filter.policyScope === PolicyScope.Cluster
+              ? r.objectMeta.name
+              : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+          return !deletingNames.has(key);
+        })}
       />
 
       <PropagationPolicyEditorDrawer
