@@ -153,12 +153,14 @@ const ConfigPage = () => {
               `${msg}${i18nInstance.t('a6d38572262cb1b1238d449b4098f002', '配置成功')}`,
             );
             hideEditor();
-            if (editor.mode === 'create') {
-              await queryClient.invalidateQueries({
-                queryKey: ['GetConfigMaps'],
-                exact: false,
-              });
-            }
+            await queryClient.invalidateQueries({
+              queryKey: [
+                filter.kind === ConfigKind.ConfigMap
+                  ? 'GetConfigMaps'
+                  : 'GetSecrets',
+              ],
+              exact: false,
+            });
           } else {
             await messageApi.error(
               `${msg}${i18nInstance.t('03d3b00687bbab3e9a7e1bd3aeeaa0a4', '配置失败')}`,
