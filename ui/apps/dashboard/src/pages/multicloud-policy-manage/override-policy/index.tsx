@@ -60,6 +60,7 @@ const OverridePolicyManage = () => {
     selectedWorkSpace: '',
     searchText: '',
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetOverridePolicies', JSON.stringify(filter)],
     queryFn: async () => {
@@ -228,6 +229,17 @@ const OverridePolicyManage = () => {
                       '删除成功',
                     ),
                   );
+                  if (ret.code === 200) {
+                    setDeletingNames((prev) => {
+                      const next = new Set(prev);
+                      const key =
+                        filter.policyScope === 'cluster-scope'
+                          ? r.objectMeta.name
+                          : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+                      next.add(key);
+                      return next;
+                    });
+                  }
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -364,7 +376,15 @@ const OverridePolicyManage = () => {
         rowKey={(r: OverridePolicy) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data || []}
+        dataSource={(data || []).filter(
+          (r: OverridePolicy | ClusterOverridePolicy) => {
+            const key =
+              filter.policyScope === 'cluster-scope'
+                ? r.objectMeta.name
+                : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+            return !deletingNames.has(key);
+          },
+        )}
       />
       <OverridePolicyEditorDrawer
         open={editorDrawerData.open}

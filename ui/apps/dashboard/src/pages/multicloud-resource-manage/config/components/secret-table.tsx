@@ -29,6 +29,7 @@ interface SecretTableProps {
   onViewSecret: (r: any) => void;
   onEditSecret: (r: Secret) => void;
   onDeleteSecretContent: (r: Secret) => void;
+  deletingNames: Set<string>;
 }
 const SecretTable: FC<SecretTableProps> = (props) => {
   const {
@@ -38,6 +39,7 @@ const SecretTable: FC<SecretTableProps> = (props) => {
     onViewSecret,
     onEditSecret,
     onDeleteSecretContent,
+    deletingNames,
   } = props;
   const { data, isLoading } = useQuery({
     queryKey: ['GetSecrets', selectedWorkSpace, searchText],
@@ -169,7 +171,10 @@ const SecretTable: FC<SecretTableProps> = (props) => {
       }
       columns={columns}
       loading={isLoading}
-      dataSource={data?.secrets || []}
+      dataSource={(data?.secrets || []).filter(
+        (s: Secret) =>
+          !deletingNames.has(`${s.objectMeta.namespace}-${s.objectMeta.name}`),
+      )}
     />
   );
 };
