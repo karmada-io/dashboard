@@ -26,10 +26,8 @@ import { useStore } from './store.ts';
 import { message } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
 const ConfigPage = () => {
-  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
   const filter = useStore((state) => state.filter);
@@ -89,13 +87,6 @@ const ConfigPage = () => {
                   ),
                 );
               }
-              if (ret.code === 200) {
-                setDeletingNames((prev) => {
-                  const next = new Set(prev);
-                  next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
-                  return next;
-                });
-              }
               await queryClient.invalidateQueries({
                 queryKey: ['GetConfigMaps'],
                 exact: false,
@@ -104,7 +95,6 @@ const ConfigPage = () => {
               console.log('error', e);
             }
           }}
-          deletingNames={deletingNames}
         />
       )}
       {filter.kind === ConfigKind.Secret && (
@@ -133,13 +123,6 @@ const ConfigPage = () => {
                   ),
                 );
               }
-              if (ret.code === 200) {
-                setDeletingNames((prev) => {
-                  const next = new Set(prev);
-                  next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
-                  return next;
-                });
-              }
               await queryClient.invalidateQueries({
                 queryKey: ['GetSecrets'],
                 exact: false,
@@ -148,7 +131,6 @@ const ConfigPage = () => {
               console.log('error', e);
             }
           }}
-          deletingNames={deletingNames}
         />
       )}
 
@@ -171,12 +153,14 @@ const ConfigPage = () => {
               `${msg}${i18nInstance.t('a6d38572262cb1b1238d449b4098f002', '配置成功')}`,
             );
             hideEditor();
-            if (editor.mode === 'create') {
-              await queryClient.invalidateQueries({
-                queryKey: ['GetConfigMaps'],
-                exact: false,
-              });
-            }
+            await queryClient.invalidateQueries({
+              queryKey: [
+                filter.kind === ConfigKind.ConfigMap
+                  ? 'GetConfigMaps'
+                  : 'GetSecrets',
+              ],
+              exact: false,
+            });
           } else {
             await messageApi.error(
               `${msg}${i18nInstance.t('03d3b00687bbab3e9a7e1bd3aeeaa0a4', '配置失败')}`,
