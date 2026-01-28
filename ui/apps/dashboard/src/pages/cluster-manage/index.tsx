@@ -60,6 +60,7 @@ const ClusterManagePage = () => {
       return ret.data;
     },
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const [clusterModalData, setModalData] = useState<{
     mode: 'create' | 'edit';
     open: boolean;
@@ -227,6 +228,11 @@ const ClusterManagePage = () => {
                       name: r.objectMeta.name,
                     }),
                   );
+                  setDeletingNames((prev) => {
+                    const next = new Set(prev);
+                    next.add(r.objectMeta.name);
+                    return next;
+                  });
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -283,7 +289,9 @@ const ClusterManagePage = () => {
         rowKey={(r: Cluster) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data?.clusters || []}
+        dataSource={(data?.clusters || []).filter(
+          (r: Cluster) => !deletingNames.has(r.objectMeta.name),
+        )}
       />
 
       <NewClusterModal

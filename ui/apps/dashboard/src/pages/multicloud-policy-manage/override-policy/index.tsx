@@ -50,6 +50,15 @@ import OverridePolicyEditorDrawer, {
 import { GetNamespaces } from '@/services/namespace.ts';
 
 export type PolicyScope = 'namespace-scope' | 'cluster-scope';
+const getPolicyKey = (
+  policy: OverridePolicy | ClusterOverridePolicy,
+  scope: PolicyScope,
+) => {
+  return scope === 'cluster-scope'
+    ? policy.objectMeta.name
+    : `${policy.objectMeta.namespace}-${policy.objectMeta.name}`;
+};
+
 const OverridePolicyManage = () => {
   const [filter, setFilter] = useState<{
     policyScope: PolicyScope;
@@ -60,6 +69,7 @@ const OverridePolicyManage = () => {
     selectedWorkSpace: '',
     searchText: '',
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetOverridePolicies', JSON.stringify(filter)],
     queryFn: async () => {
@@ -228,6 +238,13 @@ const OverridePolicyManage = () => {
                       '删除成功',
                     ),
                   );
+                    setDeletingNames((prev) => {
+                      const next = new Set(prev);
+                      const key = getPolicyKey(r, filter.policyScope);
+
+                      next.add(key);
+                      return next;
+                    });
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -361,10 +378,19 @@ const OverridePolicyManage = () => {
         </div>
       </div>
       <Table
-        rowKey={(r: OverridePolicy) => r.objectMeta.name || ''}
+        rowKey={(r: OverridePolicy | ClusterOverridePolicy) =>
+          getPolicyKey(r, filter.policyScope)
+        }
+
         columns={columns}
         loading={isLoading}
-        dataSource={data || []}
+        dataSource={(data || []).filter(
+          (r: OverridePolicy | ClusterOverridePolicy) => {
+            const key = getPolicyKey(r, filter.policyScope);
+
+            return !deletingNames.has(key);
+          },
+        )}
       />
       <OverridePolicyEditorDrawer
         open={editorDrawerData.open}

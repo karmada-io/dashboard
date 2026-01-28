@@ -26,8 +26,10 @@ import { useStore } from './store.ts';
 import { message } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
 const ConfigPage = () => {
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
   const filter = useStore((state) => state.filter);
@@ -87,6 +89,13 @@ const ConfigPage = () => {
                   ),
                 );
               }
+              if (ret.code === 200) {
+                setDeletingNames((prev) => {
+                  const next = new Set(prev);
+                  next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
+                  return next;
+                });
+              }
               await queryClient.invalidateQueries({
                 queryKey: ['GetConfigMaps'],
                 exact: false,
@@ -95,6 +104,7 @@ const ConfigPage = () => {
               console.log('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
       {filter.kind === ConfigKind.Secret && (
@@ -123,6 +133,13 @@ const ConfigPage = () => {
                   ),
                 );
               }
+              if (ret.code === 200) {
+                setDeletingNames((prev) => {
+                  const next = new Set(prev);
+                  next.add(`${r.objectMeta.namespace}-${r.objectMeta.name}`);
+                  return next;
+                });
+              }
               await queryClient.invalidateQueries({
                 queryKey: ['GetSecrets'],
                 exact: false,
@@ -131,6 +148,7 @@ const ConfigPage = () => {
               console.log('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
 
