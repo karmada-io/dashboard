@@ -50,6 +50,15 @@ import OverridePolicyEditorDrawer, {
 import { GetNamespaces } from '@/services/namespace.ts';
 
 export type PolicyScope = 'namespace-scope' | 'cluster-scope';
+const getPolicyKey = (
+  policy: OverridePolicy | ClusterOverridePolicy,
+  scope: PolicyScope,
+) => {
+  return scope === 'cluster-scope'
+    ? policy.objectMeta.name
+    : `${policy.objectMeta.namespace}-${policy.objectMeta.name}`;
+};
+
 const OverridePolicyManage = () => {
   const [filter, setFilter] = useState<{
     policyScope: PolicyScope;
@@ -229,17 +238,13 @@ const OverridePolicyManage = () => {
                       '删除成功',
                     ),
                   );
-                  if (ret.code === 200) {
                     setDeletingNames((prev) => {
                       const next = new Set(prev);
-                      const key =
-                        filter.policyScope === 'cluster-scope'
-                          ? r.objectMeta.name
-                          : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+                      const key = getPolicyKey(r, filter.policyScope);
+
                       next.add(key);
                       return next;
                     });
-                  }
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -373,15 +378,16 @@ const OverridePolicyManage = () => {
         </div>
       </div>
       <Table
-        rowKey={(r: OverridePolicy) => r.objectMeta.name || ''}
+        rowKey={(r: OverridePolicy | ClusterOverridePolicy) =>
+          getPolicyKey(r, filter.policyScope)
+        }
+
         columns={columns}
         loading={isLoading}
         dataSource={(data || []).filter(
           (r: OverridePolicy | ClusterOverridePolicy) => {
-            const key =
-              filter.policyScope === 'cluster-scope'
-                ? r.objectMeta.name
-                : `${r.objectMeta.namespace}-${r.objectMeta.name}`;
+            const key = getPolicyKey(r, filter.policyScope);
+
             return !deletingNames.has(key);
           },
         )}
