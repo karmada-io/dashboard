@@ -228,13 +228,11 @@ const ClusterManagePage = () => {
                       name: r.objectMeta.name,
                     }),
                   );
-                  if (ret.code === 200) {
-                    setDeletingNames((prev) => {
-                      const next = new Set(prev);
-                      next.add(r.objectMeta.name);
-                      return next;
-                    });
-                  }
+                  setDeletingNames((prev) => {
+                    const next = new Set(prev);
+                    next.add(r.objectMeta.name);
+                    return next;
+                  });
                   await refetch();
                 } else {
                   await messageApi.error(
