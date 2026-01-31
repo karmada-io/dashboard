@@ -38,6 +38,9 @@
   },
   "packageManager": "pnpm@9.1.2",
   "pnpm": {
+    "overrides": {
+      "micromatch": ">=4.0.8"
+    },
     "patchedDependencies": {
       "zmodem.js@0.1.10": "patches/zmodem.js@0.1.10.patch"
     }
