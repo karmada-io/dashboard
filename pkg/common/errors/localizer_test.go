@@ -41,6 +41,18 @@ func TestLocalizeError(t *testing.T) {
 			errors.NewInvalid("empty namespace may not be set"),
 			errors.NewInvalid("MSG_DEPLOY_EMPTY_NAMESPACE_ERROR"),
 		},
+		{
+			errors.NewNotFound("resource not found"),
+			errors.NewNotFound("MSG_RESOURCE_NOT_FOUND_ERROR"),
+		},
+		{
+			errors.NewAlreadyExists("already exists"),
+			errors.NewAlreadyExists("MSG_RESOURCE_ALREADY_EXISTS_ERROR"),
+		},
+		{
+			errors.NewConflict("resource version mismatch"),
+			errors.NewConflict("MSG_RESOURCE_CONFLICT_ERROR"),
+		},
 	}
 	for _, c := range cases {
 		actual := errors.LocalizeError(c.err)
