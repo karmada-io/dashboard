@@ -80,6 +80,12 @@ func LocalizeError(err error) error {
 			if strings.Contains(errString, "NOT_FOUND") {
 				return NewNotFound(errString)
 			}
+			if strings.Contains(errString, "ALREADY_EXISTS") {
+				return NewAlreadyExists(errString)
+			}
+			if strings.Contains(errString, "CONFLICT") {
+				return NewConflict(errString)
+			}
 
 			return NewBadRequest(errString)
 		}
