@@ -35,6 +35,8 @@ jobs:
         run: hack/verify-license.sh
       - name: lint
         run: hack/verify-staticcheck.sh
+      - name: test
+        run: make test
   build-frontend:
     runs-on: ubuntu-22.04
     steps:

@@ -97,6 +97,37 @@ install-ui-deps:
 install: install-deps install-ui-deps
 
 ###################
+# Quality & Test  #
+###################
+
+# Run all verification targets (lint and test)
+.PHONY: verify
+verify: lint test
+
+# Lint all components
+.PHONY: lint
+lint: lint-api
+
+# Run Go staticcheck
+.PHONY: lint-api
+lint-api:
+	hack/verify-staticcheck.sh
+
+# Format all Go code
+.PHONY: fmt
+fmt:
+	go fmt ./pkg/... ./cmd/...
+
+# Run all unit tests
+.PHONY: test
+test: test-api
+
+# Run Go unit tests
+.PHONY: test-api
+test-api:
+	go test -v ./pkg/... ./cmd/...
+
+###################
 # Development     #
 ###################
 
