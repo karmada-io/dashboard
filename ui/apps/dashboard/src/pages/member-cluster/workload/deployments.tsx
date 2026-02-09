@@ -19,7 +19,7 @@ import { Icons } from '@/components/icons';
 import { useMemberClusterContext, useMemberClusterNamespace } from '@/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { WorkloadKind } from '@/services/base';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, FC } from 'react';
 import {
   GetMemberClusterWorkloadDetail,
   GetMemberClusterWorkloadEvents,
@@ -33,8 +33,16 @@ import dayjs from 'dayjs';
 import { stringify, parse } from 'yaml';
 import Editor from '@monaco-editor/react';
 import { GetResource, PutResource } from '@/services/member-cluster/unstructured';
-import { GetMemberClusterPods, Pod } from '@/services/member-cluster/pod';
+import {
+  GetMemberClusterPodDetail,
+  GetMemberClusterPods,
+  Pod
+} from '@/services/member-cluster/pod';
 import { GetLogs, LogDetails } from '@/services/member-cluster/log';
+import { useAuth } from '@/components/auth';
+import SockJS from 'sockjs-client/dist/sockjs';
+import { Terminal } from '@xterm/xterm';
+import '@xterm/xterm/css/xterm.css';
 
 export default function MemberClusterDeployments() {
   const { message: messageApi } = App.useApp();
@@ -63,6 +71,9 @@ export default function MemberClusterDeployments() {
   const logRefreshTimerRef = useRef<number | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
 
+  const [attachDrawerOpen, setAttachDrawerOpen] = useState(false);
+  const [attachPod, setAttachPod] = useState<Pod | null>(null);
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [editSubmitting, setEditSubmitting] = useState(false);
@@ -78,6 +89,8 @@ export default function MemberClusterDeployments() {
       return workloads.data;
     },
   });
+
+  const { token } = useAuth();
 
   const fetchLogs = useCallback(
     async (pod: Pod | null) => {
@@ -98,7 +111,7 @@ export default function MemberClusterDeployments() {
         setLogLoading(false);
       }
     },
-    [messageApi, memberClusterName],
+    [memberClusterName, messageApi],
   );
 
   useEffect(() => {
@@ -257,7 +270,7 @@ export default function MemberClusterDeployments() {
                 setEditContent(stringify(ret.data));
                 setEditModalOpen(true);
               } catch (e) {
-                void messageApi.error('Failed to load deployment');
+                void messageApi.error(`Failed to load deployment ${(e as any)}`);
               }
             }}
           >
@@ -329,7 +342,7 @@ export default function MemberClusterDeployments() {
       <Drawer
         title="Deployment details"
         placement="right"
-        width={800}
+        size={800}
         open={viewDrawerOpen}
         onClose={() => {
           setViewDrawerOpen(false);
@@ -337,7 +350,7 @@ export default function MemberClusterDeployments() {
           setViewEvents([]);
           setViewPods([]);
         }}
-        destroyOnClose
+        destroyOnHidden
       >
         {viewLoading && <div>Loading...</div>}
         {!viewLoading && viewDetail && (
@@ -410,21 +423,41 @@ export default function MemberClusterDeployments() {
                   {
                     title: 'Actions',
                     key: 'actions',
-                    render: (_: unknown, record: Pod) => (
-                      <Button
-                        size="small"
-                        icon={<Icons.terminal width={14} height={14} />}
-                        title="View Pod logs"
-                        onClick={async () => {
-                          setLogPod(record);
-                          setLogDrawerOpen(true);
-                          setLogDetails(null);
-                          void fetchLogs(record);
-                        }}
-                      >
-                        Logs
-                      </Button>
-                    ),
+                    width: 180,
+                    render: (_: unknown, record: Pod) => {
+                      return (<Space size={4}>
+                        <Button
+                            size="small"
+                            icon={<Icons.terminal width={14} height={14} />}
+                            title="View Pod logs"
+                            onClick={() => {
+                              setLogPod(record);
+                              setLogDrawerOpen(true);
+                              setLogDetails(null);
+                              void fetchLogs(record);
+                            }}
+                        >
+                          Logs
+                        </Button>
+                        <Button
+                            size="small"
+                            icon={<Icons.terminal width={14} height={14} />}
+                            title="Attach to Pod"
+                            // disabled={!record.containers || !record.containers.length}
+                            onClick={async () => {
+                              const ret = await GetMemberClusterPodDetail({
+                                memberClusterName,
+                                namespace: record.objectMeta.namespace,
+                                name: record.objectMeta.name,
+                              })
+                              setAttachPod(ret.data);
+                              setAttachDrawerOpen(true);
+                            }}
+                        >
+                          Attach
+                        </Button>
+                      </Space>)
+                    },
                   },
                 ]}
                 dataSource={viewPods}
@@ -456,12 +489,50 @@ export default function MemberClusterDeployments() {
 
       <Drawer
         title={
+          attachPod
+            ? `Terminal: ${attachPod.objectMeta.namespace}/${attachPod.objectMeta.name}`
+            : 'Pod terminal'
+        }
+        placement="bottom"
+        size="40%"
+        open={attachDrawerOpen}
+        onClose={() => {
+          setAttachDrawerOpen(false);
+          setAttachPod(null);
+        }}
+        destroyOnHidden
+        styles={{
+          header: {
+            padding: '8px 4px'
+          },
+          body: { padding: 0, height: '100%' }
+        }}
+      >
+        {attachPod && attachPod.containers && attachPod.containers.length > 0 && (
+          <MemberClusterPodTerminal
+            key={`${attachPod.objectMeta.namespace}-${attachPod.objectMeta.name}-${attachPod.containers[0].name}`}
+            memberClusterName={memberClusterName}
+            namespace={attachPod.objectMeta.namespace}
+            pod={attachPod.objectMeta.name}
+            container={attachPod.containers[0].name}
+            token={token}
+          />
+        )}
+        {attachPod && (!attachPod.containers || attachPod.containers.length === 0) && (
+          <div className="h-full flex items-center justify-center text-sm text-gray-500">
+            No containers available for this pod.
+          </div>
+        )}
+      </Drawer>
+
+      <Drawer
+        title={
           logPod
             ? `Logs: ${logPod.objectMeta.namespace}/${logPod.objectMeta.name}`
             : 'Pod logs'
         }
         placement="right"
-        width={800}
+        size={800}
         open={logDrawerOpen}
         onClose={() => {
           setLogDrawerOpen(false);
@@ -469,7 +540,16 @@ export default function MemberClusterDeployments() {
           setLogPod(null);
           setLogAutoRefresh(false);
         }}
-        destroyOnClose
+        destroyOnHidden
+        styles={{
+          body: {
+            padding: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            height: '100%',
+          }
+        }}
       >
         <div className="mb-3 flex items-center gap-4 text-xs">
           <span className="flex items-center gap-2">
@@ -514,7 +594,7 @@ export default function MemberClusterDeployments() {
       <Drawer
         title="Edit deployment (YAML)"
         placement="right"
-        width={900}
+        size={900}
         open={editModalOpen}
         onClose={() => {
           if (!editSubmitting) {
@@ -522,7 +602,7 @@ export default function MemberClusterDeployments() {
             setEditContent('');
           }
         }}
-        destroyOnClose
+        destroyOnHidden
         extra={
           <Space>
             <Button
@@ -578,3 +658,207 @@ export default function MemberClusterDeployments() {
     </div>
   );
 }
+
+interface MemberClusterPodTerminalProps {
+  memberClusterName: string;
+  namespace: string;
+  pod: string;
+  container: string;
+  token?: string | null;
+}
+
+const MemberClusterPodTerminal: FC<MemberClusterPodTerminalProps> = ({
+  memberClusterName,
+  namespace,
+  pod,
+  container,
+  token,
+}) => {
+  const { message: messageApi } = App.useApp();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const termRef = useRef<Terminal | null>(null);
+  const sockRef = useRef<WebSocket | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+    if (!memberClusterName || !namespace || !pod || !container) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const setupTerminal = async () => {
+      setIsLoading(true);
+      try {
+        const sessionResp = await fetch(
+          `/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${pod}/shell/${container}`,
+          {
+            method: 'GET',
+            headers: token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : undefined,
+          },
+        );
+
+        if (!sessionResp.ok) {
+          throw new Error(`Session request failed: ${sessionResp.status}`);
+        }
+
+        const sessionJson = (await sessionResp.json()) as
+          | { id?: string }
+          | { data?: { id?: string } };
+        const sessionId =
+          (sessionJson as { id?: string }).id ??
+          (sessionJson as { data?: { id?: string } }).data?.id;
+
+        if (!sessionId) {
+          throw new Error('No session id in response');
+        }
+
+        if (cancelled || !containerRef.current) {
+          return;
+        }
+
+        const term = new Terminal({
+          cursorBlink: true,
+          scrollback: 1000,
+          fontSize: 14,
+          theme: {
+            background: '#1e1e1e',
+            foreground: '#ffffff',
+          },
+        });
+
+        termRef.current = term;
+        term.open(containerRef.current);
+
+        const authQuery = token
+          ? `&Authorization=${encodeURIComponent(`Bearer ${token}`)}`
+          : '';
+        const sock = new SockJS(
+          `/clusterapi/${memberClusterName}/api/sockjs?${sessionId}${authQuery}`,
+        );
+        sockRef.current = sock;
+
+        sock.onopen = () => {
+          const bindFrame = { Op: 'bind', SessionID: sessionId };
+          sock.send(JSON.stringify(bindFrame));
+
+          const resizeFrame = {
+            Op: 'resize',
+            Cols: term.cols,
+            Rows: term.rows,
+          };
+          sock.send(JSON.stringify(resizeFrame));
+
+          term.focus();
+          setIsLoading(false);
+        };
+
+        sock.onmessage = (event: MessageEvent) => {
+          try {
+            if (typeof event.data !== 'string') {
+              return;
+            }
+            const frame = JSON.parse(event.data) as {
+              Op: string;
+              Data?: string;
+            };
+            if (frame.Op === 'stdout') {
+              term.write(frame.Data || '');
+            } else if (frame.Op === 'toast' && frame.Data) {
+              void messageApi.info(frame.Data);
+            }
+          } catch {
+            // ignore malformed frames
+          }
+        };
+
+        sock.onclose = () => {
+          // optional toast or cleanup hook
+        };
+
+        const dataDisposable = term.onData((data) => {
+          const frame = {
+            Op: 'stdin',
+            Data: data,
+            Cols: term.cols,
+            Rows: term.rows,
+          };
+          sock.send(JSON.stringify(frame));
+        });
+
+        const resizeDisposable = term.onResize(({ cols, rows }) => {
+          const frame = {
+            Op: 'resize',
+            Cols: cols,
+            Rows: rows,
+          };
+          sock.send(JSON.stringify(frame));
+        });
+
+        return () => {
+          dataDisposable.dispose();
+          resizeDisposable.dispose();
+        };
+      } catch (e: unknown) {
+        if (!cancelled) {
+          const errorMessage = e instanceof Error ? e.message : String(e);
+          void messageApi.error(
+            `Failed to attach to pod terminal: ${errorMessage}`,
+          );
+          setIsLoading(false);
+        }
+      }
+    };
+
+    const cleanupDisposablesPromise = setupTerminal();
+
+    return () => {
+      cancelled = true;
+      if (sockRef.current) {
+        sockRef.current.close();
+        sockRef.current = null;
+      }
+      if (termRef.current) {
+        termRef.current.dispose();
+        termRef.current = null;
+      }
+      void cleanupDisposablesPromise?.then((cleanup) => {
+        if (typeof cleanup === 'function') {
+          cleanup();
+        }
+      });
+    };
+  }, [memberClusterName, namespace, pod, container, token, messageApi]);
+
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#000000',
+      }}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 text-white text-sm">
+          Connecting to pod terminal...
+        </div>
+      )}
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          visibility: !isLoading ? 'visible' : 'hidden',
+        }}
+      />
+    </div>
+  );
+};

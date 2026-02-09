@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "playwright.config.ts", "e2e"],
+  "include": ["src", "playwright.config.ts", "e2e", "typings.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
