@@ -211,10 +211,6 @@ func Init(options ...Option) {
 }
 
 func isInitialized() bool {
-	if baseConfig == nil {
-		klog.Errorf(`k8s.io/dashboard/client' package has not been initialized properly. Run 'client.Init(...)' to initialize it. `)
-		return false
-	}
-
+	// for karmada client as alternative, we'll never init baseConfig
 	return true
 }

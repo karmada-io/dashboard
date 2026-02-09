@@ -117,7 +117,7 @@ func Config(request *http.Request) (*rest.Config, error) {
 		return nil, fmt.Errorf("client package not initialized")
 	}
 
-	return configFromRequest(request)
+	return karmadaclient.ConfigForMemberClusterFromRequest(request)
 }
 
 func RestClientForHost(host string) (rest.Interface, error) {
