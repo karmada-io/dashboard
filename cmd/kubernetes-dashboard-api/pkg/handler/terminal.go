@@ -311,10 +311,20 @@ func WaitForTerminal(k8sClient kubernetes.Interface, cfg *rest.Config, request *
 
 		terminalSessions.Close(sessionId, 1, "Process exited")
 
-	case <-time.After(10 * time.Second):
+	case <-time.After(1 * time.Minute):
 		// Close chan and delete session when sockjs connection was timeout
-		close(terminalSessions.Get(sessionId).bound)
-		delete(terminalSessions.Sessions, sessionId)
+
+		terminalSessions.Lock.Lock()
+		defer terminalSessions.Lock.Unlock()
+		session, ok := terminalSessions.Sessions[sessionId]
+		if ok {
+			// The session has not been bound if sockJSSession is nil.
+			// In that case, we can safely clean it up.
+			if session.sockJSSession == nil && session.bound != nil {
+				close(session.bound)
+				delete(terminalSessions.Sessions, sessionId)
+			}
+		}
 		return
 	}
 }
