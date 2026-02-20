@@ -39,6 +39,15 @@ type Options struct {
 	DisableCSRFProtection         bool
 	OpenAPIEnabled                bool
 
+	// KubeAPIServerURL is the URL of the host cluster APIServer.
+	KubeAPIServerURL string
+	// KubeToken is the bearer token for accessing the host cluster APIServer.
+	KubeToken string
+	// KarmadaAPIServerURL is the URL of the Karmada APIServer.
+	KarmadaAPIServerURL string
+	// KarmadaToken is the bearer token for accessing the Karmada APIServer.
+	KarmadaToken string
+
 	// MCP related options
 	EnableMCP        bool
 	MCPTransportMode string
@@ -75,6 +84,11 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Namespace, "namespace", "karmada-dashboard", "Namespace to use when accessing Dashboard specific resources, i.e. configmap")
 	fs.BoolVar(&o.DisableCSRFProtection, "disable-csrf-protection", false, "allows disabling CSRF protection")
 	fs.BoolVar(&o.OpenAPIEnabled, "openapi-enabled", false, "enables OpenAPI v2 endpoint under '/apidocs.json'")
+
+	fs.StringVar(&o.KubeAPIServerURL, "kube-apiserver-url", "", "URL of the host cluster APIServer.")
+	fs.StringVar(&o.KubeToken, "kube-token", "", "Bearer token for accessing the host cluster APIServer.")
+	fs.StringVar(&o.KarmadaAPIServerURL, "karmada-apiserver-url", "", "URL of the Karmada APIServer.")
+	fs.StringVar(&o.KarmadaToken, "karmada-token", "", "Bearer token for accessing the Karmada APIServer.")
 
 	// MCP related flags
 	fs.BoolVar(&o.EnableMCP, "enable-mcp", false, "Enable MCP (Model Context Protocol) integration")
