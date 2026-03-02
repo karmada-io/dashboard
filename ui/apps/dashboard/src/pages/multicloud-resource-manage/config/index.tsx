@@ -92,7 +92,7 @@ const ConfigPage = () => {
                 exact: false,
               });
             } catch (e) {
-              console.log('error', e);
+              console.error('error', e);
             }
           }}
         />
@@ -128,7 +128,7 @@ const ConfigPage = () => {
                 exact: false,
               });
             } catch (e) {
-              console.log('error', e);
+              console.error('error', e);
             }
           }}
         />

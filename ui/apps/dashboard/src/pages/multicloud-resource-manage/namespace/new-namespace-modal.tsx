@@ -48,7 +48,7 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
           }
           onOk && (await onOk(ret));
         } catch (e) {
-          console.log('e', e);
+          console.error('error', e);
         }
       }}
       onCancel={async () => {

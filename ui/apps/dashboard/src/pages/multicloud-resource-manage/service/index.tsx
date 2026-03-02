@@ -177,7 +177,7 @@ const ServicePage = () => {
                 exact: false,
               });
             } catch (e) {
-              console.log('error', e);
+              console.error('error', e);
             }
           }}
         />
@@ -214,7 +214,7 @@ const ServicePage = () => {
                 exact: false,
               });
             } catch (e) {
-              console.log('error', e);
+              console.error('error', e);
             }
           }}
         />

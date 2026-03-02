@@ -123,7 +123,7 @@ const NewClusterModal: FC<NewClusterModalProps> = (props) => {
             onOk(ret);
           }
         } catch (e) {
-          console.log('e', e);
+          console.error('error', e);
         } finally {
           setConfirmLoading(false);
         }

@@ -83,7 +83,7 @@ const NewConfigEditorModal: FC<NewWorkloadEditorModalProps> = (props) => {
             setContent('');
           }
         } catch (e) {
-          console.log('e', e);
+          console.error('error', e);
         }
       }}
       onCancel={async () => {
