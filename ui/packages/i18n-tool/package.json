@@ -14,7 +14,7 @@
     "glob": "^13.0.1",
     "prettier": "^3.3.2",
     "csv-parse": "^6.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "scripts": {
     "test": "vitest"
