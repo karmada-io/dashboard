@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@chatui/core": "^3.1.0",
+    "@chatui/core": "^3.6.0",
     "@karmada/chatui": "workspace:*",
     "@karmada/i18n-tool": "workspace:*",
     "@karmada/terminal": "workspace:*",

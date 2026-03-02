@@ -186,13 +186,13 @@ export const FloatingChat: React.FC<ChatUIProps> = ({
   const handleStream = async (val: string, shouldUseMCP: boolean) => {
     const controller = new AbortController();
     currentControllerRef.current = controller;
-    let botMessageId: number | null = null; // Date.now()
+    let botMessageId: string | null = null; // Date.now()
     const botMessage = {
       type: "text",
       content: { text: "thinking" },
       position: "left" as const,
       user: { avatar, name: "Assistant" },
-      _id: -1,
+      _id: "-1",
     };
     appendMsg(botMessage);
     let streamingText = "";
@@ -200,9 +200,9 @@ export const FloatingChat: React.FC<ChatUIProps> = ({
     const onData = (data: string) => {
       if (controller.signal.aborted) return;
       if (!botMessageId) {
-        deleteMsg(-1);
+        deleteMsg("-1");
 
-        botMessageId = Date.now();
+        botMessageId = String(Date.now());
         appendMsg({
           ...botMessage,
           _id: botMessageId,
@@ -257,7 +257,7 @@ export const FloatingChat: React.FC<ChatUIProps> = ({
           onData,
           (toolCall) => {
             if (controller.signal.aborted) return;
-            deleteMsg(-1);
+            deleteMsg("-1");
             appendMsg({
               type: "tool_call",
               content: { text: formatToolCall(toolCall), toolCall },
