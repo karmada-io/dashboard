@@ -1,6 +1,6 @@
 module github.com/karmada-io/dashboard
 
-go 1.24.11
+go 1.25.7
 
 require (
 	github.com/distribution/reference v0.6.0
