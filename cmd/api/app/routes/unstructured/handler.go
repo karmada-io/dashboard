@@ -40,7 +40,7 @@ func handleDeleteResource(c *gin.Context) {
 	kind := c.Param("kind")
 	namespace := c.Param("namespace")
 	name := c.Param("name")
-	deleteNow := c.Param("deleteNow") == "true"
+	deleteNow := c.Query("deleteNow") == "true"
 
 	if err := verber.Delete(kind, namespace, name, deleteNow); err != nil {
 		klog.ErrorS(err, "Failed to delete resource")
@@ -132,6 +132,7 @@ func handleCreateResource(c *gin.Context) {
 	if err != nil {
 		klog.ErrorS(err, "Failed to unmarshal request body")
 		common.Fail(c, err)
+		return
 	}
 	if _, err = verber.Create(raw); err != nil {
 		klog.ErrorS(err, "Failed to create resource")
