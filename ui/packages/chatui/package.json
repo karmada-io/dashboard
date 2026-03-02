@@ -34,7 +34,7 @@
   "author": "Karmada Authors",
   "license": "Apache-2.0",
   "dependencies": {
-    "@chatui/core": "^2.4.2"
+    "@chatui/core": "^3.6.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
