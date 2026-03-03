@@ -41,8 +41,8 @@ func EnsureMemberClusterMiddleware() gin.HandlerFunc {
 		karmadaClient := client.InClusterKarmadaClient()
 		_, err := karmadaClient.ClusterV1alpha1().Clusters().Get(context.TODO(), c.Param("clustername"), metav1.GetOptions{})
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusOK, common.BaseResponse{
-				Code: 500,
+			c.AbortWithStatusJSON(http.StatusInternalServerError, common.BaseResponse{
+				Code: http.StatusInternalServerError,
 				Msg:  err.Error(),
 			})
 			return
