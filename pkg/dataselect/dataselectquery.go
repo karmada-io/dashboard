@@ -93,7 +93,7 @@ func NewSortQuery(sortByListRaw []string) *SortQuery {
 	for i := 0; i+1 < len(sortByListRaw); i += 2 {
 		// parse order option
 		var ascending bool
-		orderOption := sortByListRaw[i]
+		orderOption := sortByListRaw[i] //nolint:gosec // G602: bounds checked by loop condition
 		switch orderOption {
 		case "a":
 			ascending = true
