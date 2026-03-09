@@ -79,6 +79,6 @@
     "vite": "^7.3.0",
     "vite-plugin-banner": "^0.8.1",
     "vite-plugin-dynamic-base": "^1.2.0",
-    "vite-plugin-svgr": "^4.2.0"
+    "vite-plugin-svgr": "^4.5.0"
   }
 }

@@ -190,8 +190,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(vite@7.3.0(@types/node@20.12.11)(jiti@1.21.0)(less@4.5.1)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-svgr:
-        specifier: ^4.2.0
-        version: 4.2.0(rollup@4.54.0)(typescript@5.9.3)(vite@7.3.0(@types/node@20.12.11)(jiti@1.21.0)(less@4.5.1)(tsx@4.21.0)(yaml@2.8.2))
+        specifier: ^4.5.0
+        version: 4.5.0(rollup@4.54.0)(typescript@5.9.3)(vite@7.3.0(@types/node@20.12.11)(jiti@1.21.0)(less@4.5.1)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/chatui:
     dependencies:
@@ -1780,8 +1780,8 @@ packages:
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
 
-  '@rollup/pluginutils@5.1.0':
-    resolution: {integrity: sha512-XTIWOPPcpvyKI6L1NHo0lFlCyznUEyPmPY1mc3KpPVDYulHSTvyeLNVW00QTLIAFNhR3kYnJTQHeGqU4M3n09g==}
+  '@rollup/pluginutils@5.3.0':
+    resolution: {integrity: sha512-5EdhGZtnu3V88ces7s53hhfK5KSASnJZv8Lulpc04cWO3REESroJXg73DFsOmgbU2BhwV0E20bu2IDZb3VKW4Q==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -2985,8 +2985,8 @@ packages:
     resolution: {integrity: sha512-dJ6oBr5SQ1VSd9qkk7ByRgb/1SH4JZjCHSW/mr63/QcXO9zLVxvJ6Oy13nio03rxpSnVDDjFor75SjVeZWPW/A==}
     hasBin: true
 
-  error-ex@1.3.2:
-    resolution: {integrity: sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==}
+  error-ex@1.3.4:
+    resolution: {integrity: sha512-sqQamAnR14VgCr1A618A3sGrygcpK+HEbenA/HiEAkkUwcZIIB/tgWqHFxWgOyDh4nB4JCRimh79dR5Ywc9MDQ==}
 
   es-abstract@1.24.1:
     resolution: {integrity: sha512-zHXBLhP+QehSSbsS9Pt23Gg964240DPd6QCf8WpkqEXxQ7fhdZzYsocOr5u7apWonsS5EjZDmTF+/slGMyasvw==}
@@ -4995,10 +4995,10 @@ packages:
     peerDependencies:
       vite: '>= 2.9.5'
 
-  vite-plugin-svgr@4.2.0:
-    resolution: {integrity: sha512-SC7+FfVtNQk7So0XMjrrtLAbEC8qjFPifyD7+fs/E6aaNdVde6umlVVh0QuwDLdOMu7vp5RiGFsB70nj5yo0XA==}
+  vite-plugin-svgr@4.5.0:
+    resolution: {integrity: sha512-W+uoSpmVkSmNOGPSsDCWVW/DDAyv+9fap9AZXBvWiQqrboJ08j2vh0tFxTD/LjwqwAd3yYSVJgm54S/1GhbdnA==}
     peerDependencies:
-      vite: ^2.6.0 || 3 || 4 || 5
+      vite: '>=2.6.0'
 
   vite@5.4.21:
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
@@ -5383,7 +5383,7 @@ snapshots:
   '@babel/helper-module-imports@7.27.1':
     dependencies:
       '@babel/traverse': 7.29.0
-      '@babel/types': 7.29.0
+      '@babel/types': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6544,11 +6544,11 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
-  '@rollup/pluginutils@5.1.0(rollup@4.54.0)':
+  '@rollup/pluginutils@5.3.0(rollup@4.54.0)':
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
-      picomatch: 2.3.1
+      picomatch: 4.0.3
     optionalDependencies:
       rollup: 4.54.0
 
@@ -7748,7 +7748,7 @@ snapshots:
       prr: 1.0.1
     optional: true
 
-  error-ex@1.3.2:
+  error-ex@1.3.4:
     dependencies:
       is-arrayish: 0.2.1
 
@@ -9161,7 +9161,7 @@ snapshots:
   parse-json@5.2.0:
     dependencies:
       '@babel/code-frame': 7.29.0
-      error-ex: 1.3.2
+      error-ex: 1.3.4
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
@@ -10076,9 +10076,9 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  vite-plugin-svgr@4.2.0(rollup@4.54.0)(typescript@5.9.3)(vite@7.3.0(@types/node@20.12.11)(jiti@1.21.0)(less@4.5.1)(tsx@4.21.0)(yaml@2.8.2)):
+  vite-plugin-svgr@4.5.0(rollup@4.54.0)(typescript@5.9.3)(vite@7.3.0(@types/node@20.12.11)(jiti@1.21.0)(less@4.5.1)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@4.54.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.54.0)
       '@svgr/core': 8.1.0(typescript@5.9.3)
       '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@5.9.3))
       vite: 7.3.0(@types/node@20.12.11)(jiti@1.21.0)(less@4.5.1)(tsx@4.21.0)(yaml@2.8.2)
