@@ -55,7 +55,7 @@
     "sockjs-client": "^1.6.1",
     "tailwind-merge": "^2.5.3",
     "yaml": "^2.8.2",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@karmada/eslint-config-ts-react": "workspace:*",
