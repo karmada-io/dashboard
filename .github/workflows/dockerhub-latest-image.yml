@@ -55,7 +55,7 @@ jobs:
         with:
           go-version-file: go.mod
       - name: setup QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: setup buildx
         uses: docker/setup-buildx-action@v4
       - name: detect misc info
@@ -109,7 +109,7 @@ jobs:
         with:
           go-version-file: go.mod
       - name: setup QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: setup buildx
         uses: docker/setup-buildx-action@v4
       - name: detect misc info
@@ -153,7 +153,7 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v6
       - name: setup QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: setup buildx
         uses: docker/setup-buildx-action@v4
       - name: detect misc info
@@ -203,7 +203,7 @@ jobs:
         with:
           go-version-file: go.mod
       - name: setup QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: setup buildx
         uses: docker/setup-buildx-action@v4
       - name: detect misc info
