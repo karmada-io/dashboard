@@ -99,7 +99,27 @@ Create Service Account:
 kubectl apply -f artifacts/dashboard/karmada-dashboard-sa.yaml
 ```
 
-4. Get jwt token
+4. [Optional] For member-cluster management
+    - on the control-plane 
+      ```bash
+      kubectl --kubeconfig ~/.kube/karmada.config --context karmada-apiserver apply -f artifacts/dashboard/karmada-dashboard-clusterrolebinding.yaml
+      ```
+      
+    - on the member-cluster-plane
+      ```
+      member_clusters=(
+        member1
+        member2
+        member3
+      )
+      for member_cluster in ${member_clusters[@]}; do
+        echo "$member_cluster config start"
+        kubectl --kubeconfig ~/.kube/members.config --context $member_cluster apply -f artifacts/dashboard/member-cluster-clusterrolebinding.yaml
+        echo "$member_cluster config finish"
+      done
+      ```
+
+5. Get jwt token
 
 Execute the following code to get the jwt token:
 ```bash
