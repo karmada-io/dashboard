@@ -5,4 +5,5 @@ resources:
   - karmada-dashboard-sa.yaml
   - karmada-dashboard-web.yaml
   - karmada-dashboard-api.yaml
+  - kubernetes-dashboard-api.yaml
   - karmada-dashboard-configmap.yaml
