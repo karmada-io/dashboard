@@ -163,8 +163,8 @@ func run(ctx context.Context, opts *options.Options) error {
 		}
 	}
 
-	serve(opts, mcpClient)
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
+	serve(opts, mcpClient)
 
 	// Cleanup on shutdown
 	if mcpClient != nil {
