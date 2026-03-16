@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@karmada/eslint-config-ts-react": "workspace:*",
-    "@playwright/test": "^1.57.0",
+    "@playwright/test": "^1.58.2",
     "@types/lodash": "^4.17.24",
     "@types/node": "^20.12.11",
     "@types/react": "^19.2.14",
