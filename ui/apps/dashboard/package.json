@@ -33,7 +33,7 @@
     "@karmada/i18n-tool": "workspace:*",
     "@karmada/terminal": "workspace:*",
     "@karmada/utils": "workspace:*",
-    "@kubernetes/client-node": "^1.3.0",
+    "@kubernetes/client-node": "^1.4.0",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@monaco-editor/react": "^4.6.0",
     "@tanstack/react-query": "^5.90.21",
