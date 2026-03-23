@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 20
       - name: install node dependencies
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
