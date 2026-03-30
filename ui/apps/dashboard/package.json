@@ -44,7 +44,7 @@
     "clsx": "^2.1.1",
     "i18next": "^25.8.0",
     "lodash": "^4.17.23",
-    "lucide-react": "^0.564.0",
+    "lucide-react": "^0.577.0",
     "monaco-editor": "^0.55.1",
     "monaco-yaml": "^5.4.0",
     "react": "^19.2.4",
