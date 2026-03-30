@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Use the official ttyd image as the base
-FROM tsl0922/ttyd:1.7.7
+FROM tsl0922/ttyd:1.7.8
 
 ARG KARMADACTL_VERSION=v1.13.0
 ARG KUBECTL_VERSION=v1.32.0
