@@ -58,7 +58,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
@@ -142,7 +142,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
