@@ -11,7 +11,7 @@ require (
 	github.com/go-openapi/spec v0.22.4
 	github.com/gobuffalo/flect v1.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/karmada-io/karmada v1.17.0
+	github.com/karmada-io/karmada v1.17.1
 	github.com/mark3labs/mcp-go v0.47.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.67.5
@@ -148,7 +148,7 @@ require (
 	k8s.io/apiserver v0.35.0 // indirect
 	k8s.io/cli-runtime v0.35.0 // indirect
 	k8s.io/kube-aggregator v0.35.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20260127142750-a19766b6e2d4 // indirect
+	k8s.io/kube-openapi v0.0.0-20260304202019-5b3e3fdb0acf // indirect
 	modernc.org/libc v1.22.5 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
