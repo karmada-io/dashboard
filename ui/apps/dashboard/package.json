@@ -40,7 +40,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "@xterm/xterm": "^6.0.0",
     "antd": "^6.2.0",
-    "axios": "^1.13.4",
+    "axios": "^1.14.0",
     "clsx": "^2.1.1",
     "i18next": "^25.8.0",
     "lodash": "^4.17.23",
