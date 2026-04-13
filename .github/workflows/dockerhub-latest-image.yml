@@ -83,7 +83,7 @@ jobs:
           ls -al _output/bin
           ls -al _output/bin/dist
       - name: build and push image
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           file: "cluster/images/build-web.Dockerfile"
           context: "_output/bin/"
@@ -128,7 +128,7 @@ jobs:
       - name: build karmada-dashboard-api binary
         run: BUILD_PLATFORMS=${{ steps.misc.outputs.platforms }} make karmada-dashboard-api
       - name: build and push image
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           file: "cluster/images/Dockerfile"
           context: "_output/bin/"
@@ -172,7 +172,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build and push image
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           file: "cluster/images/build-terminal.Dockerfile"
           context: "."
@@ -222,7 +222,7 @@ jobs:
       - name: build kubernetes-dashboard-api binary
         run: BUILD_PLATFORMS=${{ steps.misc.outputs.platforms }} make kubernetes-dashboard-api
       - name: build and push image
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           file: "cluster/images/Dockerfile"
           context: "_output/bin/"
