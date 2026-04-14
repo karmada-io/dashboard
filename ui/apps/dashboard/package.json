@@ -54,7 +54,7 @@
     "react-router-dom": "^7.13.0",
     "sockjs-client": "^1.6.1",
     "tailwind-merge": "^2.5.3",
-    "yaml": "^2.8.2",
+    "yaml": "^2.8.3",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
