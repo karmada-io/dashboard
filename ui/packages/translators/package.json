@@ -19,7 +19,7 @@
   "devDependencies": {
     "tsup": "^8.5.1",
     "vite": "^8.0.3",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.4"
   },
   "dependencies": {
     "got": "^14.6.6",
