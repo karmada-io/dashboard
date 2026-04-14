@@ -31,7 +31,7 @@
   "dependencies": {
     "@karmada/utils": "workspace:*",
     "file-saver": "^2.0.5",
-    "trzsz": "^1.1.5",
+    "trzsz": "^1.1.6",
     "zmodem.js": "^0.1.10"
   },
   "devDependencies": {

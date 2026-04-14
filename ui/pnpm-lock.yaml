@@ -425,8 +425,8 @@ importers:
         specifier: ^2.0.5
         version: 2.0.5
       trzsz:
-        specifier: ^1.1.5
-        version: 1.1.5
+        specifier: ^1.1.6
+        version: 1.1.6
       zmodem.js:
         specifier: ^0.1.10
         version: 0.1.10(patch_hash=hu5xjluf4ypxmwfl72cvrgotsq)
@@ -4840,8 +4840,8 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
-  trzsz@1.1.5:
-    resolution: {integrity: sha512-yjL25MBVp7TPnUJZ3aqMAmsUo0fECm96BYllLac0CbsgYT/JpKIi9Fv7wJmBfBwYGn2xf7b/YRVrCmkhed3Nmw==}
+  trzsz@1.1.6:
+    resolution: {integrity: sha512-UkUk7xQ96ZNWhmkpqDJxAzi2Zk52siPdHlitI+JtxwpEpYTR98KK/j0CoVrk3DWoLXeFqxNutSeUIOVzP1Eosg==}
     hasBin: true
 
   ts-api-utils@2.4.0:
@@ -9889,7 +9889,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  trzsz@1.1.5: {}
+  trzsz@1.1.6: {}
 
   ts-api-utils@2.4.0(typescript@5.9.3):
     dependencies:
