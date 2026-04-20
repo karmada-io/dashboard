@@ -22,7 +22,7 @@
     "vitest": "^4.1.4"
   },
   "dependencies": {
-    "got": "^14.6.6",
+    "got": "^15.0.2",
     "openai": "^6.10.0",
     "@karmada/utils": "workspace:*"
   }
