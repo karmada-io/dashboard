@@ -96,8 +96,8 @@ importers:
         specifier: ^0.55.1
         version: 0.55.1
       monaco-yaml:
-        specifier: ^5.4.0
-        version: 5.4.0(monaco-editor@0.55.1)
+        specifier: ^5.4.1
+        version: 5.4.1(monaco-editor@0.55.1)
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -231,7 +231,7 @@ importers:
         version: 1.0.6(eslint@8.57.1)
       eslint-plugin-prettier:
         specifier: ^5.5.5
-        version: 5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@8.57.1))(eslint@8.57.1)(prettier@3.8.1)
+        version: 5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@8.57.1))(eslint@8.57.1)(prettier@3.8.3)
     devDependencies:
       '@types/eslint':
         specifier: ^9.6.1
@@ -3966,16 +3966,16 @@ packages:
   monaco-marker-data-provider@1.2.5:
     resolution: {integrity: sha512-5ZdcYukhPwgYMCvlZ9H5uWs5jc23BQ8fFF5AhSIdrz5mvYLsqGZ58ZLxTv8rCX6+AxdJ8+vxg1HVSk+F2bLosg==}
 
-  monaco-types@0.1.1:
-    resolution: {integrity: sha512-cxYEIVVKQ46FsH96b91pn+9jdl/Bz8rJ08oNeUgK2DNMGQUMuZh77USqt+L0ns9Y+/aFItWyPBgj6bkZvtWCsQ==}
+  monaco-types@0.1.2:
+    resolution: {integrity: sha512-8LwfrlWXsedHwAL41xhXyqzPibS8IqPuIXr9NdORhonS495c2/wky+sI1PRLvMCuiI0nqC2NH1six9hdiRY4Xg==}
 
   monaco-worker-manager@2.0.1:
     resolution: {integrity: sha512-kdPL0yvg5qjhKPNVjJoym331PY/5JC11aPJXtCZNwWRvBr6jhkIamvYAyiY5P1AWFmNOy0aRDRoMdZfa71h8kg==}
     peerDependencies:
       monaco-editor: '>=0.30.0'
 
-  monaco-yaml@5.4.0:
-    resolution: {integrity: sha512-tuBVDy1KAPrgO905GHTItu8AaA5bIzF5S4X0JVRAE/D66FpRhkDUk7tKi5bwKMVTTugtpMLsXN4ewh4CgE/FtQ==}
+  monaco-yaml@5.4.1:
+    resolution: {integrity: sha512-YQ6d/Ei98Uk073SJLFbwuSi95qhnl8F8NNmIUqN2XhDt9psZN2LqQ1T7pPQ866NJb2wFj44IrjnANgpa2jTfag==}
     peerDependencies:
       monaco-editor: '>=0.36'
 
@@ -4315,13 +4315,13 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.7.4:
-    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
 
-  prettier@3.8.1:
-    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
+  prettier@3.8.3:
+    resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -7902,10 +7902,10 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
-  eslint-plugin-prettier@5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@8.57.1))(eslint@8.57.1)(prettier@3.8.1):
+  eslint-plugin-prettier@5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@8.57.1))(eslint@8.57.1)(prettier@3.8.3):
     dependencies:
       eslint: 8.57.1
-      prettier: 3.8.1
+      prettier: 3.8.3
       prettier-linter-helpers: 1.0.1
       synckit: 0.11.12
     optionalDependencies:
@@ -8912,30 +8912,30 @@ snapshots:
 
   monaco-languageserver-types@0.4.0:
     dependencies:
-      monaco-types: 0.1.1
+      monaco-types: 0.1.2
       vscode-languageserver-protocol: 3.17.5
       vscode-uri: 3.1.0
 
   monaco-marker-data-provider@1.2.5:
     dependencies:
-      monaco-types: 0.1.1
+      monaco-types: 0.1.2
 
-  monaco-types@0.1.1: {}
+  monaco-types@0.1.2: {}
 
   monaco-worker-manager@2.0.1(monaco-editor@0.55.1):
     dependencies:
       monaco-editor: 0.55.1
 
-  monaco-yaml@5.4.0(monaco-editor@0.55.1):
+  monaco-yaml@5.4.1(monaco-editor@0.55.1):
     dependencies:
       jsonc-parser: 3.3.1
       monaco-editor: 0.55.1
       monaco-languageserver-types: 0.4.0
       monaco-marker-data-provider: 1.2.5
-      monaco-types: 0.1.1
+      monaco-types: 0.1.2
       monaco-worker-manager: 2.0.1(monaco-editor@0.55.1)
       path-browserify: 1.0.1
-      prettier: 3.7.4
+      prettier: 3.8.3
       vscode-languageserver-textdocument: 1.0.12
       vscode-languageserver-types: 3.17.5
       vscode-uri: 3.1.0
@@ -9229,9 +9229,9 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.7.4: {}
-
   prettier@3.8.1: {}
+
+  prettier@3.8.3: {}
 
   promise-stream-reader@1.0.1: {}
 
