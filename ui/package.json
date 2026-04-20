@@ -34,7 +34,7 @@
     "turbo": "^2.8.17"
   },
   "dependencies": {
-    "dayjs": "^1.11.19"
+    "dayjs": "^1.11.20"
   },
   "packageManager": "pnpm@9.1.2",
   "pnpm": {
