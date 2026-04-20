@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.23.3
+FROM alpine:3.23.4
 
 ARG BINARY
 ARG TARGETPLATFORM
