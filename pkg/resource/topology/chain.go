@@ -255,11 +255,12 @@ func traceChain(
 				mu.Lock()
 				defer mu.Unlock()
 				resp.Nodes = append(resp.Nodes, TopologyNode{
-					ID:      workNodeID,
-					Type:    NodeTypeWork,
-					Name:    w.Name,
-					Cluster: clusterName,
-					Status:  NodeStatusHealthy,
+					ID:        workNodeID,
+					Type:      NodeTypeWork,
+					Name:      w.Name,
+					Namespace: w.Namespace,
+					Cluster:   clusterName,
+					Status:    NodeStatusHealthy,
 				})
 				opLabel := ""
 				var opEdgeData *TopologyEdgeData
