@@ -24,7 +24,8 @@ import (
 
 // GetResourceTopology traces the full propagation topology for a given resource.
 func GetResourceTopology(
+	ctx context.Context,
 	k8sClient kubeclient.Interface,
 	namespace, name, kind string) (*TopologyResponse, error) {
-	return traceChain(context.TODO(), k8sClient, namespace, name, kind)
+	return traceChain(ctx, k8sClient, namespace, name, kind)
 }
