@@ -239,11 +239,12 @@ func traceChain(
 			workNodeID := fmt.Sprintf("work-%s", w.UID)
 			overrides := parseOverridePolicies(w.Annotations, namespace)
 			resp.Nodes = append(resp.Nodes, TopologyNode{
-				ID:      workNodeID,
-				Type:    NodeTypeWork,
-				Name:    w.Name,
-				Cluster: clusterName,
-				Status:  NodeStatusHealthy,
+				ID:        workNodeID,
+				Type:      NodeTypeWork,
+				Name:      w.Name,
+				Namespace: w.Namespace,
+				Cluster:   clusterName,
+				Status:    NodeStatusHealthy,
 			})
 			opLabel := ""
 			var opEdgeData *TopologyEdgeData
