@@ -29,6 +29,7 @@ const nodeTypeLabels: Record<string, string> = {
   ResourceBinding: 'Resource Binding',
   Work: 'Work',
   MemberClusterWorkload: 'Member Workload',
+  Pod: 'Pod',
 };
 
 function TopologyNodeComponent({ data }: NodeProps) {

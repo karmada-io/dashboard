@@ -25,6 +25,7 @@ const (
 	NodeTypeResourceBinding       NodeType = "ResourceBinding"
 	NodeTypeWork                  NodeType = "Work"
 	NodeTypeMemberClusterWorkload NodeType = "MemberClusterWorkload"
+	NodeTypePod                   NodeType = "Pod"
 )
 
 // NodeStatus represents the health status of a topology node.
@@ -99,4 +100,10 @@ type ResourceTemplateNodeData struct {
 // WorkNodeData carries extra info for Work type nodes.
 type WorkNodeData struct {
 	OverridePolicies []OverridePolicyRef `json:"overridePolicies,omitempty"`
+}
+
+// PodNodeData carries extra info for Pod type nodes.
+type PodNodeData struct {
+	Ready bool   `json:"ready"`
+	Phase string `json:"phase"`
 }
