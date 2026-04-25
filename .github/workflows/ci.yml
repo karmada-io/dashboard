@@ -58,10 +58,15 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 20
-      - uses: pnpm/action-setup@078e9d416474b29c0c387560859308974f7e9c53 # v6.0.1
+      - uses: pnpm/action-setup@71c92474e7e4f5bca283fb17ef80fba9cdb2b4b1 # v6.0.2
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
+      - name: Assert pnpm version
+        run: |
+          which pnpm
+          pnpm --version
+          test "$(pnpm --version)" = "9.1.2"
       - name: Build dashboard
         run: |
           echo "Start build"
@@ -93,7 +98,7 @@ jobs:
         # Here support the latest three minor releases of Kubernetes, this can be considered to be roughly
         # the same as the End of Life of the Kubernetes release: https://kubernetes.io/releases/
         # Please remember to update the CI Schedule Workflow when we add a new version.
-        k8s: [ v1.31.0, v1.32.0, v1.33.0 ]
+        k8s: [ v1.33.0, v1.34.0, v1.35.0 ]
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
@@ -142,10 +147,15 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 20
-      - uses: pnpm/action-setup@078e9d416474b29c0c387560859308974f7e9c53 # v6.0.1
+      - uses: pnpm/action-setup@71c92474e7e4f5bca283fb17ef80fba9cdb2b4b1 # v6.0.2
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
+      - name: Assert pnpm version
+        run: |
+          which pnpm
+          pnpm --version
+          test "$(pnpm --version)" = "9.1.2"
 
       - name: Install dependencies
         run: |
@@ -199,8 +209,8 @@ jobs:
       - name: Test API connectivity before running tests
         run: |
           echo "Testing API connectivity..."
-          curl -f http://localhost:8000/api/v1/cluster && echo "✓ Cluster API works" || echo "✗ Cluster API failed"
-          curl -f http://localhost:8000/api/v1/namespace && echo "✓ Namespace API works" || echo "✗ Namespace API failed"
+          curl -f -H "Authorization: Bearer ${KARMADA_TOKEN}" http://localhost:8000/api/v1/cluster && echo "✓ Cluster API works" || echo "✗ Cluster API failed"
+          curl -f -H "Authorization: Bearer ${KARMADA_TOKEN}" http://localhost:8000/api/v1/namespace && echo "✓ Namespace API works" || echo "✗ Namespace API failed"
           echo "API tests completed"
       - name: Debug working dir
         if: ${{ env.DEBUG == 'true' }}
