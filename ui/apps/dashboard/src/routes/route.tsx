@@ -28,6 +28,7 @@ import {
   MultiCloudService,
   MultiCloudworkload,
 } from '@/pages/multicloud-resource-manage';
+import MultiCloudTopology from '@/pages/topology';
 import {
   MultiCloudOverridePolicy,
   MultiCloudPropagationPolicy,
@@ -107,6 +108,15 @@ export function getRoutes() {
             sidebarKey: 'OVERVIEW',
             sidebarName: i18nInstance.t('86385379cf9cfbc2c554944f1c054a45'),
             icon: <Icons.overview {...IconStyles} />,
+          },
+        },
+        {
+          path: '/topology',
+          element: <MultiCloudTopology />,
+          handle: {
+            sidebarKey: 'TOPOLOGY',
+            sidebarName: i18nInstance.t('topology_sidebar_key', 'Topology'),
+            icon: <Icons.topology {...IconStyles} />,
           },
         },
         {

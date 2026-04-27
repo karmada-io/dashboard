@@ -19,10 +19,7 @@ import Panel from '@/components/panel';
 import {
   App,
   Button,
-  Input,
   Popconfirm,
-  Segmented,
-  Select,
   Space,
   Table,
   TableColumnProps,
@@ -43,6 +40,7 @@ import { stringify } from 'yaml';
 import TagList, { convertLabelToTags } from '@/components/tag-list';
 import { WorkloadKind } from '@/services/base.ts';
 import useNamespace from '@/hooks/use-namespace.ts';
+import WorkloadFilter from '@/components/workload-filter';
 
 const propagationpolicyKey = 'propagationpolicy.karmada.io/name';
 const WorkloadPage = () => {
@@ -215,98 +213,51 @@ const WorkloadPage = () => {
   const { message: messageApi } = App.useApp();
   return (
     <Panel>
-      <div className={'flex flex-row justify-between mb-4'}>
-        <div>
-          <Segmented
-            value={filter.kind}
-            style={{
-              marginBottom: 8,
-            }}
-            onChange={(value) => {
-              // reset filter when switch workload kind
-              const k = value as WorkloadKind;
-              if (k !== filter.kind) {
-                setFilter({
-                  ...filter,
-                  kind: value as WorkloadKind,
-                  selectedWorkSpace: '',
-                  searchText: '',
-                });
-              } else {
-                setFilter({
-                  ...filter,
-                  kind: value as WorkloadKind,
-                });
-              }
-            }}
-            options={[
-              {
-                label: 'Deployment',
-                value: WorkloadKind.Deployment,
-              },
-              {
-                label: 'Statefulset',
-                value: WorkloadKind.Statefulset,
-              },
-              {
-                label: 'Daemonset',
-                value: WorkloadKind.Daemonset,
-              },
-              {
-                label: 'Cronjob',
-                value: WorkloadKind.Cronjob,
-              },
-              {
-                label: 'Job',
-                value: WorkloadKind.Job,
-              },
-            ]}
-          />
-        </div>
-        <Button
-          type={'primary'}
-          icon={<Icons.add width={16} height={16} />}
-          className="flex flex-row items-center"
-          onClick={() => {
-            toggleShowModal(true);
-          }}
-        >
-          {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0', '新增工作负载')}
-        </Button>
-      </div>
-      <div className={'flex flex-row space-x-4 mb-4'}>
-        <h3 className={'leading-[32px]'}>
-          {i18nInstance.t('280c56077360c204e536eb770495bc5f', '命名空间')}：
-        </h3>
-        <Select
-          options={nsOptions}
-          className={'min-w-[200px]'}
-          value={filter.selectedWorkSpace}
-          loading={isNsDataLoading}
-          showSearch
-          allowClear
-          onChange={(v) => {
+      <WorkloadFilter
+        kind={filter.kind}
+        namespace={filter.selectedWorkSpace}
+        onKindChange={(k) => {
+          if (k !== filter.kind) {
             setFilter({
               ...filter,
-              selectedWorkSpace: v,
+              kind: k,
+              selectedWorkSpace: '',
+              searchText: '',
             });
-          }}
-        />
-        <Input.Search
-          placeholder={i18nInstance.t(
-            'cfaff3e369b9bd51504feb59bf0972a0',
-            '按命名空间搜索',
-          )}
-          className={'w-[300px]'}
-          onPressEnter={(e) => {
-            const input = e.currentTarget.value;
+          } else {
             setFilter({
               ...filter,
-              searchText: input,
+              kind: k,
             });
-          }}
-        />
-      </div>
+          }
+        }}
+        onNamespaceChange={(v) => {
+          setFilter({
+            ...filter,
+            selectedWorkSpace: v,
+          });
+        }}
+        onSearch={(input) => {
+          setFilter({
+            ...filter,
+            searchText: input,
+          });
+        }}
+        nsOptions={nsOptions}
+        isNsDataLoading={isNsDataLoading}
+        extra={
+          <Button
+            type={'primary'}
+            icon={<Icons.add width={16} height={16} />}
+            className="flex flex-row items-center"
+            onClick={() => {
+              toggleShowModal(true);
+            }}
+          >
+            {i18nInstance.t('96d6b0fcc58b6f65dc4c00c6138d2ac0', '新增工作负载')}
+          </Button>
+        }
+      />
       <Table
         rowKey={(r: DeploymentWorkload) =>
           `${r.objectMeta.namespace}-${r.objectMeta.name}` || ''
