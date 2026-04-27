@@ -62,6 +62,11 @@ jobs:
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
+      - name: Assert pnpm version
+        run: |
+          which pnpm
+          pnpm --version
+          test "$(pnpm --version)" = "9.1.2"
       - name: Build dashboard
         run: |
           echo "Start build"
@@ -93,7 +98,7 @@ jobs:
         # Here support the latest three minor releases of Kubernetes, this can be considered to be roughly
         # the same as the End of Life of the Kubernetes release: https://kubernetes.io/releases/
         # Please remember to update the CI Schedule Workflow when we add a new version.
-        k8s: [ v1.31.0, v1.32.0, v1.33.0 ]
+        k8s: [ v1.33.0, v1.34.0, v1.35.0 ]
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
@@ -146,7 +151,11 @@ jobs:
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
-
+      - name: Assert pnpm version
+        run: |
+          which pnpm
+          pnpm --version
+          test "$(pnpm --version)" = "9.1.2"
       - name: Install dependencies
         run: |
           echo "Start build"
