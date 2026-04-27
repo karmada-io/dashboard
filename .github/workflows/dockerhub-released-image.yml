@@ -25,6 +25,11 @@ jobs:
         with:
           # keep in sync with the packageManager version in `ui/package.json`
           version: 9.1.2
+      - name: Assert pnpm version
+        run: |
+          which pnpm
+          pnpm --version
+          test "$(pnpm --version)" = "9.1.2"
       - name: build dashboard
         run: |
           echo "Start build"
