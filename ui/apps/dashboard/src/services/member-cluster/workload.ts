@@ -64,8 +64,8 @@ export async function GetMemberClusterWorkloads(params: {
     requestData.filterBy = ['name', params.keyword];
   }
   const url = namespace
-    ? `/clusterapi/${memberClusterName}/api/v1/${kind}/${namespace}`
-    : `/clusterapi/${memberClusterName}/api/v1/${kind}`;
+    ? `/api/v1/member/${memberClusterName}/${kind}/${namespace}`
+    : `/api/v1/member/${memberClusterName}/${kind}`;
   const resp = await karmadaMemberClusterClient.get<{
     errors: string[];
     listMeta: {
@@ -95,8 +95,8 @@ export async function GetMemberClusterDeployments(params: {
 }) {
   const { memberClusterName, namespace, keyword, ...queryParams } = params;
   const url = namespace
-    ? `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}`
-    : `/clusterapi/${memberClusterName}/api/v1/deployment`;
+    ? `/api/v1/member/${memberClusterName}/deployment/${namespace}`
+    : `/api/v1/member/${memberClusterName}/deployment`;
   const requestData = { ...queryParams } as DataSelectQuery;
   if (keyword) {
     requestData.filterBy = ['name', keyword];
@@ -263,7 +263,7 @@ export async function GetMemberClusterWorkloadDetail(params: {
   kind: WorkloadKind;
 }) {
   const { memberClusterName, kind, name, namespace } = params;
-  const url = `/clusterapi/${memberClusterName}/api/v1/${kind}/${namespace}/${name}`;
+  const url = `/api/v1/member/${memberClusterName}/${kind}/${namespace}/${name}`;
   const resp = await karmadaMemberClusterClient.get<{
     errors: string[];
   } & WorkloadDetail>(url);
@@ -294,7 +294,7 @@ export async function GetMemberClusterWorkloadEvents(params: {
   kind: WorkloadKind;
 }) {
   const { memberClusterName, kind, name, namespace } = params;
-  const url = `/clusterapi/${memberClusterName}/api/v1/${kind}/${namespace}/${name}/event`;
+  const url = `/api/v1/member/${memberClusterName}/${kind}/${namespace}/${name}/event`;
   const resp = await karmadaMemberClusterClient.get<{
     errors: string[];
     listMeta: {
@@ -318,7 +318,7 @@ export async function CreateMemberClusterDeployment(params: {
       totalItems: number;
     };
     events: WorkloadEvent[];
-  }>(`/clusterapi/${memberClusterName}/api/v1/deployment`, deploymentParams);
+  }>(`/api/v1/member/${memberClusterName}/deployment`, deploymentParams);
   return resp;
 }
 
@@ -336,7 +336,7 @@ export async function GetMemberClusterDeploymentNewReplicaSets(params: {
     };
     replicaSets: any[];
   }>(
-    `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}/${name}/newreplicaset`,
+    `/api/v1/member/${memberClusterName}/deployment/${namespace}/${name}/newreplicaset`,
   );
   return resp;
 }
@@ -354,7 +354,7 @@ export async function GetMemberClusterDeploymentOldReplicaSets(params: {
     };
     replicaSets: any[];
   }>(
-    `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}/${name}/oldreplicaset`,
+    `/api/v1/member/${memberClusterName}/deployment/${namespace}/${name}/oldreplicaset`,
   );
   return resp;
 }
@@ -366,7 +366,7 @@ export async function PauseMemberClusterDeployment(params: {
 }) {
   const { memberClusterName, namespace, name } = params;
   const resp = await karmadaMemberClusterClient.put<any>(
-    `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}/${name}/pause`,
+    `/api/v1/member/${memberClusterName}/deployment/${namespace}/${name}/pause`,
   );
   return resp;
 }
@@ -378,7 +378,7 @@ export async function ResumeMemberClusterDeployment(params: {
 }) {
   const { memberClusterName, namespace, name } = params;
   const resp = await karmadaMemberClusterClient.put<any>(
-    `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}/${name}/resume`,
+    `/api/v1/member/${memberClusterName}/deployment/${namespace}/${name}/resume`,
   );
   return resp;
 }
@@ -390,7 +390,7 @@ export async function RestartMemberClusterDeployment(params: {
 }) {
   const { memberClusterName, namespace, name } = params;
   const resp = await karmadaMemberClusterClient.put<any>(
-    `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}/${name}/restart`,
+    `/api/v1/member/${memberClusterName}/deployment/${namespace}/${name}/restart`,
   );
   return resp;
 }
@@ -403,7 +403,7 @@ export async function RollbackMemberClusterDeployment(params: {
 }) {
   const { memberClusterName, namespace, name, targetRevision } = params;
   const resp = await karmadaMemberClusterClient.put<any>(
-    `/clusterapi/${memberClusterName}/api/v1/deployment/${namespace}/${name}/rollback`,
+    `/api/v1/member/${memberClusterName}/deployment/${namespace}/${name}/rollback`,
     { targetRevision },
   );
   return resp;

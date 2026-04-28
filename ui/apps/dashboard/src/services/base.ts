@@ -152,6 +152,16 @@ interface MemberClusterResponse {
 
 karmadaMemberClusterClient.interceptors.response.use(
   (response) => {
+    // Unwrap BaseResponse { code, message, data } wrapper from the backend
+    if (
+      response.data &&
+      typeof response.data === 'object' &&
+      'code' in response.data &&
+      'data' in response.data
+    ) {
+      response.data = response.data.data;
+    }
+
     const data = response.data as MemberClusterResponse | undefined;
     const errors = data?.errors ?? [];
 

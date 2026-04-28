@@ -74,8 +74,8 @@ export async function GetMemberClusterPods(params: {
 }) {
   const { memberClusterName, namespace, keyword } = params;
   const url = namespace
-    ? `/clusterapi/${memberClusterName}/api/v1/pod/${namespace}`
-    : `/clusterapi/${memberClusterName}/api/v1/pod`;
+    ? `/api/v1/member/${memberClusterName}/pod/${namespace}`
+    : `/api/v1/member/${memberClusterName}/pod`;
   const requestData = {} as DataSelectQuery;
   if (keyword) {
     requestData.filterBy = ['name', keyword];
@@ -100,7 +100,7 @@ export async function GetMemberClusterPodDetail(params: {
   const { memberClusterName, namespace, name } = params;
   const resp = await karmadaMemberClusterClient.get<{
     errors: string[];
-  } & PodDetail>(`/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${name}`);
+  } & PodDetail>(`/api/v1/member/${memberClusterName}/pod/${namespace}/${name}`);
   return resp;
 }
 
@@ -113,7 +113,7 @@ export async function GetMemberClusterPodContainers(params: {
   const resp = await karmadaMemberClusterClient.get<{
     containers: Container[];
   }>(
-    `/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${name}/container`,
+    `/api/v1/member/${memberClusterName}/pod/${namespace}/${name}/container`,
   );
   return resp;
 }
@@ -130,7 +130,7 @@ export async function GetMemberClusterPodEvents(params: {
       totalItems: number;
     };
     events: any[];
-  }>(`/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${name}/event`);
+  }>(`/api/v1/member/${memberClusterName}/pod/${namespace}/${name}/event`);
   return resp;
 }
 
@@ -143,7 +143,7 @@ export async function GetMemberClusterPodPersistentVolumeClaims(params: {
   const resp = await karmadaMemberClusterClient.get<{
     persistentVolumeClaims: any[];
   }>(
-    `/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${name}/persistentvolumeclaim`,
+    `/api/v1/member/${memberClusterName}/pod/${namespace}/${name}/persistentvolumeclaim`,
   );
   return resp;
 }
@@ -156,7 +156,7 @@ export async function GetMemberClusterPodShell(params: {
 }) {
   const { memberClusterName, namespace, pod, container } = params;
   const resp = await karmadaMemberClusterClient.get<any>(
-    `/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${pod}/shell/${container}`,
+    `/api/v1/member/${memberClusterName}/pod/${namespace}/${pod}/shell/${container}`,
   );
   return resp;
 }
