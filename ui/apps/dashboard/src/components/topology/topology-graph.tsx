@@ -37,6 +37,7 @@ import PropagationPolicyEditorDrawer from '@/pages/multicloud-policy-manage/prop
 import OverridePolicyEditorDrawer from '@/pages/multicloud-policy-manage/override-policy/override-policy-editor-drawer';
 import ResourceBindingDetailDrawer from '@/pages/multicloud-resource-manage/resource-binding/resource-binding-detail-drawer';
 import WorkDetailDrawer from '@/pages/multicloud-resource-manage/work/work-detail-drawer';
+import MemberClusterWorkloadDetailDrawer from '@/pages/member-cluster/workload/member-cluster-workload-detail-drawer';
 import { GetResource } from '@/services/unstructured';
 import { stringify } from 'yaml';
 
@@ -78,6 +79,14 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
   const [rbDrawerState, setRbDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
   const [workDrawerState, setWorkDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
 
+  const [memberWorkloadDrawerState, setMemberWorkloadDrawerState] = useState<{
+    open: boolean;
+    memberClusterName: string;
+    namespace: string;
+    name: string;
+    kind: WorkloadKind;
+  }>({ open: false, memberClusterName: '', namespace: '', name: '', kind: '' as WorkloadKind });
+
   const onNodeClick = useCallback(async (_: React.MouseEvent, node: Node) => {
     const d = node.data as unknown as TopologyNodeData;
     if (d.nodeType === 'ResourceTemplate' && d.kind && d.namespace && d.name) {
@@ -111,6 +120,14 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
       } catch (err) {
         console.error('Failed to fetch Work detail', err);
       }
+    } else if (d.nodeType === 'MemberClusterWorkload' && d.cluster && d.name && d.namespace && d.kind) {
+      setMemberWorkloadDrawerState({
+        open: true,
+        memberClusterName: d.cluster,
+        namespace: d.namespace,
+        name: d.name,
+        kind: d.kind.toLowerCase() as WorkloadKind,
+      });
     }
   }, []);
 
@@ -272,6 +289,14 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         namespace={workDrawerState.namespace}
         content={workDrawerState.content}
         onClose={() => setWorkDrawerState(closedPolicyDrawer)}
+      />
+      <MemberClusterWorkloadDetailDrawer
+        open={memberWorkloadDrawerState.open}
+        memberClusterName={memberWorkloadDrawerState.memberClusterName}
+        namespace={memberWorkloadDrawerState.namespace}
+        name={memberWorkloadDrawerState.name}
+        kind={memberWorkloadDrawerState.kind}
+        onClose={() => setMemberWorkloadDrawerState((s) => ({ ...s, open: false }))}
       />
     </>
   );
