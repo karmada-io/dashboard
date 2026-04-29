@@ -26,10 +26,10 @@ import (
 	policyv1alpha1 "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	workv1alpha1 "github.com/karmada-io/karmada/pkg/apis/work/v1alpha1"
 	workv1alpha2 "github.com/karmada-io/karmada/pkg/apis/work/v1alpha2"
-		karmadautil "github.com/karmada-io/karmada/pkg/util"
-		karmadanames "github.com/karmada-io/karmada/pkg/util/names"
-		"golang.org/x/sync/errgroup"
-		corev1 "k8s.io/api/core/v1"
+	karmadautil "github.com/karmada-io/karmada/pkg/util"
+	karmadanames "github.com/karmada-io/karmada/pkg/util/names"
+	"golang.org/x/sync/errgroup"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kubeclient "k8s.io/client-go/kubernetes"
@@ -445,34 +445,33 @@ func traceChain(
 					Status:    memberStatus,
 				})
 				resp.Edges = append(resp.Edges, TopologyEdge{Source: workNodeID, Target: memberNodeID})
+
+				// Step 5: Get Pods in member cluster
+				pods, err := getPodsByWorkUID(ctx, clusterName, namespace, name, kind)
+				if err != nil {
+					klog.V(4).InfoS("Failed to get pods", "work", w.Name, "cluster", clusterName, "err", err)
+					return nil
+				}
+				for _, pod := range pods {
+					podNodeID := fmt.Sprintf("pod-%s-%s", clusterName, pod.UID)
+					resp.Nodes = append(resp.Nodes, TopologyNode{
+						ID:        podNodeID,
+						Type:      NodeTypePod,
+						Name:      pod.Name,
+						Namespace: pod.Namespace,
+						Cluster:   clusterName,
+						Status:    getPodStatus(pod),
+					})
+					resp.Edges = append(resp.Edges, TopologyEdge{
+						Source: memberNodeID,
+						Target: podNodeID,
+					})
+				}
 				return nil
 			})
-			// Step 5: Get Pods in member cluster
-			pods, err := getPodsByWorkUID(ctx, clusterName, namespace, name, kind)
-			if err != nil {
-				klog.V(4).InfoS("Failed to get pods", "work", w.Name, "cluster", clusterName, "err", err)
-				return nil
-			}
-			for _, pod := range pods {
-				podNodeID := fmt.Sprintf("pod-%s-%s", clusterName, pod.UID)
-				resp.Nodes = append(resp.Nodes, TopologyNode{
-					ID:        podNodeID,
-					Type:      NodeTypePod,
-					Name:      pod.Name,
-					Namespace: pod.Namespace,
-					Cluster:   clusterName,
-					Status:    getPodStatus(pod),
-				})
-				resp.Edges = append(resp.Edges, TopologyEdge{
-					Source: memberNodeID,
-					Target: podNodeID,
-				})
-			}
-			return nil
-		})
-	}
-	if err := g.Wait(); err != nil {
-		return nil, err
+		}
+		if err := g.Wait(); err != nil {
+			return nil, err
 		}
 	}
 	return resp, nil
