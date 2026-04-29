@@ -36,6 +36,7 @@ import { WorkloadKind } from '@/services/base';
 import PropagationPolicyEditorDrawer from '@/pages/multicloud-policy-manage/propagation-policy/propagation-policy-editor-drawer';
 import OverridePolicyEditorDrawer from '@/pages/multicloud-policy-manage/override-policy/override-policy-editor-drawer';
 import ResourceBindingDetailDrawer from '@/pages/multicloud-resource-manage/resource-binding/resource-binding-detail-drawer';
+import WorkDetailDrawer from '@/pages/multicloud-resource-manage/work/work-detail-drawer';
 import { GetResource } from '@/services/unstructured';
 import { stringify } from 'yaml';
 
@@ -75,6 +76,7 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
   const [ppDrawerState, setPpDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
   const [opDrawerState, setOpDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
   const [rbDrawerState, setRbDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
+  const [workDrawerState, setWorkDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
 
   const onNodeClick = useCallback(async (_: React.MouseEvent, node: Node) => {
     const d = node.data as unknown as TopologyNodeData;
@@ -96,6 +98,18 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         setRbDrawerState({ open: true, name: d.name, namespace: d.namespace || '', content });
       } catch (err) {
         console.error('Failed to fetch ResourceBinding detail', err);
+      }
+    } else if (d.nodeType === 'Work' && d.name) {
+      try {
+        const ret = await GetResource({
+          kind: 'work',
+          namespace: d.namespace || '',
+          name: d.name,
+        });
+        const content = stringify(ret.data);
+        setWorkDrawerState({ open: true, name: d.name, namespace: d.namespace || '', content });
+      } catch (err) {
+        console.error('Failed to fetch Work detail', err);
       }
     }
   }, []);
@@ -251,6 +265,13 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         namespace={rbDrawerState.namespace}
         content={rbDrawerState.content}
         onClose={() => setRbDrawerState(closedPolicyDrawer)}
+      />
+      <WorkDetailDrawer
+        open={workDrawerState.open}
+        name={workDrawerState.name}
+        namespace={workDrawerState.namespace}
+        content={workDrawerState.content}
+        onClose={() => setWorkDrawerState(closedPolicyDrawer)}
       />
     </>
   );
