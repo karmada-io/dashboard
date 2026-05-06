@@ -186,3 +186,17 @@ karmadaMemberClusterClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * Generates a unique key for a policy based on its scope.
+ * For cluster-scoped policies, returns just the name.
+ * For namespace-scoped policies, returns namespace-name format.
+ */
+export const getPolicyKey = (
+  policy: { objectMeta: ObjectMeta },
+  scope: PolicyScope,
+): string => {
+  return scope === PolicyScope.Cluster
+    ? policy.objectMeta.name
+    : `${policy.objectMeta.namespace}-${policy.objectMeta.name}`;
+};
