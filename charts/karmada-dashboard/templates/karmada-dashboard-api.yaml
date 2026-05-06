@@ -65,12 +65,12 @@ spec:
           volumeMounts:
             - name: kubeconfig-secret
               subPath: kubeconfig
-              mountPath: /etc/kubeconfig
+              mountPath: /etc/kubeconfig/kubeconfig
           command:
             - karmada-dashboard-api
-            - --karmada-kubeconfig=/etc/kubeconfig
+            - --karmada-kubeconfig=/etc/kubeconfig/kubeconfig
             - --karmada-context={{ .Values.api.kubeconfigContext }}
-            - --kubeconfig=/etc/kubeconfig
+            - --kubeconfig=/etc/kubeconfig/kubeconfig
             - --context={{ .Values.api.kubeconfigContext }}
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
