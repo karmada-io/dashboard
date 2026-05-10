@@ -127,7 +127,6 @@ export async function setMonacoEditorContent(page: Page, yamlContent: string): P
         }
     }, yamlContent);
 
-    /* eslint-disable */
     // Call React onChange callback to update component state
     await page.evaluate((yaml) => {
         const findReactFiber = (element: any) => {
@@ -175,7 +174,6 @@ export async function setMonacoEditorContent(page: Page, yamlContent: string): P
             }
         }
     }, yamlContent);
-    /* eslint-enable */
 }
 
 /**

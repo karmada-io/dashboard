@@ -30,7 +30,7 @@ export const KarmadaClusterSelector = () => {
       navigate('/overview');
       return;
     }
-    setCurrentCluster(value)
+    setCurrentCluster(value);
     navigate(`/member-cluster/${value}/overview`);
   };
 

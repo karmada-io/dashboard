@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import i18nInstance from '@/utils/i18n';
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { Button, Drawer, Space } from 'antd';
 import { CreatePropagationPolicy } from '@/services/propagationpolicy.ts';
@@ -61,12 +61,16 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
     onCreate,
     onUpdate,
   } = props;
-  const [content, setContent] = useState<string>(propagationContent || '');
-  useEffect(() => {
-    setContent(propagationContent || '');
-  }, [propagationContent]);
+  const [draftContent, setDraftContent] = useState<string | null>(null);
+  const content = draftContent ?? (propagationContent || '');
+
+  function handleClose() {
+    setDraftContent(null);
+    onClose();
+  }
+
   function handleEditorChange(value: string | undefined) {
-    setContent(value || '');
+    setDraftContent(value || '');
   }
   return (
     <Drawer
@@ -79,11 +83,11 @@ const PropagationPolicyEditorDrawer: FC<PropagationPolicyEditorDrawerProps> = (
         },
       }}
       closeIcon={false}
-      onClose={onClose}
+      onClose={handleClose}
       footer={
         <div className={'flex flex-row justify-end'}>
           <Space>
-            <Button onClick={onClose}>
+            <Button onClick={handleClose}>
               {i18nInstance.t('625fb26b4b3340f7872b411f401e754c', '取消')}
             </Button>
             <Button

@@ -30,15 +30,22 @@ import { FloatingChat } from '@karmada/chatui';
 const { Sider: AntdSider, Content: AntdContent } = AntdLayout;
 
 export const MainLayout: FC = () => {
-  const { authenticated } = useAuth();
+  const { authenticated, token } = useAuth();
   const { width } = useWindowSize();
   const isSmallScreen = width !== null && width <= 768;
-  const karmadaTerminalOpen = useGlobalStore((s) => s.karmadaTerminalOpen);
-  const toggleKarmadaTerminal = useGlobalStore((s) => s.toggleKarmadaTerminal);
-  const setKarmadaTerminalOpen = useGlobalStore((s) => s.setKarmadaTerminalOpen);
-    const { token } = useAuth();
+  const {
+    karmadaTerminalOpen,
+    toggleKarmadaTerminal,
+    setKarmadaTerminalOpen,
+  } = useGlobalStore(
+    (s) => ({
+      karmadaTerminalOpen: s.karmadaTerminalOpen,
+      toggleKarmadaTerminal: s.toggleKarmadaTerminal,
+      setKarmadaTerminalOpen: s.setKarmadaTerminalOpen,
+    }),
+  );
 
-    if (!authenticated) {
+  if (!authenticated) {
     return <Navigate to="/login" />;
   }
 
@@ -72,10 +79,10 @@ export const MainLayout: FC = () => {
       <FloatingChat
         apiConfig={{
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           chatEndpoint: '/api/v1/chat',
-          toolsEndpoint: '/api/v1/chat/tools'
+          toolsEndpoint: '/api/v1/chat/tools',
         }}
         enableMCP={true}
       />

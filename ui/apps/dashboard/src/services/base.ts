@@ -37,7 +37,7 @@ export const karmadaMemberClusterClient = axios.create({
   baseURL: memberclusterBaseURL,
 });
 
-export interface IResponse<Data = {}> {
+export interface IResponse<Data = unknown> {
   code: number;
   message: string;
   data: Data;
@@ -173,8 +173,8 @@ karmadaMemberClusterClient.interceptors.response.use(
 
     return response;
   },
-  (error) => {
-    const status = error?.response?.status;
+  (error: unknown) => {
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
     if (status === 403) {
       notification.error({
         message: '成员集群权限不足',
@@ -183,6 +183,10 @@ karmadaMemberClusterClient.interceptors.response.use(
       });
     }
 
-    return Promise.reject(error);
+    if (error instanceof Error) {
+      return Promise.reject(error);
+    }
+
+    return Promise.reject(new Error('Unknown member cluster request error'));
   }
 );

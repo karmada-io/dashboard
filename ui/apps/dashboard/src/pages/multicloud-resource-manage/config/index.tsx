@@ -27,26 +27,29 @@ import { message } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
+import { shallow } from 'zustand/shallow';
+
 const ConfigPage = () => {
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
-  const filter = useStore((state) => state.filter);
-  const { setFilter } = useStore((state) => {
-    return {
-      setFilter: state.setFilter,
-    };
-  });
-  const editor = useStore((state) => state.editor);
-  const { editConfig, viewConfig, createConfig, hideEditor } = useStore(
-    (state) => {
-      return {
+  const { filter, editor } = useStore(
+    (state) => ({
+      filter: state.filter,
+      editor: state.editor,
+    }),
+    shallow,
+  );
+  const { setFilter, editConfig, viewConfig, createConfig, hideEditor } =
+    useStore(
+      (state) => ({
+        setFilter: state.setFilter,
         editConfig: state.editConfig,
         viewConfig: state.viewConfig,
         createConfig: state.createConfig,
         hideEditor: state.hideEditor,
-      };
-    },
-  );
+      }),
+      shallow,
+    );
   const queryClient = useQueryClient();
   const [messageApi, messageContextHolder] = message.useMessage();
   return (

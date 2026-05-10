@@ -62,7 +62,6 @@ export default function MemberClusterEvents() {
     );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getReasonTag = (reason: string, _type: string) => {
     const reasonColors: Record<string, string> = {
       'Pulling': 'blue',
@@ -127,7 +126,6 @@ export default function MemberClusterEvents() {
       dataIndex: 'reason',
       key: 'reason',
       render: (reason: string, record: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
         return getReasonTag(reason, record.type)
       },
       width: 120

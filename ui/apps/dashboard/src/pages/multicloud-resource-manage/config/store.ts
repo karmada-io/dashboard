@@ -34,62 +34,111 @@ type Actions = {
 
 export type Store = State & Actions;
 
+const initialFilter: FilterState = {
+  kind: ConfigKind.ConfigMap,
+  selectedWorkspace: '',
+  searchText: '',
+};
+
+const initialEditor: EditorState = {
+  show: false,
+  mode: 'create',
+  content: '',
+};
+
+const isEditorEqual = (a: EditorState, b: EditorState) =>
+  a.show === b.show && a.mode === b.mode && a.content === b.content;
+
 export const useStore = createWithEqualityFn<Store>()((set) => ({
-  filter: {
-    kind: ConfigKind.ConfigMap,
-    selectedWorkspace: '',
-    searchText: '',
-  },
-  editor: {
-    show: false,
-    mode: 'create',
-    content: '',
-  },
+  filter: initialFilter,
+  editor: initialEditor,
   setFilter: (k: Partial<FilterState>) => {
     set((state) => {
-      const f = state.filter;
+      const nextFilter = {
+        ...state.filter,
+        ...k,
+      };
+
+      if (
+        nextFilter.kind === state.filter.kind &&
+        nextFilter.selectedWorkspace === state.filter.selectedWorkspace &&
+        nextFilter.searchText === state.filter.searchText
+      ) {
+        return state;
+      }
+
       return {
-        filter: {
-          ...f,
-          ...k,
-        },
+        filter: nextFilter,
       };
     });
   },
   viewConfig: (config: string) => {
-    set({
-      editor: {
+    set((state) => {
+      const nextEditor: EditorState = {
         show: true,
         mode: 'read',
         content: config,
-      },
+      };
+
+      if (isEditorEqual(state.editor, nextEditor)) {
+        return state;
+      }
+
+      return {
+        editor: nextEditor,
+      };
     });
   },
   editConfig: (config: string) => {
-    set({
-      editor: {
+    set((state) => {
+      const nextEditor: EditorState = {
         show: true,
         mode: 'edit',
         content: config,
-      },
+      };
+
+      if (isEditorEqual(state.editor, nextEditor)) {
+        return state;
+      }
+
+      return {
+        editor: nextEditor,
+      };
     });
   },
   hideEditor: () => {
-    set({
-      editor: {
+    set((state) => {
+      const nextEditor: EditorState = {
         show: false,
-        mode: 'edit',
+        // Hidden state does not carry user intent; reset to default create mode.
+        mode: 'create',
         content: '',
-      },
+      };
+
+      if (isEditorEqual(state.editor, nextEditor)) {
+        return state;
+      }
+
+      return {
+        editor: nextEditor,
+      };
     });
   },
   createConfig: () => {
-    set({
-      editor: {
+    set((state) => {
+      const nextEditor: EditorState = {
         show: true,
         mode: 'create',
         content: '',
-      },
+      };
+
+      if (isEditorEqual(state.editor, nextEditor)) {
+        return state;
+      }
+
+      return {
+        editor: nextEditor,
+      };
     });
   },
-}),shallow);
+}), shallow);
