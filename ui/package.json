@@ -38,6 +38,10 @@
   },
   "packageManager": "pnpm@9.1.2",
   "pnpm": {
+    "overrides": {
+      "react": "^19.2.6",
+      "react-dom": "^19.2.6"
+    },
     "patchedDependencies": {
       "zmodem.js@0.1.10": "patches/zmodem.js@0.1.10.patch"
     }

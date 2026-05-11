@@ -36,6 +36,7 @@ func handleGetResourceTopology(c *gin.Context) {
 	}
 
 	result, err := topology.GetResourceTopology(c.Request.Context(), k8sClient, namespace, name, kind)
+
 	if err != nil {
 		common.Fail(c, err)
 		return

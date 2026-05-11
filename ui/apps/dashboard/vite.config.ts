@@ -75,6 +75,10 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+      dedupe: ['react', 'react-dom'],
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
     server: {
       proxy: {
