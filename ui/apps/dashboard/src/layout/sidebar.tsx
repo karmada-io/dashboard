@@ -29,12 +29,17 @@ import { getSidebarWidth } from '@/utils/i18n';
 import { cn } from '@/utils/cn.ts';
 import { useQuery } from '@tanstack/react-query';
 import { GetDashboardConfig, menuConfig } from '@/services/dashboard-config.ts';
+import { getDashboardVersionInfo } from '@/utils/version';
 
 interface SidebarProps {
   collapsed: boolean;
 }
 
 const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
+  const { versionKind, displayVersion, targetUrl, title } =
+    getDashboardVersionInfo();
+  const sidebarWidth = collapsed ? 80 : getSidebarWidth();
+  const versionLabel = versionKind === 'tag' ? 'Tag' : 'Commit';
   const navigate = useNavigate();
   const onClick: MenuProps['onClick'] = (e) => {
     const url = flattenRoutes[e.key];
@@ -62,19 +67,67 @@ const Sidebar: FC<SidebarProps> = ({ collapsed }) => {
     return filterMenuItems(menuItems, menuInfo);
   }, [data]);
   return (
-    <div className={cn('w-full', 'h-full', 'overflow-y-auto')}>
-      <Menu
-        onClick={onClick}
-        style={{ width: collapsed ? '80px' : getSidebarWidth() }}
-        selectedKeys={selectKeys}
-        defaultOpenKeys={
-          selectKeys.length > 0
-            ? [selectKeys[0]]
-            : ['MULTICLOUD-RESOURCE-MANAGE', 'MULTICLOUD-POLICY-MANAGE']
-        }
-        mode="inline"
-        items={filteredMenuItems}
-      />
+    <div className={cn('w-full', 'h-full', 'flex', 'flex-col')}>
+      <div className={cn('flex-1', 'overflow-y-auto')}>
+        <Menu
+          onClick={onClick}
+          style={{ width: `${sidebarWidth}px` }}
+          selectedKeys={selectKeys}
+          defaultOpenKeys={
+            selectKeys.length > 0
+              ? [selectKeys[0]]
+              : ['MULTICLOUD-RESOURCE-MANAGE', 'MULTICLOUD-POLICY-MANAGE']
+          }
+          mode="inline"
+          items={filteredMenuItems}
+        />
+      </div>
+      <a
+        href={targetUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          'h-11',
+          'w-full',
+          'px-3',
+          collapsed ? 'text-center' : 'text-left',
+          'text-[11px]',
+          'leading-[1.2]',
+          'text-[#666666]',
+          'border-0 border-l-0 border-r-0 border-b-0',
+          'border-t',
+          'border-solid',
+          'border-[#ebebeb]',
+          'bg-[#fafafa]',
+          'cursor-pointer',
+          'no-underline',
+          'transition-colors duration-200 ease-out',
+          'hover:bg-[#f5f5f5]',
+          'hover:text-[#171717]',
+          'focus-visible:outline',
+          'focus-visible:outline-2',
+          'focus-visible:outline-offset-[-2px]',
+          'focus-visible:outline-[#1677ff]',
+          'flex',
+          'items-center',
+          collapsed ? 'justify-center' : 'justify-start',
+        )}
+        title={title}
+        aria-label={`Open ${versionKind} in repository`}
+      >
+        {collapsed ? (
+          <span className={cn('block', 'truncate', 'font-mono')}>
+            {displayVersion.slice(0, 7)}
+          </span>
+        ) : (
+          <span className={cn('flex', 'w-full', 'items-center', 'gap-1.5')}>
+            <span className={cn('text-[#8c8c8c]')}>{versionLabel}</span>
+            <span className={cn('block', 'truncate', 'font-mono', 'text-[#262626]')}>
+              {displayVersion}
+            </span>
+          </span>
+        )}
+      </a>
     </div>
   );
 };

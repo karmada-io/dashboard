@@ -18,6 +18,7 @@ import { defineConfig, loadEnv, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
+import { execSync } from 'node:child_process';
 import { dynamicBase } from 'vite-plugin-dynamic-base';
 import banner from 'vite-plugin-banner';
 import { getLicense } from '@karmada/utils';
@@ -34,13 +35,33 @@ const replacePathPrefixPlugin = (): Plugin => {
   };
 };
 
+function runGitCommand(command: string): string {
+  try {
+    return execSync(command, {
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const license = getLicense();
-
   const env = loadEnv(mode, process.cwd(), '');
+  const gitTag = runGitCommand('git tag --points-at HEAD | head -n 1');
+  const gitCommit = runGitCommand('git rev-parse --short=8 HEAD') || 'unknown';
+  const repoUrl =
+    env.VITE_DASHBOARD_REPO_URL || 'https://github.com/karmada-io/dashboard';
+
   return {
     base: process.env.NODE_ENV === 'development' ? '' : '/static',
+    define: {
+      __DASHBOARD_GIT_TAG__: JSON.stringify(gitTag),
+      __DASHBOARD_GIT_COMMIT__: JSON.stringify(gitCommit),
+      __DASHBOARD_REPO_URL__: JSON.stringify(repoUrl),
+    },
 
     plugins: [
       banner(license) as Plugin,
