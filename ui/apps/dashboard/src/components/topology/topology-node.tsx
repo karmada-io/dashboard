@@ -15,7 +15,8 @@ limitations under the License.
 */
 
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Tag } from 'antd';
+import { Button, Tag } from 'antd';
+import { Icons } from '@/components/icons';
 import type { TopologyNodeData } from './types';
 
 const statusColorMap: Record<string, { border: string; bg: string; tag: string; text: string }> = {
@@ -66,6 +67,24 @@ function TopologyNodeComponent({ data }: NodeProps) {
           </Tag>
         )}
       </div>
+      {nodeData.nodeType === 'Pod' && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <Button
+            size="small"
+            icon={<Icons.terminal width={14} height={14} />}
+            onClick={(e) => { e.stopPropagation(); nodeData.onLogClick?.(); }}
+          >
+            Logs
+          </Button>
+          <Button
+            size="small"
+            icon={<Icons.terminal width={14} height={14} />}
+            onClick={(e) => { e.stopPropagation(); nodeData.onAttachClick?.(); }}
+          >
+            Attach
+          </Button>
+        </div>
+      )}
       <Handle type="source" position={Position.Bottom} style={{ visibility: 'hidden' }} />
     </div>
   );

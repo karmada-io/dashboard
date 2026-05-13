@@ -24,5 +24,6 @@ export interface TopologyNodeData {
   kind?: string;
   cluster?: string;
   status: NodeStatus;
-  [key: string]: unknown;
+  onLogClick?: () => void;
+  onAttachClick?: () => void;
 }
