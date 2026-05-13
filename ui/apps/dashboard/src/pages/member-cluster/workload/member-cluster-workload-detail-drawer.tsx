@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { App, Button, Drawer, Space, Spin, Switch, Table, TableColumnsType } from 'antd';
+import { App, Button, Drawer, Space, Table, TableColumnsType } from 'antd';
 import { WorkloadKind } from '@/services/base';
-import { useCallback, useEffect, useRef, useState, FC } from 'react';
+import { useEffect, useRef, useState, FC } from 'react';
 import {
   GetMemberClusterWorkloadDetail,
   GetMemberClusterWorkloadEvents,
@@ -25,7 +25,7 @@ import {
 } from '@/services/member-cluster/workload';
 import dayjs from 'dayjs';
 import { GetMemberClusterPods, Pod } from '@/services/member-cluster/pod';
-import { GetLogs, LogDetails } from '@/services/member-cluster/log';
+import PodLogDrawer from '@/components/pod-log-drawer/pod-log-drawer';
 import { GetMemberClusterPodDetail } from '@/services/member-cluster/pod';
 import { useAuth } from '@/components/auth';
 import { Icons } from '@/components/icons';
@@ -197,63 +197,13 @@ const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerPro
   const [viewPods, setViewPods] = useState<Pod[]>([]);
   const [viewLoading, setViewLoading] = useState(false);
 
-  const [logDrawerOpen, setLogDrawerOpen] = useState(false);
-  const [logLoading, setLogLoading] = useState(false);
-  const [logDetails, setLogDetails] = useState<LogDetails | null>(null);
   const [logPod, setLogPod] = useState<Pod | null>(null);
-  const [logAutoRefresh, setLogAutoRefresh] = useState<boolean>(false);
-  const [logAutoScroll, setLogAutoScroll] = useState<boolean>(true);
-  const logScrollRef = useRef<HTMLPreElement | null>(null);
-  const logRefreshTimerRef = useRef<number | null>(null);
+  const [logDrawerOpen, setLogDrawerOpen] = useState(false);
 
   const [attachDrawerOpen, setAttachDrawerOpen] = useState(false);
   const [attachPod, setAttachPod] = useState<Pod | null>(null);
 
   const { token } = useAuth();
-
-  const fetchLogs = useCallback(
-    async (pod: Pod | null) => {
-      if (!pod) return;
-      setLogLoading(true);
-      try {
-        const ret = await GetLogs({
-          memberClusterName,
-          namespace: pod.objectMeta.namespace,
-          pod: pod.objectMeta.name,
-          tailLines: 200,
-          timestamps: true,
-        });
-        setLogDetails(ret.data);
-      } catch {
-        // silently fail
-      } finally {
-        setLogLoading(false);
-      }
-    },
-    [memberClusterName],
-  );
-
-  // auto-refresh logs
-  useEffect(() => {
-    if (logAutoRefresh && logDrawerOpen && logPod) {
-      const timer = window.setInterval(() => { void fetchLogs(logPod); }, 5000);
-      logRefreshTimerRef.current = timer;
-      return () => { window.clearInterval(timer); logRefreshTimerRef.current = null; };
-    }
-    if (!logAutoRefresh && logRefreshTimerRef.current) {
-      window.clearInterval(logRefreshTimerRef.current);
-      logRefreshTimerRef.current = null;
-    }
-    return undefined;
-  }, [logAutoRefresh, logDrawerOpen, logPod, fetchLogs]);
-
-  // auto-scroll logs
-  useEffect(() => {
-    if (!logAutoScroll || !logScrollRef.current) return;
-    const hasContent = Boolean(logDetails?.podLogs?.logs?.length || logDetails?.logs?.length);
-    if (!hasContent) return;
-    logScrollRef.current.scrollTop = logScrollRef.current.scrollHeight;
-  }, [logAutoScroll, logDetails]);
 
   useEffect(() => {
     if (!open || !memberClusterName || !namespace || !name || !kind) return;
@@ -340,8 +290,6 @@ const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerPro
             onClick={() => {
               setLogPod(record);
               setLogDrawerOpen(true);
-              setLogDetails(null);
-              void fetchLogs(record);
             }}
           >
             Logs
@@ -429,48 +377,16 @@ const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerPro
 
       {showActions && (
         <>
-          <Drawer
-            title={
-              logPod
-                ? `Logs: ${logPod.objectMeta.namespace}/${logPod.objectMeta.name}`
-                : 'Pod logs'
-            }
-            placement="right"
-            size={800}
+          <PodLogDrawer
+            memberClusterName={memberClusterName}
+            namespace={logPod?.objectMeta.namespace || ''}
+            podName={logPod?.objectMeta.name || ''}
             open={logDrawerOpen}
             onClose={() => {
               setLogDrawerOpen(false);
-              setLogDetails(null);
               setLogPod(null);
-              setLogAutoRefresh(false);
             }}
-            destroyOnHidden
-            styles={{ body: { padding: 16, display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%' } }}
-          >
-            <div className="mb-3 flex items-center gap-4 text-xs">
-              <span className="flex items-center gap-2">
-                Auto-refresh:
-                <Switch size="small" checked={logAutoRefresh} onChange={setLogAutoRefresh} />
-              </span>
-              <span className="flex items-center gap-2">
-                Auto-scroll:
-                <Switch size="small" checked={logAutoScroll} onChange={setLogAutoScroll} />
-              </span>
-            </div>
-            <Spin spinning={logLoading} wrapperClassName="flex-1 overflow-hidden">
-              <pre
-                ref={logScrollRef}
-                className="h-full overflow-auto text-xs bg-black text-green-400 p-3 rounded font-mono"
-              >
-                {(logDetails?.podLogs?.logs || logDetails?.logs || []).map((line, i) => (
-                  <div key={i}>{typeof line === 'string' ? line : line.content || ''}</div>
-                ))}
-                {!logDetails?.podLogs?.logs && !logDetails?.logs && !logLoading && (
-                  <div className="text-gray-500">No logs available</div>
-                )}
-              </pre>
-            </Spin>
-          </Drawer>
+          />
 
           <Drawer
             title={
