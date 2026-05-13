@@ -14,8 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { create, StateCreator } from 'zustand';
+import { StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { createWithEqualityFn } from 'zustand/traditional';
+import { shallow } from 'zustand/shallow';
 
 type GlobalState = {
   karmadaTerminalOpen: boolean;
@@ -62,8 +64,9 @@ const createGlobalSlice: StateCreator<
   };
 };
 
-export const useGlobalStore = create<GlobalState>()(
+export const useGlobalStore = createWithEqualityFn<GlobalState>()(
   devtools(createGlobalSlice, {
     enabled: isDev,
   }),
+  shallow,
 );

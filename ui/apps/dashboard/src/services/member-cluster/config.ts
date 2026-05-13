@@ -47,7 +47,6 @@ export interface PersistentVolumeClaim {
   accessModes: string[];
   storageClass: string;
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface PersistentVolumeClaimDetail extends PersistentVolumeClaim {
 }
 

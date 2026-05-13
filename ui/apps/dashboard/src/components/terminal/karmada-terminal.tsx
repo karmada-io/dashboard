@@ -95,7 +95,7 @@ const KarmadaTerminal: React.FC<KarmadaTerminalProps> = ({
           setIsLoading(false);
         });
     })();
-  }, [isOpen, setIsLoading]);
+  }, [isOpen, token]);
 
   return (
     <div

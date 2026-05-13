@@ -143,7 +143,7 @@ spec:
     }
 
     // Modify YAML content (change schedule from every 5 minutes to every 10 minutes)
-    const yamlObject = parse(yamlContent);
+    const yamlObject = parse(yamlContent) as Record<string, unknown>;
     _.set(yamlObject, 'spec.schedule', '*/10 * * * *');
     const modifiedYaml = stringify(yamlObject);
 

@@ -46,14 +46,18 @@ const NewNamespaceModal: FC<NewNamespaceModalProps> = (props) => {
           if (ret.code === 200) {
             form.resetFields();
           }
-          onOk && (await onOk(ret));
+          if (onOk) {
+            await onOk(ret);
+          }
         } catch (e) {
           console.error('error', e);
         }
       }}
       onCancel={async () => {
         form.resetFields();
-        onCancel && (await onCancel());
+        if (onCancel) {
+          await onCancel();
+        }
       }}
       destroyOnHidden={true}
     >
