@@ -38,6 +38,7 @@ import OverridePolicyEditorDrawer from '@/pages/multicloud-policy-manage/overrid
 import ResourceBindingDetailDrawer from '@/pages/multicloud-resource-manage/resource-binding/resource-binding-detail-drawer';
 import WorkDetailDrawer from '@/pages/multicloud-resource-manage/work/work-detail-drawer';
 import MemberClusterWorkloadDetailDrawer from '@/pages/member-cluster/workload/member-cluster-workload-detail-drawer';
+import PodLogDrawer from '@/components/pod-log-drawer/pod-log-drawer';
 import { GetResource } from '@/services/unstructured';
 import { stringify } from 'yaml';
 
@@ -86,6 +87,8 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
     name: string;
     kind: WorkloadKind;
   }>({ open: false, memberClusterName: '', namespace: '', name: '', kind: '' as WorkloadKind });
+
+  const [logPod, setLogPod] = useState<{ cluster: string; namespace: string; podName: string } | null>(null);
 
   const onNodeClick = useCallback(async (_: React.MouseEvent, node: Node) => {
     const d = node.data as unknown as TopologyNodeData;
@@ -178,6 +181,10 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         kind: n.kind,
         cluster: n.cluster,
         status: n.status,
+        onLogClick: n.type === 'Pod' && n.cluster && n.namespace
+          ? () => setLogPod({ cluster: n.cluster!, namespace: n.namespace!, podName: n.name })
+          : undefined,
+        onAttachClick: undefined,
       } satisfies TopologyNodeData,
     }));
   }, [data]);
@@ -297,6 +304,13 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         name={memberWorkloadDrawerState.name}
         kind={memberWorkloadDrawerState.kind}
         onClose={() => setMemberWorkloadDrawerState((s) => ({ ...s, open: false }))}
+      />
+      <PodLogDrawer
+        memberClusterName={logPod?.cluster || ''}
+        namespace={logPod?.namespace || ''}
+        podName={logPod?.podName || ''}
+        open={logPod !== null}
+        onClose={() => setLogPod(null)}
       />
     </>
   );
