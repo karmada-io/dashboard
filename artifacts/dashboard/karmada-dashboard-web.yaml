@@ -59,18 +59,18 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-            - name: kubeconfig
-              subPath: kubeconfig
-              mountPath: /etc/kubeconfig
+            - name: karmada-config
+              subPath: karmada.config
+              mountPath: /etc/karmada/config/karmada.config
             - name: dashboard-config
               subPath: prod.yaml
               mountPath: /config/dashboard-config.yaml
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: kubeconfig
+        - name: karmada-config
           secret:
-            secretName: kubeconfig
+            secretName: karmada-dashboard-config
         - name: dashboard-config
           configMap:
             name:  karmada-dashboard-configmap

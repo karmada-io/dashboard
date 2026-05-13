@@ -11,3 +11,10 @@ Differences from the main repository are:
 
 # Usage
 ## start a mininal karmada environment
+
+## generate independent dashboard kubeconfig secret
+After Karmada control plane is installed and certificates exist in `${HOME}/.karmada` (or `CERT_DIR`), run:
+```bash
+hack/generate-karmada-dashboard-kubeconfig.sh <HOST_CLUSTER_KUBECONFIG> <HOST_CONTEXT_NAME>
+```
+This will create/update `karmada-dashboard-config` in namespace `karmada-system`.

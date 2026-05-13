@@ -25,10 +25,8 @@ spec:
       containers:
         - command:
             - karmada-dashboard-api
-            - --karmada-kubeconfig=/etc/kubeconfig
+            - --karmada-kubeconfig=/etc/karmada/config/karmada.config
             - --karmada-context=karmada-apiserver
-            - --kubeconfig=/etc/kubeconfig
-            - --context=karmada
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
           name: karmada-dashboard-api
@@ -62,15 +60,15 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-            - name: kubeconfig
-              subPath: kubeconfig
-              mountPath: /etc/kubeconfig
+            - name: karmada-config
+              subPath: karmada.config
+              mountPath: /etc/karmada/config/karmada.config
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: kubeconfig
+        - name: karmada-config
           secret:
-            secretName: kubeconfig
+            secretName: karmada-dashboard-config
 ---
 apiVersion: v1
 kind: Service

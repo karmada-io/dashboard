@@ -27,7 +27,7 @@ spec:
             - kubernetes-dashboard-api
             - --bind-address=0.0.0.0
             - --insecure-bind-address=0.0.0.0
-            - --karmada-kubeconfig=/etc/kubeconfig
+            - --karmada-kubeconfig=/etc/karmada/config/karmada.config
             - --karmada-context=karmada-apiserver
             - --openapi-enabled
             - --metrics-provider=none
@@ -61,15 +61,15 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-            - name: kubeconfig
-              subPath: kubeconfig
-              mountPath: /etc/kubeconfig
+            - name: karmada-config
+              subPath: karmada.config
+              mountPath: /etc/karmada/config/karmada.config
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: kubeconfig
+        - name: karmada-config
           secret:
-            secretName: kubeconfig
+            secretName: karmada-dashboard-config
 ---
 apiVersion: v1
 kind: Service
