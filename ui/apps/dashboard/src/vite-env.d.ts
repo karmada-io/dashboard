@@ -18,3 +18,7 @@ limitations under the License.
 interface Window {
   __path_prefix__: string;
 }
+
+declare const __DASHBOARD_GIT_TAG__: string;
+declare const __DASHBOARD_GIT_COMMIT__: string;
+declare const __DASHBOARD_REPO_URL__: string;
