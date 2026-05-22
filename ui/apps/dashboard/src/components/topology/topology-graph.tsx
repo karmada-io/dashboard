@@ -231,19 +231,23 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', background: '#fafafa' }}>
         <Spin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <Alert type="error" message="Failed to load topology" description={String(error)} />;
+    return (
+      <div style={{ padding: 24 }}>
+        <Alert type="error" message="Failed to load topology" description={String(error)} />
+      </div>
+    );
   }
 
   if (!data || nodes.length === 0) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', background: '#fafafa' }}>
         <Empty description="No topology data" />
       </div>
     );
@@ -257,13 +261,27 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
+        fitViewOptions={{ padding: 0.3 }}
         nodesDraggable
         nodesConnectable={false}
         onNodeClick={onNodeClick}
         proOptions={{ hideAttribution: true }}
+        defaultEdgeOptions={{
+          style: { stroke: '#c0c0c0', strokeWidth: 1.5 },
+        }}
       >
-        <Background />
-        <Controls />
+        <Background
+          color="#e8e8e8"
+          gap={20}
+          size={1}
+        />
+        <Controls
+          style={{
+            border: '1px solid #e8e8e8',
+            borderRadius: 6,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          }}
+        />
       </ReactFlow>
       <WorkloadDetailDrawer
         open={drawerState.open}
