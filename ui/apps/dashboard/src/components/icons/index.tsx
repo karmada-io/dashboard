@@ -112,6 +112,7 @@ export const Icons = {
   certificate: ShieldCheck,
   key: KeyRound,
   api: Workflow,
+  topology: Boxes,
   audit: ClipboardList,
   cloudServer: ServerCog,
   container: Package,
