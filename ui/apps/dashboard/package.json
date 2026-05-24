@@ -64,7 +64,7 @@
     "@playwright/test": "^1.58.2",
     "@types/dagre": "^0.7.54",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^20.12.11",
+    "@types/node": "^25.9.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/sockjs-client": "^1.5.4",
