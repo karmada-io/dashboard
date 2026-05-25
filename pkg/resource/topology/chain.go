@@ -29,6 +29,7 @@ import (
 	karmadautil "github.com/karmada-io/karmada/pkg/util"
 	karmadanames "github.com/karmada-io/karmada/pkg/util/names"
 	"golang.org/x/sync/errgroup"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kubeclient "k8s.io/client-go/kubernetes"
@@ -123,6 +124,183 @@ func getWorksByRBName(rbName string) ([]*workv1alpha1.Work, error) {
 		works = append(works, item.(*workv1alpha1.Work))
 	}
 	return works, nil
+}
+
+// selectorLabels carries labels usable to narrow down API list calls for pods or intermediate resources.
+type selectorLabels map[string]string
+
+func (s selectorLabels) String() string {
+	parts := make([]string, 0, len(s))
+	for k, v := range s {
+		parts = append(parts, fmt.Sprintf("%s=%s", k, v))
+	}
+	return strings.Join(parts, ",")
+}
+
+// getMemberWorkloadInfo returns the UID and selector labels of a workload in a member cluster.
+func getMemberWorkloadInfo(ctx context.Context, memberClient kubeclient.Interface, namespace, name, kind string) (types.UID, selectorLabels, error) {
+	switch kind {
+	case "Deployment":
+		obj, err := memberClient.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return "", nil, fmt.Errorf("get deployment in member cluster: %w", err)
+		}
+		return obj.UID, obj.Spec.Selector.MatchLabels, nil
+	case "StatefulSet":
+		obj, err := memberClient.AppsV1().StatefulSets(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return "", nil, fmt.Errorf("get statefulset in member cluster: %w", err)
+		}
+		return obj.UID, obj.Spec.Selector.MatchLabels, nil
+	case "DaemonSet":
+		obj, err := memberClient.AppsV1().DaemonSets(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return "", nil, fmt.Errorf("get daemonset in member cluster: %w", err)
+		}
+		return obj.UID, obj.Spec.Selector.MatchLabels, nil
+	case "Job":
+		obj, err := memberClient.BatchV1().Jobs(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return "", nil, fmt.Errorf("get job in member cluster: %w", err)
+		}
+		return obj.UID, selectorLabels{"job-name": name}, nil
+	case "CronJob":
+		obj, err := memberClient.BatchV1().CronJobs(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return "", nil, fmt.Errorf("get cronjob in member cluster: %w", err)
+		}
+		return obj.UID, selectorLabels{"cronjob-name": name}, nil
+	default:
+		return "", nil, fmt.Errorf("unsupported workload kind for pod lookup: %s", kind)
+	}
+}
+
+// getPodDirectOwnerUIDs returns UIDs of objects that directly own pods for the given workload.
+// For Deployment, it returns ReplicaSet UIDs. For CronJob, it returns Job UIDs.
+// For other types, pods are directly owned by the workload itself.
+// Uses label selector to narrow down list calls at the API level, then filters by ownerReference.
+func getPodDirectOwnerUIDs(ctx context.Context, memberClient kubeclient.Interface, namespace, kind string, workloadUID types.UID, labels selectorLabels) []types.UID {
+	labelSelector := labels.String()
+	switch kind {
+	case "Deployment":
+		rsList, err := memberClient.AppsV1().ReplicaSets(namespace).List(ctx, metav1.ListOptions{
+			LabelSelector: labelSelector,
+		})
+		if err != nil {
+			return []types.UID{workloadUID}
+		}
+		var uids []types.UID
+		for i := range rsList.Items {
+			rs := &rsList.Items[i]
+			for _, ownerRef := range rs.OwnerReferences {
+				if ownerRef.UID == workloadUID {
+					uids = append(uids, rs.UID)
+					break
+				}
+			}
+		}
+		return uids
+	case "CronJob":
+		jobList, err := memberClient.BatchV1().Jobs(namespace).List(ctx, metav1.ListOptions{
+			LabelSelector: labelSelector,
+		})
+		if err != nil {
+			return []types.UID{workloadUID}
+		}
+		var uids []types.UID
+		for i := range jobList.Items {
+			job := &jobList.Items[i]
+			for _, ownerRef := range job.OwnerReferences {
+				if ownerRef.UID == workloadUID {
+					uids = append(uids, job.UID)
+					break
+				}
+			}
+		}
+		return uids
+	default:
+		return []types.UID{workloadUID}
+	}
+}
+
+// filterPodsByOwners returns pods whose ownerReference matches any of the given UIDs.
+func filterPodsByOwners(pods []corev1.Pod, ownerUIDs []types.UID) []*corev1.Pod {
+	uidSet := make(map[types.UID]bool, len(ownerUIDs))
+	for _, uid := range ownerUIDs {
+		uidSet[uid] = true
+	}
+	var result []*corev1.Pod
+	for i := range pods {
+		pod := &pods[i]
+		for _, ownerRef := range pod.OwnerReferences {
+			if uidSet[ownerRef.UID] {
+				result = append(result, pod)
+				break
+			}
+		}
+	}
+	return result
+}
+
+// getPodsByWorkUID fetches Pods from member cluster that belong to the workload.
+// It uses label selectors from the workload spec to narrow the list call at API level,
+// then filters by ownerReference as a safety net.
+func getPodsByWorkUID(ctx context.Context, clusterName, namespace, name, kind string) ([]*corev1.Pod, error) {
+	memberClient := client.InClusterClientForMemberCluster(clusterName)
+	if memberClient == nil {
+		return nil, fmt.Errorf("unable to get client for member cluster %s", clusterName)
+	}
+	workloadUID, labels, err := getMemberWorkloadInfo(ctx, memberClient, namespace, name, kind)
+	if err != nil {
+		return nil, err
+	}
+	ownerUIDs := getPodDirectOwnerUIDs(ctx, memberClient, namespace, kind, workloadUID, labels)
+	podList, err := memberClient.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
+		LabelSelector: labels.String(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("list pods in member cluster: %w", err)
+	}
+	return filterPodsByOwners(podList.Items, ownerUIDs), nil
+}
+
+// getPodStatus evaluates the health status of a Pod.
+func getPodStatus(pod *corev1.Pod) NodeStatus {
+	// Check pod phase
+	switch pod.Status.Phase {
+	case corev1.PodRunning:
+		// Pod is running, check if all containers are ready
+		if pod.Status.Conditions != nil {
+			for _, condition := range pod.Status.Conditions {
+				if condition.Type == corev1.PodReady {
+					if condition.Status == corev1.ConditionTrue {
+						return NodeStatusHealthy
+					}
+					break
+				}
+			}
+		}
+		// Pod is running but not all containers are ready
+		return NodeStatusProgressing
+
+	case corev1.PodSucceeded:
+		// Pod completed successfully (e.g., Job pods)
+		return NodeStatusHealthy
+
+	case corev1.PodPending:
+		// Pod is waiting to be scheduled or containers are starting
+		return NodeStatusProgressing
+
+	case corev1.PodFailed:
+		// Pod has failed
+		return NodeStatusAbnormal
+
+	case corev1.PodUnknown:
+		fallthrough
+	default:
+		// Unknown state
+		return NodeStatusAbnormal
+	}
 }
 
 // parseOverridePolicies extracts applied override policy refs from Work annotations.
@@ -253,7 +431,6 @@ func traceChain(
 				memberNodeID := fmt.Sprintf("member-%s-%s", clusterName, name)
 
 				mu.Lock()
-				defer mu.Unlock()
 				resp.Nodes = append(resp.Nodes, TopologyNode{
 					ID:        workNodeID,
 					Type:      NodeTypeWork,
@@ -287,6 +464,32 @@ func traceChain(
 					Status:    memberStatus,
 				})
 				resp.Edges = append(resp.Edges, TopologyEdge{Source: workNodeID, Target: memberNodeID})
+				mu.Unlock()
+
+				// Step 5: Get Pods in member cluster
+				pods, err := getPodsByWorkUID(ctx, clusterName, namespace, name, kind)
+				if err != nil {
+					klog.V(4).InfoS("Failed to get pods", "work", w.Name, "cluster", clusterName, "err", err)
+					return nil
+				}
+
+				mu.Lock()
+				for _, pod := range pods {
+					podNodeID := fmt.Sprintf("pod-%s-%s", clusterName, pod.UID)
+					resp.Nodes = append(resp.Nodes, TopologyNode{
+						ID:        podNodeID,
+						Type:      NodeTypePod,
+						Name:      pod.Name,
+						Namespace: pod.Namespace,
+						Cluster:   clusterName,
+						Status:    getPodStatus(pod),
+					})
+					resp.Edges = append(resp.Edges, TopologyEdge{
+						Source: memberNodeID,
+						Target: podNodeID,
+					})
+				}
+				mu.Unlock()
 				return nil
 			})
 		}
@@ -294,6 +497,5 @@ func traceChain(
 			return nil, err
 		}
 	}
-
 	return resp, nil
 }
