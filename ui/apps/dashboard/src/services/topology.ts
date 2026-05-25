@@ -20,7 +20,8 @@ export type NodeType =
   | 'ResourceTemplate'
   | 'ResourceBinding'
   | 'Work'
-  | 'MemberClusterWorkload';
+  | 'MemberClusterWorkload'
+  | 'Pod';
 
 export type NodeStatus = 'healthy' | 'progressing' | 'abnormal';
 

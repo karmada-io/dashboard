@@ -58,6 +58,12 @@ type Pod struct {
 	// Status determined based on the same logic as kubectl.
 	Status string `json:"status"`
 
+	// PodPhase is the phase of the Pod.
+	PodPhase v1.PodPhase `json:"podPhase"`
+
+	// PodIP is the IP of the Pod.
+	PodIP string `json:"podIP"`
+
 	// RestartCount of containers restarts.
 	RestartCount int32 `json:"restartCount"`
 
@@ -182,6 +188,8 @@ func toPod(pod *v1.Pod, metrics *MetricsByPod, warnings []common.Event) Pod {
 		TypeMeta:           types.NewTypeMeta(types.ResourceKindPod),
 		Warnings:           warnings,
 		Status:             getPodStatus(*pod),
+		PodPhase:           pod.Status.Phase,
+		PodIP:              pod.Status.PodIP,
 		RestartCount:       getRestartCount(*pod),
 		NodeName:           pod.Spec.NodeName,
 		ContainerImages:    common.GetContainerImages(&pod.Spec),
