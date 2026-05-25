@@ -67,6 +67,7 @@
     "@types/node": "^20.12.11",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "@types/dagre": "^0.7.54",
     "@types/sockjs-client": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.56.1",
