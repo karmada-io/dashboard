@@ -16,13 +16,16 @@ limitations under the License.
 
 import { FC } from 'react';
 import Navigation from '@/components/navigation';
+import { AuthUser } from '@/components/auth';
 interface HeaderProps {
   onTerminalClick?: () => void;
+  user?: AuthUser | null;
+  onLogout?: () => void;
 }
-const Header: FC<HeaderProps> = ({ onTerminalClick }) => {
+const Header: FC<HeaderProps> = ({ onTerminalClick, user, onLogout }) => {
   return (
     <>
-      <Navigation onTerminalClick={onTerminalClick} />
+      <Navigation onTerminalClick={onTerminalClick} userInfo={user} onLogout={onLogout} />
     </>
   );
 };

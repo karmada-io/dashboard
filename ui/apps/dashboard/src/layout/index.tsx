@@ -30,7 +30,7 @@ import { FloatingChat } from '@karmada/chatui';
 const { Sider: AntdSider, Content: AntdContent } = AntdLayout;
 
 export const MainLayout: FC = () => {
-  const { authenticated, token } = useAuth();
+  const { authenticated, token, user, logout } = useAuth();
   const { width } = useWindowSize();
   const isSmallScreen = width !== null && width <= 768;
   const {
@@ -51,7 +51,7 @@ export const MainLayout: FC = () => {
 
   return (
     <>
-      <Header onTerminalClick={toggleKarmadaTerminal} />
+      <Header onTerminalClick={toggleKarmadaTerminal} user={user} onLogout={logout} />
       <AntdLayout
         className={cn('h-[calc(100vh-48px)]', 'overflow-hidden', 'flex')}
       >

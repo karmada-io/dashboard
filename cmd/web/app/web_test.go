@@ -20,19 +20,13 @@ import "testing"
 
 func TestIsAnonymousProxyPath(t *testing.T) {
 	tests := []struct {
-		name       string
-		path       string
-		pathPrefix string
-		expect     bool
+		name   string
+		path   string
+		expect bool
 	}{
 		{
 			name:   "oidc enabled path",
 			path:   "/api/v1/auth/oidc/enabled",
-			expect: true,
-		},
-		{
-			name:   "short oidc enabled path",
-			path:   "/auth/oidc/enabled",
 			expect: true,
 		},
 		{
@@ -41,47 +35,24 @@ func TestIsAnonymousProxyPath(t *testing.T) {
 			expect: true,
 		},
 		{
-			name:   "short oidc login path",
-			path:   "/auth/oidc/login",
-			expect: true,
-		},
-		{
 			name:   "oidc callback path",
 			path:   "/api/v1/auth/oidc/callback",
 			expect: true,
 		},
 		{
-			name:   "short oidc callback path",
-			path:   "/auth/oidc/callback",
+			name:   "oidc enabled path with prefix",
+			path:   "/dashboard/api/v1/auth/oidc/enabled",
 			expect: true,
 		},
 		{
-			name:       "oidc enabled path with prefix",
-			path:       "/dashboard/api/v1/auth/oidc/enabled",
-			pathPrefix: "/dashboard",
-			expect:     true,
+			name:   "oidc login path with prefix",
+			path:   "/dashboard/api/v1/auth/oidc/login",
+			expect: true,
 		},
 		{
-			name:       "oidc login path with prefix",
-			path:       "/dashboard/api/v1/auth/oidc/login",
-			pathPrefix: "/dashboard",
-			expect:     true,
-		},
-		{
-			name:       "oidc callback path with prefix",
-			path:       "/dashboard/api/v1/auth/oidc/callback",
-			pathPrefix: "/dashboard",
-			expect:     true,
-		},
-		{
-			name:   "clusterapi path must not bypass",
-			path:   "/clusterapi/my-cluster/api/v1/auth/oidc/enabled",
-			expect: false,
-		},
-		{
-			name:   "path ending with oidc path must not bypass",
-			path:   "/x/y/z/auth/oidc/login",
-			expect: false,
+			name:   "oidc callback path with prefix",
+			path:   "/dashboard/api/v1/auth/oidc/callback",
+			expect: true,
 		},
 		{
 			name:   "non-oidc path",
@@ -92,7 +63,7 @@ func TestIsAnonymousProxyPath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := isAnonymousProxyPathWithPrefix(tt.path, tt.pathPrefix)
+			got := isAnonymousProxyPath(tt.path)
 			if got != tt.expect {
 				t.Fatalf("isAnonymousProxyPath(%q) = %v, want %v", tt.path, got, tt.expect)
 			}

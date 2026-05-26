@@ -150,10 +150,36 @@ interface MemberClusterResponse {
   errors?: MemberClusterErrorItem[];
 }
 
+function extractMemberClusterName(url?: string): string {
+  if (!url) {
+    return '';
+  }
+  const match = url.match(/\/clusterapi\/([^/]+)\//);
+  return match?.[1] ?? '';
+}
+
+function getFirstErrStatusMessage(data: unknown): string {
+  if (!data || typeof data !== 'object') {
+    return '';
+  }
+
+  const maybeData = data as MemberClusterResponse;
+  if (!Array.isArray(maybeData.errors) || maybeData.errors.length === 0) {
+    return '';
+  }
+
+  return maybeData.errors[0]?.ErrStatus?.message ?? '';
+}
+
+function buildMemberClusterErrorTitle(clusterName: string): string {
+  return clusterName ? `成员集群请求失败（${clusterName}）` : '成员集群请求失败';
+}
+
 karmadaMemberClusterClient.interceptors.response.use(
   (response) => {
     const data = response.data as MemberClusterResponse | undefined;
     const errors = data?.errors ?? [];
+    const clusterName = extractMemberClusterName(response?.config?.url);
 
     if (Array.isArray(errors) && errors.length > 0) {
       const messages = errors
@@ -163,7 +189,7 @@ karmadaMemberClusterClient.interceptors.response.use(
       if (messages.length > 0) {
         messages.forEach((msg) => {
           notification.error({
-            message: '成员集群请求失败',
+            message: buildMemberClusterErrorTitle(clusterName),
             description: msg,
             duration: 5,
           });
@@ -174,11 +200,20 @@ karmadaMemberClusterClient.interceptors.response.use(
     return response;
   },
   (error: unknown) => {
-    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    const axiosError = axios.isAxiosError(error) ? error : undefined;
+    const status = axiosError?.response?.status;
+    const clusterName = extractMemberClusterName(axiosError?.config?.url);
+    const backendMessage = getFirstErrStatusMessage(axiosError?.response?.data);
     if (status === 403) {
       notification.error({
-        message: '成员集群权限不足',
-        description: '当前账号没有访问成员集群相关资源的权限（HTTP 403）',
+        message: clusterName ? `成员集群权限不足（${clusterName}）` : '成员集群权限不足',
+        description: backendMessage || '当前账号没有访问成员集群相关资源的权限（HTTP 403）',
+        duration: 5,
+      });
+    } else if (typeof status === 'number' && status >= 400) {
+      notification.error({
+        message: buildMemberClusterErrorTitle(clusterName),
+        description: backendMessage || `成员集群接口返回异常（HTTP ${status}）`,
         duration: 5,
       });
     }

@@ -16,6 +16,14 @@ limitations under the License.
 
 import { IResponse, karmadaClient } from '@/services/base.ts';
 
+export interface MeResponse {
+  authenticated: boolean;
+  name?: string;
+  email?: string;
+  preferredUsername?: string;
+  authType?: string;
+}
+
 export async function Login(token: string) {
   const resp = await karmadaClient.post<IResponse<{ token: string }>>(
     `/login`,
@@ -31,10 +39,34 @@ export async function Login(token: string) {
 }
 
 export async function Me() {
+  const resp = await karmadaClient.get<IResponse<MeResponse>>(`me`);
+  return resp.data;
+}
+
+export async function GetOIDCEnabled() {
   const resp = await karmadaClient.get<
     IResponse<{
-      authenticated: boolean;
+      enabled: boolean;
     }>
-  >(`me`);
+  >(`/auth/oidc/enabled`);
+  return resp.data;
+}
+
+export async function GetOIDCLoginURL() {
+  const resp = await karmadaClient.get<
+    IResponse<{
+      authUrl: string;
+      state: string;
+    }>
+  >(`/auth/oidc/login`);
+  return resp.data;
+}
+
+export async function OIDCCallback(code: string, state: string) {
+  const resp = await karmadaClient.get<
+    IResponse<{
+      token: string;
+    }>
+  >(`/auth/oidc/callback`, { params: { code, state } });
   return resp.data;
 }
