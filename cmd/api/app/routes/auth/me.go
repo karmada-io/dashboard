@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -55,25 +56,53 @@ func me(request *http.Request) (*v1.User, int, error) {
 }
 
 func getUserFromToken(token string) *v1.User {
-	parsed, _ := jwt.Parse(token, nil)
-	if parsed == nil {
-		return &v1.User{Authenticated: true}
+	user := &v1.User{Authenticated: true, AuthType: "token"}
+	claims := parseTokenClaims(token)
+	if claims == nil {
+		return user
 	}
 
-	claims := parsed.Claims.(jwt.MapClaims)
-
+	// service account token path
 	found, value := traverse(tokenServiceAccountKey, claims)
-	if !found {
-		return &v1.User{Authenticated: true}
+	if found {
+		var sa v1.ServiceAccount
+		if ok := transcode(value, &sa); ok && sa.Name != "" {
+			user.Name = sa.Name
+			return user
+		}
 	}
 
-	var sa v1.ServiceAccount
-	ok := transcode(value, &sa)
-	if !ok {
-		return &v1.User{Authenticated: true}
+	// oidc/general jwt claims path
+	if sub, ok := claims["sub"].(string); ok && strings.TrimSpace(sub) != "" {
+		user.AuthType = "oidc"
 	}
+	if name, ok := claims["name"].(string); ok {
+		user.Name = strings.TrimSpace(name)
+	}
+	if email, ok := claims["email"].(string); ok {
+		user.Email = strings.TrimSpace(email)
+	}
+	if preferred, ok := claims["preferred_username"].(string); ok {
+		user.PreferredUsername = strings.TrimSpace(preferred)
+	}
+	if user.Name == "" {
+		if user.PreferredUsername != "" {
+			user.Name = user.PreferredUsername
+		} else if user.Email != "" {
+			user.Name = user.Email
+		}
+	}
+	return user
+}
 
-	return &v1.User{Name: sa.Name, Authenticated: true}
+func parseTokenClaims(token string) jwt.MapClaims {
+	parser := jwt.NewParser()
+	claims := jwt.MapClaims{}
+	_, _, err := parser.ParseUnverified(token, claims)
+	if err != nil {
+		return nil
+	}
+	return claims
 }
 
 func traverse(key string, m map[string]interface{}) (found bool, value interface{}) {

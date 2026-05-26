@@ -28,12 +28,37 @@ type LoginResponse struct {
 
 // User is the user info.
 type User struct {
-	Name          string `json:"name,omitempty"`
-	Authenticated bool   `json:"authenticated"`
+	Name              string `json:"name,omitempty"`
+	Email             string `json:"email,omitempty"`
+	PreferredUsername string `json:"preferredUsername,omitempty"`
+	AuthType          string `json:"authType,omitempty"`
+	Authenticated     bool   `json:"authenticated"`
 }
 
 // ServiceAccount is the service account info.
 type ServiceAccount struct {
 	Name string `json:"name"`
 	UID  string `json:"uid"`
+}
+
+// OIDCLoginResponse is the response for OIDC login initiation.
+type OIDCLoginResponse struct {
+	AuthURL string `json:"authUrl"`
+	State   string `json:"state"`
+}
+
+// OIDCCallbackRequest is the request for OIDC callback.
+type OIDCCallbackRequest struct {
+	Code  string `form:"code" binding:"required"`
+	State string `form:"state" binding:"required"`
+}
+
+// OIDCCallbackResponse is the response for OIDC callback.
+type OIDCCallbackResponse struct {
+	Token string `json:"token"`
+}
+
+// OIDCEnabledResponse is the response for OIDC feature state.
+type OIDCEnabledResponse struct {
+	Enabled bool `json:"enabled"`
 }
