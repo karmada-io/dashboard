@@ -16,7 +16,7 @@ limitations under the License.
 
 export default {
   plugins: {
-    tailwindcss: {},
+    '@tailwindcss/postcss': {},
     autoprefixer: {},
   },
 };
