@@ -35,6 +35,17 @@ const (
 	kubeClientContextKey    = "kubeClient"
 )
 
+func isAnonymousPath(path string) bool {
+	switch path {
+	case "/api/v1/auth/oidc/enabled", "/api/v1/auth/oidc/login", "/api/v1/auth/oidc/callback":
+		return true
+	case "/auth/oidc/enabled", "/auth/oidc/login", "/auth/oidc/callback":
+		return true
+	default:
+		return false
+	}
+}
+
 // EnsureMemberClusterMiddleware ensures that the member cluster exists.
 func EnsureMemberClusterMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -54,6 +65,11 @@ func EnsureMemberClusterMiddleware() gin.HandlerFunc {
 // AuthMiddleware checks if the request has an Authorization header.
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if isAnonymousPath(c.Request.URL.Path) {
+			c.Next()
+			return
+		}
+
 		if c.Request.Header.Get("Authorization") == "" && c.Query("Authorization") == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, common.BaseResponse{
 				Code: http.StatusUnauthorized,

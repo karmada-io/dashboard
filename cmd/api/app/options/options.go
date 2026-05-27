@@ -50,6 +50,13 @@ type Options struct {
 	LLMModel    string
 	LLMEndpoint string
 	LLMTimeout  time.Duration
+
+	// OIDC related options
+	OIDCIssuerURL    string
+	OIDCClientID     string
+	OIDCClientSecret string
+	OIDCRedirectURL  string
+	OIDCScopes       []string
 }
 
 // NewOptions returns initialized Options.
@@ -87,4 +94,11 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.LLMModel, "llm-model", "gpt-3.5-turbo", "LLM model to use for AI assistant")
 	fs.StringVar(&o.LLMEndpoint, "llm-endpoint", "https://api.openai.com/v1", "LLM API endpoint URL")
 	fs.DurationVar(&o.LLMTimeout, "llm-timeout", 30*time.Second, "Timeout for LLM API requests")
+
+	// OIDC related flags
+	fs.StringVar(&o.OIDCIssuerURL, "oidc-issuer-url", "", "OIDC issuer URL (e.g., https://dex.example.com). When set, enables OIDC login.")
+	fs.StringVar(&o.OIDCClientID, "oidc-client-id", "", "OIDC client ID registered in the identity provider")
+	fs.StringVar(&o.OIDCClientSecret, "oidc-client-secret", "", "OIDC client secret")
+	fs.StringVar(&o.OIDCRedirectURL, "oidc-redirect-url", "", "OIDC redirect URL (e.g., https://dashboard.example.com/login/callback)")
+	fs.StringSliceVar(&o.OIDCScopes, "oidc-scopes", []string{"openid", "email", "groups", "profile"}, "OIDC scopes to request")
 }

@@ -30,7 +30,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/api/app/options"
 	"github.com/karmada-io/dashboard/cmd/api/app/router"
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/assistant"                // Importing route packages forces route registration
-	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/auth"                     // Importing route packages forces route registration
+	"github.com/karmada-io/dashboard/cmd/api/app/routes/auth"                       // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/cluster"                  // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusteroverridepolicy"    // Importing route packages forces route registration
 	_ "github.com/karmada-io/dashboard/cmd/api/app/routes/clusterpropagationpolicy" // Importing route packages forces route registration
@@ -58,6 +58,7 @@ import (
 	"github.com/karmada-io/dashboard/pkg/informer"
 	"github.com/karmada-io/dashboard/pkg/llm"
 	"github.com/karmada-io/dashboard/pkg/mcpclient"
+	oidcpkg "github.com/karmada-io/dashboard/pkg/oidc"
 )
 
 // NewAPICommand creates a *cobra.Command object with default parameters
@@ -137,6 +138,20 @@ func run(ctx context.Context, opts *options.Options) error {
 			klog.Warningf("LLM client initialization failed: %v", err)
 		} else {
 			klog.Infof("LLM client initialized successfully")
+		}
+	}
+
+	// Initialize OIDC provider if configured
+	if opts.OIDCIssuerURL != "" {
+		oidcCfg := &oidcpkg.Config{
+			IssuerURL:    opts.OIDCIssuerURL,
+			ClientID:     opts.OIDCClientID,
+			ClientSecret: opts.OIDCClientSecret,
+			RedirectURL:  opts.OIDCRedirectURL,
+			Scopes:       opts.OIDCScopes,
+		}
+		if err := auth.InitOIDCProvider(ctx, oidcCfg); err != nil {
+			klog.Fatalf("Failed to initialize OIDC provider: %v", err)
 		}
 	}
 

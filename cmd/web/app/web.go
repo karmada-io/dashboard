@@ -97,7 +97,9 @@ func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Contex
 	}
 
 	return func(c *gin.Context) {
-		if c.Request.Header.Get("Authorization") == "" && c.Query("Authorization") == "" {
+		if c.Request.Header.Get("Authorization") == "" &&
+			c.Query("Authorization") == "" &&
+			!isAnonymousProxyPath(c.Request.URL.Path) {
 			c.String(http.StatusUnauthorized, "Forbidden")
 			c.Abort()
 			return
@@ -112,6 +114,26 @@ func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Contex
 		}
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}, nil
+}
+
+func isAnonymousProxyPath(reqPath string) bool {
+	return isAnonymousProxyPathWithPrefix(reqPath, config.GetDashboardConfig().PathPrefix)
+}
+
+func isAnonymousProxyPathWithPrefix(reqPath, pathPrefix string) bool {
+	cleanedPath := reqPath
+	if pathPrefix != "" && strings.HasPrefix(cleanedPath, pathPrefix) {
+		cleanedPath = strings.TrimPrefix(cleanedPath, pathPrefix)
+	}
+
+	switch cleanedPath {
+	case "/api/v1/auth/oidc/enabled", "/auth/oidc/enabled",
+		"/api/v1/auth/oidc/login", "/auth/oidc/login",
+		"/api/v1/auth/oidc/callback", "/auth/oidc/callback":
+		return true
+	default:
+		return false
+	}
 }
 
 func serve(opts *options.Options) {
