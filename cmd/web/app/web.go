@@ -117,19 +117,12 @@ func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Contex
 }
 
 func isAnonymousProxyPath(reqPath string) bool {
-	return isAnonymousProxyPathWithPrefix(reqPath, config.GetDashboardConfig().PathPrefix)
-}
-
-func isAnonymousProxyPathWithPrefix(reqPath, pathPrefix string) bool {
-	cleanedPath := reqPath
-	if pathPrefix != "" && strings.HasPrefix(cleanedPath, pathPrefix) {
-		cleanedPath = strings.TrimPrefix(cleanedPath, pathPrefix)
-	}
-
-	switch cleanedPath {
-	case "/api/v1/auth/oidc/enabled", "/auth/oidc/enabled",
-		"/api/v1/auth/oidc/login", "/auth/oidc/login",
-		"/api/v1/auth/oidc/callback", "/auth/oidc/callback":
+	switch {
+	case reqPath == "/api/v1/auth/oidc/enabled", strings.HasSuffix(reqPath, "/api/v1/auth/oidc/enabled"), strings.HasSuffix(reqPath, "/auth/oidc/enabled"):
+		return true
+	case reqPath == "/api/v1/auth/oidc/login", strings.HasSuffix(reqPath, "/api/v1/auth/oidc/login"), strings.HasSuffix(reqPath, "/auth/oidc/login"):
+		return true
+	case reqPath == "/api/v1/auth/oidc/callback", strings.HasSuffix(reqPath, "/api/v1/auth/oidc/callback"), strings.HasSuffix(reqPath, "/auth/oidc/callback"):
 		return true
 	default:
 		return false

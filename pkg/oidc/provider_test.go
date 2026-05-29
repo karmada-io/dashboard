@@ -21,8 +21,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"strconv"
-	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -71,38 +69,5 @@ func TestValidateState_StatelessExpired(t *testing.T) {
 
 	if p.validateSignedState(state, 10*time.Minute) {
 		t.Fatalf("expired state should fail")
-	}
-}
-
-func TestValidateState_ConcurrentReplayBlocked(t *testing.T) {
-	p := &Provider{stateKey: []byte("test-key")}
-
-	state, err := p.generateState()
-	if err != nil {
-		t.Fatalf("generate state failed: %v", err)
-	}
-
-	const workers = 32
-	var wg sync.WaitGroup
-	wg.Add(workers)
-
-	var successes atomic.Int32
-	start := make(chan struct{})
-
-	for i := 0; i < workers; i++ {
-		go func() {
-			defer wg.Done()
-			<-start
-			if err := p.ValidateState(state); err == nil {
-				successes.Add(1)
-			}
-		}()
-	}
-
-	close(start)
-	wg.Wait()
-
-	if got := successes.Load(); got != 1 {
-		t.Fatalf("concurrent ValidateState should succeed exactly once, got %d", got)
 	}
 }

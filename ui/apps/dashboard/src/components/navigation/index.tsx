@@ -27,18 +27,14 @@ import {
 } from '@/utils/i18n';
 import { Dropdown } from 'antd';
 import { Icons } from '@/components/icons';
-
-export interface IUserInfo {
-  id: number;
-  username: string;
-  avatar: string;
-}
+import { AuthUser } from '@/components/auth';
 
 interface INavigationProps {
   headerStyle?: CSSProperties;
   usePlaceholder?: boolean;
   brandText?: string;
-  userInfo?: IUserInfo;
+  userInfo?: AuthUser | null;
+  onLogout?: () => void;
   onTerminalClick?: () => void;
 }
 
@@ -48,8 +44,17 @@ const Navigation: FC<INavigationProps> = (props) => {
     usePlaceholder = true,
     brandText = 'Karmada Dashboard',
     userInfo,
+    onLogout,
     onTerminalClick,
   } = props;
+
+  const lang = getLang();
+  const isEnglish = lang === 'en-US';
+  const emailPrefix = userInfo?.email?.split('@')[0] || '';
+  const displayName = isEnglish
+    ? emailPrefix || userInfo?.preferredUsername || userInfo?.name || userInfo?.email || ''
+    : userInfo?.name || userInfo?.preferredUsername || userInfo?.email || '';
+
   return (
     <>
       <div className={styles.navbar}>
@@ -105,11 +110,27 @@ const Navigation: FC<INavigationProps> = (props) => {
             </div>
 
             {/* user info */}
-            {userInfo && (
+            {displayName && (
               <div className={styles.userWrap}>
-                <div className={styles.user}>
-                  <img src={userInfo?.avatar} className={styles.avatar} />
-                </div>
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'logout',
+                        label: 'Logout',
+                      },
+                    ],
+                    onClick: ({ key }) => {
+                      if (key === 'logout') {
+                        onLogout?.();
+                      }
+                    },
+                  }}
+                  placement="bottomRight"
+                  arrow
+                >
+                  <div className={styles.userName}>{displayName}</div>
+                </Dropdown>
               </div>
             )}
           </div>

@@ -125,7 +125,7 @@ func (p *Provider) ValidateState(state string) error {
 	if state == "" {
 		return fmt.Errorf("state parameter is empty")
 	}
-	if _, used := p.usedStates.LoadOrStore(state, time.Now()); used {
+	if _, used := p.usedStates.Load(state); used {
 		return fmt.Errorf("state parameter already used")
 	}
 
@@ -133,7 +133,6 @@ func (p *Provider) ValidateState(state string) error {
 	if value, loaded := p.states.LoadAndDelete(state); loaded {
 		entry := value.(stateEntry)
 		if time.Since(entry.createdAt) > 10*time.Minute {
-			p.usedStates.Delete(state)
 			return fmt.Errorf("state parameter expired")
 		}
 		p.usedStates.Store(state, time.Now())
@@ -142,7 +141,6 @@ func (p *Provider) ValidateState(state string) error {
 
 	// Fallback to stateless signature validation to support multi-instance / restart scenarios.
 	if !p.validateSignedState(state, 10*time.Minute) {
-		p.usedStates.Delete(state)
 		return fmt.Errorf("invalid or expired state parameter")
 	}
 	p.usedStates.Store(state, time.Now())

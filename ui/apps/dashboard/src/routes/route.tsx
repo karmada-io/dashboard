@@ -64,6 +64,7 @@ import MemberClusterRoleBindings from '@/pages/member-cluster/cluster/role-bindi
 import MemberClusterRoles from '@/pages/member-cluster/cluster/roles';
 import MemberClusterServiceAccounts from '@/pages/member-cluster/cluster/service-accounts';
 import Login from '@/pages/login';
+import OIDCCallbackPage from '@/pages/login/callback';
 import { Icons } from '@/components/icons';
 
 export interface IRouteObjectHandle {
@@ -324,6 +325,11 @@ export function getRoutes() {
       path: '/login',
       errorElement: <ErrorBoundary />,
       element: <Login />,
+    },
+    {
+      path: '/login/callback',
+      errorElement: <ErrorBoundary />,
+      element: <OIDCCallbackPage />,
     },
     {
       path: '/member-cluster/:memberCluster',

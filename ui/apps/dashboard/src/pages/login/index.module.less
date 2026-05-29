@@ -1,5 +1,240 @@
 .login-card {
+  width: min(92vw, 680px);
+
   :global(.ant-card-head) {
     padding: 0;
+  }
+
+  :global(.ant-card-body) {
+    padding: 20px;
+  }
+
+  :global(.ant-collapse-content-box) {
+    padding-top: 8px;
+    padding-bottom: 4px;
+  }
+}
+
+.login-page {
+  width: 100vw;
+  min-height: 100vh;
+  background: oklch(0.985 0.005 240);
+}
+
+.login-layout {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+.login-card-title {
+  height: 92px;
+  padding: 14px 16px 12px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background: oklch(0.56 0.16 250);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.title-text {
+  margin: 0 !important;
+  color: oklch(0.98 0.01 250) !important;
+}
+
+.title-subtitle {
+  color: oklch(0.94 0.01 250) !important;
+  line-height: 1.35;
+}
+
+.login-input {
+  margin-top: 12px;
+}
+
+.action-row {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.auth-section {
+  border-radius: 8px;
+  padding: 12px 0 0;
+}
+
+.enterprise-section {
+  padding-top: 6px;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: oklch(0.45 0.01 250);
+}
+
+.mode-switcher {
+  margin-bottom: 6px;
+}
+
+.token-help-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.token-help-label {
+  font-size: 12px;
+  color: oklch(0.48 0.01 250);
+}
+
+.token-command-toggle {
+  border: 1px solid oklch(0.88 0.01 250);
+  background: oklch(0.995 0.005 250);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: oklch(0.46 0.01 250);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.token-command-toggle:hover {
+  color: oklch(0.4 0.01 250);
+  border-color: oklch(0.82 0.01 250);
+}
+
+.token-command-toggle:focus-visible {
+  outline: 2px solid oklch(0.42 0.14 250);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.command-row {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.token-help-wrap {
+  position: relative;
+}
+
+.token-help {
+  margin: 0;
+  max-width: 100%;
+  flex: 1;
+}
+
+.token-help-block {
+  display: block;
+  padding: 12px 44px 12px 12px;
+  border-radius: 8px;
+  border: 1px solid oklch(0.88 0.01 250);
+  background: oklch(0.98 0.004 250);
+  overflow-x: auto;
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.55;
+    color: oklch(0.28 0.01 250);
+    white-space: pre;
+    word-break: normal;
+    display: block;
+  }
+}
+
+.copy-icon-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid oklch(0.86 0.01 250);
+  background: oklch(0.995 0.005 250);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: oklch(0.45 0.01 250);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+}
+
+.token-help-wrap:hover .copy-icon-btn,
+.token-help-wrap:focus-within .copy-icon-btn,
+.copy-icon-btn-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.copy-icon-btn:hover {
+  color: oklch(0.4 0.01 250);
+  border-color: oklch(0.8 0.01 250);
+}
+
+.copy-icon-btn:focus-visible {
+  outline: 2px solid oklch(0.42 0.14 250);
+  outline-offset: 2px;
+}
+
+.copied-hint {
+  font-size: 12px;
+  color: oklch(0.42 0.12 150);
+}
+
+.token-error {
+  display: inline-block;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .login-card {
+    width: 100%;
+  }
+
+  .login-layout {
+    align-items: flex-start;
+    padding-top: 24px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .login-card-title {
+    height: auto;
+    min-height: 92px;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .action-row :global(.ant-btn) {
+    width: 100%;
+  }
+
+  .token-help-block {
+    padding-right: 40px;
+  }
+
+  .copy-icon-btn {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy-icon-btn {
+    transition: none;
   }
 }
