@@ -1,6 +1,6 @@
 module github.com/karmada-io/dashboard
 
-go 1.25.7
+go 1.25.10
 
 require (
 	github.com/coreos/go-oidc/v3 v3.18.0
@@ -12,7 +12,7 @@ require (
 	github.com/go-openapi/spec v0.22.4
 	github.com/gobuffalo/flect v1.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/karmada-io/karmada v1.17.2
+	github.com/karmada-io/karmada v1.18.0
 	github.com/mark3labs/mcp-go v0.54.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.67.5
@@ -24,11 +24,11 @@ require (
 	golang.org/x/sync v0.20.0
 	gopkg.in/igm/sockjs-go.v2 v2.1.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.35.0
-	k8s.io/apiextensions-apiserver v0.35.0
-	k8s.io/apimachinery v0.35.0
-	k8s.io/client-go v0.35.0
-	k8s.io/component-base v0.35.0
+	k8s.io/api v0.35.3
+	k8s.io/apiextensions-apiserver v0.35.3
+	k8s.io/apimachinery v0.35.3
+	k8s.io/client-go v0.35.3
+	k8s.io/component-base v0.35.3
 	k8s.io/dashboard/certificates v0.0.0-00010101000000-000000000000
 	k8s.io/dashboard/client v0.0.0-00010101000000-000000000000
 	k8s.io/dashboard/csrf v0.0.0-00010101000000-000000000000
@@ -36,7 +36,7 @@ require (
 	k8s.io/dashboard/helpers v0.0.0-00010101000000-000000000000
 	k8s.io/dashboard/types v0.0.0-00010101000000-000000000000
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubectl v0.35.0
+	k8s.io/kubectl v0.35.3
 	k8s.io/utils v0.0.0-20260108192941-914a6e750570
 	sigs.k8s.io/yaml v1.6.0
 )
@@ -148,9 +148,9 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gorm.io/gorm v1.25.7 // indirect
-	k8s.io/apiserver v0.35.0 // indirect
-	k8s.io/cli-runtime v0.35.0 // indirect
-	k8s.io/kube-aggregator v0.35.0 // indirect
+	k8s.io/apiserver v0.35.3 // indirect
+	k8s.io/cli-runtime v0.35.3 // indirect
+	k8s.io/kube-aggregator v0.35.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20260304202019-5b3e3fdb0acf // indirect
 	modernc.org/libc v1.22.5 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
