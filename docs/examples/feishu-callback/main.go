@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -18,6 +19,7 @@ import (
 
 const (
 	defaultAddr = ":18080"
+	addrEnvName = "CALLBACK_ADDR"
 	// #nosec G101 -- Public OAuth endpoint URL, not a hardcoded secret.
 	feishuTokenEndpoint      = "https://open.feishu.cn/open-apis/authen/v2/oauth/token"
 	feishuUserInfoEndpoint   = "https://open.feishu.cn/open-apis/authen/v1/user_info"
@@ -51,7 +53,44 @@ type callbackDebugResponse struct {
 	State       string          `json:"state"`
 	AccessToken string          `json:"accessToken,omitempty"`
 	UserInfo    json.RawMessage `json:"userInfo,omitempty"`
+	OIDCDebug   *oidcDebugInfo  `json:"oidcDebug,omitempty"`
 	Warning     string          `json:"warning,omitempty"`
+}
+
+type flatUserInfo struct {
+	OpenID        string `json:"open_id"`
+	Name          string `json:"name,omitempty"`
+	EnName        string `json:"en_name,omitempty"`
+	Email         string `json:"email,omitempty"`
+	EmailVerified bool   `json:"email_verified"`
+}
+
+type upstreamUserInfo struct {
+	OpenID        string   `json:"open_id"`
+	UserID        string   `json:"user_id"`
+	UnionID       string   `json:"union_id"`
+	Sub           string   `json:"sub"`
+	Name          string   `json:"name"`
+	EnName        string   `json:"en_name"`
+	Email         string   `json:"email"`
+	Groups        []string `json:"groups,omitempty"`
+	EmailVerified *bool    `json:"email_verified"`
+}
+
+type oidcDebugInfo struct {
+	DexUserIDCandidate string   `json:"dexUserIdCandidate"`
+	K8sUsernameBySub   string   `json:"k8sUsernameBySub"`
+	SubFromUserInfo    string   `json:"subFromUserInfo,omitempty"`
+	OpenID             string   `json:"openId,omitempty"`
+	UserID             string   `json:"userId,omitempty"`
+	UnionID            string   `json:"unionId,omitempty"`
+	Groups             []string `json:"groups,omitempty"`
+}
+
+type userInfoDebugResponse struct {
+	Flat *flatUserInfo   `json:"flat"`
+	Raw  json.RawMessage `json:"raw"`
+	OIDC *oidcDebugInfo  `json:"oidc"`
 }
 
 type stateStore struct {
@@ -93,11 +132,12 @@ func (s *stateStore) cleanup() {
 func main() {
 	appID := os.Getenv("FEISHU_APP_ID")
 	appSecret := os.Getenv("FEISHU_APP_SECRET")
-	if appID == "" || appSecret == "" {
-		log.Fatal("FEISHU_APP_ID and FEISHU_APP_SECRET are required")
+	enableOAuthCallback := appID != "" && appSecret != ""
+	if !enableOAuthCallback {
+		log.Printf("FEISHU_APP_ID/FEISHU_APP_SECRET not set, /auth/start and /callback are disabled")
 	}
 
-	addr := os.Getenv("TEMP_CALLBACK_ADDR")
+	addr := strings.TrimSpace(os.Getenv(addrEnvName))
 	if addr == "" {
 		addr = defaultAddr
 	}
@@ -113,6 +153,11 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/auth/start", func(w http.ResponseWriter, _ *http.Request) {
+		if !enableOAuthCallback {
+			http.Error(w, "oauth callback flow disabled: FEISHU_APP_ID/FEISHU_APP_SECRET not set", http.StatusServiceUnavailable)
+			return
+		}
+
 		state, err := generateState()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("generate state failed: %v", err), http.StatusInternalServerError)
@@ -131,6 +176,11 @@ func main() {
 	})
 
 	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+		if !enableOAuthCallback {
+			http.Error(w, "oauth callback flow disabled: FEISHU_APP_ID/FEISHU_APP_SECRET not set", http.StatusServiceUnavailable)
+			return
+		}
+
 		code := strings.TrimSpace(r.URL.Query().Get("code"))
 		state := strings.TrimSpace(r.URL.Query().Get(defaultExpectedStateName))
 		if code == "" || state == "" {
@@ -162,14 +212,75 @@ func main() {
 			resp.Warning = "token ok, userinfo failed: " + err.Error()
 		} else {
 			resp.UserInfo = userInfo
+			resp.OIDCDebug = buildOIDCDebug(userInfo)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(resp)
 	})
 
+	mux.HandleFunc("/userinfo", func(w http.ResponseWriter, r *http.Request) {
+		auth := strings.TrimSpace(r.Header.Get("Authorization"))
+		if auth == "" {
+			writeJSONError(w, http.StatusUnauthorized, "missing_authorization")
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(r.Context(), requestTimeout)
+		defer cancel()
+
+		rawData, err := fetchUserInfoByAuthorization(ctx, auth)
+		if err != nil {
+			writeJSONError(w, http.StatusBadGateway, err.Error())
+			return
+		}
+
+		flat, err := flattenUserInfo(rawData)
+		if err != nil {
+			writeJSONError(w, http.StatusBadGateway, err.Error())
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(flat)
+	})
+
+	mux.HandleFunc("/userinfo/debug", func(w http.ResponseWriter, r *http.Request) {
+		auth := strings.TrimSpace(r.Header.Get("Authorization"))
+		if auth == "" {
+			writeJSONError(w, http.StatusUnauthorized, "missing_authorization")
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(r.Context(), requestTimeout)
+		defer cancel()
+
+		rawData, err := fetchUserInfoByAuthorization(ctx, auth)
+		if err != nil {
+			writeJSONError(w, http.StatusBadGateway, err.Error())
+			return
+		}
+
+		flat, err := flattenUserInfo(rawData)
+		if err != nil {
+			writeJSONError(w, http.StatusBadGateway, err.Error())
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(userInfoDebugResponse{
+			Flat: flat,
+			Raw:  rawData,
+			OIDC: buildOIDCDebug(rawData),
+		})
+	})
+
 	log.Printf("temporary callback server listening on %s", addr)
-	log.Printf("GET /auth/start to generate state, then use /callback?code=...&state=...")
+	if enableOAuthCallback {
+		log.Printf("GET /auth/start to generate state, then use /callback?code=...&state=...")
+	}
+	log.Printf("GET /userinfo with Authorization header for Dex userInfoURL adapter")
+	log.Printf("GET /userinfo/debug with Authorization header for detailed OIDC/RBAC hints")
 	server := &http.Server{
 		Addr:              addr,
 		Handler:           mux,
@@ -224,11 +335,15 @@ func exchangeToken(ctx context.Context, appID, appSecret, code string) (string, 
 }
 
 func fetchUserInfo(ctx context.Context, accessToken string) (json.RawMessage, error) {
+	return fetchUserInfoByAuthorization(ctx, "Bearer "+accessToken)
+}
+
+func fetchUserInfoByAuthorization(ctx context.Context, authorization string) (json.RawMessage, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, feishuUserInfoEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Authorization", authorization)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -252,4 +367,70 @@ func fetchUserInfo(ctx context.Context, accessToken string) (json.RawMessage, er
 		return nil, fmt.Errorf("feishu userinfo error code=%d msg=%s raw=%s", ur.Code, ur.Msg, string(raw))
 	}
 	return ur.Data, nil
+}
+
+func flattenUserInfo(raw json.RawMessage) (*flatUserInfo, error) {
+	var in upstreamUserInfo
+	if err := json.Unmarshal(raw, &in); err != nil {
+		return nil, fmt.Errorf("decode userinfo.data failed: %w", err)
+	}
+
+	id := firstNonEmpty(in.OpenID, in.UserID, in.UnionID, in.Sub)
+	if id == "" {
+		return nil, errors.New("missing open_id/user_id/union_id/sub in userinfo.data")
+	}
+
+	out := &flatUserInfo{
+		OpenID:        id,
+		Name:          in.Name,
+		EnName:        in.EnName,
+		Email:         in.Email,
+		EmailVerified: in.EmailVerified != nil && *in.EmailVerified,
+	}
+	return out, nil
+}
+
+func buildOIDCDebug(raw json.RawMessage) *oidcDebugInfo {
+	var in upstreamUserInfo
+	if err := json.Unmarshal(raw, &in); err != nil {
+		return nil
+	}
+
+	id := firstNonEmpty(in.OpenID, in.UserID, in.UnionID, in.Sub)
+	if id == "" {
+		return &oidcDebugInfo{
+			SubFromUserInfo: in.Sub,
+			OpenID:          in.OpenID,
+			UserID:          in.UserID,
+			UnionID:         in.UnionID,
+			Groups:          in.Groups,
+		}
+	}
+
+	return &oidcDebugInfo{
+		DexUserIDCandidate: id,
+		K8sUsernameBySub:   "oidc:" + id,
+		SubFromUserInfo:    in.Sub,
+		OpenID:             in.OpenID,
+		UserID:             in.UserID,
+		UnionID:            in.UnionID,
+		Groups:             in.Groups,
+	}
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, v := range values {
+		if strings.TrimSpace(v) != "" {
+			return v
+		}
+	}
+	return ""
+}
+
+func writeJSONError(w http.ResponseWriter, status int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"error": msg,
+	})
 }
