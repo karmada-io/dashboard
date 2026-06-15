@@ -26,10 +26,12 @@ import { useStore } from './store.ts';
 import { message } from 'antd';
 import { DeleteResource } from '@/services/unstructured.ts';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import SecretTable from '@/pages/multicloud-resource-manage/config/components/secret-table.tsx';
 import { shallow } from 'zustand/shallow';
 
 const ConfigPage = () => {
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const { tagNum } = useTagNum();
   const { filter, editor } = useStore(
@@ -82,7 +84,9 @@ const ConfigPage = () => {
                 name: r.objectMeta.name,
                 namespace: r.objectMeta.namespace,
               });
-              if (ret.code !== 200) {
+              if (ret.code === 200) {
+                setDeletingNames((prev) => new Set(prev).add(`${r.objectMeta.namespace}-${r.objectMeta.name}`));
+              } else {
                 await messageApi.error(
                   i18nInstance.t(
                     'f8484c9d3de78566f9e255360977f12c',
@@ -98,6 +102,7 @@ const ConfigPage = () => {
               console.error('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
       {filter.kind === ConfigKind.Secret && (
@@ -118,7 +123,9 @@ const ConfigPage = () => {
                 name: r.objectMeta.name,
                 namespace: r.objectMeta.namespace,
               });
-              if (ret.code !== 200) {
+              if (ret.code === 200) {
+                setDeletingNames((prev) => new Set(prev).add(`${r.objectMeta.namespace}-${r.objectMeta.name}`));
+              } else {
                 await messageApi.error(
                   i18nInstance.t(
                     '1de397f628eb5943bdb6861ad667ff0a',
@@ -134,6 +141,7 @@ const ConfigPage = () => {
               console.error('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
 
