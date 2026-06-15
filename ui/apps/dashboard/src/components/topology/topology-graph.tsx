@@ -37,6 +37,9 @@ import PropagationPolicyEditorDrawer from '@/pages/multicloud-policy-manage/prop
 import OverridePolicyEditorDrawer from '@/pages/multicloud-policy-manage/override-policy/override-policy-editor-drawer';
 import ResourceBindingDetailDrawer from '@/pages/multicloud-resource-manage/resource-binding/resource-binding-detail-drawer';
 import WorkDetailDrawer from '@/pages/multicloud-resource-manage/work/work-detail-drawer';
+import MemberClusterWorkloadDetailDrawer from '@/pages/member-cluster/workload/member-cluster-workload-detail-drawer';
+import PodLogDrawer from '@/components/pod-log-drawer/pod-log-drawer';
+import PodTerminalDrawer from '@/components/pod-terminal-drawer/pod-terminal-drawer';
 import { GetResource } from '@/services/unstructured';
 import { stringify } from 'yaml';
 
@@ -78,6 +81,22 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
   const [rbDrawerState, setRbDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
   const [workDrawerState, setWorkDrawerState] = useState<PolicyDrawerState>(closedPolicyDrawer);
 
+  const [memberWorkloadDrawerState, setMemberWorkloadDrawerState] = useState<{
+    open: boolean;
+    memberClusterName: string;
+    namespace: string;
+    name: string;
+    kind: WorkloadKind;
+  }>({ open: false, memberClusterName: '', namespace: '', name: '', kind: '' as WorkloadKind });
+
+  const [logPod, setLogPod] = useState<{ cluster: string; namespace: string; podName: string } | null>(null);
+
+  const [attachPod, setAttachPod] = useState<{
+    cluster: string;
+    namespace: string;
+    podName: string;
+  } | null>(null);
+
   const onNodeClick = useCallback(async (_: React.MouseEvent, node: Node) => {
     const d = node.data as unknown as TopologyNodeData;
     if (d.nodeType === 'ResourceTemplate' && d.kind && d.namespace && d.name) {
@@ -111,6 +130,14 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
       } catch (err) {
         console.error('Failed to fetch Work detail', err);
       }
+    } else if (d.nodeType === 'MemberClusterWorkload' && d.cluster && d.name && d.namespace && d.kind) {
+      setMemberWorkloadDrawerState({
+        open: true,
+        memberClusterName: d.cluster,
+        namespace: d.namespace,
+        name: d.name,
+        kind: d.kind.toLowerCase() as WorkloadKind,
+      });
     }
   }, []);
 
@@ -161,6 +188,12 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         kind: n.kind,
         cluster: n.cluster,
         status: n.status,
+        onLogClick: n.type === 'Pod' && n.cluster && n.namespace
+          ? () => setLogPod({ cluster: n.cluster!, namespace: n.namespace!, podName: n.name })
+          : undefined,
+        onAttachClick: n.type === 'Pod' && n.cluster && n.namespace
+          ? () => setAttachPod({ cluster: n.cluster!, namespace: n.namespace!, podName: n.name })
+          : undefined,
       } satisfies TopologyNodeData,
     }));
   }, [data]);
@@ -198,19 +231,23 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', background: '#fafafa' }}>
         <Spin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <Alert type="error" message="Failed to load topology" description={String(error)} />;
+    return (
+      <div style={{ padding: 24 }}>
+        <Alert type="error" message="Failed to load topology" description={String(error)} />
+      </div>
+    );
   }
 
   if (!data || nodes.length === 0) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', background: '#fafafa' }}>
         <Empty description="No topology data" />
       </div>
     );
@@ -224,13 +261,27 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
+        fitViewOptions={{ padding: 0.3 }}
         nodesDraggable
         nodesConnectable={false}
         onNodeClick={onNodeClick}
         proOptions={{ hideAttribution: true }}
+        defaultEdgeOptions={{
+          style: { stroke: '#c0c0c0', strokeWidth: 1.5 },
+        }}
       >
-        <Background />
-        <Controls />
+        <Background
+          color="#e8e8e8"
+          gap={20}
+          size={1}
+        />
+        <Controls
+          style={{
+            border: '1px solid #e8e8e8',
+            borderRadius: 6,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          }}
+        />
       </ReactFlow>
       <WorkloadDetailDrawer
         open={drawerState.open}
@@ -272,6 +323,28 @@ const TopologyGraph = ({ namespace, kind, name }: TopologyGraphProps) => {
         namespace={workDrawerState.namespace}
         content={workDrawerState.content}
         onClose={() => setWorkDrawerState(closedPolicyDrawer)}
+      />
+      <MemberClusterWorkloadDetailDrawer
+        open={memberWorkloadDrawerState.open}
+        memberClusterName={memberWorkloadDrawerState.memberClusterName}
+        namespace={memberWorkloadDrawerState.namespace}
+        name={memberWorkloadDrawerState.name}
+        kind={memberWorkloadDrawerState.kind}
+        onClose={() => setMemberWorkloadDrawerState((s) => ({ ...s, open: false }))}
+      />
+      <PodLogDrawer
+        memberClusterName={logPod?.cluster || ''}
+        namespace={logPod?.namespace || ''}
+        podName={logPod?.podName || ''}
+        open={logPod !== null}
+        onClose={() => setLogPod(null)}
+      />
+      <PodTerminalDrawer
+        open={attachPod !== null}
+        memberClusterName={attachPod?.cluster || ''}
+        namespace={attachPod?.namespace || ''}
+        podName={attachPod?.podName || ''}
+        onClose={() => setAttachPod(null)}
       />
     </>
   );
