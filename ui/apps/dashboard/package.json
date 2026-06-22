@@ -28,6 +28,7 @@
     ]
   },
   "dependencies": {
+    "@ant-design/cssinjs": "^2.1.2",
     "@chatui/core": "^3.8.0",
     "@karmada/chatui": "workspace:*",
     "@karmada/i18n-tool": "workspace:*",

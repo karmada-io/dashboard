@@ -45,6 +45,9 @@ importers:
 
   apps/dashboard:
     dependencies:
+      '@ant-design/cssinjs':
+        specifier: ^2.1.2
+        version: 2.1.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@chatui/core':
         specifier: ^3.8.0
         version: 3.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
