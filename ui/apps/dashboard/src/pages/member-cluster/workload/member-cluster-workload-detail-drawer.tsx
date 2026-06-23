@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { App, Button, Drawer, Space, Table, TableColumnsType } from 'antd';
+import { Button, Drawer, Space, Table, TableColumnsType } from 'antd';
 import { WorkloadKind } from '@/services/base';
-import { useEffect, useRef, useState, FC } from 'react';
+import { useEffect, useState, FC } from 'react';
 import {
   GetMemberClusterWorkloadDetail,
   GetMemberClusterWorkloadEvents,
@@ -26,12 +26,8 @@ import {
 import dayjs from 'dayjs';
 import { GetMemberClusterPods, Pod } from '@/services/member-cluster/pod';
 import PodLogDrawer from '@/components/pod-log-drawer/pod-log-drawer';
-import { GetMemberClusterPodDetail } from '@/services/member-cluster/pod';
-import { useAuth } from '@/components/auth';
+import PodTerminalDrawer from '@/components/pod-terminal-drawer/pod-terminal-drawer';
 import { Icons } from '@/components/icons';
-import SockJS from 'sockjs-client/dist/sockjs';
-import { Terminal } from '@xterm/xterm';
-import '@xterm/xterm/css/xterm.css';
 
 interface MemberClusterWorkloadDetailDrawerProps {
   open: boolean;
@@ -42,146 +38,6 @@ interface MemberClusterWorkloadDetailDrawerProps {
   onClose: () => void;
   showActions?: boolean;
 }
-
-interface MemberClusterPodTerminalProps {
-  memberClusterName: string;
-  namespace: string;
-  pod: string;
-  container: string;
-  token?: string | null;
-}
-
-const MemberClusterPodTerminal: FC<MemberClusterPodTerminalProps> = ({
-  memberClusterName,
-  namespace,
-  pod,
-  container,
-  token,
-}) => {
-  const { message: messageApi } = App.useApp();
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const termRef = useRef<Terminal | null>(null);
-  const sockRef = useRef<WebSocket | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!containerRef.current || !memberClusterName || !namespace || !pod || !container) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const setupTerminal = async () => {
-      setIsLoading(true);
-      try {
-        const sessionResp = await fetch(
-          `/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${pod}/shell/${container}`,
-          {
-            method: 'GET',
-            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          },
-        );
-
-        if (!sessionResp.ok) {
-          throw new Error(`Session request failed: ${sessionResp.status}`);
-        }
-
-        const sessionJson = (await sessionResp.json()) as
-          | { id?: string }
-          | { data?: { id?: string } };
-        const sessionId =
-          (sessionJson as { id?: string }).id ??
-          (sessionJson as { data?: { id?: string } }).data?.id;
-
-        if (!sessionId) {
-          throw new Error('No session id in response');
-        }
-
-        if (cancelled || !containerRef.current) return;
-
-        const term = new Terminal({
-          cursorBlink: true,
-          scrollback: 1000,
-          fontSize: 14,
-          theme: { background: '#1e1e1e', foreground: '#ffffff' },
-        });
-
-        termRef.current = term;
-        term.open(containerRef.current);
-
-        const authQuery = token
-          ? `&Authorization=${encodeURIComponent(`Bearer ${token}`)}`
-          : '';
-        const sock = new SockJS(
-          `/clusterapi/${memberClusterName}/api/sockjs?${sessionId}${authQuery}`,
-        );
-        sockRef.current = sock;
-
-        sock.onopen = () => {
-          sock.send(JSON.stringify({ Op: 'bind', SessionID: sessionId }));
-          sock.send(JSON.stringify({ Op: 'resize', Cols: term.cols, Rows: term.rows }));
-          term.focus();
-          setIsLoading(false);
-        };
-
-        sock.onmessage = (event: MessageEvent) => {
-          try {
-            if (typeof event.data !== 'string') return;
-            const frame = JSON.parse(event.data) as { Op: string; Data?: string };
-            if (frame.Op === 'stdout') term.write(frame.Data || '');
-            else if (frame.Op === 'toast' && frame.Data) void messageApi.info(frame.Data);
-          } catch { /* ignore malformed frames */ }
-        };
-
-        sock.onclose = () => {};
-
-        const dataDisposable = term.onData((data) => {
-          sock.send(JSON.stringify({ Op: 'stdin', Data: data, Cols: term.cols, Rows: term.rows }));
-        });
-
-        const resizeDisposable = term.onResize(({ cols, rows }) => {
-          sock.send(JSON.stringify({ Op: 'resize', Cols: cols, Rows: rows }));
-        });
-
-        return () => { dataDisposable.dispose(); resizeDisposable.dispose(); };
-      } catch (e: unknown) {
-        if (!cancelled) {
-          void messageApi.error(`Failed to attach to pod terminal: ${e instanceof Error ? e.message : String(e)}`);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    const cleanupDisposablesPromise = setupTerminal();
-
-    return () => {
-      cancelled = true;
-      if (sockRef.current) { sockRef.current.close(); sockRef.current = null; }
-      if (termRef.current) { termRef.current.dispose(); termRef.current = null; }
-      void cleanupDisposablesPromise?.then((cleanup) => {
-        if (typeof cleanup === 'function') cleanup();
-      });
-    };
-  }, [memberClusterName, namespace, pod, container, token, messageApi]);
-
-  return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000000' }}>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 text-white text-sm">
-          Connecting to pod terminal...
-        </div>
-      )}
-      <div
-        ref={containerRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          visibility: !isLoading ? 'visible' : 'hidden',
-        }}
-      />
-    </div>
-  );
-};
 
 const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerProps> = ({
   open,
@@ -200,10 +56,7 @@ const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerPro
   const [logPod, setLogPod] = useState<Pod | null>(null);
   const [logDrawerOpen, setLogDrawerOpen] = useState(false);
 
-  const [attachDrawerOpen, setAttachDrawerOpen] = useState(false);
-  const [attachPod, setAttachPod] = useState<Pod | null>(null);
-
-  const { token } = useAuth();
+  const [terminalPod, setTerminalPod] = useState<{ namespace: string; name: string } | null>(null);
 
   useEffect(() => {
     if (!open || !memberClusterName || !namespace || !name || !kind) return;
@@ -298,14 +151,8 @@ const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerPro
             size="small"
             icon={<Icons.terminal width={14} height={14} />}
             title="Attach to Pod"
-            onClick={async () => {
-              const ret = await GetMemberClusterPodDetail({
-                memberClusterName,
-                namespace: record.objectMeta.namespace,
-                name: record.objectMeta.name,
-              });
-              setAttachPod(ret.data);
-              setAttachDrawerOpen(true);
+            onClick={() => {
+              setTerminalPod({ namespace: record.objectMeta.namespace, name: record.objectMeta.name });
             }}
           >
             Attach
@@ -388,35 +235,13 @@ const MemberClusterWorkloadDetailDrawer: FC<MemberClusterWorkloadDetailDrawerPro
             }}
           />
 
-          <Drawer
-            title={
-              attachPod
-                ? `Terminal: ${attachPod.objectMeta.namespace}/${attachPod.objectMeta.name}`
-                : 'Pod terminal'
-            }
-            placement="bottom"
-            height="40%"
-            open={attachDrawerOpen}
-            onClose={() => { setAttachDrawerOpen(false); setAttachPod(null); }}
-            destroyOnHidden
-            styles={{ header: { padding: '8px 4px' }, body: { padding: 0, height: '100%' } }}
-          >
-            {attachPod && attachPod.containers && attachPod.containers.length > 0 && (
-              <MemberClusterPodTerminal
-                key={`${attachPod.objectMeta.namespace}-${attachPod.objectMeta.name}-${attachPod.containers[0].name}`}
-                memberClusterName={memberClusterName}
-                namespace={attachPod.objectMeta.namespace}
-                pod={attachPod.objectMeta.name}
-                container={attachPod.containers[0].name}
-                token={token}
-              />
-            )}
-            {attachPod && (!attachPod.containers || attachPod.containers.length === 0) && (
-              <div className="h-full flex items-center justify-center text-sm text-gray-500">
-                No containers available for this pod.
-              </div>
-            )}
-          </Drawer>
+          <PodTerminalDrawer
+            memberClusterName={memberClusterName}
+            namespace={terminalPod?.namespace || ''}
+            podName={terminalPod?.name || ''}
+            open={terminalPod !== null}
+            onClose={() => setTerminalPod(null)}
+          />
         </>
       )}
     </>
