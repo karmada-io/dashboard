@@ -21,7 +21,6 @@ import {
   Position,
   type EdgeProps,
 } from '@xyflow/react';
-import { Tag } from 'antd';
 
 interface PolicyInfo {
   type: 'pp' | 'op';
@@ -76,17 +75,17 @@ function PolicyCard({
       style={{
         background: '#fff',
         border: `1px solid ${hovered && clickable ? '#1677ff' : '#e8e8e8'}`,
-        borderRadius: 6,
-        padding: '4px 8px',
+        borderRadius: 4,
+        padding: '3px 8px 3px 3px',
         boxShadow:
           hovered && clickable
-            ? '0 3px 10px rgba(22,119,255,0.12)'
-            : '0 2px 6px rgba(0,0,0,0.06)',
+            ? '0 2px 8px rgba(22,119,255,0.1)'
+            : '0 1px 3px rgba(0,0,0,0.04)',
         cursor: clickable ? 'pointer' : 'default',
         transition: 'border-color 0.2s, box-shadow 0.2s',
         display: 'flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 5,
         whiteSpace: 'nowrap' as const,
       }}
       onMouseEnter={() => setHovered(true)}
@@ -98,13 +97,18 @@ function PolicyCard({
         }
       }}
     >
-      <Tag
-        color={tagColor}
-        style={{ margin: 0, fontSize: 10, lineHeight: '18px', padding: '0 4px' }}
-      >
+      <span style={{
+        fontSize: 10,
+        fontWeight: 600,
+        color: '#fff',
+        background: tagColor === 'blue' ? '#1677ff' : '#722ed1',
+        borderRadius: 3,
+        padding: '1px 5px',
+        lineHeight: '16px',
+      }}>
         {tagLabel}
-      </Tag>
-      <span style={{ fontSize: 12, color: '#262626' }}>{name}</span>
+      </span>
+      <span style={{ fontSize: 11, color: '#262626', fontWeight: 500 }}>{name}</span>
     </div>
   );
 }
@@ -145,7 +149,7 @@ function LabeledEdge({
         className="react-flow__edge-path"
         d={edgePath}
         markerEnd={markerEnd}
-        style={{ ...style, strokeWidth: 1.5 }}
+        style={{ ...style, stroke: '#c0c0c0', strokeWidth: 1.5 }}
       />
       {label && (
         <EdgeLabelRenderer>
@@ -178,10 +182,11 @@ function LabeledEdge({
                 position: 'absolute',
                 transform: `translate(${labelX + 8}px, ${labelY - 8}px)`,
                 fontSize: 11,
-                color: '#595959',
-                background: 'rgba(255,255,255,0.85)',
+                color: '#8c8c8c',
+                background: 'rgba(250,250,250,0.9)',
                 padding: '2px 6px',
-                borderRadius: 4,
+                borderRadius: 3,
+                border: '1px solid #f0f0f0',
                 pointerEvents: 'all',
                 whiteSpace: 'nowrap',
               }}
