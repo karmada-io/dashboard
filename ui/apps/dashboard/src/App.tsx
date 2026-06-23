@@ -20,6 +20,7 @@ import "./App.css";
 import Router from "./routes";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { ConfigProvider, App as AntdApp } from "antd";
+import { StyleProvider } from "@ant-design/cssinjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AuthProvider from "@/components/auth";
 import { getAntdLocale } from "@/utils/i18n.tsx";
@@ -41,16 +42,17 @@ const queryClient = new QueryClient({
 function App() {
   const [cluster, setCluster] = useState<string>("");
   return (
-    <ConfigProvider
-      locale={getAntdLocale()}
-      theme={{
-        components: {
-          Layout: {
-            siderBg: "#ffffff",
+    <StyleProvider layer>
+      <ConfigProvider
+        locale={getAntdLocale()}
+        theme={{
+          components: {
+            Layout: {
+              siderBg: "#ffffff",
+            },
           },
-        },
-      }}
-    >
+        }}
+      >
       <AntdApp>
         <QueryClientProvider client={queryClient}>
           <ClusterContext.Provider value={{
@@ -93,7 +95,8 @@ function App() {
           </ClusterContext.Provider>
         </QueryClientProvider>
       </AntdApp>
-    </ConfigProvider>
+      </ConfigProvider>
+    </StyleProvider>
   );
 }
 
