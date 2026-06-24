@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dex-feishu-adapter
+  namespace: dex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dex-feishu-adapter
+  template:
+    metadata:
+      labels:
+        app: dex-feishu-adapter
+    spec:
+      containers:
+        - name: adapter
+          image: docker.io/karmada/feishu-callback:v0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CALLBACK_ADDR
+              value: ":8080"
+          ports:
+            - containerPort: 8080
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dex-feishu-adapter
+  namespace: dex
+spec:
+  selector:
+    app: dex-feishu-adapter
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

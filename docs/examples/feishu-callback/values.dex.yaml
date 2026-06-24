@@ -1,0 +1,47 @@
+image:
+  repository: "${DEX_IMAGE_REPOSITORY}"
+config:
+  issuer: "${DEX_ISSUER_URL}"
+  storage:
+    type: kubernetes
+    config:
+      inCluster: true
+  oauth2:
+    skipApprovalScreen: true
+
+  staticClients:
+    - name: Karmada Dashboard
+      id: "karmada-dashboard"
+      secret: "${DEX_STATIC_CLIENT_SECRET}"
+      redirectURIs:
+        - "${KARMADA_DASHBOARD_CALLBACK_URL}"
+        - "${LOCAL_DEV_CALLBACK_URL}"
+
+  connectors:
+    - type: oauth
+      id: feishu
+      name: Feishu
+      config:
+        clientID: "${FEISHU_CLIENT_ID}"
+        clientSecret: "${FEISHU_CLIENT_SECRET}"
+        redirectURI: "${DEX_ISSUER_URL}/callback"
+        authorizationURL: "https://accounts.feishu.cn/open-apis/authen/v1/authorize"
+        tokenURL: "https://open.feishu.cn/open-apis/authen/v2/oauth/token"
+        userInfoURL: "http://dex-feishu-adapter.dex.svc.cluster.local/userinfo"
+        scopes: []
+        userIDKey: open_id
+        claimMapping:
+          userNameKey: name
+          preferredUsernameKey: en_name
+          emailKey: email
+          emailVerifiedKey: email_verified
+        insecureSkipEmailVerified: true
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: "${DEX_INGRESS_HOST}"
+      paths:
+        - path: /
+          pathType: Prefix
