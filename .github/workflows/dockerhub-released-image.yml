@@ -151,7 +151,7 @@ jobs:
       IMAGE_NAME: karmada/karmada-dashboard-terminal
       PLATFORMS: linux/amd64,linux/arm64
       # Karmada CLI version, should align with the Karmada version declared in go.mod
-      KARMADACTL_VERSION: 'v1.13.0'
+      KARMADACTL_VERSION: 'v1.18.0'
       # Kubernetes CLI version, should align with the Kubernetes version declared in go.mod
       KUBECTL_VERSION: 'v1.32.0'
     steps:
