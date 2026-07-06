@@ -4,7 +4,7 @@
   "bin": "src/index.js",
   "dependencies": {
     "@babel/generator": "^8.0.0",
-    "@babel/parser": "^7.29.3",
+    "@babel/parser": "^8.0.0",
     "@babel/traverse": "^7.29.0",
     "@babel/types": "^8.0.0",
     "@karmada/translators": "workspace:*",
