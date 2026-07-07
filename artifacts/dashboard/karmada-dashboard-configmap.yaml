@@ -11,6 +11,9 @@ data:
       - path: /overview
         enable: true
         sidebar_key: OVERVIEW
+      - path: /topology
+        enable: true
+        sidebar_key: TOPOLOGY
       - path: /multicloud-resource-manage
         enable: true
         sidebar_key: MULTICLOUD-RESOURCE-MANAGE
@@ -27,9 +30,6 @@ data:
           - path: config
             enable: true
             sidebar_key: CONFIG
-          - path: topology
-            enable: true
-            sidebar_key: TOPOLOGY
       - path: /multicloud-policy-manage
         enable: true
         sidebar_key: MULTICLOUD-POLICY-MANAGE
@@ -92,6 +92,9 @@ data:
       - path: /overview
         enable: true
         sidebar_key: OVERVIEW
+      - path: /topology
+        enable: true
+        sidebar_key: TOPOLOGY
       - path: /multicloud-resource-manage
         enable: true
         sidebar_key: MULTICLOUD-RESOURCE-MANAGE
@@ -108,9 +111,6 @@ data:
           - path: config
             enable: true
             sidebar_key: CONFIG
-          - path: topology
-            enable: true
-            sidebar_key: TOPOLOGY
       - path: /multicloud-policy-manage
         enable: true
         sidebar_key: MULTICLOUD-POLICY-MANAGE
@@ -166,4 +166,3 @@ data:
           - path: thirdparty
             enable: true
             sidebar_key: THIRDPARTY
-

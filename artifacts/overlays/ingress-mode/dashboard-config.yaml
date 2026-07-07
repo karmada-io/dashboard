@@ -6,6 +6,9 @@ menu_configs:
   - path: /overview
     enable: true
     sidebar_key: OVERVIEW
+  - path: /topology
+    enable: true
+    sidebar_key: TOPOLOGY
   - path: /multicloud-resource-manage
     enable: true
     sidebar_key: MULTICLOUD-RESOURCE-MANAGE
