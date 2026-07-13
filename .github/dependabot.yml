@@ -18,7 +18,13 @@ updates:
     day: "monday"
     time: "00:00"
     timezone: "UTC"
-    
+  groups:
+    # The init/autobuild/analyze actions of github/codeql-action must be
+    # upgraded together to the same version, so group them into one PR.
+    codeql-action:
+      patterns:
+        - "github/codeql-action*"
+
 - package-ecosystem: "docker"
   directory: "/cluster/images/"
   schedule:
