@@ -35,7 +35,7 @@ importers:
         version: 17.0.4
       tsup:
         specifier: ^8.5.1
-        version: 8.5.1(@swc/core@1.15.24)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.8.4)
+        version: 8.5.1(@swc/core@1.15.24)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
       tsx:
         specifier: ^4.22.4
         version: 4.22.4
@@ -133,8 +133,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       yaml:
-        specifier: ^2.8.3
-        version: 2.8.3
+        specifier: ^2.9.0
+        version: 2.9.0
       zustand:
         specifier: ^5.0.14
         version: 5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
@@ -174,7 +174,7 @@ importers:
         version: 8.61.0(eslint@10.7.0(jiti@2.7.0))(typescript@5.9.3)
       '@vitejs/plugin-react':
         specifier: ^6.0.3
-        version: 6.0.3(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3))
+        version: 6.0.3(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))
       autoprefixer:
         specifier: ^10.5.2
         version: 10.5.2(postcss@8.5.15)
@@ -201,16 +201,16 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^8.0.16
-        version: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3)
+        version: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
       vite-plugin-banner:
         specifier: ^0.8.1
         version: 0.8.1
       vite-plugin-dynamic-base:
         specifier: ^1.3.0
-        version: 1.3.0(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3))
+        version: 1.3.0(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))
       vite-plugin-svgr:
         specifier: ^5.2.0
-        version: 5.2.0(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3))
+        version: 5.2.0(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))
 
   packages/chatui:
     dependencies:
@@ -413,13 +413,13 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.5.1
-        version: 8.5.1(@swc/core@1.15.24)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.8.4)
+        version: 8.5.1(@swc/core@1.15.24)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
       vite:
         specifier: ^8.0.16
-        version: 8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4)
+        version: 8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
       vitest:
         specifier: ^4.1.9
-        version: 4.1.9(@types/node@25.9.2)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4))
+        version: 4.1.9(@types/node@25.9.2)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))
 
   packages/utils: {}
 
@@ -5014,13 +5014,8 @@ packages:
   yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
-  yaml@2.8.3:
-    resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
-    engines: {node: '>= 14.6'}
-    hasBin: true
-
-  yaml@2.8.4:
-    resolution: {integrity: sha512-ml/JPOj9fOQK8RNnWojA67GbZ0ApXAUlN2UQclwv2eVgTgn7O9gg9o7paZWKMp4g0H3nTLtS9LVzhkpOFIKzog==}
+  yaml@2.9.0:
+    resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -6895,10 +6890,10 @@ snapshots:
 
   '@ungap/structured-clone@1.3.3': {}
 
-  '@vitejs/plugin-react@6.0.3(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3))':
+  '@vitejs/plugin-react@6.0.3(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3)
+      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
 
   '@vitest/expect@4.1.9':
     dependencies:
@@ -6909,13 +6904,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.9(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4))':
+  '@vitest/mocker@4.1.9(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.9':
     dependencies:
@@ -8562,7 +8557,7 @@ snapshots:
       string-argv: 0.3.2
       tinyexec: 1.1.2
     optionalDependencies:
-      yaml: 2.8.4
+      yaml: 2.9.0
 
   listr2@10.2.1:
     dependencies:
@@ -8718,7 +8713,7 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-languageserver-types: 3.18.0
       vscode-uri: 3.1.0
-      yaml: 2.8.4
+      yaml: 2.9.0
 
   mri@1.2.0: {}
 
@@ -8927,14 +8922,14 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-load-config@6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(yaml@2.8.4):
+  postcss-load-config@6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       lilconfig: 3.1.3
     optionalDependencies:
       jiti: 2.7.0
       postcss: 8.5.15
       tsx: 4.22.4
-      yaml: 2.8.4
+      yaml: 2.9.0
 
   postcss-value-parser@4.2.0: {}
 
@@ -9554,7 +9549,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsup@8.5.1(@swc/core@1.15.24)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.8.4):
+  tsup@8.5.1(@swc/core@1.15.24)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.27.0)
       cac: 6.7.14
@@ -9565,7 +9560,7 @@ snapshots:
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
       picocolors: 1.1.1
-      postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(yaml@2.8.4)
+      postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(yaml@2.9.0)
       resolve-from: 5.0.0
       rollup: 4.53.3
       source-map: 0.7.6
@@ -9681,26 +9676,26 @@ snapshots:
 
   vite-plugin-banner@0.8.1: {}
 
-  vite-plugin-dynamic-base@1.3.0(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3)):
+  vite-plugin-dynamic-base@1.3.0(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@swc/core': 1.15.24
       node-html-parser: 5.4.2
-      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3)
+      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  vite-plugin-svgr@5.2.0(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3)):
+  vite-plugin-svgr@5.2.0(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.54.0)
       '@svgr/core': 8.1.0(typescript@5.9.3)
       '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@5.9.3))
-      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3)
+      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - rollup
       - supports-color
       - typescript
 
-  vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4):
+  vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -9714,9 +9709,9 @@ snapshots:
       jiti: 2.7.0
       less: 4.5.1
       tsx: 4.22.4
-      yaml: 2.8.4
+      yaml: 2.9.0
 
-  vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.3):
+  vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -9730,12 +9725,12 @@ snapshots:
       jiti: 2.7.0
       less: 4.5.1
       tsx: 4.22.4
-      yaml: 2.8.3
+      yaml: 2.9.0
 
-  vitest@4.1.9(@types/node@25.9.2)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4)):
+  vitest@4.1.9(@types/node@25.9.2)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.9
-      '@vitest/mocker': 4.1.9(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4))
+      '@vitest/mocker': 4.1.9(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.9
       '@vitest/runner': 4.1.9
       '@vitest/snapshot': 4.1.9
@@ -9752,7 +9747,7 @@ snapshots:
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 8.0.16(@types/node@25.9.2)(esbuild@0.27.0)(jiti@2.7.0)(less@4.5.1)(tsx@4.22.4)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.9.2
@@ -9861,9 +9856,7 @@ snapshots:
 
   yallist@4.0.0: {}
 
-  yaml@2.8.3: {}
-
-  yaml@2.8.4: {}
+  yaml@2.9.0: {}
 
   yocto-queue@0.1.0: {}
 
