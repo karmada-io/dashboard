@@ -47,7 +47,7 @@
     "dagre": "^0.8.5",
     "i18next": "^26.3.1",
     "lodash": "^4.18.1",
-    "lucide-react": "^1.21.0",
+    "lucide-react": "^1.25.0",
     "monaco-editor": "^0.55.1",
     "monaco-yaml": "^5.5.1",
     "react": "^19.2.7",
