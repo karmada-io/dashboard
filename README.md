@@ -62,10 +62,14 @@ Change to the dashboard directory:
 cd dashboard
 ```
 
-Create the secret based on your Karmada config, the Karmada Dashboard will use this config to talk to the Karmada API server.
+Create the secret that the Karmada Dashboard uses to talk to the Karmada API server. This generates the
+`karmada-dashboard-config` secret (the exact name the dashboard deployments mount) from the certificates in
+`${HOME}/.karmada`:
 ```
-kubectl create secret generic kubeconfig --from-file=kubeconfig=$HOME/.kube/karmada.config -n karmada-system
+hack/generate-karmada-dashboard-kubeconfig.sh "$HOME/.kube/karmada.config" karmada-host
 ```
+> If you already ran this in the [Generate independent dashboard kubeconfig](#generate-independent-dashboard-kubeconfig)
+> step above, you can skip it here. 
 
 Deploy Karmada Dashboard:
 ```
