@@ -19,6 +19,7 @@ package db
 // PodInfo is the pod info.
 type PodInfo struct {
 	Name string `json:"name"`
+	IP   string `json:"ip"`
 }
 
 // Metric is the metric info.

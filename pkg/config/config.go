@@ -114,8 +114,71 @@ func GetDashboardConfig() DashboardConfig {
 	if config.MenuConfigs == nil {
 		config.MenuConfigs = []MenuConfig{}
 	}
+	if config.MetricsDashboards == nil {
+		config.MetricsDashboards = []MetricsDashboard{}
+	}
 
 	return config
+}
+
+// GetMetricsDashboards returns the persisted metrics dashboards (never nil).
+func GetMetricsDashboards() []MetricsDashboard {
+	if dashboardConfig.MetricsDashboards == nil {
+		return []MetricsDashboard{}
+	}
+	dashboards := make([]MetricsDashboard, len(dashboardConfig.MetricsDashboards))
+	copy(dashboards, dashboardConfig.MetricsDashboards)
+	return dashboards
+}
+
+// UpsertMetricsDashboard inserts or replaces the metrics dashboard for a single
+// component and persists it to the dashboard ConfigMap. It reads the ConfigMap
+// fresh and merges only the metrics dashboards, so other config fields are never
+// clobbered by a stale in-memory cache.
+func UpsertMetricsDashboard(k8sClient kubernetes.Interface, dashboard MetricsDashboard) error {
+	ctx := context.TODO()
+	configMap, err := k8sClient.CoreV1().ConfigMaps(configNamespace).Get(ctx, configName, metav1.GetOptions{})
+	if err != nil {
+		klog.Errorf("Failed to get ConfigMap %s: %v", configName, err)
+		return err
+	}
+
+	configKey := GetConfigKey()
+	var current DashboardConfig
+	if raw, ok := configMap.Data[configKey]; ok && raw != "" {
+		if err = yaml.Unmarshal([]byte(raw), &current); err != nil {
+			klog.Errorf("Failed to unmarshal ConfigMap %s: %v", configName, err)
+			return err
+		}
+	}
+
+	replaced := false
+	for i := range current.MetricsDashboards {
+		if current.MetricsDashboards[i].Component == dashboard.Component {
+			current.MetricsDashboards[i] = dashboard
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		current.MetricsDashboards = append(current.MetricsDashboards, dashboard)
+	}
+
+	buff, err := yaml.Marshal(current)
+	if err != nil {
+		klog.Errorf("Failed to marshal dashboard config: %v", err)
+		return err
+	}
+	if configMap.Data == nil {
+		configMap.Data = map[string]string{}
+	}
+	configMap.Data[configKey] = string(buff)
+	if _, err = k8sClient.CoreV1().ConfigMaps(configNamespace).Update(ctx, configMap, metav1.UpdateOptions{}); err != nil {
+		klog.Errorf("Failed to update ConfigMap %s: %v", configName, err)
+		return err
+	}
+	dashboardConfig = current
+	return nil
 }
 
 // UpdateDashboardConfig updates the dashboard configuration in the Kubernetes ConfigMap.
