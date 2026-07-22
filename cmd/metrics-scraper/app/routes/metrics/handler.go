@@ -18,13 +18,12 @@ package metrics
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
-
-var requests = make(chan scrape.SaveRequest)
 
 // GetMetrics returns the metrics for the given app name
 func GetMetrics(c *gin.Context) {
@@ -50,14 +49,24 @@ func GetMetrics(c *gin.Context) {
 		return
 	}
 
-	allMetrics, errors, err := scrape.FetchMetrics(c.Request.Context(), appName, requests)
+	// Pass nil for the save channel; live metrics are persisted by background goroutines only.
+	allMetrics, errors, err := scrape.FetchMetrics(c.Request.Context(), appName, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": errors, "error": err.Error()})
+		status := http.StatusBadGateway
+		if strings.Contains(strings.ToLower(err.Error()), "no pods found") {
+			status = http.StatusServiceUnavailable
+		}
+		c.JSON(status, gin.H{"errors": errors, "error": err.Error()})
 		return
 	}
 	if len(allMetrics) > 0 {
 		c.JSON(http.StatusOK, allMetrics)
 	} else {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "No metrics data found", "errors": errors})
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "No metrics data found", "errors": errors})
 	}
+}
+
+// GetVisualization returns visualization-oriented time series for the given app.
+func GetVisualization(c *gin.Context) {
+	GetSchedulerVisualization(c)
 }

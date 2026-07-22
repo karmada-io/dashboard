@@ -21,24 +21,46 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	_ "github.com/glebarez/sqlite" // Import the SQLite driver
 	"github.com/prometheus/common/expfmt"
+	"github.com/prometheus/common/model"
 
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/db"
 )
 
-var dbMutex sync.Mutex
+var (
+	dbMutexMap      = make(map[string]*sync.Mutex)
+	dbMutexLock     sync.Mutex
+	scrapeCounter   uint64
+	scrapeCounterMu sync.Mutex
+)
+
+func getDBMutex(appName string) *sync.Mutex {
+	dbMutexLock.Lock()
+	defer dbMutexLock.Unlock()
+
+	if mu, ok := dbMutexMap[appName]; ok {
+		return mu
+	}
+
+	mu := &sync.Mutex{}
+	dbMutexMap[appName] = mu
+	return mu
+}
 
 func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.ParsedData) (err error) {
 	sanitizedPodName := strings.ReplaceAll(podName, "-", "_")
 	log.Printf("Saving data for app '%s', pod '%s' (sanitized: '%s')", appName, podName, sanitizedPodName)
 
-	dbMutex.Lock()
-	defer dbMutex.Unlock()
+	mu := getDBMutex(appName)
+	mu.Lock()
+	defer mu.Unlock()
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -64,13 +86,41 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 		return err
 	}
 
+	if _, err = tx.Exec(fmt.Sprintf(createMetadataTableSQL, sanitizedPodName)); err != nil {
+		log.Printf("Error creating metadata table: %v", err)
+		return err
+	}
+
 	if _, err = tx.Exec(fmt.Sprintf(createValuesTableSQL, sanitizedPodName, sanitizedPodName)); err != nil {
 		log.Printf("Error creating values table: %v", err)
 		return err
 	}
 
-	if _, err = tx.Exec(fmt.Sprintf(createLabelsTableSQL, sanitizedPodName, sanitizedPodName)); err != nil {
+	if _, err = tx.Exec(fmt.Sprintf(createLabelStringsTableSQL, sanitizedPodName)); err != nil {
+		log.Printf("Error creating label_strings table: %v", err)
+		return err
+	}
+
+	if _, err = tx.Exec(fmt.Sprintf(createLabelsTableSQL, sanitizedPodName, sanitizedPodName, sanitizedPodName)); err != nil {
 		log.Printf("Error creating labels table: %v", err)
+		return err
+	}
+
+	// Create indexes for query performance
+	if _, err = tx.Exec(fmt.Sprintf(createMainIndexSQL, sanitizedPodName, sanitizedPodName)); err != nil {
+		log.Printf("Error creating main index: %v", err)
+		return err
+	}
+	if _, err = tx.Exec(fmt.Sprintf(createValuesIndexSQL, sanitizedPodName, sanitizedPodName)); err != nil {
+		log.Printf("Error creating values index: %v", err)
+		return err
+	}
+	if _, err = tx.Exec(fmt.Sprintf(createLabelsIndexSQL, sanitizedPodName, sanitizedPodName)); err != nil {
+		log.Printf("Error creating labels index: %v", err)
+		return err
+	}
+	if _, err = tx.Exec(fmt.Sprintf(createLabelStringsIndexSQL, sanitizedPodName, sanitizedPodName)); err != nil {
+		log.Printf("Error creating label_strings index: %v", err)
 		return err
 	}
 
@@ -96,54 +146,73 @@ func saveToDBWithConnection(db *sql.DB, appName, podName string, data *db.Parsed
 		return err
 	}
 
-	if err = tx.Commit(); err != nil {
-		log.Printf("Error committing transaction: %v", err)
-		return err
-	}
-
 	log.Println("Data inserted successfully")
 	return nil
 }
 
 func cleanupOldData(tx *sql.Tx, timeLoadTableName, sanitizedPodName string) error {
-	var oldestTime string
-	err := tx.QueryRow(fmt.Sprintf(getOldestTimeSQL, timeLoadTableName)).Scan(&oldestTime)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("Error getting oldest time entry: %v", err)
+	// Use time-based TTL: delete everything older than 5 minutes
+	cutoffTime := time.Now().Add(-15 * time.Minute).Format(time.RFC3339)
+
+	result, err := tx.Exec(fmt.Sprintf(deleteOldTimeSQL, timeLoadTableName), cutoffTime)
+	if err != nil {
+		log.Printf("Error deleting old time entries: %v", err)
 		return err
 	}
-
-	if oldestTime != "" {
-		result, err := tx.Exec(fmt.Sprintf(deleteOldTimeSQL, timeLoadTableName), oldestTime)
-		if err != nil {
-			log.Printf("Error deleting old time entries: %v", err)
-			return err
-		}
-		rowsAffected, _ := result.RowsAffected()
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected > 0 {
 		log.Printf("Deleted %d old time entries from %s", rowsAffected, timeLoadTableName)
 
-		result, err = tx.Exec(fmt.Sprintf(deleteAssociatedMetricsSQL, sanitizedPodName), oldestTime)
+		// Delete labels first (depends on values which depends on metrics)
+		result, err = tx.Exec(fmt.Sprintf(deleteAssociatedLabelsSQL, sanitizedPodName, sanitizedPodName, sanitizedPodName), cutoffTime)
 		if err != nil {
-			log.Printf("Error deleting associated metrics: %v", err)
+			log.Printf("Error deleting associated labels: %v", err)
 			return err
 		}
-		rowsAffected, _ = result.RowsAffected()
-		log.Printf("Deleted %d associated metrics from %s", rowsAffected, sanitizedPodName)
+		labelsAffected, _ := result.RowsAffected()
+		log.Printf("Deleted %d associated labels from %s_labels", labelsAffected, sanitizedPodName)
 
-		result, err = tx.Exec(fmt.Sprintf(deleteAssociatedValuesSQL, sanitizedPodName, sanitizedPodName))
+		// Delete values (depends on metrics)
+		result, err = tx.Exec(fmt.Sprintf(deleteAssociatedValuesSQL, sanitizedPodName, sanitizedPodName), cutoffTime)
 		if err != nil {
 			log.Printf("Error deleting associated values: %v", err)
 			return err
 		}
-		rowsAffected, _ = result.RowsAffected()
-		log.Printf("Deleted %d associated values from %s_values", rowsAffected, sanitizedPodName)
+		valuesAffected, _ := result.RowsAffected()
+		log.Printf("Deleted %d associated values from %s_values", valuesAffected, sanitizedPodName)
+
+		// Delete metrics last
+		result, err = tx.Exec(fmt.Sprintf(deleteAssociatedMetricsSQL, sanitizedPodName), cutoffTime)
+		if err != nil {
+			log.Printf("Error deleting associated metrics: %v", err)
+			return err
+		}
+		metricsAffected, _ := result.RowsAffected()
+		log.Printf("Deleted %d associated metrics from %s", metricsAffected, sanitizedPodName)
 	}
 	return nil
 }
 
 func insertMetricsData(tx *sql.Tx, data *db.ParsedData, sanitizedPodName string) error {
+	scrapeCounterMu.Lock()
+	scrapeCounter++
+	currentScrape := scrapeCounter
+	scrapeCounterMu.Unlock()
+
 	for metricName, metricData := range data.Metrics {
-		result, err := tx.Exec(fmt.Sprintf(insertMainSQL, sanitizedPodName), metricName, metricData.Help, metricData.Type, data.CurrentTime)
+		tier := db.GetMetricTier(metricName)
+
+		// Skip low-tier metrics on non-sampled scrapes (keep every 3rd)
+		if tier == db.TierLow && currentScrape%3 != 0 {
+			continue
+		}
+
+		if _, err := tx.Exec(fmt.Sprintf(insertMetadataSQL, sanitizedPodName), metricName, metricData.Help, metricData.Type); err != nil {
+			log.Printf("Error inserting metadata for metric %s: %v", metricName, err)
+			return err
+		}
+
+		result, err := tx.Exec(fmt.Sprintf(insertMainSQL, sanitizedPodName), metricName, data.CurrentTime)
 		if err != nil {
 			log.Printf("Error inserting data for metric %s: %v", metricName, err)
 			return err
@@ -156,7 +225,16 @@ func insertMetricsData(tx *sql.Tx, data *db.ParsedData, sanitizedPodName string)
 		}
 
 		for _, value := range metricData.Values {
-			valueIDResult, err := tx.Exec(fmt.Sprintf("INSERT INTO %s_values (metric_id, value, measure) VALUES (?, ?, ?)", sanitizedPodName), metricID, value.Value, value.Measure)
+			// Skip histogram bucket detail rows — keep only sum and count
+			if value.Measure == "cumulative_count" {
+				continue
+			}
+
+			numericValue, ok := parseFiniteMetricValue(value.Value)
+			if !ok {
+				continue
+			}
+			valueIDResult, err := tx.Exec(fmt.Sprintf("INSERT INTO %s_values (metric_id, value, measure) VALUES (?, ?, ?)", sanitizedPodName), metricID, numericValue, value.Measure)
 			if err != nil {
 				log.Printf("Error inserting value for metric %s: %v", metricName, err)
 				return err
@@ -168,15 +246,36 @@ func insertMetricsData(tx *sql.Tx, data *db.ParsedData, sanitizedPodName string)
 			}
 
 			for labelKey, labelValue := range value.Labels {
-				_, err = tx.Exec(fmt.Sprintf("INSERT INTO %s_labels (value_id, key, value) VALUES (?, ?, ?)", sanitizedPodName), valueID, labelKey, labelValue)
+				_, err = tx.Exec(fmt.Sprintf("INSERT OR IGNORE INTO %s_label_strings (key, value) VALUES (?, ?)", sanitizedPodName), labelKey, labelValue)
 				if err != nil {
-					log.Printf("Error inserting label for value of metric %s: %v", metricName, err)
+					log.Printf("Error interning label for metric %s: %v", metricName, err)
+					return err
+				}
+
+				var labelStringID int64
+				err = tx.QueryRow(fmt.Sprintf("SELECT id FROM %s_label_strings WHERE key = ? AND value = ?", sanitizedPodName), labelKey, labelValue).Scan(&labelStringID)
+				if err != nil {
+					log.Printf("Error getting interned label ID for metric %s: %v", metricName, err)
+					return err
+				}
+
+				_, err = tx.Exec(fmt.Sprintf("INSERT INTO %s_labels (value_id, label_string_id) VALUES (?, ?)", sanitizedPodName), valueID, labelStringID)
+				if err != nil {
+					log.Printf("Error inserting label ref for metric %s: %v", metricName, err)
 					return err
 				}
 			}
 		}
 	}
 	return nil
+}
+
+func parseFiniteMetricValue(raw string) (float64, bool) {
+	value, err := strconv.ParseFloat(strings.TrimSpace(raw), 64)
+	if err != nil || math.IsNaN(value) || math.IsInf(value, 0) {
+		return 0, false
+	}
+	return value, true
 }
 
 func isJSON(data []byte) bool {
@@ -206,7 +305,7 @@ func startDatabaseWorker(requests chan SaveRequest) {
 }
 
 func parseMetricsToJSON(metricsOutput string) (*db.ParsedData, error) {
-	var parser expfmt.TextParser
+	parser := expfmt.NewTextParser(model.UTF8Validation)
 	metricFamilies, err := parser.TextToMetricFamilies(strings.NewReader(metricsOutput))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing metrics: %w", err)

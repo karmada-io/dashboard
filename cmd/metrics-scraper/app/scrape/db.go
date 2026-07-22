@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
@@ -53,10 +54,55 @@ func GetDB(appName string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	// Set connection pool settings
-	db.SetMaxOpenConns(1) // Restrict to 1 connection to prevent lock conflicts
-	db.SetMaxIdleConns(1)
+	// Enable WAL mode for concurrent read/write
+	if _, err := db.Exec("PRAGMA journal_mode=WAL"); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to enable WAL mode: %w", err)
+	}
+	if _, err := db.Exec("PRAGMA synchronous=NORMAL"); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to set synchronous mode: %w", err)
+	}
+	// Enable incremental auto-vacuum to reclaim space after deletes.
+	// This pragma only takes effect on new databases; for existing ones we must VACUUM.
+	if _, err := db.Exec("PRAGMA auto_vacuum=INCREMENTAL"); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to set auto_vacuum: %w", err)
+	}
+	var vacuumMode int
+	if err := db.QueryRow("PRAGMA auto_vacuum").Scan(&vacuumMode); err == nil && vacuumMode == 0 {
+		// Database was created with NONE; apply change via full VACUUM
+		_, _ = db.Exec("VACUUM")
+	}
+
+	// WAL mode allows concurrent readers, increase max connections
+	db.SetMaxOpenConns(4)
+	db.SetMaxIdleConns(2)
 
 	dbMap[sanitizedAppName] = db
 	return db, nil
+}
+
+// RunPeriodicMaintenance starts a background goroutine that periodically
+// runs incremental vacuum and WAL checkpoint on all open databases.
+func RunPeriodicMaintenance() {
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			dbMapLock.RLock()
+			dbs := make([]*sql.DB, 0, len(dbMap))
+			for _, d := range dbMap {
+				dbs = append(dbs, d)
+			}
+			dbMapLock.RUnlock()
+
+			for _, d := range dbs {
+				// Reclaim freed pages
+				_, _ = d.Exec("PRAGMA incremental_vacuum(200)")
+				// Checkpoint WAL to keep file size bounded
+				_, _ = d.Exec("PRAGMA wal_checkpoint(TRUNCATE)")
+			}
+		}
+	}()
 }
