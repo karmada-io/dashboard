@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/karmada-io/karmada/pkg/sharedcli/klogflag"
 	"github.com/spf13/cobra"
@@ -88,7 +89,11 @@ func run(ctx context.Context, opts *options.Options) error {
 	)
 	ensureAPIServerConnectionOrDie()
 	serve(opts)
-	go scrape.InitDatabase()
+	scrapeInterval := opts.ScrapeInterval
+	if scrapeInterval <= 0 {
+		scrapeInterval = 10 * time.Second
+	}
+	go scrape.InitDatabase(scrapeInterval)
 
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	<-ctx.Done()
@@ -126,7 +131,12 @@ func init() {
 	r := router.V1()
 	r.GET("/metrics", metrics.GetMetrics)
 	r.GET("/metrics/:app_name", metrics.GetMetrics)
+	r.GET("/metrics/:app_name/visualization", metrics.GetVisualization)
+	r.GET("/metrics/:app_name/explore", metrics.GetMetricExplore)
+	r.GET("/metrics/:app_name/pods", metrics.GetComponentPods)
 	r.GET("/metrics/:app_name/:pod_name", metrics.QueryMetrics)
+	r.GET("/metrics-config", metrics.GetDashboardConfig)
+	r.PUT("/metrics-config", metrics.SaveDashboardConfig)
 }
 
 // http://localhost:8000/api/v1/metrics/karmada-scheduler?type=metricsdetails  //from sqlite details bar

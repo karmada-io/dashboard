@@ -18,6 +18,7 @@ package options
 
 import (
 	"net"
+	"time"
 
 	"github.com/spf13/pflag"
 )
@@ -35,6 +36,7 @@ type Options struct {
 	KarmadaContext                string
 	SkipKarmadaApiserverTLSVerify bool
 	Namespace                     string
+	ScrapeInterval                time.Duration
 	DisableCSRFProtection         bool
 	OpenAPIEnabled                bool
 }
@@ -60,6 +62,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.KarmadaContext, "karmada-context", "", "The name of the karmada-kubeconfig context to use.")
 	fs.BoolVar(&o.SkipKarmadaApiserverTLSVerify, "skip-karmada-apiserver-tls-verify", false, "enable if connection with remote Karmada API server should skip TLS verify")
 	fs.StringVar(&o.Namespace, "namespace", "karmada-dashboard", "Namespace to use when accessing Dashboard specific resources, i.e. configmap")
+	fs.DurationVar(&o.ScrapeInterval, "scrape-interval", 10*time.Second, "Interval between metrics scrape cycles, e.g. 5s, 30s, 1m")
 	fs.BoolVar(&o.DisableCSRFProtection, "disable-csrf-protection", false, "allows disabling CSRF protection")
 	fs.BoolVar(&o.OpenAPIEnabled, "openapi-enabled", false, "enables OpenAPI v2 endpoint under '/apidocs.json'")
 }

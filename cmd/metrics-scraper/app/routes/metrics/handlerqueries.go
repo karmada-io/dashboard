@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -28,6 +30,9 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 )
+
+// validTableNameRe ensures a table name contains only safe identifier characters.
+var validTableNameRe = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 
 // MetricInfo represents the information about a metric.
 type MetricInfo struct {
@@ -44,6 +49,11 @@ func QueryMetrics(c *gin.Context) {
 
 	sanitizedAppName := strings.ReplaceAll(appName, "-", "_")
 	sanitizedPodName := strings.ReplaceAll(podName, "-", "_")
+
+	if !validTableNameRe.MatchString(sanitizedPodName) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pod_name"})
+		return
+	}
 
 	db, err := scrape.GetDB(sanitizedAppName)
 	if err != nil {
@@ -71,6 +81,18 @@ func QueryMetrics(c *gin.Context) {
 	case "metricsdetails":
 		queryMetricDetails(c, appName)
 	}
+}
+
+type sqlQueryer interface {
+	Query(query string, args ...any) (*sql.Rows, error)
+}
+
+func queryWithMetadataFallback(q sqlQueryer, metadataTableName, preferredQuery, fallbackQuery string, args ...any) (*sql.Rows, error) {
+	rows, err := q.Query(preferredQuery, args...)
+	if err != nil && strings.Contains(err.Error(), "no such table: "+metadataTableName) {
+		return q.Query(fallbackQuery, args...)
+	}
+	return rows, err
 }
 
 func queryMetricNames(c *gin.Context, tx *sql.Tx, sanitizedPodName string) {
@@ -101,18 +123,24 @@ func queryMetricDetailsByName(c *gin.Context, tx *sql.Tx, sanitizedPodName, metr
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Metric name required for details"})
 		return
 	}
-	query := `
+	// Single query with JOIN to avoid N+1 queries for labels
+	query := fmt.Sprintf(`
             SELECT 
                 m.currentTime, 
                 m.name, 
                 v.value, 
                 v.measure, 
-                v.id
-            FROM ? m
-            INNER JOIN ? v ON m.id = v.metric_id
+                v.id,
+                COALESCE(ls.key, '') AS label_key,
+                COALESCE(ls.value, '') AS label_value
+            FROM %s m
+            INNER JOIN %s_values v ON m.id = v.metric_id
+            LEFT JOIN %s_labels l ON v.id = l.value_id
+            LEFT JOIN %s_label_strings ls ON l.label_string_id = ls.id
             WHERE m.name = ?
-        `
-	rows, err := tx.Query(query, sanitizedPodName, fmt.Sprintf("%s_values", sanitizedPodName), metricName)
+            ORDER BY m.currentTime, v.id
+        `, sanitizedPodName, sanitizedPodName, sanitizedPodName, sanitizedPodName)
+	rows, err := tx.Query(query, metricName)
 	if err != nil {
 		log.Printf("Error querying metric details: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query metric details"})
@@ -132,54 +160,47 @@ func queryMetricDetailsByName(c *gin.Context, tx *sql.Tx, sanitizedPodName, metr
 	}
 
 	detailsMap := make(map[string]MetricDetails)
+	// Track values by (timeKey, valueID) to accumulate labels
+	type valueKey struct {
+		timeKey string
+		valueID int
+	}
+	valueLabels := make(map[valueKey]map[string]string)
+	valueIndex := make(map[valueKey]*MetricValue)
 
 	for rows.Next() {
 		var currentTime time.Time
-		var name, value, measure string
+		var name, measure, labelKey, labelValue string
+		var numericValue float64
 		var valueID int
-		if err := rows.Scan(&currentTime, &name, &value, &measure, &valueID); err != nil {
+		if err := rows.Scan(&currentTime, &name, &numericValue, &measure, &valueID, &labelKey, &labelValue); err != nil {
 			log.Printf("Error scanning metric details: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan metric details"})
 			return
 		}
 
-		labelsQuery := "SELECT key, value FROM ? WHERE value_id = ?"
-		labelsRows, err := tx.Query(labelsQuery, fmt.Sprintf("%s_labels", sanitizedPodName), valueID)
-		if err != nil {
-			log.Printf("Error querying labels: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query labels"})
-			return
-		}
-		defer labelsRows.Close()
-
-		labels := make(map[string]string)
-		for labelsRows.Next() {
-			var labelKey, labelValue string
-			if err := labelsRows.Scan(&labelKey, &labelValue); err != nil {
-				log.Printf("Error scanning labels: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan labels"})
-				return
-			}
-			labels[labelKey] = labelValue
-		}
-
 		timeKey := currentTime.Format(time.RFC3339)
+		vk := valueKey{timeKey: timeKey, valueID: valueID}
 
-		detail, exists := detailsMap[timeKey]
-		if !exists {
-			detail = MetricDetails{
-				Name:   name,
-				Values: []MetricValue{},
+		if _, exists := valueIndex[vk]; !exists {
+			detail, detailExists := detailsMap[timeKey]
+			if !detailExists {
+				detail = MetricDetails{
+					Name:   name,
+					Values: []MetricValue{},
+				}
 			}
+			labels := make(map[string]string)
+			mv := MetricValue{Value: strconv.FormatFloat(numericValue, 'f', -1, 64), Measure: measure, Labels: labels}
+			detail.Values = append(detail.Values, mv)
+			detailsMap[timeKey] = detail
+			valueLabels[vk] = labels
+			valueIndex[vk] = &detailsMap[timeKey].Values[len(detailsMap[timeKey].Values)-1]
 		}
 
-		detail.Values = append(detail.Values, MetricValue{
-			Value:   value,
-			Measure: measure,
-			Labels:  labels,
-		})
-
-		detailsMap[timeKey] = detail
+		if labelKey != "" {
+			valueLabels[vk][labelKey] = labelValue
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"details": detailsMap})
@@ -187,13 +208,13 @@ func queryMetricDetailsByName(c *gin.Context, tx *sql.Tx, sanitizedPodName, metr
 
 func queryMetricDetails(c *gin.Context, appName string) {
 	// Handle metricsdetails query type
-	db, err := sql.Open("sqlite", strings.ReplaceAll(appName, "-", "_")+".db")
+	sanitizedName := strings.ReplaceAll(appName, "-", "_")
+	db, err := scrape.GetDB(sanitizedName)
 	if err != nil {
 		log.Printf("Error opening database: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open database"})
 		return
 	}
-	defer db.Close()
 
 	// Get all relevant tables
 	rows, err := db.Query(`
@@ -202,6 +223,8 @@ func queryMetricDetails(c *gin.Context, appName string) {
 			WHERE type='table' 
 			AND name NOT LIKE '%_values' 
 			AND name NOT LIKE '%_labels' 
+			AND name NOT LIKE '%_label_strings'
+			AND name NOT LIKE '%_metadata'
 			AND name NOT LIKE '%_time_load'
 			AND name != 'sqlite_sequence'
 		`)
@@ -223,16 +246,22 @@ func queryMetricDetails(c *gin.Context, appName string) {
 		}
 
 		// Get metrics for this pod
-		metricRows, err := db.Query(fmt.Sprintf(`
+		metadataQuery := fmt.Sprintf(`
+				SELECT DISTINCT m.name, COALESCE(md.help, ''), COALESCE(md.type, '')
+				FROM %s m
+				LEFT JOIN %s_metadata md ON m.name = md.name
+				GROUP BY m.name
+			`, tableName, tableName)
+		fallbackQuery := fmt.Sprintf(`
 				SELECT DISTINCT name, help, type 
 				FROM %s 
 				GROUP BY name
-			`, tableName))
+			`, tableName)
+		metricRows, err := queryWithMetadataFallback(db, fmt.Sprintf("%s_metadata", tableName), metadataQuery, fallbackQuery)
 		if err != nil {
 			log.Printf("Error querying metrics for table %s: %v", tableName, err)
 			continue
 		}
-		defer metricRows.Close()
 
 		podMetrics := make(map[string]MetricInfo)
 
@@ -249,6 +278,7 @@ func queryMetricDetails(c *gin.Context, appName string) {
 				Type: metricType,
 			}
 		}
+		metricRows.Close()
 
 		result[tableName] = podMetrics
 	}

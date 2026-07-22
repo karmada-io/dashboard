@@ -19,6 +19,7 @@ package scrape
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -31,17 +32,28 @@ import (
 )
 
 var (
-	requests chan SaveRequest
-	sqldb    *sql.DB
-	syncMap  sync.Map
+	requestsMap map[string]chan SaveRequest
+	sqldb       *sql.DB
+	syncMap     sync.Map
+	// scrapeInterval controls how frequently each app fetcher triggers a scrape cycle.
+	scrapeInterval = 10 * time.Second
 	// Add contexts and cancel functions for each app
 	appContexts    map[string]context.Context
 	appCancelFuncs map[string]context.CancelFunc
 	contextMutex   sync.Mutex
 )
 
+func getRequestsChannel(appName string) (chan SaveRequest, bool) {
+	if requestsMap == nil {
+		return nil, false
+	}
+
+	requests, ok := requestsMap[appName]
+	return requests, ok
+}
+
 func startAppMetricsFetcher(appName string) {
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(scrapeInterval)
 	defer ticker.Stop()
 
 	for {
@@ -66,15 +78,19 @@ func startAppMetricsFetcher(appName string) {
 
 			syncTrigger, ok := syncTriggerVal.(int)
 			if !ok || syncTrigger != 1 {
-				return
+				continue
 			}
 
-			go func(ctx context.Context) {
-				_, errors, err := FetchMetrics(ctx, appName, requests)
-				if err != nil {
-					log.Printf("Error fetching metrics for %s: %v, errors: %v\n", appName, err, errors)
-				}
-			}(ctx)
+			requests, ok := getRequestsChannel(appName)
+			if !ok {
+				log.Printf("Request channel not found for %s", appName)
+				continue
+			}
+
+			_, errors, err := FetchMetrics(ctx, appName, requests)
+			if err != nil {
+				log.Printf("Error fetching metrics for %s: %v, errors: %v\n", appName, err, errors)
+			}
 		}
 	}
 }
@@ -83,7 +99,7 @@ func startAppMetricsFetcher(appName string) {
 func CheckAppStatus(c *gin.Context) {
 	statusMap := make(map[string]bool)
 
-	// Get status for all registered apps
+	// Get status for all registered apps (same list as InitDatabase)
 	for _, app := range []string{
 		db.KarmadaScheduler,
 		db.KarmadaControllerManager,
@@ -91,6 +107,13 @@ func CheckAppStatus(c *gin.Context) {
 		db.KarmadaSchedulerEstimator + "-member1",
 		db.KarmadaSchedulerEstimator + "-member2",
 		db.KarmadaSchedulerEstimator + "-member3",
+		db.KarmadaAggregatedAPIServer,
+		db.KarmadaAPIServer,
+		db.KarmadaDescheduler,
+		db.KarmadaKubeControllerManager,
+		db.KarmadaMetricsAdapter,
+		db.KarmadaSearch,
+		db.KarmadaWebhook,
 	} {
 		syncValue, exists := syncMap.Load(app)
 		if !exists {
@@ -122,9 +145,11 @@ func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryTyp
 		// Cancel all existing contexts and create new ones if turning on
 		contextMutex.Lock()
 		for app := range appContexts {
-			currentSyncValue, _ := syncMap.Load(app)
-			if currentSyncValue == syncValue {
-				continue // Skip if already in the desired state
+			currentSyncValue, ok := syncMap.Load(app)
+			if ok {
+				if val, isInt := currentSyncValue.(int); isInt && val == syncValue {
+					continue // Skip if already in the desired state
+				}
 			}
 
 			if cancel, exists := appCancelFuncs[app]; exists {
@@ -150,11 +175,13 @@ func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryTyp
 		c.JSON(http.StatusOK, gin.H{"message": message})
 	} else {
 		// Update specific app
-		currentSyncValue, _ := syncMap.Load(appName)
-		if currentSyncValue == syncValue {
-			message := fmt.Sprintf("Sync is already %s for %s", queryType, appName)
-			c.JSON(http.StatusOK, gin.H{"message": message})
-			return
+		currentSyncValue, ok := syncMap.Load(appName)
+		if ok {
+			if val, isInt := currentSyncValue.(int); isInt && val == syncValue {
+				message := fmt.Sprintf("Sync is already %s for %s", queryType, appName)
+				c.JSON(http.StatusOK, gin.H{"message": message})
+				return
+			}
 		}
 
 		_, err := sqldb.Exec("UPDATE app_sync SET sync_trigger = ? WHERE app_name = ?", syncValue, appName)
@@ -190,7 +217,12 @@ func HandleSyncOperation(c *gin.Context, appName string, syncValue int, queryTyp
 }
 
 // InitDatabase initializes the database and starts the metrics fetchers.
-func InitDatabase() {
+func InitDatabase(interval time.Duration) {
+	if interval > 0 {
+		scrapeInterval = interval
+	}
+	log.Printf("Metrics scrape interval set to %s", scrapeInterval)
+
 	// Initialize contexts and cancel functions
 	appContexts = make(map[string]context.Context)
 	appCancelFuncs = make(map[string]context.CancelFunc)
@@ -202,6 +234,13 @@ func InitDatabase() {
 		db.KarmadaSchedulerEstimator + "-member1",
 		db.KarmadaSchedulerEstimator + "-member2",
 		db.KarmadaSchedulerEstimator + "-member3",
+		db.KarmadaAggregatedAPIServer,
+		db.KarmadaAPIServer,
+		db.KarmadaDescheduler,
+		db.KarmadaKubeControllerManager,
+		db.KarmadaMetricsAdapter,
+		db.KarmadaSearch,
+		db.KarmadaWebhook,
 	}
 
 	// Create database connection
@@ -239,11 +278,36 @@ func InitDatabase() {
 		syncMap.Store(appName, 1)
 	}
 
-	requests = make(chan SaveRequest, len(appNames))
-	go startDatabaseWorker(requests)
+	requestsMap = make(map[string]chan SaveRequest, len(appNames))
+	for _, appName := range appNames {
+		requests := make(chan SaveRequest, len(appNames))
+		requestsMap[appName] = requests
+		go startDatabaseWorker(requests)
+	}
 
 	// Start metrics fetchers with context
 	for _, app := range appNames {
 		go startAppMetricsFetcher(app)
 	}
+
+	// Start periodic database maintenance (vacuum + WAL checkpoint)
+	RunPeriodicMaintenance()
+
+	// Start aggregation workers for downsampling
+	StartAggregationWorkers()
+}
+
+// TriggerScrapeNow triggers an immediate scrape for a single app and stores the result.
+func TriggerScrapeNow(ctx context.Context, appName string) ([]string, error) {
+	requests, ok := getRequestsChannel(appName)
+	if !ok {
+		return nil, errors.New("metrics scraper is not initialized for app")
+	}
+
+	_, scrapeErrors, err := FetchMetrics(ctx, appName, requests)
+	if err != nil {
+		return scrapeErrors, err
+	}
+
+	return scrapeErrors, nil
 }
