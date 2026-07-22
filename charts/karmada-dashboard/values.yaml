@@ -27,6 +27,728 @@ karmadaDashboardImagePullPolicy: &karmadaDashboardImagePullPolicy IfNotPresent
 
 podDisruptionBudget: &podDisruptionBudget { }
 
+## Default component dashboard layouts persisted in karmada-dashboard-configmap.
+## @param dashboardConfig.metricsDashboards metrics panels displayed for each Karmada component
+dashboardConfig:
+  metricsDashboards:
+    - version: 1
+      component: karmada-scheduler
+      panels:
+        - id: karmada-scheduler-01
+          metric_name: karmada_scheduler_schedule_attempts_total
+          chart_type: line
+          title: Karmada Scheduler Schedule Attempts Total
+          visible: true
+          order: 0
+        - id: karmada-scheduler-02
+          metric_name: karmada_scheduler_queue_incoming_bindings_total
+          chart_type: line
+          title: Karmada Scheduler Queue Incoming Bindings Total
+          visible: true
+          order: 1
+        - id: karmada-scheduler-03
+          metric_name: karmada_scheduler_e2e_scheduling_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler E2e Scheduling Duration Seconds
+          visible: true
+          order: 2
+        - id: karmada-scheduler-04
+          metric_name: karmada_scheduler_scheduling_algorithm_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Scheduling Algorithm Duration Seconds
+          visible: true
+          order: 3
+        - id: karmada-scheduler-05
+          metric_name: karmada_scheduler_framework_extension_point_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Framework Extension Point Duration Seconds
+          visible: true
+          order: 4
+        - id: karmada-scheduler-06
+          metric_name: karmada_scheduler_plugin_execution_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Plugin Execution Duration Seconds
+          visible: true
+          order: 5
+        - id: karmada-scheduler-07
+          metric_name: leader_election_master_status
+          chart_type: gauge
+          title: Leader Election Master Status
+          visible: true
+          order: 6
+        - id: karmada-scheduler-08
+          metric_name: workqueue_depth
+          chart_type: gauge
+          title: Workqueue Depth
+          visible: true
+          order: 7
+        - id: karmada-scheduler-09
+          metric_name: workqueue_retries_total
+          chart_type: line
+          title: Workqueue Retries Total
+          visible: true
+          order: 8
+        - id: karmada-scheduler-10
+          metric_name: workqueue_longest_running_processor_seconds
+          chart_type: gauge
+          title: Workqueue Longest Running Processor Seconds
+          visible: true
+          order: 9
+    - version: 1
+      component: karmada-controller-manager
+      panels:
+        - id: karmada-controller-manager-01
+          metric_name: cluster_ready_state
+          chart_type: gauge
+          title: Cluster Ready State
+          visible: true
+          order: 0
+        - id: karmada-controller-manager-02
+          metric_name: cluster_ready_node_number
+          chart_type: gauge
+          title: Cluster Ready Node Number
+          visible: true
+          order: 1
+        - id: karmada-controller-manager-03
+          metric_name: cluster_node_number
+          chart_type: gauge
+          title: Cluster Node Number
+          visible: true
+          order: 2
+        - id: karmada-controller-manager-04
+          metric_name: cluster_cpu_allocatable_number
+          chart_type: gauge
+          title: Cluster Cpu Allocatable Number
+          visible: true
+          order: 3
+        - id: karmada-controller-manager-05
+          metric_name: cluster_cpu_allocated_number
+          chart_type: gauge
+          title: Cluster Cpu Allocated Number
+          visible: true
+          order: 4
+        - id: karmada-controller-manager-06
+          metric_name: cluster_memory_allocatable_bytes
+          chart_type: area
+          title: Cluster Memory Allocatable Bytes
+          visible: true
+          order: 5
+        - id: karmada-controller-manager-07
+          metric_name: cluster_memory_allocated_bytes
+          chart_type: area
+          title: Cluster Memory Allocated Bytes
+          visible: true
+          order: 6
+        - id: karmada-controller-manager-08
+          metric_name: cluster_pod_allocatable_number
+          chart_type: gauge
+          title: Cluster Pod Allocatable Number
+          visible: true
+          order: 7
+        - id: karmada-controller-manager-09
+          metric_name: cluster_pod_allocated_number
+          chart_type: gauge
+          title: Cluster Pod Allocated Number
+          visible: true
+          order: 8
+        - id: karmada-controller-manager-10
+          metric_name: cluster_sync_status_duration_seconds
+          chart_type: bar
+          title: Cluster Sync Status Duration Seconds
+          visible: true
+          order: 9
+        - id: karmada-controller-manager-11
+          metric_name: policy_apply_attempts_total
+          chart_type: line
+          title: Policy Apply Attempts Total
+          visible: true
+          order: 10
+        - id: karmada-controller-manager-12
+          metric_name: resource_apply_policy_duration_seconds
+          chart_type: bar
+          title: Resource Apply Policy Duration Seconds
+          visible: true
+          order: 11
+    - version: 1
+      component: karmada-agent
+      panels:
+        - id: karmada-agent-01
+          metric_name: cluster_ready_state
+          chart_type: gauge
+          title: Cluster Ready State
+          visible: true
+          order: 0
+        - id: karmada-agent-02
+          metric_name: cluster_ready_node_number
+          chart_type: gauge
+          title: Cluster Ready Node Number
+          visible: true
+          order: 1
+        - id: karmada-agent-03
+          metric_name: cluster_node_number
+          chart_type: gauge
+          title: Cluster Node Number
+          visible: true
+          order: 2
+        - id: karmada-agent-04
+          metric_name: cluster_cpu_allocatable_number
+          chart_type: gauge
+          title: Cluster Cpu Allocatable Number
+          visible: true
+          order: 3
+        - id: karmada-agent-05
+          metric_name: cluster_cpu_allocated_number
+          chart_type: gauge
+          title: Cluster Cpu Allocated Number
+          visible: true
+          order: 4
+        - id: karmada-agent-06
+          metric_name: cluster_memory_allocatable_bytes
+          chart_type: area
+          title: Cluster Memory Allocatable Bytes
+          visible: true
+          order: 5
+        - id: karmada-agent-07
+          metric_name: cluster_memory_allocated_bytes
+          chart_type: area
+          title: Cluster Memory Allocated Bytes
+          visible: true
+          order: 6
+        - id: karmada-agent-08
+          metric_name: cluster_pod_allocatable_number
+          chart_type: gauge
+          title: Cluster Pod Allocatable Number
+          visible: true
+          order: 7
+        - id: karmada-agent-09
+          metric_name: cluster_pod_allocated_number
+          chart_type: gauge
+          title: Cluster Pod Allocated Number
+          visible: true
+          order: 8
+        - id: karmada-agent-10
+          metric_name: cluster_sync_status_duration_seconds
+          chart_type: bar
+          title: Cluster Sync Status Duration Seconds
+          visible: true
+          order: 9
+        - id: karmada-agent-11
+          metric_name: workqueue_depth
+          chart_type: gauge
+          title: Workqueue Depth
+          visible: true
+          order: 10
+    - version: 1
+      component: karmada-aggregated-apiserver
+      panels:
+        - id: karmada-aggregated-apiserver-01
+          metric_name: apiserver_request_total
+          chart_type: line
+          title: Apiserver Request Total
+          visible: true
+          order: 0
+        - id: karmada-aggregated-apiserver-02
+          metric_name: apiserver_request_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-aggregated-apiserver-03
+          metric_name: apiserver_current_inflight_requests
+          chart_type: gauge
+          title: Apiserver Current Inflight Requests
+          visible: true
+          order: 2
+        - id: karmada-aggregated-apiserver-04
+          metric_name: apiserver_longrunning_requests
+          chart_type: gauge
+          title: Apiserver Longrunning Requests
+          visible: true
+          order: 3
+        - id: karmada-aggregated-apiserver-05
+          metric_name: apiserver_request_sli_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Sli Duration Seconds
+          visible: true
+          order: 4
+        - id: karmada-aggregated-apiserver-06
+          metric_name: apiserver_response_sizes
+          chart_type: bar
+          title: Apiserver Response Sizes
+          visible: true
+          order: 5
+        - id: karmada-aggregated-apiserver-07
+          metric_name: apiserver_storage_objects
+          chart_type: gauge
+          title: Apiserver Storage Objects
+          visible: true
+          order: 6
+        - id: karmada-aggregated-apiserver-08
+          metric_name: apiserver_storage_size_bytes
+          chart_type: area
+          title: Apiserver Storage Size Bytes
+          visible: true
+          order: 7
+        - id: karmada-aggregated-apiserver-09
+          metric_name: apiserver_storage_db_total_size_in_bytes
+          chart_type: area
+          title: Apiserver Storage Db Total Size In Bytes
+          visible: true
+          order: 8
+        - id: karmada-aggregated-apiserver-10
+          metric_name: apiserver_tls_handshake_errors_total
+          chart_type: line
+          title: Apiserver Tls Handshake Errors Total
+          visible: true
+          order: 9
+        - id: karmada-aggregated-apiserver-11
+          metric_name: apiserver_delegated_authz_request_total
+          chart_type: line
+          title: Apiserver Delegated Authz Request Total
+          visible: true
+          order: 10
+        - id: karmada-aggregated-apiserver-12
+          metric_name: apiserver_delegated_authz_request_duration_seconds
+          chart_type: bar
+          title: Apiserver Delegated Authz Request Duration Seconds
+          visible: true
+          order: 11
+    - version: 1
+      component: karmada-apiserver
+      panels:
+        - id: karmada-apiserver-01
+          metric_name: apiserver_request_total
+          chart_type: line
+          title: Apiserver Request Total
+          visible: true
+          order: 0
+        - id: karmada-apiserver-02
+          metric_name: apiserver_request_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-apiserver-03
+          metric_name: apiserver_current_inflight_requests
+          chart_type: gauge
+          title: Apiserver Current Inflight Requests
+          visible: true
+          order: 2
+        - id: karmada-apiserver-04
+          metric_name: apiserver_current_inqueue_requests
+          chart_type: gauge
+          title: Apiserver Current Inqueue Requests
+          visible: true
+          order: 3
+        - id: karmada-apiserver-05
+          metric_name: apiserver_longrunning_requests
+          chart_type: gauge
+          title: Apiserver Longrunning Requests
+          visible: true
+          order: 4
+        - id: karmada-apiserver-06
+          metric_name: apiserver_flowcontrol_current_executing_requests
+          chart_type: gauge
+          title: Apiserver Flowcontrol Current Executing Requests
+          visible: true
+          order: 5
+        - id: karmada-apiserver-07
+          metric_name: apiserver_flowcontrol_current_inqueue_requests
+          chart_type: gauge
+          title: Apiserver Flowcontrol Current Inqueue Requests
+          visible: true
+          order: 6
+        - id: karmada-apiserver-08
+          metric_name: apiserver_flowcontrol_request_wait_duration_seconds
+          chart_type: bar
+          title: Apiserver Flowcontrol Request Wait Duration Seconds
+          visible: true
+          order: 7
+        - id: karmada-apiserver-09
+          metric_name: apiserver_admission_controller_admission_duration_seconds
+          chart_type: bar
+          title: Apiserver Admission Controller Admission Duration Seconds
+          visible: true
+          order: 8
+        - id: karmada-apiserver-10
+          metric_name: apiserver_storage_objects
+          chart_type: gauge
+          title: Apiserver Storage Objects
+          visible: true
+          order: 9
+        - id: karmada-apiserver-11
+          metric_name: apiserver_storage_size_bytes
+          chart_type: area
+          title: Apiserver Storage Size Bytes
+          visible: true
+          order: 10
+        - id: karmada-apiserver-12
+          metric_name: apiserver_tls_handshake_errors_total
+          chart_type: line
+          title: Apiserver Tls Handshake Errors Total
+          visible: true
+          order: 11
+    - version: 1
+      component: karmada-descheduler
+      panels:
+        - id: karmada-descheduler-01
+          metric_name: leader_election_master_status
+          chart_type: gauge
+          title: Leader Election Master Status
+          visible: true
+          order: 0
+        - id: karmada-descheduler-02
+          metric_name: workqueue_depth
+          chart_type: gauge
+          title: Workqueue Depth
+          visible: true
+          order: 1
+        - id: karmada-descheduler-03
+          metric_name: workqueue_adds_total
+          chart_type: line
+          title: Workqueue Adds Total
+          visible: true
+          order: 2
+        - id: karmada-descheduler-04
+          metric_name: workqueue_retries_total
+          chart_type: line
+          title: Workqueue Retries Total
+          visible: true
+          order: 3
+        - id: karmada-descheduler-05
+          metric_name: workqueue_queue_duration_seconds
+          chart_type: bar
+          title: Workqueue Queue Duration Seconds
+          visible: true
+          order: 4
+        - id: karmada-descheduler-06
+          metric_name: workqueue_work_duration_seconds
+          chart_type: bar
+          title: Workqueue Work Duration Seconds
+          visible: true
+          order: 5
+        - id: karmada-descheduler-07
+          metric_name: workqueue_longest_running_processor_seconds
+          chart_type: gauge
+          title: Workqueue Longest Running Processor Seconds
+          visible: true
+          order: 6
+        - id: karmada-descheduler-08
+          metric_name: workqueue_unfinished_work_seconds
+          chart_type: gauge
+          title: Workqueue Unfinished Work Seconds
+          visible: true
+          order: 7
+    - version: 1
+      component: karmada-kube-controller-manager
+      panels:
+        - id: karmada-kube-controller-manager-01
+          metric_name: node_collector_update_all_nodes_health_duration_seconds
+          chart_type: bar
+          title: Node Collector Update All Nodes Health Duration Seconds
+          visible: true
+          order: 0
+        - id: karmada-kube-controller-manager-02
+          metric_name: node_collector_update_node_health_duration_seconds
+          chart_type: bar
+          title: Node Collector Update Node Health Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-kube-controller-manager-03
+          metric_name: garbagecollector_controller_resources_sync_error_total
+          chart_type: line
+          title: Garbagecollector Controller Resources Sync Error Total
+          visible: true
+          order: 2
+        - id: karmada-kube-controller-manager-04
+          metric_name: ttl_after_finished_controller_job_deletion_duration_seconds
+          chart_type: bar
+          title: Ttl After Finished Controller Job Deletion Duration Seconds
+          visible: true
+          order: 3
+        - id: karmada-kube-controller-manager-05
+          metric_name: leader_election_master_status
+          chart_type: gauge
+          title: Leader Election Master Status
+          visible: true
+          order: 4
+        - id: karmada-kube-controller-manager-06
+          metric_name: workqueue_depth
+          chart_type: gauge
+          title: Workqueue Depth
+          visible: true
+          order: 5
+        - id: karmada-kube-controller-manager-07
+          metric_name: workqueue_adds_total
+          chart_type: line
+          title: Workqueue Adds Total
+          visible: true
+          order: 6
+        - id: karmada-kube-controller-manager-08
+          metric_name: workqueue_retries_total
+          chart_type: line
+          title: Workqueue Retries Total
+          visible: true
+          order: 7
+        - id: karmada-kube-controller-manager-09
+          metric_name: workqueue_longest_running_processor_seconds
+          chart_type: gauge
+          title: Workqueue Longest Running Processor Seconds
+          visible: true
+          order: 8
+        - id: karmada-kube-controller-manager-10
+          metric_name: workqueue_unfinished_work_seconds
+          chart_type: gauge
+          title: Workqueue Unfinished Work Seconds
+          visible: true
+          order: 9
+    - version: 1
+      component: karmada-metrics-adapter
+      panels:
+        - id: karmada-metrics-adapter-01
+          metric_name: apiserver_request_total
+          chart_type: line
+          title: Apiserver Request Total
+          visible: true
+          order: 0
+        - id: karmada-metrics-adapter-02
+          metric_name: apiserver_request_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-metrics-adapter-03
+          metric_name: apiserver_request_sli_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Sli Duration Seconds
+          visible: true
+          order: 2
+        - id: karmada-metrics-adapter-04
+          metric_name: apiserver_request_slo_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Slo Duration Seconds
+          visible: true
+          order: 3
+        - id: karmada-metrics-adapter-05
+          metric_name: apiserver_request_filter_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Filter Duration Seconds
+          visible: true
+          order: 4
+        - id: karmada-metrics-adapter-06
+          metric_name: apiserver_current_inflight_requests
+          chart_type: gauge
+          title: Apiserver Current Inflight Requests
+          visible: true
+          order: 5
+        - id: karmada-metrics-adapter-07
+          metric_name: workqueue_depth
+          chart_type: gauge
+          title: Workqueue Depth
+          visible: true
+          order: 6
+        - id: karmada-metrics-adapter-08
+          metric_name: workqueue_adds_total
+          chart_type: line
+          title: Workqueue Adds Total
+          visible: true
+          order: 7
+        - id: karmada-metrics-adapter-09
+          metric_name: workqueue_retries_total
+          chart_type: line
+          title: Workqueue Retries Total
+          visible: true
+          order: 8
+    - version: 1
+      component: karmada-scheduler-estimator-member1
+      panels:
+        - id: karmada-scheduler-estimator-member1-01
+          metric_name: karmada_scheduler_estimator_estimating_request_total
+          chart_type: line
+          title: Karmada Scheduler Estimator Estimating Request Total
+          visible: true
+          order: 0
+        - id: karmada-scheduler-estimator-member1-02
+          metric_name: karmada_scheduler_estimator_estimating_algorithm_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Algorithm Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-scheduler-estimator-member1-03
+          metric_name: karmada_scheduler_estimator_estimating_plugin_execution_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Plugin Execution Duration Seconds
+          visible: true
+          order: 2
+        - id: karmada-scheduler-estimator-member1-04
+          metric_name: karmada_scheduler_estimator_estimating_plugin_extension_point_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Plugin Extension Point Duration Seconds
+          visible: true
+          order: 3
+    - version: 1
+      component: karmada-scheduler-estimator-member2
+      panels:
+        - id: karmada-scheduler-estimator-member2-01
+          metric_name: karmada_scheduler_estimator_estimating_request_total
+          chart_type: line
+          title: Karmada Scheduler Estimator Estimating Request Total
+          visible: true
+          order: 0
+        - id: karmada-scheduler-estimator-member2-02
+          metric_name: karmada_scheduler_estimator_estimating_algorithm_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Algorithm Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-scheduler-estimator-member2-03
+          metric_name: karmada_scheduler_estimator_estimating_plugin_execution_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Plugin Execution Duration Seconds
+          visible: true
+          order: 2
+        - id: karmada-scheduler-estimator-member2-04
+          metric_name: karmada_scheduler_estimator_estimating_plugin_extension_point_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Plugin Extension Point Duration Seconds
+          visible: true
+          order: 3
+    - version: 1
+      component: karmada-scheduler-estimator-member3
+      panels:
+        - id: karmada-scheduler-estimator-member3-01
+          metric_name: karmada_scheduler_estimator_estimating_request_total
+          chart_type: line
+          title: Karmada Scheduler Estimator Estimating Request Total
+          visible: true
+          order: 0
+        - id: karmada-scheduler-estimator-member3-02
+          metric_name: karmada_scheduler_estimator_estimating_algorithm_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Algorithm Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-scheduler-estimator-member3-03
+          metric_name: karmada_scheduler_estimator_estimating_plugin_execution_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Plugin Execution Duration Seconds
+          visible: true
+          order: 2
+        - id: karmada-scheduler-estimator-member3-04
+          metric_name: karmada_scheduler_estimator_estimating_plugin_extension_point_duration_seconds
+          chart_type: bar
+          title: Karmada Scheduler Estimator Estimating Plugin Extension Point Duration Seconds
+          visible: true
+          order: 3
+    - version: 1
+      component: karmada-search
+      panels:
+        - id: karmada-search-01
+          metric_name: apiserver_request_total
+          chart_type: line
+          title: Apiserver Request Total
+          visible: true
+          order: 0
+        - id: karmada-search-02
+          metric_name: apiserver_request_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Duration Seconds
+          visible: true
+          order: 1
+        - id: karmada-search-03
+          metric_name: apiserver_current_inflight_requests
+          chart_type: gauge
+          title: Apiserver Current Inflight Requests
+          visible: true
+          order: 2
+        - id: karmada-search-04
+          metric_name: apiserver_longrunning_requests
+          chart_type: gauge
+          title: Apiserver Longrunning Requests
+          visible: true
+          order: 3
+        - id: karmada-search-05
+          metric_name: apiserver_request_sli_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Sli Duration Seconds
+          visible: true
+          order: 4
+        - id: karmada-search-06
+          metric_name: apiserver_request_slo_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Slo Duration Seconds
+          visible: true
+          order: 5
+        - id: karmada-search-07
+          metric_name: apiserver_request_filter_duration_seconds
+          chart_type: bar
+          title: Apiserver Request Filter Duration Seconds
+          visible: true
+          order: 6
+        - id: karmada-search-08
+          metric_name: apiserver_storage_objects
+          chart_type: gauge
+          title: Apiserver Storage Objects
+          visible: true
+          order: 7
+        - id: karmada-search-09
+          metric_name: apiserver_storage_size_bytes
+          chart_type: area
+          title: Apiserver Storage Size Bytes
+          visible: true
+          order: 8
+        - id: karmada-search-10
+          metric_name: etcd_request_duration_seconds
+          chart_type: bar
+          title: Etcd Request Duration Seconds
+          visible: true
+          order: 9
+        - id: karmada-search-11
+          metric_name: etcd_requests_total
+          chart_type: line
+          title: Etcd Requests Total
+          visible: true
+          order: 10
+        - id: karmada-search-12
+          metric_name: workqueue_depth
+          chart_type: gauge
+          title: Workqueue Depth
+          visible: true
+          order: 11
+    - version: 1
+      component: karmada-webhook
+      panels:
+        - id: karmada-webhook-01
+          metric_name: controller_runtime_webhook_requests_total
+          chart_type: line
+          title: Controller Runtime Webhook Requests Total
+          visible: true
+          order: 0
+        - id: karmada-webhook-02
+          metric_name: controller_runtime_webhook_latency_seconds
+          chart_type: bar
+          title: Controller Runtime Webhook Latency Seconds
+          visible: true
+          order: 1
+        - id: karmada-webhook-03
+          metric_name: controller_runtime_webhook_requests_in_flight
+          chart_type: gauge
+          title: Controller Runtime Webhook Requests In Flight
+          visible: true
+          order: 2
+        - id: karmada-webhook-04
+          metric_name: controller_runtime_webhook_panics_total
+          chart_type: line
+          title: Controller Runtime Webhook Panics Total
+          visible: true
+          order: 3
+        - id: karmada-webhook-05
+          metric_name: controller_runtime_conversion_webhook_panics_total
+          chart_type: line
+          title: Controller Runtime Conversion Webhook Panics Total
+          visible: true
+          order: 4
+
 ingress:
   enabled: false
   className: ""
@@ -241,6 +963,75 @@ kubernetes_dashboard_api:
     #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  service:
+    type: ClusterIP
+    port: 8000
+
+metrics_scraper:
+  ## @param metrics_scraper.labels labels of the metrics-scraper deployment
+  labels: {}
+  replicaCount: 1
+  ## @param metrics_scraper.podAnnotations annotations of the metrics-scraper pods
+  podAnnotations: { }
+  ## @param metrics_scraper.podLabels labels of the metrics-scraper pods
+  podLabels: { }
+  ## @param metrics_scraper.image.registry metrics-scraper image registry
+  ## @param metrics_scraper.image.repository metrics-scraper image repository
+  ## @param metrics_scraper.image.tag karmada metrics-scraper image tag (immutable tags are recommended)
+  ## @param metrics_scraper.image.pullPolicy metrics-scraper image pull policy
+  ## @param metrics_scraper.image.pullSecrets Specify docker-registry secret names as an array
+  ##
+  image:
+    registry: docker.io
+    repository: karmada/karmada-dashboard-metrics-scraper
+    tag: *karmadaDashboardImageVersion
+    pullPolicy: *karmadaDashboardImagePullPolicy
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: [ ]
+  ## @param metrics_scraper.resources resource quota of the metrics-scraper
+  resources: { }
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  ## @param metrics_scraper.nodeSelector node selector of the metrics-scraper
+  nodeSelector: { }
+  ## @param metrics_scraper.affinity affinity of the metrics-scraper
+  affinity: { }
+  ## @param metrics_scraper.tolerations tolerations of the metrics-scraper
+  tolerations: [ ]
+  # - key: node-role.kubernetes.io/master
+  #   operator: Exists
+  ## @param metrics_scraper.strategy strategy of the metrics-scraper
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 50%
+  ## @param metrics_scraper.kubeconfigName secret name of the Karmada kubeconfig
+  kubeconfigName: karmada-kubeconfig
+  ## @param metrics_scraper.kubeconfigContext context name used in the Karmada kubeconfig
+  kubeconfigContext: karmada-apiserver
+  ## @param metrics_scraper.podDisruptionBudget
+  podDisruptionBudget: *podDisruptionBudget
+  podSecurityContext: { }
+  # fsGroup: 2000
+  securityContext: { }
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
   service:

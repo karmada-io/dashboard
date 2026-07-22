@@ -158,6 +158,15 @@ func serve(opts *options.Options) {
 				klog.Fatalf("failed to parse kubernetes-dashboard-api-proxy-endpoint: %v", err)
 			}
 		}
+		if opts.EnableMetricsScraperProxy {
+			if metricsScraperProxyFunc, err := generateAPIProxy(opts.MetricsScraperProxyEndpoint, func(req *http.Request, _ *gin.Context) {
+				req.URL.Path = strings.TrimPrefix(req.URL.Path, pathPrefix+"/metrics-scraper")
+			}); err == nil {
+				g.Any("/metrics-scraper/*path", metricsScraperProxyFunc)
+			} else {
+				klog.Fatalf("failed to parse metrics-scraper-proxy-endpoint: %v", err)
+			}
+		}
 		g.GET("/i18n/*path", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{})
 		})
