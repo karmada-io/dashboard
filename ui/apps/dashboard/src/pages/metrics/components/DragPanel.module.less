@@ -1,0 +1,43 @@
+.dragPanel {
+  position: relative;
+}
+
+.withHandle :global(.ant-card-head-title) {
+  padding-left: 34px;
+}
+
+.dragHandle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(35, 48, 44, 0.1);
+  border-radius: 9px;
+  color: rgba(23, 33, 31, 0.54);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 8px 18px rgba(45, 58, 55, 0.12);
+  cursor: grab;
+  backdrop-filter: blur(10px);
+  transition:
+    transform 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.dragHandle:hover {
+  border-color: rgba(23, 109, 99, 0.28);
+  color: #176d63;
+  box-shadow: 0 12px 24px rgba(23, 109, 99, 0.16);
+  transform: translateY(-1px);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+  transform: translateY(0) scale(0.97);
+}

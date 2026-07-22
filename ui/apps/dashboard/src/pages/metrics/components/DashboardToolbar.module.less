@@ -1,0 +1,49 @@
+.toolbar {
+  justify-content: flex-end;
+}
+
+.toolbar :global(.ant-btn) {
+  font-weight: 650;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.toolbar :global(.ant-btn:hover) {
+  transform: translateY(-1px);
+}
+
+.toolbar :global(.ant-btn:active) {
+  transform: translateY(0) scale(0.98);
+}
+
+.secondaryButton {
+  border-color: rgba(23, 109, 99, 0.16) !important;
+  color: #176d63 !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 8px 18px rgba(23, 109, 99, 0.08);
+}
+
+.secondaryButton:hover {
+  border-color: rgba(23, 109, 99, 0.34) !important;
+  box-shadow: 0 12px 24px rgba(23, 109, 99, 0.12);
+}
+
+.primaryButton {
+  border-color: #176d63 !important;
+  background: #176d63 !important;
+  box-shadow: 0 10px 24px rgba(23, 109, 99, 0.22);
+}
+
+.primaryButton:hover {
+  border-color: #11564f !important;
+  background: #11564f !important;
+  box-shadow: 0 14px 30px rgba(23, 109, 99, 0.26);
+}
+
+.dangerButton {
+  background: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 8px 18px rgba(151, 65, 53, 0.08);
+}

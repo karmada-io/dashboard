@@ -77,6 +77,7 @@ import {
   HardDrive,
   Cloud,
   PanelsTopLeft,
+  Activity,
 
 } from 'lucide-react';
 
@@ -127,6 +128,7 @@ export const Icons = {
   storage: HardDrive,
   cloud: Cloud,
   control: SlidersHorizontal,
+  metrics: Activity,
 
   gitHub: ({ ...props }: LucideProps) => (
     <svg
