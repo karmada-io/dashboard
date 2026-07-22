@@ -65,6 +65,7 @@ import MemberClusterRoles from '@/pages/member-cluster/cluster/roles';
 import MemberClusterServiceAccounts from '@/pages/member-cluster/cluster/service-accounts';
 import Login from '@/pages/login';
 import OIDCCallbackPage from '@/pages/login/callback';
+import MetricsPage from '@/pages/metrics';
 import { Icons } from '@/components/icons';
 
 export interface IRouteObjectHandle {
@@ -318,6 +319,15 @@ export function getRoutes() {
               },
             },
           ],
+        },
+        {
+          path: '/metrics',
+          element: <MetricsPage />,
+          handle: {
+            sidebarKey: 'METRICS',
+            sidebarName: 'Metrics',
+            icon: <Icons.metrics {...IconStyles} />,
+          },
         },
       ],
     },

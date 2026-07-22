@@ -1,0 +1,36 @@
+.shell {
+  position: relative;
+  background: var(--karmada-color-bg);
+}
+
+.shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent 220px);
+}
+
+.sider {
+  position: relative;
+  z-index: 1;
+  border-right: 1px solid var(--karmada-color-shell-border);
+  box-shadow: 6px 0 18px rgba(20, 27, 43, 0.08);
+}
+
+.mainPane {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  flex: 1 1 auto;
+  height: calc(100dvh - 48px);
+  overflow: hidden;
+}

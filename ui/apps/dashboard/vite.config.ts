@@ -74,7 +74,24 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     resolve: {
-      alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+      alias: [
+        { find: '@', replacement: path.resolve(__dirname, 'src') },
+        // Vite 8 + rolldown has a CJS transform issue with es-toolkit compat modules
+        // used by recharts. Map them to equivalent lodash helpers to avoid runtime errors.
+        { find: 'es-toolkit/compat/get', replacement: 'lodash/get' },
+        { find: 'es-toolkit/compat/sortBy', replacement: 'lodash/sortBy' },
+        { find: 'es-toolkit/compat/maxBy', replacement: 'lodash/maxBy' },
+        { find: 'es-toolkit/compat/sumBy', replacement: 'lodash/sumBy' },
+        { find: 'es-toolkit/compat/throttle', replacement: 'lodash/throttle' },
+        { find: 'es-toolkit/compat/omit', replacement: 'lodash/omit' },
+        { find: 'es-toolkit/compat/minBy', replacement: 'lodash/minBy' },
+        { find: 'es-toolkit/compat/last', replacement: 'lodash/last' },
+        { find: 'es-toolkit/compat/range', replacement: 'lodash/range' },
+        { find: 'es-toolkit/compat/isPlainObject', replacement: 'lodash/isPlainObject' },
+        { find: 'es-toolkit/compat/uniqBy', replacement: 'lodash/uniqBy' },
+        { find: 'react', replacement: path.resolve(__dirname, 'node_modules/react') },
+        { find: 'react-dom', replacement: path.resolve(__dirname, 'node_modules/react-dom') },
+      ],
       dedupe: ['react', 'react-dom'],
     },
     optimizeDeps: {
