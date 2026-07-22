@@ -89,6 +89,9 @@ export * from './dashboard-config';
 // Overview/statistics
 export * from './overview';
 
+// Metrics scraper
+export * from './metrics';
+
 // Member cluster services
 const memberClusterServices = {
   workload: () => import('./member-cluster/workload'),
