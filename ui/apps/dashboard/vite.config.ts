@@ -127,6 +127,10 @@ export default defineConfig(({ mode }) => {
           secure: false,
           ws: true,
         },
+        '^/metrics-scraper/.*': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+        },
       },
     },
   };

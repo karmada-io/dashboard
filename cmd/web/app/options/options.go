@@ -34,6 +34,8 @@ type Options struct {
 	APIProxyEndpoint                    string
 	EnableKubernetesDashboardAPIProxy   bool
 	KubernetesDashboardAPIProxyEndpoint string
+	EnableMetricsScraperProxy           bool
+	MetricsScraperProxyEndpoint         string
 	DashboardConfigPath                 string
 }
 
@@ -57,5 +59,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.APIProxyEndpoint, "api-proxy-endpoint", "http://karmada-dashboard-api.karmada-system.svc.cluster.local:8000", "karmada-dashboard-api endpoint")
 	fs.BoolVar(&o.EnableKubernetesDashboardAPIProxy, "enable-kubernetes-dashboard-api-proxy", true, "whether enable proxy to kubernetes-dashboard-api, if set true, all requests with /clusterapi prefix will be proxied to kubernetes-dashboard-api.karmada-system.svc.cluster.local")
 	fs.StringVar(&o.KubernetesDashboardAPIProxyEndpoint, "kubernetes-dashboard-api-proxy-endpoint", "http://kubernetes-dashboard-api.karmada-system.svc.cluster.local:8000", "kubernetes-dashboard-api endpoint")
+	fs.BoolVar(&o.EnableMetricsScraperProxy, "enable-metrics-scraper-proxy", true, "whether enable proxy to karmada-dashboard-metrics-scraper, if set true, all requests with /metrics-scraper prefix will be proxied to the metrics-scraper endpoint")
+	fs.StringVar(&o.MetricsScraperProxyEndpoint, "metrics-scraper-proxy-endpoint", "http://karmada-dashboard-metrics-scraper.karmada-system.svc.cluster.local:8000", "karmada-dashboard-metrics-scraper endpoint")
 	fs.StringVar(&o.DashboardConfigPath, "dashboard-config-path", "./config/dashboard-config.yaml", "path to dashboard config file")
 }
