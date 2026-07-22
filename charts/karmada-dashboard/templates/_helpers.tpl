@@ -119,5 +119,25 @@ app: {{ include "karmada-dashboard.name" . }}-kubernetes-dashboard-api
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "karmada-dashboard.imagePullSecrets" -}}
-{{ include "common.images.pullSecrets" (dict "images" (list .Values.api.image .Values.web.image .Values.kubernetes_dashboard_api.image) "global" .Values.global) }}
+{{ include "common.images.pullSecrets" (dict "images" (list .Values.api.image .Values.web.image .Values.kubernetes_dashboard_api.image .Values.metrics_scraper.image) "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+Return the proper metrics-scraper image name
+*/}}
+{{- define "karmada-dashboard.metrics-scraper.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.metrics_scraper.image "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+metrics-scraper labels
+*/}}
+{{- define "karmada-dashboard.metrics-scraper.labels" -}}
+{{ include "karmada-dashboard.labels" . }}
+app: {{ include "karmada-dashboard.name" . }}-metrics-scraper
+{{- if .Values.metrics_scraper.labels }}
+{{- range $key, $value := .Values.metrics_scraper.labels }}
+{{ $key }}: {{ $value }}
+{{- end }}
+{{- end }}
 {{- end -}}

@@ -73,6 +73,7 @@ KARMADA_TARGET_SOURCE=(
   karmada-dashboard-api=cmd/api
   karmada-dashboard-web=cmd/web
   kubernetes-dashboard-api=cmd/kubernetes-dashboard-api
+  karmada-dashboard-metrics-scraper=cmd/metrics-scraper
 )
 
 

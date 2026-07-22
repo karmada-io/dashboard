@@ -14,6 +14,9 @@ data:
       - path: /topology
         enable: true
         sidebar_key: TOPOLOGY
+      - path: /metrics
+        enable: true
+        sidebar_key: METRICS
       - path: /multicloud-resource-manage
         enable: true
         sidebar_key: MULTICLOUD-RESOURCE-MANAGE
@@ -88,6 +91,10 @@ data:
   prod.yaml: |-
     docker_registries: [ ]
     chart_registries: [ ]
+{{ with .Values.dashboardConfig.metricsDashboards }}
+    metrics_dashboards:
+{{ toYaml . | nindent 6 }}
+{{ end }}
     menu_configs:
       - path: /overview
         enable: true
@@ -95,6 +102,9 @@ data:
       - path: /topology
         enable: true
         sidebar_key: TOPOLOGY
+      - path: /metrics
+        enable: true
+        sidebar_key: METRICS
       - path: /multicloud-resource-manage
         enable: true
         sidebar_key: MULTICLOUD-RESOURCE-MANAGE

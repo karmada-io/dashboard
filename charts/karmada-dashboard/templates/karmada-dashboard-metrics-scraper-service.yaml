@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "karmada-dashboard.name" . }}-metrics-scraper
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+  labels:
+    {{- include "karmada-dashboard.metrics-scraper.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.metrics_scraper.service.type }}
+  ports:
+    - port: {{ .Values.metrics_scraper.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "karmada-dashboard.metrics-scraper.labels" . | nindent 4 }}

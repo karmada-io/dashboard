@@ -9,7 +9,8 @@ VERSION 				?= $(shell hack/version.sh)
 # Build targets
 TARGETS := karmada-dashboard-api \
 		   karmada-dashboard-web \
-		   kubernetes-dashboard-api
+		   kubernetes-dashboard-api \
+		   karmada-dashboard-metrics-scraper
 
 # Docker image related variables
 REGISTRY				?= docker.io/karmada
@@ -148,6 +149,20 @@ endif
 .PHONY: run-web
 run-web: install-ui-deps build
 	cd ui && VITE_API_HOST=$(API_HOST) pnpm run dashboard:dev
+
+# Run Metrics Scraper only
+.PHONY: run-metrics-scraper
+run-metrics-scraper: build
+ifndef KUBECONFIG
+	$(error KUBECONFIG is required. Please specify the path to karmada kubeconfig)
+endif
+	_output/bin/$(GOOS)/$(GOARCH)/karmada-dashboard-metrics-scraper \
+		--karmada-kubeconfig=$(KUBECONFIG) \
+		--karmada-context=$(KARMADA_CTX) \
+		--kubeconfig=$(KUBECONFIG) \
+		--context=$(HOST_CTX) \
+		--insecure-port=8001 \
+		$(if $(filter true,$(SKIP_TLS_VERIFY)),--skip-karmada-apiserver-tls-verify)
 
 # Generate JWT token for dashboard login
 .PHONY: gen-token
