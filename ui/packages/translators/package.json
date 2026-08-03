@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "got": "^15.0.2",
-    "openai": "^6.10.0",
+    "openai": "^7.2.0",
     "@karmada/utils": "workspace:*"
   }
 }
