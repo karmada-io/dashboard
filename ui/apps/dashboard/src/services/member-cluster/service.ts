@@ -23,6 +23,7 @@ import {
   TypeMeta,
 } from '../base';
 import { Event } from './event'
+import { Pod } from './pod';
 
 export enum Protocol {
   TCP = 'TCP',
@@ -172,7 +173,7 @@ export async function GetMemberClusterServicePods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(`/clusterapi/${memberClusterName}/api/v1/service/${namespace}/${name}/pod`);
   return resp;
 }
