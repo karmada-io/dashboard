@@ -15,6 +15,7 @@
 package errors
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -27,6 +28,10 @@ const (
 	MsgDashboardExclusiveResourceError = "MSG_DASHBOARD_EXCLUSIVE_RESOURCE_ERROR"
 	MsgTokenExpiredError               = "MSG_TOKEN_EXPIRED_ERROR" //nolint:gosec // mistake `Token` as hardcoded credential
 	MsgCSRFValidationError             = "MSG_CSRF_VALIDATION_ERROR"
+	MsgResourceNotFoundError           = "MSG_RESOURCE_NOT_FOUND_ERROR"
+	MsgResourceAlreadyExistsError      = "MSG_RESOURCE_ALREADY_EXISTS_ERROR"
+	MsgResourceConflictError           = "MSG_RESOURCE_CONFLICT_ERROR"
+	MsgInternalServerError             = "MSG_INTERNAL_SERVER_ERROR"
 )
 
 // This file contains all errors that should be kept in sync with:
@@ -42,6 +47,9 @@ var partialsToErrorsMap = map[string]string{
 	"does not match the namespace":                               MsgDeployNamespaceMismatchError,
 	"empty namespace may not be set":                             MsgDeployEmptyNamespaceError,
 	"the server has asked for the client to provide credentials": MsgLoginUnauthorizedError,
+	"not found":      MsgResourceNotFoundError,
+	"already exists": MsgResourceAlreadyExistsError,
+	"conflict":       MsgResourceConflictError,
 }
 
 // LocalizeError returns error code (string) that can be used by frontend to localize error message.
@@ -50,10 +58,33 @@ func LocalizeError(err error) error {
 		return nil
 	}
 
+	if IsNotFound(err) {
+		return NewNotFound(MsgResourceNotFoundError)
+	}
+	if IsAlreadyExists(err) {
+		return NewAlreadyExists(MsgResourceAlreadyExistsError)
+	}
+	if IsConflict(err) {
+		return NewConflict(MsgResourceConflictError)
+	}
+	if IsUnauthorized(err) {
+		return NewUnauthorized(MsgLoginUnauthorizedError)
+	}
+	if IsForbidden(err) {
+		return NewForbidden("", fmt.Errorf("%s", MsgForbiddenError))
+	}
+
+	errLower := strings.ToLower(err.Error())
 	for partial, errString := range partialsToErrorsMap {
-		if strings.Contains(err.Error(), partial) {
-			if IsUnauthorized(err) {
-				return NewUnauthorized(errString)
+		if strings.Contains(errLower, strings.ToLower(partial)) {
+			if strings.Contains(errString, "NOT_FOUND") {
+				return NewNotFound(errString)
+			}
+			if strings.Contains(errString, "ALREADY_EXISTS") {
+				return NewAlreadyExists(errString)
+			}
+			if strings.Contains(errString, "CONFLICT") {
+				return NewConflict(errString)
 			}
 
 			return NewBadRequest(errString)
