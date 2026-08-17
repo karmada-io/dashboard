@@ -13,7 +13,7 @@ require (
 	github.com/gobuffalo/flect v1.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/karmada-io/karmada v1.18.2
-	github.com/mark3labs/mcp-go v0.57.0
+	github.com/mark3labs/mcp-go v0.58.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.70.1
 	github.com/sashabaranov/go-openai v1.42.0
