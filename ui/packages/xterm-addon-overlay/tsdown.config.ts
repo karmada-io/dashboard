@@ -14,22 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 import { getLicense } from '@karmada/utils';
 
 const license = getLicense();
-
 export default defineConfig({
-  entry: ['src/index.tsx'],
+  entry: ['src/index.ts'],
   splitting: false,
   sourcemap: true,
   clean: true,
   format: ['cjs', 'esm'],
-  // external: ['react'],
-  dts: {
-    banner: license,
-  },
+  outExtensions: ({ format }) => ({
+    js: format === 'cjs' ? '.js' : '.mjs',
+    dts: format === 'cjs' ? '.d.ts' : '.d.mts',
+  }),
+  dts: true,
   banner: {
     js: license,
+    dts: license,
   },
 });

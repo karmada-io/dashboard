@@ -41,6 +41,7 @@ missing_license_header_files="$($ADDLICENSE_BIN \
   -ignore "**/*.json" \
   -ignore ".idea/**" \
   -ignore "**/*/node_modules/**" \
+  -ignore "ui/**/dist/**" \
   -ignore "ui/.husky/**" \
   .)" || true
 

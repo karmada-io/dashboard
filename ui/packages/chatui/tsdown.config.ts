@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 const license = `/*
 Copyright 2024 The Karmada Authors.
@@ -38,9 +38,15 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   format: ["cjs", "esm"],
+  outExtensions: ({ format }) => ({
+    js: format === "cjs" ? ".js" : ".mjs",
+    dts: format === "cjs" ? ".d.ts" : ".d.mts",
+  }),
   external: ["react", "react-dom"],
   dts: true,
   banner: {
     js: license,
+    css: license,
+    dts: license,
   },
 });

@@ -9,15 +9,15 @@
     }
   },
   "scripts": {
-    "prepublish": "tsup --config ./tsup.config.ts",
-    "build": "tsup --config ./tsup.config.ts",
+    "prepublish": "tsdown --config ./tsdown.config.ts",
+    "build": "tsdown --config ./tsdown.config.ts",
     "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "tsup": "^8.5.1",
+    "tsdown": "^0.22.14",
     "vite": "^8.0.16",
     "vitest": "^4.1.9"
   },
