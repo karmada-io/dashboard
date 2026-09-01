@@ -16,6 +16,9 @@ limitations under the License.
 
 import { convertDataSelectQuery, karmadaMemberClusterClient } from '../base';
 import type { ObjectMeta, TypeMeta, WorkloadKind, Selector, RollingUpdateStrategy, DataSelectQuery } from '../base';
+import type { Event } from './event';
+import type { Pod } from './pod';
+import type { Service } from './service';
 
 export interface DeploymentWorkload {
   objectMeta: ObjectMeta;
@@ -41,7 +44,7 @@ export interface Pods {
   pending: number;
   failed: number;
   succeeded: number;
-  warnings: any[];
+  warnings: Event[];
 }
 
 export interface WorkloadStatus {
@@ -421,7 +424,7 @@ export async function GetMemberClusterDaemonSetPods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(
     `/clusterapi/${memberClusterName}/api/v1/daemonset/${namespace}/${name}/pod`,
   );
@@ -439,7 +442,7 @@ export async function GetMemberClusterDaemonSetServices(params: {
     listMeta: {
       totalItems: number;
     };
-    services: any[];
+    services: Service[];
   }>(
     `/clusterapi/${memberClusterName}/api/v1/daemonset/${namespace}/${name}/service`,
   );
@@ -458,7 +461,7 @@ export async function GetMemberClusterStatefulSetPods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(
     `/clusterapi/${memberClusterName}/api/v1/statefulset/${namespace}/${name}/pod`,
   );
@@ -477,7 +480,7 @@ export async function GetMemberClusterJobPods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(`/clusterapi/${memberClusterName}/api/v1/job/${namespace}/${name}/pod`);
   return resp;
 }
