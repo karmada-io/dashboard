@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
 Copyright 2024 The Karmada Authors.
 
@@ -13,8 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-#!/usr/bin/env node
 
 const {Command} = require('commander');
 const chalk = require('chalk');
