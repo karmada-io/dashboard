@@ -47,3 +47,9 @@ func IsForbidden(err error) bool {
 
 // IsNotFound checks if the given error is of type NotFound.
 func IsNotFound(err error) bool { return k8serrors.IsNotFound(err) }
+
+// IsInternalError checks if the given error is of type InternalError.
+func IsInternalError(err error) bool { return k8serrors.IsInternalError(err) }
+
+// IsConflict checks if the given error is of type Conflict.
+func IsConflict(err error) bool { return k8serrors.IsConflict(err) }
