@@ -25,7 +25,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/customresourcedefinition/types"
 	crdv1 "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/customresourcedefinition/v1"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 var (

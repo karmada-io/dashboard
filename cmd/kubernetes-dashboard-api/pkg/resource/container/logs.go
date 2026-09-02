@@ -18,11 +18,11 @@ import (
 	"context"
 	"io"
 
+	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/logs"
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/logs"
 )
 
 // maximum number of lines loaded from the apiserver

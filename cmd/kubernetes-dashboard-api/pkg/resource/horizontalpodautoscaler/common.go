@@ -15,8 +15,8 @@
 package horizontalpodautoscaler
 
 import (
-	autoscaling "k8s.io/api/autoscaling/v1"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
+	autoscaling "k8s.io/api/autoscaling/v1"
 )
 
 // ScaleTargetRef is a simple mapping of an autoscaling.CrossVersionObjectReference

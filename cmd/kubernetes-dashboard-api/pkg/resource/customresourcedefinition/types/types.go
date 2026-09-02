@@ -22,7 +22,7 @@ import (
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // CustomResourceDefinitionList contains a list of Custom Resource Definitions in the cluster.

@@ -22,7 +22,7 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // TestToPodPodStatusFailed tests the returned status for pods that have completed unsuccessfully.
@@ -42,6 +42,7 @@ func TestToPodPodStatusFailed(t *testing.T) {
 	expected := Pod{
 		TypeMeta:          types.TypeMeta{Kind: types.ResourceKindPod},
 		Status:            string(v1.PodFailed),
+		PodPhase:          v1.PodFailed,
 		Warnings:          []common.Event{},
 		ContainerStatuses: make([]ContainerStatus, 0),
 	}
@@ -70,6 +71,7 @@ func TestToPodPodStatusSucceeded(t *testing.T) {
 	expected := Pod{
 		TypeMeta:          types.TypeMeta{Kind: types.ResourceKindPod},
 		Status:            string(v1.PodSucceeded),
+		PodPhase:          v1.PodSucceeded,
 		Warnings:          []common.Event{},
 		ContainerStatuses: make([]ContainerStatus, 0),
 	}
@@ -102,6 +104,7 @@ func TestToPodPodStatusRunning(t *testing.T) {
 	expected := Pod{
 		TypeMeta:          types.TypeMeta{Kind: types.ResourceKindPod},
 		Status:            string(v1.PodRunning),
+		PodPhase:          v1.PodRunning,
 		Warnings:          []common.Event{},
 		ContainerStatuses: make([]ContainerStatus, 0),
 	}
@@ -130,6 +133,7 @@ func TestToPodPodStatusPending(t *testing.T) {
 	expected := Pod{
 		TypeMeta:          types.TypeMeta{Kind: types.ResourceKindPod},
 		Status:            string(v1.PodPending),
+		PodPhase:          v1.PodPending,
 		Warnings:          []common.Event{},
 		ContainerStatuses: make([]ContainerStatus, 0),
 	}
@@ -168,6 +172,7 @@ func TestToPodContainerStates(t *testing.T) {
 	expected := Pod{
 		TypeMeta: types.TypeMeta{Kind: types.ResourceKindPod},
 		Status:   "Terminated",
+		PodPhase: v1.PodRunning,
 		Warnings: []common.Event{},
 		ContainerStatuses: []ContainerStatus{
 			{

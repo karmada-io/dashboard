@@ -24,7 +24,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	test "k8s.io/client-go/testing"
 
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 func areErrorsEqual(err1, err2 error) bool {

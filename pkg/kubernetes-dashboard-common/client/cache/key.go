@@ -24,10 +24,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
-	"k8s.io/dashboard/client/args"
-	"k8s.io/dashboard/errors"
-	"k8s.io/dashboard/helpers"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/args"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // contextCache is used in multi-cluster setup to map tokens to context (cluster) identifiers.
