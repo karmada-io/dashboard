@@ -19,7 +19,7 @@ import (
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 
-	"k8s.io/dashboard/client/cache/client/core"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/cache/client/core"
 )
 
 // CachedInterface is a custom wrapper around the [client.Interface].

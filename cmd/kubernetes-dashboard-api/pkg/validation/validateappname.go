@@ -22,7 +22,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/args"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // AppNameValiditySpec is a specification for application name validation request.

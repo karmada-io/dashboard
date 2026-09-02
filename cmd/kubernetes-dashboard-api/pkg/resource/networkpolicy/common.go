@@ -15,8 +15,8 @@
 package networkpolicy
 
 import (
-	v1 "k8s.io/api/networking/v1"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
+	v1 "k8s.io/api/networking/v1"
 )
 
 type ServiceAccountCell v1.NetworkPolicy

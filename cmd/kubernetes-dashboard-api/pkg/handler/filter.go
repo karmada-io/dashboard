@@ -27,8 +27,8 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/args"
-	"k8s.io/dashboard/csrf"
-	"k8s.io/dashboard/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/csrf"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
 )
 
 const (

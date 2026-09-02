@@ -17,7 +17,7 @@ package common
 import (
 	v1 "k8s.io/api/core/v1"
 
-	"k8s.io/dashboard/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
 )
 
 // FilterNamespacedServicesBySelector returns services targeted by given resource selector in

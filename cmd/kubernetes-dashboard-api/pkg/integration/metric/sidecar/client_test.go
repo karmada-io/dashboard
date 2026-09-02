@@ -32,7 +32,7 @@ import (
 
 	integrationapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/api"
 	metricapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/metric/api"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 func areErrorsEqual(err1, err2 error) bool {

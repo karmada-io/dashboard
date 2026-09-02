@@ -21,7 +21,7 @@ import (
 	"github.com/Yiling-J/theine-go"
 	"k8s.io/klog/v2"
 
-	"k8s.io/dashboard/client/args"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/args"
 )
 
 var (

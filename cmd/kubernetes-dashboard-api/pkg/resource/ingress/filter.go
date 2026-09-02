@@ -17,7 +17,7 @@ package ingress
 import (
 	networkingv1 "k8s.io/api/networking/v1"
 
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 func FilterIngressByService(ingresses []networkingv1.Ingress, serviceName string) []networkingv1.Ingress {

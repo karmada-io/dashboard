@@ -37,7 +37,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/args"
-	derrors "k8s.io/dashboard/errors"
+	derrors "github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 const (
