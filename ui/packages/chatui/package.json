@@ -13,9 +13,9 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepublish": "tsup --config ./tsup.config.ts",
-    "build": "tsup --config ./tsup.config.ts",
-    "dev": "tsup --config ./tsup.config.ts --watch"
+    "prepublish": "tsdown --config ./tsdown.config.ts",
+    "build": "tsdown --config ./tsdown.config.ts",
+    "dev": "tsdown --config ./tsdown.config.ts --watch"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,json,css,md}": [
@@ -37,6 +37,7 @@
     "@chatui/core": "^3.8.0"
   },
   "devDependencies": {
+    "@tsdown/css": "^0.22.14",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3"
   },

@@ -14,7 +14,7 @@
     "translators": "pnpm --filter @karmada/translators"
   },
   "engines": {
-    "node": ">=18.14.0"
+    "node": ">=22.18.0"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,json}": [
@@ -29,9 +29,10 @@
     "@types/node": "^26.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.4",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.22.14",
     "tsx": "^4.22.4",
-    "turbo": "^2.10.5"
+    "turbo": "^2.10.5",
+    "unrun": "^0.3.1"
   },
   "dependencies": {
     "dayjs": "^1.11.21"

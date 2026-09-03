@@ -13,8 +13,8 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepublish": "tsup --config ./tsup.config.ts",
-    "build": "tsup --config ./tsup.config.ts"
+    "prepublish": "tsdown --config ./tsdown.config.ts",
+    "build": "tsdown --config ./tsdown.config.ts"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,json,css,md}": [

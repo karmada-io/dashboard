@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Karmada Authors.
+Copyright 2025 The Karmada Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { defineConfig } from 'tsup';
-import {getLicense} from '@karmada/utils';
+import { defineConfig } from 'tsdown';
+import { getLicense } from './src/index.ts';
 
-const license = getLicense()
+const license = getLicense();
+
 export default defineConfig({
   entry: ['src/index.ts'],
   splitting: false,
   sourcemap: true,
   clean: true,
+  dts: true,
   format: ['cjs', 'esm'],
-  dts: false,
+  outExtensions: ({ format }) => ({
+    js: format === 'cjs' ? '.js' : '.mjs',
+    dts: format === 'cjs' ? '.d.ts' : '.d.mts',
+  }),
   banner: {
-    js: license
-  }
+    js: license,
+    dts: license,
+  },
 });
