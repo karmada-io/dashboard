@@ -20,7 +20,7 @@ import (
 	authorizationv1 "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/client-go/rest"
 
-	"k8s.io/dashboard/client/cache/client/extensions"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/cache/client/extensions"
 )
 
 // CachedExtensionsInterface is a custom wrapper around the [extensionsclient.Interface].

@@ -19,7 +19,7 @@ import (
 
 	"github.com/gobuffalo/flect"
 
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 type Option[T any] func(*CachedResourceLister[T])

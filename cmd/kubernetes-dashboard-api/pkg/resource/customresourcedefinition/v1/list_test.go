@@ -25,7 +25,7 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/customresourcedefinition/types"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
-	commontypes "k8s.io/dashboard/types"
+	commontypes "github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 func TestGetCustomResourceDefinition(t *testing.T) {

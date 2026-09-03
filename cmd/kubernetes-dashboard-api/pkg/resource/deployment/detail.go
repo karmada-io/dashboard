@@ -24,7 +24,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // RollingUpdateStrategy is behavior of a rolling update. See RollingUpdateDeployment K8s object.

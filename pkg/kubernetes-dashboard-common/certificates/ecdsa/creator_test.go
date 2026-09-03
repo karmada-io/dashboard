@@ -18,7 +18,7 @@ import (
 	"crypto/elliptic"
 	"testing"
 
-	"k8s.io/dashboard/certificates/ecdsa"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/certificates/ecdsa"
 )
 
 func TestNewECDSACreator(t *testing.T) {

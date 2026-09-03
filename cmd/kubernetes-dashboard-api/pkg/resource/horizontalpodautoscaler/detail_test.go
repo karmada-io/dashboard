@@ -22,7 +22,7 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // func GetHorizontalPodAutoscalerDetail(client *client.Client, namespace string, name string) (*HorizontalPodAutoscalerDetail, error)

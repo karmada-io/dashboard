@@ -25,7 +25,7 @@ import (
 	metricapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/metric/api"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	hpa "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/horizontalpodautoscaler"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // ReplicaSetDetail is a presentation layer view of Kubernetes Replica Set resource. This means

@@ -3,10 +3,12 @@ module github.com/karmada-io/dashboard
 go 1.25.10
 
 require (
+	github.com/Yiling-J/theine-go v0.6.0
 	github.com/coreos/go-oidc/v3 v3.20.0
 	github.com/distribution/reference v0.6.0
 	github.com/emicklei/go-restful-openapi/v2 v2.12.1
 	github.com/emicklei/go-restful/v3 v3.13.0
+	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-openapi/spec v0.22.11
@@ -16,6 +18,7 @@ require (
 	github.com/mark3labs/mcp-go v0.58.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.70.1
+	github.com/samber/lo v1.47.0
 	github.com/sashabaranov/go-openai v1.42.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
@@ -29,12 +32,6 @@ require (
 	k8s.io/apimachinery v0.35.3
 	k8s.io/client-go v0.35.3
 	k8s.io/component-base v0.35.3
-	k8s.io/dashboard/certificates v0.0.0-00010101000000-000000000000
-	k8s.io/dashboard/client v0.0.0-00010101000000-000000000000
-	k8s.io/dashboard/csrf v0.0.0-00010101000000-000000000000
-	k8s.io/dashboard/errors v0.0.0-00010101000000-000000000000
-	k8s.io/dashboard/helpers v0.0.0-00010101000000-000000000000
-	k8s.io/dashboard/types v0.0.0-00010101000000-000000000000
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kubectl v0.35.3
 	k8s.io/utils v0.0.0-20260108192941-914a6e750570
@@ -44,7 +41,6 @@ require (
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
-	github.com/Yiling-J/theine-go v0.6.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
@@ -57,7 +53,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erraggy/oastools v1.36.1 // indirect
 	github.com/evanphx/json-patch v5.7.0+incompatible // indirect
-	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
@@ -123,7 +118,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.47.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -163,13 +157,4 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.20.1 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.2-0.20260122202528-d9cc6641c482 // indirect
-)
-
-replace (
-	k8s.io/dashboard/certificates => ./pkg/kubernetes-dashboard-common/certificates
-	k8s.io/dashboard/client => ./pkg/kubernetes-dashboard-common/client
-	k8s.io/dashboard/csrf => ./pkg/kubernetes-dashboard-common/csrf
-	k8s.io/dashboard/errors => ./pkg/kubernetes-dashboard-common/errors
-	k8s.io/dashboard/helpers => ./pkg/kubernetes-dashboard-common/helpers
-	k8s.io/dashboard/types => ./pkg/kubernetes-dashboard-common/types
 )

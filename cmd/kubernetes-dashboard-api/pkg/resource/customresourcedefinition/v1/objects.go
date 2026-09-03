@@ -27,8 +27,8 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/customresourcedefinition/types"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
-	"k8s.io/dashboard/errors"
-	commontypes "k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
+	commontypes "github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // GetCustomResourceObjectList gets objects for a CR.

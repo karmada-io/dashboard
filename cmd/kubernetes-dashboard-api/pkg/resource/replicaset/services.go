@@ -17,12 +17,12 @@ package replicaset
 import (
 	"context"
 
-	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	client "k8s.io/client-go/kubernetes"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/service"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	client "k8s.io/client-go/kubernetes"
 )
 
 // GetReplicaSetServices returns list of services that are related to replica set targeted by given name.

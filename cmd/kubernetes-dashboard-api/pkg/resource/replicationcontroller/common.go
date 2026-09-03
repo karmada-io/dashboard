@@ -27,7 +27,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/event"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // Transforms simple selector map to labels.Selector object that can be used when querying for

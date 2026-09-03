@@ -17,7 +17,7 @@ package endpoint
 import (
 	v1 "k8s.io/api/core/v1"
 
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 type EndpointList struct {

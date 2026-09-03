@@ -18,9 +18,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	api "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 )
 
 func TestGetPodsEventWarningsApi(t *testing.T) {

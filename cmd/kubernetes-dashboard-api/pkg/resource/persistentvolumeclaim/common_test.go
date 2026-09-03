@@ -23,7 +23,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 func TestGetPodPersistentVolumeClaims(t *testing.T) {
