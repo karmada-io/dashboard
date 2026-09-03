@@ -89,6 +89,10 @@ export default defineConfig(({ mode }) => {
         { find: 'es-toolkit/compat/range', replacement: 'lodash/range' },
         { find: 'es-toolkit/compat/isPlainObject', replacement: 'lodash/isPlainObject' },
         { find: 'es-toolkit/compat/uniqBy', replacement: 'lodash/uniqBy' },
+        {
+          find: 'monaco-editor/esm/vs/editor/editor.worker.js',
+          replacement: 'monaco-editor/editor/editor.worker',
+        },
         { find: 'react', replacement: path.resolve(__dirname, 'node_modules/react') },
         { find: 'react-dom', replacement: path.resolve(__dirname, 'node_modules/react-dom') },
       ],

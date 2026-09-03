@@ -26,7 +26,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import editorWorker from 'monaco-editor/editor/editor.worker?worker';
 // https://github.com/remcohaszing/monaco-yaml/issues/150
 import yamlWorker from '@/utils/workaround-yaml.worker?worker';
 import enTexts from '../locales/en-US.json';
