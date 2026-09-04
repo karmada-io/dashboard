@@ -226,6 +226,9 @@ importers:
       vite-plugin-svgr:
         specifier: ^5.2.0
         version: 5.2.0(rollup@4.54.0)(typescript@7.0.2)(vite@8.0.16(@types/node@26.1.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.8.1)(tsx@4.22.4)(yaml@2.9.0))
+      vitest:
+        specifier: ^4.1.9
+        version: 4.1.9(@types/node@26.1.2)(vite@8.0.16(@types/node@26.1.2)(esbuild@0.28.0)(jiti@2.7.0)(less@4.8.1)(tsx@4.22.4)(yaml@2.9.0))
 
   packages/chatui:
     dependencies:

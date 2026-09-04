@@ -78,7 +78,7 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	return ClusterAllocatedResources{
 		CPUCapacity:    allocatableCPU.Value(),
 		CPUFraction:    cpuFraction,
-		MemoryCapacity: allocatedMemory.Value(),
+		MemoryCapacity: memoryCapacity,
 		MemoryFraction: memoryFraction,
 		AllocatedPods:  allocatedPod.Value(),
 		PodCapacity:    podCapacity,

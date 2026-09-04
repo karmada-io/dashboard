@@ -14,11 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/// <reference types="vitest/config" />
+
 import { defineConfig, loadEnv, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
 import { execSync } from 'node:child_process';
+import { configDefaults } from 'vitest/config';
 import { dynamicBase } from 'vite-plugin-dynamic-base';
 import banner from 'vite-plugin-banner';
 import { getLicense } from '@karmada/utils';
@@ -61,6 +64,9 @@ export default defineConfig(({ mode }) => {
       __DASHBOARD_GIT_TAG__: JSON.stringify(gitTag),
       __DASHBOARD_GIT_COMMIT__: JSON.stringify(gitCommit),
       __DASHBOARD_REPO_URL__: JSON.stringify(repoUrl),
+    },
+    test: {
+      exclude: [...configDefaults.exclude, 'e2e/**'],
     },
 
     plugins: [

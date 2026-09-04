@@ -20,6 +20,7 @@ import { Badge, Descriptions, DescriptionsProps, Statistic, Spin } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { GetOverview } from '@/services/overview.ts';
 import dayjs from 'dayjs';
+import { bytesToGiB } from './memory';
 
 const Overview = () => {
   const { data, isLoading } = useQuery({
@@ -101,18 +102,12 @@ const Overview = () => {
             ：
             <span>
               {data?.memberClusterStatus?.memorySummary?.allocatedMemory &&
-                (
-                  data.memberClusterStatus.memorySummary.allocatedMemory /
-                  8 /
-                  1024 /
-                  1024
+                bytesToGiB(
+                  data.memberClusterStatus.memorySummary.allocatedMemory,
                 ).toFixed(2)}
               GiB /
               {data?.memberClusterStatus?.memorySummary?.totalMemory &&
-                data.memberClusterStatus.memorySummary.totalMemory /
-                  8 /
-                  1024 /
-                  1024}
+                bytesToGiB(data.memberClusterStatus.memorySummary.totalMemory)}
               GiB
             </span>
           </div>
