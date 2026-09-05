@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { expect, test } from 'vitest';
 
 import type { MetricCatalogItem } from '@/services/metrics';
 
@@ -64,22 +63,20 @@ function catalogItem(name: string): MetricCatalogItem {
 }
 
 test('every dashboard component has non-internal defaults', () => {
-  assert.deepEqual(
-    Object.keys(DEFAULT_METRIC_NAMES_BY_COMPONENT).sort(),
+  expect(Object.keys(DEFAULT_METRIC_NAMES_BY_COMPONENT).sort()).toEqual(
     [...COMPONENTS].sort(),
   );
 
   for (const component of COMPONENTS) {
     const defaults = DEFAULT_METRIC_NAMES_BY_COMPONENT[component];
-    assert.ok(defaults.length > 0, `${component} has no defaults`);
+    expect(defaults.length, `${component} has no defaults`).toBeGreaterThan(0);
     for (const metricName of defaults) {
-      assert.equal(
+      expect(
         INTERNAL_METRIC_PREFIXES.some((prefix) =>
           metricName.startsWith(prefix),
         ),
-        false,
         `${component} unexpectedly defaults to ${metricName}`,
-      );
+      ).toBe(false);
     }
   }
 });
@@ -95,14 +92,11 @@ test('default metrics preserve allowlist order and require catalog presence', ()
     ],
   );
 
-  assert.deepEqual(
-    selected.map((item) => item.name),
-    [
-      'node_collector_update_all_nodes_health_duration_seconds',
-      'node_collector_update_node_health_duration_seconds',
-      'workqueue_depth',
-    ],
-  );
+  expect(selected.map((item) => item.name)).toEqual([
+    'node_collector_update_all_nodes_health_duration_seconds',
+    'node_collector_update_node_health_duration_seconds',
+    'workqueue_depth',
+  ]);
 });
 
 test('internal metrics are never selected by an automatic fallback', () => {
@@ -110,7 +104,7 @@ test('internal metrics are never selected by an automatic fallback', () => {
     catalogItem('go_gc_duration_seconds'),
     catalogItem('process_resident_memory_bytes'),
   ]);
-  assert.deepEqual(config.panels, []);
+  expect(config.panels).toEqual([]);
 });
 
 test('explicit user configuration keeps internal metrics', () => {
@@ -128,9 +122,7 @@ test('explicit user configuration keeps internal metrics', () => {
     ],
   };
 
-  assert.deepEqual(getConfiguredMetricNames(config), [
-    'go_gc_duration_seconds',
-  ]);
+  expect(getConfiguredMetricNames(config)).toEqual(['go_gc_duration_seconds']);
 });
 
 test('component export contains only the selected dashboard', () => {
@@ -148,7 +140,7 @@ test('component export contains only the selected dashboard', () => {
     ],
   };
 
-  assert.deepEqual(JSON.parse(serializeComponentDashboardConfig(config)), {
+  expect(JSON.parse(serializeComponentDashboardConfig(config))).toEqual({
     metrics_dashboards: [config],
   });
 });
