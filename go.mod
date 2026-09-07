@@ -15,7 +15,7 @@ require (
 	github.com/karmada-io/karmada v1.18.2
 	github.com/mark3labs/mcp-go v0.58.0
 	github.com/prometheus/client_golang v1.24.1
-	github.com/prometheus/common v0.70.1
+	github.com/prometheus/common v0.71.0
 	github.com/sashabaranov/go-openai v1.42.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
@@ -145,7 +145,7 @@ require (
 	golang.org/x/text v0.41.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gorm.io/gorm v1.25.7 // indirect
