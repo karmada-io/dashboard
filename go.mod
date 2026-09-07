@@ -1,6 +1,6 @@
 module github.com/karmada-io/dashboard
 
-go 1.25.10
+go 1.26.0
 
 require (
 	github.com/coreos/go-oidc/v3 v3.20.0
@@ -9,7 +9,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.13.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
-	github.com/go-openapi/spec v0.22.11
+	github.com/go-openapi/spec v1.0.1
 	github.com/gobuffalo/flect v1.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/karmada-io/karmada v1.18.2
