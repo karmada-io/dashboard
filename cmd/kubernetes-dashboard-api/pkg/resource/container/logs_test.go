@@ -19,8 +19,8 @@ import (
 	"reflect"
 	"testing"
 
-	v1 "k8s.io/api/core/v1"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/logs"
+	v1 "k8s.io/api/core/v1"
 )
 
 var log1 = logs.LogLine{

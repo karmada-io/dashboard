@@ -21,7 +21,7 @@ import (
 	"golang.org/x/net/xsrftoken"
 	"k8s.io/klog/v2"
 
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 var (

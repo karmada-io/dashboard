@@ -30,7 +30,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	certapi "k8s.io/dashboard/certificates/api"
+	certapi "github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/certificates/api"
 )
 
 // Implements certificate Creator interface. See Creator for more information.

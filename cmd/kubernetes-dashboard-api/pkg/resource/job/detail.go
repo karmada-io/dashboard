@@ -22,7 +22,7 @@ import (
 	k8sClient "k8s.io/client-go/kubernetes"
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // JobDetail is a presentation layer view of Kubernetes Job resource.

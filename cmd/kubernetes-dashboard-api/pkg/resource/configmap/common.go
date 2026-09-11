@@ -15,8 +15,8 @@
 package configmap
 
 import (
-	api "k8s.io/api/core/v1"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
+	api "k8s.io/api/core/v1"
 )
 
 // The code below allows to perform complex data section on []api.ConfigMap

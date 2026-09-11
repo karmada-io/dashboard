@@ -20,7 +20,7 @@ import (
 
 	integrationapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/api"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/metric/api"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 const fakeMetricClientID integrationapi.IntegrationID = "test-id"

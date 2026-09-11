@@ -17,9 +17,9 @@ package event
 import (
 	"strings"
 
+	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	api "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 )
 
 // FailedReasonPartials  is an array of partial strings to correctly filter warning events.
