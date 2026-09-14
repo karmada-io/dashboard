@@ -19,7 +19,7 @@ import (
 
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"k8s.io/dashboard/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
 )
 
 func TestIsSelectorMatching(t *testing.T) {

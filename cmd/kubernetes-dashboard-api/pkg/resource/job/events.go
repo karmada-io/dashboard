@@ -15,10 +15,10 @@
 package job
 
 import (
-	client "k8s.io/client-go/kubernetes"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/event"
+	client "k8s.io/client-go/kubernetes"
 )
 
 // GetJobEvents gets events associated to job.

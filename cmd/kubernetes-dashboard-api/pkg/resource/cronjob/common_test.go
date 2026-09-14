@@ -15,7 +15,7 @@
 package cronjob_test
 
 import (
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 var (

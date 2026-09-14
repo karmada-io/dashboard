@@ -17,7 +17,7 @@ package errors_test
 import (
 	"testing"
 
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 func TestLocalizeError(t *testing.T) {

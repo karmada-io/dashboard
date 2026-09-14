@@ -24,7 +24,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/replicaset"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // GetDeploymentNewReplicaSet returns old replica sets targeting Deployment with given name

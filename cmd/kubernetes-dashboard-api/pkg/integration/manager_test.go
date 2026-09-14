@@ -20,7 +20,7 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/api"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 func areErrorsEqual(err1, err2 error) bool {

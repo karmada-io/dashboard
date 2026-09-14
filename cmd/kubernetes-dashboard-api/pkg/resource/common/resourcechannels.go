@@ -29,7 +29,7 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	client "k8s.io/client-go/kubernetes"
 
-	"k8s.io/dashboard/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
 )
 
 // ResourceChannels struct holds channels to resource lists. Each list channel is paired with

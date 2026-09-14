@@ -29,14 +29,18 @@ import (
 	"k8s.io/klog/v2"
 
 	karmadaclient "github.com/karmada-io/dashboard/pkg/client"
-	"k8s.io/dashboard/client/args"
-	cacheclient "k8s.io/dashboard/client/cache/client"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/args"
+	cacheclient "github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/cache/client"
 )
 
 const MemberClusterHeaderName = "X-Member-ClusterName"
 
 func InClusterClient() client.Interface {
 	if !isInitialized() {
+		return nil
+	}
+
+	if baseConfig == nil {
 		return nil
 	}
 

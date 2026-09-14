@@ -17,7 +17,7 @@ package resourcequota
 import (
 	v1 "k8s.io/api/core/v1"
 
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // ResourceStatus provides the status of the resource defined by a resource quota.

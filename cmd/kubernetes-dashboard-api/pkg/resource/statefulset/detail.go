@@ -24,7 +24,7 @@ import (
 
 	metricapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/metric/api"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // StatefulSetDetail is a presentation layer view of Kubernetes Stateful Set resource. This means it is Stateful

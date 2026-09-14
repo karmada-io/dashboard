@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/pflag"
 	"k8s.io/klog/v2"
 
-	"k8s.io/dashboard/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
 )
 
 const keySizeBytes = 256

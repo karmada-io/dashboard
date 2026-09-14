@@ -29,7 +29,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/event"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/pod"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 // GetReplicaSetPods return list of pods targeting replica set.

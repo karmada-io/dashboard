@@ -19,7 +19,7 @@ import (
 	"log"
 	"os"
 
-	"k8s.io/dashboard/certificates/api"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/certificates/api"
 )
 
 // Manager is used to implement cert/api/types.Manager interface. See Manager for more information.

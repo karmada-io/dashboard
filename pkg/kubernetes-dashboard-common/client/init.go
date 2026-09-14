@@ -25,8 +25,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
 
-	"k8s.io/dashboard/client/args"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/args"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
 )
 
 var (

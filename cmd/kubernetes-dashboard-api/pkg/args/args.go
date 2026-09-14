@@ -24,9 +24,9 @@ import (
 	"k8s.io/klog/v2"
 
 	// Load client args
-	_ "k8s.io/dashboard/client/args"
-	"k8s.io/dashboard/csrf"
-	"k8s.io/dashboard/helpers"
+	_ "github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client/args"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/csrf"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
 )
 
 const (

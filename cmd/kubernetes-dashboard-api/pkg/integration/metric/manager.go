@@ -24,7 +24,7 @@ import (
 	integrationapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/api"
 	metricapi "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/metric/api"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/integration/metric/sidecar"
-	"k8s.io/dashboard/client"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/client"
 )
 
 // MetricManager is responsible for management of all integrated applications related to metrics.

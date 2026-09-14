@@ -27,7 +27,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/horizontalpodautoscaler"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/pod"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/service"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 func TestGetReplicaSetDetail(t *testing.T) {

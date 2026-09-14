@@ -15,11 +15,11 @@
 package service
 
 import (
-	client "k8s.io/client-go/kubernetes"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/common"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/ingress"
-	"k8s.io/dashboard/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
+	client "k8s.io/client-go/kubernetes"
 )
 
 func GetServiceIngressList(client client.Interface, dsQuery *dataselect.DataSelectQuery,

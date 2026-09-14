@@ -24,9 +24,9 @@ import (
 
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/limitrange"
 	rq "github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/resourcequota"
-	"k8s.io/dashboard/errors"
-	"k8s.io/dashboard/helpers"
-	"k8s.io/dashboard/types"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/errors"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/helpers"
+	"github.com/karmada-io/dashboard/pkg/kubernetes-dashboard-common/types"
 )
 
 // NamespaceDetail is a presentation layer view of Kubernetes Namespace resource. This means it is Namespace plus

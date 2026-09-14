@@ -15,8 +15,8 @@
 package ingress
 
 import (
-	v1 "k8s.io/api/networking/v1"
 	"github.com/karmada-io/dashboard/cmd/kubernetes-dashboard-api/pkg/resource/dataselect"
+	v1 "k8s.io/api/networking/v1"
 )
 
 // The code below allows to perform complex data section on []extensions.Ingress
