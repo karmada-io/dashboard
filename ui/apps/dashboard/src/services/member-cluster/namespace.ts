@@ -21,6 +21,7 @@ import {
   ObjectMeta,
   TypeMeta,
 } from '../base';
+import { Event } from './event';
 
 export interface Namespace {
   objectMeta: ObjectMeta;
@@ -80,7 +81,7 @@ export async function GetMemberClusterNamespaceEvents(params: {
     listMeta: {
       totalItems: number;
     };
-    events: any[];
+    events: Event[];
   }>(`/clusterapi/${memberClusterName}/api/v1/namespace/${name}/event`);
   return resp;
 }
