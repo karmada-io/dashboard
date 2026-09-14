@@ -21,7 +21,7 @@ import TagList from '@/components/tag-list';
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { GetResource } from '@/services/unstructured.ts';
-import { Config, GetSecrets, Secret } from '@/services/config.ts';
+import { GetSecrets, Secret } from '@/services/config.ts';
 interface SecretTableProps {
   labelTagNum?: number;
   selectedWorkSpace: string;
@@ -49,7 +49,7 @@ const SecretTable: FC<SecretTableProps> = (props) => {
       return services.data || {};
     },
   });
-  const columns: TableColumnProps<Config>[] = [
+  const columns: TableColumnProps<Secret>[] = [
     {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
       key: 'namespaceName',
@@ -164,7 +164,7 @@ const SecretTable: FC<SecretTableProps> = (props) => {
   ];
   return (
     <Table
-      rowKey={(r: Config) =>
+      rowKey={(r: Secret) =>
         `${r.objectMeta.namespace}-${r.objectMeta.name}` || ''
       }
       columns={columns}
