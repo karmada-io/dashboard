@@ -17,6 +17,8 @@ limitations under the License.
 import { useMemberClusterContext } from '@/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { GetClusterDetail, ClusterDetail } from '@/services/cluster';
+import { useClusters } from '@/hooks/use-cluster';
+import { fleetGPUCapacity } from '@/utils/gpu';
 
 export default function MemberClusterOverview() {
   const { memberClusterName } = useMemberClusterContext();
@@ -34,12 +36,23 @@ export default function MemberClusterOverview() {
   const totalPods = clusterDetail?.allocatedResources.allocatedPods ?? 0;
   const cpuUsage = clusterDetail?.allocatedResources.cpuFraction ?? null;
   const memoryUsage = clusterDetail?.allocatedResources.memoryFraction ?? null;
+  const gpuCapacity = clusterDetail?.allocatedResources.gpuCapacity ?? 0;
+  const allocatedGPUs = clusterDetail?.allocatedResources.allocatedGPUs ?? 0;
   const kubeVersion = clusterDetail?.kubernetesVersion ?? '-';
   const syncMode = clusterDetail?.syncMode ?? '-';
   const loading = isLoading;
 
   const formatPercentage = (value: number | null) =>
     value !== null ? `${value.toFixed(2)}%` : '-';
+
+  // Clusters without GPU nodes report zero capacity, so show a dash rather
+  // than "0/0" which would read as an exhausted pool.
+  const gpuUsage = gpuCapacity > 0 ? `${allocatedGPUs}/${gpuCapacity}` : '—';
+
+  // The GPU card only appears when the fleet has accelerator capacity, so a
+  // fleet without accelerators keeps the original 4-card layout.
+  const { data: clusters } = useClusters();
+  const showGPU = fleetGPUCapacity(clusters) > 0;
 
   return (
     <div className="p-4 space-y-6">
@@ -69,7 +82,9 @@ export default function MemberClusterOverview() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 ${showGPU ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4`}
+      >
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Total Pods</h3>
           <p className="text-2xl font-bold text-green-600">
@@ -94,6 +109,14 @@ export default function MemberClusterOverview() {
             {loading ? '...' : formatPercentage(memoryUsage)}
           </p>
         </div>
+        {showGPU && (
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500 mb-2">GPU Usage</h3>
+            <p className="text-2xl font-bold text-purple-600">
+              {loading ? '...' : gpuUsage}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ node_modules
 /public
 
 # local env files
-.env.local
 .env.*.local
 
 # Log files
@@ -16,7 +15,6 @@ pnpm-debug.log*
 
 # Editor directories and files
 .idea
-.vscode
 *.suo
 *.ntvs*
 *.njsproj
@@ -45,3 +43,4 @@ test-results/
 playwright-report/
 playwright/.cache/
 
+config.bat

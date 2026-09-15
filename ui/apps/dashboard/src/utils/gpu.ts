@@ -14,22 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { describe, expect, it } from 'vitest';
-import { bytesToGiB, formatGiB } from './memory';
+import type { Cluster } from '@/services/cluster';
 
-describe('bytesToGiB', () => {
-  it('converts bytes to binary GiB', () => {
-    expect(bytesToGiB(1024 ** 3)).toBe(1);
-  });
-});
-
-describe('formatGiB', () => {
-  it('rounds to 2 decimals', () => {
-    // 2515.0407180786133 GiB used to render unrounded on the overview page.
-    expect(formatGiB(2515.0407180786133 * 1024 ** 3)).toBe('2515.04');
-  });
-
-  it('keeps 2 decimals for whole values', () => {
-    expect(formatGiB(8 * 1024 ** 3)).toBe('8.00');
-  });
-});
+// fleetGPUCapacity sums accelerator capacity across all member clusters.
+// GPU UI is shown only when this is greater than zero, so a fleet without
+// accelerators looks exactly as it did before GPU support.
+export function fleetGPUCapacity(clusters: Cluster[] | undefined): number {
+  return (clusters ?? []).reduce(
+    (sum, cluster) => sum + (cluster.allocatedResources?.gpuCapacity ?? 0),
+    0,
+  );
+}

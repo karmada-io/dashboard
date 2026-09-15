@@ -19,3 +19,8 @@ const BYTES_PER_GIB = 1024 ** 3;
 export function bytesToGiB(bytes: number): number {
   return bytes / BYTES_PER_GIB;
 }
+
+// formatGiB renders bytes as GiB rounded to 2 decimals, e.g. "2515.04".
+export function formatGiB(bytes: number): string {
+  return bytesToGiB(bytes).toFixed(2);
+}
