@@ -25,6 +25,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/karmada-io/dashboard/pkg/config"
 )
 
 // ClusterAllocatedResources is the resource summary of a cluster.
@@ -45,9 +47,28 @@ type ClusterAllocatedResources struct {
 
 	// PodFraction is a fraction of pods, that can be allocated on given node.
 	PodFraction float64 `json:"podFraction"`
+
+	// GPUCapacity is the number of accelerator devices the cluster can
+	// allocate, summed over the configured accelerator resource names
+	// (default nvidia.com/gpu). Zero for clusters without accelerators, which
+	// callers render as absent rather than as an empty gauge.
+	GPUCapacity int64 `json:"gpuCapacity"`
+
+	// AllocatedGPUs is the number of accelerator devices currently requested
+	// by scheduled pods, summed over the same resource names.
+	AllocatedGPUs int64 `json:"allocatedGPUs"`
+
+	// GPUFraction is the percentage of the cluster's GPUs already allocated.
+	GPUFraction float64 `json:"gpuFraction"`
 }
 
 func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedResources, error) {
+	return getclusterAllocatedResourcesFor(cluster, config.GetAcceleratorResources())
+}
+
+// getclusterAllocatedResourcesFor computes the summary, counting the given
+// extended resource names as accelerator devices.
+func getclusterAllocatedResourcesFor(cluster *v1alpha1.Cluster, acceleratorResources []corev1.ResourceName) (ClusterAllocatedResources, error) {
 	if cluster.Status.ResourceSummary == nil {
 		return ClusterAllocatedResources{}, nil
 	}
@@ -75,6 +96,17 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 	if podCapacity > 0 {
 		podFraction = float64(allocatedPod.Value()) / float64(podCapacity) * 100
 	}
+
+	// Accelerators are extended resources, so they are absent from the summary
+	// on clusters without them. A zero capacity leaves the fraction at zero and
+	// marks the cluster as "no GPU" for callers.
+	gpuCapacity := acceleratorCount(cluster.Status.ResourceSummary.Allocatable, acceleratorResources)
+	allocatedGPUs := acceleratorCount(cluster.Status.ResourceSummary.Allocated, acceleratorResources)
+	var gpuFraction float64
+	if gpuCapacity > 0 {
+		gpuFraction = float64(allocatedGPUs) / float64(gpuCapacity) * 100
+	}
+
 	return ClusterAllocatedResources{
 		CPUCapacity:    allocatableCPU.Value(),
 		CPUFraction:    cpuFraction,
@@ -83,7 +115,21 @@ func getclusterAllocatedResources(cluster *v1alpha1.Cluster) (ClusterAllocatedRe
 		AllocatedPods:  allocatedPod.Value(),
 		PodCapacity:    podCapacity,
 		PodFraction:    podFraction,
+		GPUCapacity:    gpuCapacity,
+		AllocatedGPUs:  allocatedGPUs,
+		GPUFraction:    gpuFraction,
 	}, nil
+}
+
+// acceleratorCount sums the device counts of the given accelerator resources.
+func acceleratorCount(resources corev1.ResourceList, names []corev1.ResourceName) int64 {
+	var total int64
+	for _, name := range names {
+		if quantity, ok := resources[name]; ok {
+			total += quantity.Value()
+		}
+	}
+	return total
 }
 
 // ClusterDetail is the detailed information of a cluster.
