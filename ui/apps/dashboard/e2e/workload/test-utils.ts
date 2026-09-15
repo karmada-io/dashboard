@@ -131,7 +131,7 @@ export async function createK8sResource<ResourceType extends keyof typeof RESOUR
             if (resourceType === 'cronjob') {
                 await k8sApi.createNamespacedCronJob({
                     namespace: namespace,
-                    body: yamlObject
+                    body: yamlObject as k8s.V1CronJob
                 });
             } else {
                 await k8sApi.createNamespacedJob({
