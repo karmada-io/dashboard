@@ -20,7 +20,7 @@ import { Badge, Descriptions, DescriptionsProps, Statistic, Spin } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { GetOverview } from '@/services/overview.ts';
 import dayjs from 'dayjs';
-import { bytesToGiB } from './memory';
+import { formatGiB } from './memory';
 
 const Overview = () => {
   const { data, isLoading } = useQuery({
@@ -30,6 +30,7 @@ const Overview = () => {
       return ret.data;
     },
   });
+  const gpuSummary = data?.memberClusterStatus?.gpuSummary;
   const basicItems: DescriptionsProps['items'] = [
     {
       key: 'karmada-version',
@@ -102,12 +103,12 @@ const Overview = () => {
             ：
             <span>
               {data?.memberClusterStatus?.memorySummary?.allocatedMemory &&
-                bytesToGiB(
+                formatGiB(
                   data.memberClusterStatus.memorySummary.allocatedMemory,
-                ).toFixed(2)}
+                )}
               GiB /
               {data?.memberClusterStatus?.memorySummary?.totalMemory &&
-                bytesToGiB(data.memberClusterStatus.memorySummary.totalMemory)}
+                formatGiB(data.memberClusterStatus.memorySummary.totalMemory)}
               GiB
             </span>
           </div>
@@ -124,6 +125,21 @@ const Overview = () => {
               {data?.memberClusterStatus?.podSummary?.totalPod}
             </span>
           </div>
+          {/* Shown only when the fleet has accelerator capacity. */}
+          {gpuSummary && gpuSummary.totalGPU > 0 && (
+            <div>
+              <span>
+                {i18nInstance.t(
+                  'bb7b4f937b2ddd07b0ca203c0c6000c4',
+                  'GPU使用情况',
+                )}
+              </span>
+              ：
+              <span>
+                {gpuSummary.allocatedGPU}/{gpuSummary.totalGPU}
+              </span>
+            </div>
+          )}
         </>
       ),
 

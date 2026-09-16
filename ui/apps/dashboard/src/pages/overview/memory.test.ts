@@ -15,10 +15,21 @@ limitations under the License.
 */
 
 import { describe, expect, it } from 'vitest';
-import { bytesToGiB } from './memory';
+import { bytesToGiB, formatGiB } from './memory';
 
 describe('bytesToGiB', () => {
   it('converts bytes to binary GiB', () => {
     expect(bytesToGiB(1024 ** 3)).toBe(1);
+  });
+});
+
+describe('formatGiB', () => {
+  it('rounds to 2 decimals', () => {
+    // 2515.0407180786133 GiB used to render unrounded on the overview page.
+    expect(formatGiB(2515.0407180786133 * 1024 ** 3)).toBe('2515.04');
+  });
+
+  it('keeps 2 decimals for whole values', () => {
+    expect(formatGiB(8 * 1024 ** 3)).toBe('8.00');
   });
 });

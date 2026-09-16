@@ -2,6 +2,12 @@ docker_registries: []
 chart_registries: []
 # path_prefix: '/karmada'
 path_prefix: ''
+# Extended resource names counted as accelerator (GPU) devices; quantities are
+# summed. Defaults to ["nvidia.com/gpu"] when unset. GPU usage is shown only
+# when the fleet has accelerator capacity. See docs/user-guide.md.
+# accelerator_resources:
+#   - nvidia.com/gpu
+#   - amd.com/gpu
 metrics_dashboards:
   - version: 1
     component: karmada-scheduler
