@@ -21,6 +21,7 @@ import {
   ObjectMeta,
   TypeMeta,
 } from '../base';
+import { Event } from './event';
 
 export interface CustomResourceDefinition {
   objectMeta: ObjectMeta;
@@ -133,7 +134,7 @@ export async function GetCustomResourceEvents(params: {
     listMeta: {
       totalItems: number;
     };
-    events: any[];
+    events: Event[];
   }>(`/crd/${namespace}/${crd}/${object}/event`);
   return resp;
 }

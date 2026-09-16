@@ -21,37 +21,35 @@ import {
   ObjectMeta,
   TypeMeta,
 } from '../base';
+import { Event } from './event';
+import { Pod } from './pod';
+import { Service } from './service';
+import { ScaleResource } from './scaling';
+
+export interface PodInfo {
+  current: number;
+  desired: number;
+  running: number;
+  pending: number;
+  failed: number;
+  succeeded: number;
+  warnings: Event[];
+}
 
 export interface ReplicaSet {
   objectMeta: ObjectMeta;
   typeMeta: TypeMeta;
-  pods: {
-    current: number;
-    desired: number;
-    running: number;
-    pending: number;
-    failed: number;
-    succeeded: number;
-    warnings: any[];
-  };
+  pods: PodInfo;
   containerImages: string[];
-  initContainerImages: any[];
+  initContainerImages: string[];
 }
 
 export interface ReplicationController {
   objectMeta: ObjectMeta;
   typeMeta: TypeMeta;
-  pods: {
-    current: number;
-    desired: number;
-    running: number;
-    pending: number;
-    failed: number;
-    succeeded: number;
-    warnings: any[];
-  };
+  pods: PodInfo;
   containerImages: string[];
-  initContainerImages: any[];
+  initContainerImages: string[];
 }
 
 // ReplicaSet APIs
@@ -102,7 +100,7 @@ export async function GetReplicaSetEvents(params: {
     listMeta: {
       totalItems: number;
     };
-    events: any[];
+    events: Event[];
   }>(`/replicaset/${namespace}/${name}/event`);
   return resp;
 }
@@ -117,7 +115,7 @@ export async function GetReplicaSetPods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(`/replicaset/${namespace}/${name}/pod`);
   return resp;
 }
@@ -132,7 +130,7 @@ export async function GetReplicaSetServices(params: {
     listMeta: {
       totalItems: number;
     };
-    services: any[];
+    services: Service[];
   }>(`/replicaset/${namespace}/${name}/service`);
   return resp;
 }
@@ -185,7 +183,7 @@ export async function GetReplicationControllerEvents(params: {
     listMeta: {
       totalItems: number;
     };
-    events: any[];
+    events: Event[];
   }>(`/replicationcontroller/${namespace}/${name}/event`);
   return resp;
 }
@@ -200,7 +198,7 @@ export async function GetReplicationControllerPods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(`/replicationcontroller/${namespace}/${name}/pod`);
   return resp;
 }
@@ -215,7 +213,7 @@ export async function GetReplicationControllerServices(params: {
     listMeta: {
       totalItems: number;
     };
-    services: any[];
+    services: Service[];
   }>(`/replicationcontroller/${namespace}/${name}/service`);
   return resp;
 }
@@ -226,6 +224,6 @@ export async function ScaleReplicationController(params: {
   replicas: number;
 }) {
   const { namespace, name, replicas } = params;
-  const resp = await karmadaMemberClusterClient.post<any>(`/replicationcontroller/${namespace}/${name}/update/pod`, { replicas });
+  const resp = await karmadaMemberClusterClient.post<ScaleResource>(`/replicationcontroller/${namespace}/${name}/update/pod`, { replicas });
   return resp;
 }

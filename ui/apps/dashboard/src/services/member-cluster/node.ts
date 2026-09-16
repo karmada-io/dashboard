@@ -21,6 +21,8 @@ import {
   ObjectMeta,
   TypeMeta
 } from '../base';
+import { Event } from './event';
+import { Pod } from './pod';
 export interface NodeCondition {
   type: string;
   status: string;
@@ -84,8 +86,8 @@ export interface AllocatedResources {
 export interface NodeDetail extends Node {
   spec: NodeSpec;
   status: NodeStatus;
-  pods: any[];
-  events: any[];
+  pods: Pod[];
+  events: Event[];
 }
 
 export async function GetMemberClusterNodes(params: {
@@ -134,7 +136,7 @@ export async function GetMemberClusterNodeEvents(params: {
     listMeta: {
       totalItems: number;
     };
-    events: any[];
+    events: Event[];
   }>(`/clusterapi/${memberClusterName}/api/v1/node/${name}/event`);
   return resp;
 }
@@ -149,7 +151,7 @@ export async function GetMemberClusterNodePods(params: {
     listMeta: {
       totalItems: number;
     };
-    pods: any[];
+    pods: Pod[];
   }>(`/clusterapi/${memberClusterName}/api/v1/node/${name}/pod`);
   return resp;
 }

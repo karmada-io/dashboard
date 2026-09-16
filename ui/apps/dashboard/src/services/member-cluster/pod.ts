@@ -21,6 +21,7 @@ import {
   ObjectMeta,
   TypeMeta,
 } from '../base';
+import { Event } from './event';
 
 export interface Container {
   name: string;
@@ -55,7 +56,7 @@ export interface Pod {
   restartCount: number;
   containers: Container[];
   containerStatuses: ContainerStatus[];
-  warnings: any[];
+  warnings: Event[];
 }
 
 export interface PodDetail extends Pod {
@@ -129,7 +130,7 @@ export async function GetMemberClusterPodEvents(params: {
     listMeta: {
       totalItems: number;
     };
-    events: any[];
+    events: Event[];
   }>(`/clusterapi/${memberClusterName}/api/v1/pod/${namespace}/${name}/event`);
   return resp;
 }
