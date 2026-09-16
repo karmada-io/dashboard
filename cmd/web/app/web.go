@@ -104,13 +104,15 @@ func generateAPIProxy(remoteURL string, director func(*http.Request, *gin.Contex
 			c.Abort()
 			return
 		}
-		proxy := httputil.NewSingleHostReverseProxy(remoteEndpoint)
-		originalDirector := proxy.Director
-		proxy.Director = func(req *http.Request) {
-			originalDirector(req)
-			req.Header = c.Request.Header.Clone()
-			req.Host = remoteEndpoint.Host
-			director(req, c)
+		proxy := &httputil.ReverseProxy{
+			Rewrite: func(r *httputil.ProxyRequest) {
+				r.SetURL(remoteEndpoint)
+				r.Out.Header = c.Request.Header.Clone()
+				r.Out.Host = remoteEndpoint.Host
+				// Director mode appended X-Forwarded-For automatically; Rewrite mode requires this explicit call.
+				r.SetXForwarded()
+				director(r.Out, c)
+			},
 		}
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}, nil

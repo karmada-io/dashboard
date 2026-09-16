@@ -90,10 +90,11 @@ func NewSortQuery(sortByListRaw []string) *SortQuery {
 		return NoSort
 	}
 	sortByList := []SortBy{}
-	for i := 0; i+1 < len(sortByListRaw); i += 2 {
-		// parse order option
+	// Consume the raw list two elements at a time to avoid indexed access.
+	for rest := sortByListRaw; len(rest) >= 2; rest = rest[2:] {
+		orderOption, propertyName := rest[0], rest[1]
+
 		var ascending bool
-		orderOption := sortByListRaw[i] //nolint:gosec // G602: bounds checked by loop condition
 		switch orderOption {
 		case "a":
 			ascending = true
@@ -104,8 +105,6 @@ func NewSortQuery(sortByListRaw []string) *SortQuery {
 			return NoSort
 		}
 
-		// parse property name
-		propertyName := sortByListRaw[i+1]
 		sortBy := SortBy{
 			Property:  PropertyName(propertyName),
 			Ascending: ascending,
@@ -126,9 +125,9 @@ func NewFilterQuery(filterByListRaw []string) *FilterQuery {
 		return NoFilter
 	}
 	filterByList := []FilterBy{}
-	for i := 0; i+1 < len(filterByListRaw); i += 2 {
-		propertyName := filterByListRaw[i]
-		propertyValue := filterByListRaw[i+1]
+	for rest := filterByListRaw; len(rest) >= 2; rest = rest[2:] {
+		propertyName, propertyValue := rest[0], rest[1]
+
 		filterBy := FilterBy{
 			Property: PropertyName(propertyName),
 			Value:    StdComparableString(propertyValue),

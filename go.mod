@@ -1,6 +1,6 @@
 module github.com/karmada-io/dashboard
 
-go 1.25.10
+go 1.26.8
 
 require (
 	github.com/Yiling-J/theine-go v0.6.0
