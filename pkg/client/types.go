@@ -32,6 +32,12 @@ const (
 	DefaultUserAgent = "dashboard"
 	// DefaultCmdConfigName is the default cluster/context/auth name to be set in clientcmd config
 	DefaultCmdConfigName = "kubernetes"
+	// ContextName is the name of the context.
+	ContextName = "context"
+	// ClusterName is the name of the cluster.
+	ClusterName = "cluster"
+	// AuthInfoName is the name of the auth info.
+	AuthInfoName = "user"
 	// ImpersonateUserHeader is the header name to identify username to act as.
 	ImpersonateUserHeader = "Impersonate-User"
 	// ImpersonateGroupHeader is the header name to identify group name to act as.

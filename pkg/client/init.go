@@ -47,6 +47,8 @@ var (
 type configBuilder struct {
 	kubeconfigPath string
 	kubeContext    string
+	masterURL      string
+	token          string
 	insecure       bool
 	userAgent      string
 }
@@ -75,6 +77,20 @@ func WithKubeContext(kubecontext string) Option {
 	}
 }
 
+// WithToken is an option to set the bearer token.
+func WithToken(token string) Option {
+	return func(c *configBuilder) {
+		c.token = token
+	}
+}
+
+// WithMasterURL is an option to set the master URL.
+func WithMasterURL(url string) Option {
+	return func(c *configBuilder) {
+		c.masterURL = url
+	}
+}
+
 // WithInsecureTLSSkipVerify is an option to set the insecure tls skip verify.
 func WithInsecureTLSSkipVerify(insecure bool) Option {
 	return func(c *configBuilder) {
@@ -92,15 +108,39 @@ func newConfigBuilder(options ...Option) *configBuilder {
 	return builder
 }
 
-func (in *configBuilder) buildRestConfig() (*rest.Config, error) {
-	if len(in.kubeconfigPath) == 0 {
-		return nil, errors.New("must specify kubeconfig")
+func (in *configBuilder) validate() error {
+	if len(in.kubeconfigPath) == 0 && !in.hasMasterURLAndToken() {
+		return errors.New("must specify kubeconfig or masterURL and token")
 	}
-	klog.InfoS("Using kubeconfig", "kubeconfig", in.kubeconfigPath)
+	return nil
+}
 
-	restConfig, err := LoadRestConfig(in.kubeconfigPath, in.kubeContext)
-	if err != nil {
+func (in *configBuilder) hasMasterURLAndToken() bool {
+	return len(in.masterURL) > 0 && len(in.token) > 0
+}
+
+func (in *configBuilder) buildRestConfig() (*rest.Config, error) {
+	if err := in.validate(); err != nil {
 		return nil, err
+	}
+
+	var restConfig *rest.Config
+	var err error
+	if in.hasMasterURLAndToken() {
+		klog.InfoS("Using masterURL and token")
+		restConfig = &rest.Config{
+			Host:        in.masterURL,
+			BearerToken: in.token,
+			TLSClientConfig: rest.TLSClientConfig{
+				Insecure: in.insecure,
+			},
+		}
+	} else {
+		klog.InfoS("Using kubeconfig", "kubeconfig", in.kubeconfigPath)
+		restConfig, err = LoadRestConfig(in.kubeconfigPath, in.kubeContext)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	restConfig.QPS = DefaultQPS
@@ -113,9 +153,33 @@ func (in *configBuilder) buildRestConfig() (*rest.Config, error) {
 }
 
 func (in *configBuilder) buildAPIConfig() (*clientcmdapi.Config, error) {
-	if len(in.kubeconfigPath) == 0 {
-		return nil, errors.New("must specify kubeconfig")
+	if err := in.validate(); err != nil {
+		return nil, err
 	}
+
+	if in.hasMasterURLAndToken() {
+		return &clientcmdapi.Config{
+			Clusters: map[string]*clientcmdapi.Cluster{
+				ClusterName: {
+					Server:                in.masterURL,
+					InsecureSkipTLSVerify: in.insecure,
+				},
+			},
+			AuthInfos: map[string]*clientcmdapi.AuthInfo{
+				AuthInfoName: {
+					Token: in.token,
+				},
+			},
+			Contexts: map[string]*clientcmdapi.Context{
+				ContextName: {
+					Cluster:  ClusterName,
+					AuthInfo: AuthInfoName,
+				},
+			},
+			CurrentContext: ContextName,
+		}, nil
+	}
+
 	klog.InfoS("Using kubeconfig", "kubeconfig", in.kubeconfigPath)
 	apiConfig, err := LoadAPIConfig(in.kubeconfigPath, in.kubeContext)
 	if err != nil {
