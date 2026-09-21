@@ -19,7 +19,7 @@ require (
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.71.0
 	github.com/samber/lo v1.47.0
-	github.com/sashabaranov/go-openai v1.42.0
+	github.com/sashabaranov/go-openai v1.42.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	golang.org/x/net v0.59.0
