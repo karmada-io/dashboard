@@ -31,6 +31,7 @@ interface ServiceTableProps {
   searchText: string;
   onViewIngressContent: (r: any) => void;
   onDeleteIngressContent: (r: Ingress) => void;
+  deletingNames: Set<string>;
 }
 const IngressTable: FC<ServiceTableProps> = (props) => {
   const {
@@ -39,6 +40,7 @@ const IngressTable: FC<ServiceTableProps> = (props) => {
     searchText,
     onViewIngressContent,
     onDeleteIngressContent,
+    deletingNames,
   } = props;
   const columns: TableColumnProps<Ingress>[] = [
     {
@@ -165,7 +167,10 @@ const IngressTable: FC<ServiceTableProps> = (props) => {
       }
       columns={columns}
       loading={isLoading}
-      dataSource={data?.items || []}
+      dataSource={(data?.items || []).filter(
+        (i: Ingress) =>
+          !deletingNames.has(`${i.objectMeta.namespace}-${i.objectMeta.name}`),
+      )}
     />
   );
 };
