@@ -17,7 +17,7 @@ require (
 	github.com/karmada-io/karmada v1.19.0
 	github.com/mark3labs/mcp-go v1.1.1
 	github.com/prometheus/client_golang v1.24.1
-	github.com/prometheus/common v0.71.0
+	github.com/prometheus/common v0.72.0
 	github.com/samber/lo v1.53.0
 	github.com/sashabaranov/go-openai v1.43.0
 	github.com/spf13/cobra v1.10.2
@@ -108,7 +108,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_model v0.6.2 // indirect
+	github.com/prometheus/client_model v0.6.3 // indirect
 	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
