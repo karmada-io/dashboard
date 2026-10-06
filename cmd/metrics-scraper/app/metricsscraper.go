@@ -30,6 +30,7 @@ import (
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/options"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/router"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/routes/metrics"
+	prometheusmetrics "github.com/karmada-io/dashboard/cmd/metrics-scraper/app/routes/metrics/prometheus"
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
 	"github.com/karmada-io/dashboard/pkg/client"
 	"github.com/karmada-io/dashboard/pkg/config"
@@ -72,6 +73,9 @@ func NewMetricsScraperCommand(ctx context.Context) *cobra.Command {
 }
 
 func run(ctx context.Context, opts *options.Options) error {
+	if err := opts.Validate(); err != nil {
+		return err
+	}
 	klog.InfoS("Starting Karmada Dashboard API", "version", environment.Version)
 
 	client.InitKarmadaConfig(
@@ -88,16 +92,49 @@ func run(ctx context.Context, opts *options.Options) error {
 		client.WithInsecureTLSSkipVerify(opts.SkipKubeApiserverTLSVerify),
 	)
 	ensureAPIServerConnectionOrDie()
-	serve(opts)
-	scrapeInterval := opts.ScrapeInterval
-	if scrapeInterval <= 0 {
-		scrapeInterval = 10 * time.Second
+	if err := configureMetricsProvider(opts); err != nil {
+		return err
 	}
-	go scrape.InitDatabase(scrapeInterval)
+	serve(opts)
 
 	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
 	<-ctx.Done()
 	os.Exit(0)
+	return nil
+}
+
+func configureMetricsProvider(opts *options.Options) error {
+	r := router.V1()
+	if opts.MetricsProvider == options.MetricsProviderSQLite {
+		r.GET("/metrics", metrics.GetMetrics)
+		r.GET("/metrics/:app_name", metrics.GetMetrics)
+		r.GET("/metrics/:app_name/visualization", metrics.GetVisualization)
+		r.GET("/metrics/:app_name/explore", metrics.GetMetricExplore)
+		r.GET("/metrics/:app_name/pods", metrics.GetComponentPods)
+		r.GET("/metrics/:app_name/:pod_name", metrics.QueryMetrics)
+
+		scrapeInterval := opts.ScrapeInterval
+		if scrapeInterval <= 0 {
+			scrapeInterval = 10 * time.Second
+		}
+		go scrape.InitDatabase(scrapeInterval)
+		return nil
+	}
+
+	prometheus, err := prometheusmetrics.NewClient(prometheusmetrics.Config{
+		URL:                opts.PrometheusURL,
+		Timeout:            opts.PrometheusTimeout,
+		BearerTokenFile:    opts.PrometheusBearerTokenFile,
+		CAFile:             opts.PrometheusCAFile,
+		InsecureSkipVerify: opts.PrometheusInsecureSkipVerify,
+	})
+	if err != nil {
+		return err
+	}
+	handler := prometheusmetrics.NewHandler(prometheus)
+	r.GET("/metrics/:app_name/visualization", handler.GetSchedulerVisualization)
+	r.GET("/metrics/:app_name/explore", handler.GetMetricExplore)
+	r.GET("/metrics/:app_name/pods", handler.GetComponentPods)
 	return nil
 }
 
@@ -129,12 +166,6 @@ func ensureAPIServerConnectionOrDie() {
 
 func init() {
 	r := router.V1()
-	r.GET("/metrics", metrics.GetMetrics)
-	r.GET("/metrics/:app_name", metrics.GetMetrics)
-	r.GET("/metrics/:app_name/visualization", metrics.GetVisualization)
-	r.GET("/metrics/:app_name/explore", metrics.GetMetricExplore)
-	r.GET("/metrics/:app_name/pods", metrics.GetComponentPods)
-	r.GET("/metrics/:app_name/:pod_name", metrics.QueryMetrics)
 	r.GET("/metrics-config", metrics.GetDashboardConfig)
 	r.PUT("/metrics-config", metrics.SaveDashboardConfig)
 }

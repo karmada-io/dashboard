@@ -92,6 +92,14 @@ import styles from './index.module.less';
 const { Title, Text } = Typography;
 
 const defaultWindow = '15m';
+const prometheusWindowOptions = [
+  { label: '5 minutes', value: '5m' },
+  { label: '15 minutes', value: '15m' },
+  { label: '30 minutes', value: '30m' },
+  { label: '1 hour', value: '1h' },
+  { label: '3 hours', value: '3h' },
+  { label: '6 hours', value: '6h' },
+];
 
 type ChartType = 'line' | 'area' | 'bar' | 'gauge';
 
@@ -267,6 +275,86 @@ function getSeriesBounds(rows: ChartPointRow[], key: SeriesKey) {
   return { min, max };
 }
 
+const binaryStatusMetrics = new Set([
+  'leader_election_master_status',
+  'cluster_ready_state',
+]);
+
+const gaugeMetrics = new Set([
+  ...binaryStatusMetrics,
+  'cluster_ready_node_number',
+  'cluster_node_number',
+  'cluster_cpu_allocatable_number',
+  'cluster_cpu_allocated_number',
+  'cluster_pod_allocatable_number',
+  'cluster_pod_allocated_number',
+]);
+
+const lineMetrics = new Set([
+  'apiserver_admission_controller_admission_duration_seconds',
+  'apiserver_current_inflight_requests',
+  'apiserver_current_inqueue_requests',
+  'apiserver_delegated_authz_request_duration_seconds',
+  'apiserver_flowcontrol_current_executing_requests',
+  'apiserver_flowcontrol_current_inqueue_requests',
+  'apiserver_flowcontrol_request_wait_duration_seconds',
+  'apiserver_longrunning_requests',
+  'apiserver_request_filter_duration_seconds',
+  'apiserver_request_duration_seconds',
+  'apiserver_request_sli_duration_seconds',
+  'apiserver_request_slo_duration_seconds',
+  'apiserver_response_sizes',
+  'apiserver_resource_objects',
+  'apiserver_storage_objects',
+  'cluster_sync_status_duration_seconds',
+  'controller_runtime_webhook_latency_seconds',
+  'controller_runtime_webhook_requests_in_flight',
+  'etcd_request_duration_seconds',
+  'karmada_scheduler_e2e_scheduling_duration_seconds',
+  'karmada_scheduler_estimator_estimating_algorithm_duration_seconds',
+  'karmada_scheduler_estimator_estimating_plugin_execution_duration_seconds',
+  'karmada_scheduler_estimator_estimating_plugin_extension_point_duration_seconds',
+  'karmada_scheduler_framework_extension_point_duration_seconds',
+  'karmada_scheduler_plugin_execution_duration_seconds',
+  'karmada_scheduler_scheduling_algorithm_duration_seconds',
+  'node_collector_update_all_nodes_health_duration_seconds',
+  'node_collector_update_node_health_duration_seconds',
+  'resource_apply_policy_duration_seconds',
+  'ttl_after_finished_controller_job_deletion_duration_seconds',
+  'workqueue_depth',
+  'workqueue_longest_running_processor_seconds',
+  'workqueue_queue_duration_seconds',
+  'workqueue_unfinished_work_seconds',
+  'workqueue_work_duration_seconds',
+]);
+
+const gaugeMaximumMetric: Record<string, string> = {
+  cluster_ready_node_number: 'cluster_node_number',
+  cluster_cpu_allocated_number: 'cluster_cpu_allocatable_number',
+  cluster_pod_allocated_number: 'cluster_pod_allocatable_number',
+};
+
+const hiddenBuildInfoLabels = new Set([
+  'endpoint',
+  'instance',
+  'job',
+  'namespace',
+  'service',
+]);
+
+function getGaugeBounds(rows: ChartPointRow[], key: SeriesKey) {
+  if (binaryStatusMetrics.has(key)) {
+    return { min: 0, max: 1 };
+  }
+
+  const maximumMetric = gaugeMaximumMetric[key];
+  const maximum = maximumMetric
+    ? getLatestSeriesValue(rows, maximumMetric)
+    : getSeriesBounds(rows, key)?.max;
+
+  return { min: 0, max: maximum && maximum > 0 ? maximum : 1 };
+}
+
 function buildChartConfigFromCatalog(
   item: MetricCatalogItem,
   index: number,
@@ -276,7 +364,7 @@ function buildChartConfigFromCatalog(
     key: item.name,
     title: metricNameToTitle(item.name),
     color: CHART_COLORS[index % CHART_COLORS.length],
-    chart: item.suggestedChart,
+    chart: lineMetrics.has(item.name) ? 'line' : item.suggestedChart,
     valueFormatter: formatters.valueFormatter,
     axisFormatter: formatters.axisFormatter,
   };
@@ -289,6 +377,7 @@ const MetricsPage = () => {
   const [activeComponent, setActiveComponent] = useState<KarmadaComponentKey>(
     KARMADA_COMPONENTS[0].key,
   );
+  const [visualizationWindow, setVisualizationWindow] = useState(defaultWindow);
   const [visualizationPod, setVisualizationPod] = useState<string>('all');
   const [hasInitializedPodSelection, setHasInitializedPodSelection] =
     useState<boolean>(false);
@@ -348,12 +437,12 @@ const MetricsPage = () => {
       'componentVisualization',
       activeComponent,
       visualizationPod,
-      defaultWindow,
+      visualizationWindow,
       configuredMetricsKey,
     ],
     queryFn: () =>
       GetSchedulerVisualization(activeComponent, {
-        window: defaultWindow,
+        window: visualizationWindow,
         pod: visualizationPod,
         refresh: false,
         metrics: configuredMetrics,
@@ -372,7 +461,7 @@ const MetricsPage = () => {
   const refreshVisualizationMutation = useMutation({
     mutationFn: () =>
       GetSchedulerVisualization(activeComponent, {
-        window: defaultWindow,
+        window: visualizationWindow,
         pod: visualizationPod,
         refresh: true,
         metrics: configuredMetrics,
@@ -383,7 +472,7 @@ const MetricsPage = () => {
           'componentVisualization',
           activeComponent,
           visualizationPod,
-          defaultWindow,
+          visualizationWindow,
         ],
       });
     },
@@ -413,6 +502,14 @@ const MetricsPage = () => {
   const sampleIntervalLabel = visualizationData?.meta?.sampleIntervalSec
     ? `${visualizationData.meta.sampleIntervalSec}s`
     : '--';
+  const metricsProvider = visualizationData?.meta?.provider;
+  const isPrometheusProvider = metricsProvider === 'prometheus';
+
+  useEffect(() => {
+    if (metricsProvider === 'sqlite' && visualizationWindow !== defaultWindow) {
+      setVisualizationWindow(defaultWindow);
+    }
+  }, [metricsProvider, visualizationWindow]);
 
   useEffect(() => {
     if (committedConfig || draftConfig) return;
@@ -609,7 +706,9 @@ const MetricsPage = () => {
             key: panel.metricName,
             title: panel.title,
             color: CHART_COLORS[idx % CHART_COLORS.length],
-            chart: panel.chartType as ChartType,
+            chart: lineMetrics.has(panel.metricName)
+              ? 'line'
+              : (panel.chartType as ChartType),
             panelId: panel.id,
             valueFormatter: formatters.valueFormatter,
             axisFormatter: formatters.axisFormatter,
@@ -754,9 +853,44 @@ const MetricsPage = () => {
   const renderChartContent = (config: ChartConfig) => {
     const gradientId = `series-gradient-${config.key}`;
 
+    if (gaugeMetrics.has(config.key)) {
+      const latestValue = getLatestSeriesValue(visualizationRows, config.key);
+      return renderGauge(
+        config,
+        latestValue ?? 0,
+        getGaugeBounds(visualizationRows, config.key),
+      );
+    }
+
+    if (isPrometheusProvider && config.key === 'karmada_build_info') {
+      const buildInfo = visualizationData?.metricLabels?.[config.key] ?? [];
+      return (
+        <div className="flex h-[240px] flex-col justify-center gap-4 overflow-auto px-6">
+          {buildInfo.map((labels, index) => (
+            <div key={`${labels.pod ?? 'component'}-${index}`}>
+              {buildInfo.length > 1 ? (
+                <Text strong>{labels.pod ?? `Instance ${index + 1}`}</Text>
+              ) : null}
+              <div className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                {Object.entries(labels)
+                  .filter(([key]) => !hiddenBuildInfoLabels.has(key))
+                  .sort(([left], [right]) => left.localeCompare(right))
+                  .map(([key, value]) => (
+                    <div key={key} className="contents">
+                      <Text type="secondary">{metricNameToTitle(key)}</Text>
+                      <Text copyable={key.includes('commit')}>{value}</Text>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     if (config.chart === 'gauge') {
       const latestValue = getLatestSeriesValue(visualizationRows, config.key);
-      const bounds = getSeriesBounds(visualizationRows, config.key);
+      const bounds = getGaugeBounds(visualizationRows, config.key);
       return renderGauge(config, latestValue ?? 0, bounds);
     }
 
@@ -959,10 +1093,15 @@ const MetricsPage = () => {
   };
 
   const renderChartCard = (config: ChartConfig) => {
+    const isBuildInfo =
+      isPrometheusProvider && config.key === 'karmada_build_info';
     const latestValue = getLatestSeriesValue(visualizationRows, config.key);
     const valueFormatter =
       config.valueFormatter ?? ((value: number) => formatNumber(value));
-    const bounds = getSeriesBounds(visualizationRows, config.key);
+    const bounds =
+      config.chart === 'gauge'
+        ? getGaugeBounds(visualizationRows, config.key)
+        : getSeriesBounds(visualizationRows, config.key);
     const panel = config.panelId
       ? dashboardConfig?.panels.find((item) => item.id === config.panelId)
       : undefined;
@@ -981,13 +1120,15 @@ const MetricsPage = () => {
                   {config.title}
                 </Text>
               </Space>
-              <Text className={styles.latestValue}>
-                {typeof latestValue === 'number'
-                  ? valueFormatter(latestValue)
-                  : '--'}
-              </Text>
+              {!isBuildInfo ? (
+                <Text className={styles.latestValue}>
+                  {typeof latestValue === 'number'
+                    ? valueFormatter(latestValue)
+                    : '--'}
+                </Text>
+              ) : null}
             </div>
-            {bounds ? (
+            {!isBuildInfo && bounds ? (
               <Text type="secondary" className={styles.chartRange}>
                 {valueFormatter(bounds.min)} to {valueFormatter(bounds.max)}
               </Text>
@@ -1050,6 +1191,14 @@ const MetricsPage = () => {
                 {visualizationPod === 'all' ? 'All pods' : visualizationPod}
               </span>
               <span>{generatedAtLabel}</span>
+              <span>
+                Provider:{' '}
+                {metricsProvider === 'prometheus'
+                  ? 'Prometheus'
+                  : metricsProvider === 'sqlite'
+                    ? 'SQLite'
+                    : 'Detecting'}
+              </span>
             </div>
           </div>
 
@@ -1117,10 +1266,11 @@ const MetricsPage = () => {
               <Select
                 size="middle"
                 variant="filled"
-                value={defaultWindow}
-                disabled
-                options={[{ label: '15 minutes', value: defaultWindow }]}
+                value={visualizationWindow}
+                disabled={!isPrometheusProvider}
+                options={prometheusWindowOptions}
                 className={styles.windowSelect}
+                onChange={setVisualizationWindow}
               />
             </label>
 
@@ -1177,7 +1327,7 @@ const MetricsPage = () => {
           </div>
           <div className={styles.summaryItem}>
             <Text className={styles.summaryLabel}>Window</Text>
-            <Text className={styles.summaryValue}>15m</Text>
+            <Text className={styles.summaryValue}>{visualizationWindow}</Text>
           </div>
         </section>
 
@@ -1282,6 +1432,7 @@ const MetricsPage = () => {
           catalog={visualizationData?.metricsCatalog ?? []}
           component={activeComponent}
           pod={visualizationPod}
+          window={visualizationWindow}
         />
       </main>
     </Panel>

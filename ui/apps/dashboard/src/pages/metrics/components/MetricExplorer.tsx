@@ -49,6 +49,7 @@ interface MetricExplorerProps {
   catalog: MetricCatalogItem[];
   component: KarmadaComponentKey;
   pod: string;
+  window: string;
 }
 
 const aggregationOptions = [
@@ -81,6 +82,7 @@ export default function MetricExplorer({
   catalog,
   component,
   pod,
+  window,
 }: MetricExplorerProps) {
   const { token } = theme.useToken();
   const [selectedMetric, setSelectedMetric] = useState<string>('');
@@ -116,13 +118,21 @@ export default function MetricExplorer({
     isLoading: exploring,
     error: exploreError,
   } = useQuery({
-    queryKey: ['metricExplore', component, selectedMetric, aggregation, JSON.stringify(labelFilters), pod],
+    queryKey: [
+      'metricExplore',
+      component,
+      selectedMetric,
+      aggregation,
+      JSON.stringify(labelFilters),
+      pod,
+      window,
+    ],
     queryFn: () =>
       ExploreMetric(component, {
         metric: selectedMetric,
         aggregation,
         labels: labelFilters.length > 0 ? labelFilters : undefined,
-        window: '15m',
+        window,
         pod,
       }),
     enabled: open && !!selectedMetric,

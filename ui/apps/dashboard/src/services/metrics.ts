@@ -77,6 +77,7 @@ export interface VisualizationPoint {
 
 export interface SchedulerVisualizationMeta {
   appName: string;
+  provider: 'sqlite' | 'prometheus';
   window: string;
   podMode: string;
   sampleIntervalSec: number;
@@ -100,6 +101,7 @@ export interface MetricCatalogItem {
 export interface SchedulerVisualizationResponse {
   meta: SchedulerVisualizationMeta;
   timeseries: Record<string, VisualizationPoint[]>;
+  metricLabels?: Record<string, Record<string, string>[]>;
   pods: string[];
   warnings?: string[];
   availableMetrics?: MetricInfo[];
