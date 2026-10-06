@@ -173,6 +173,7 @@ func GetMemberClusterInfo(karmadaClient karmadaclientset.Interface, ds *datasele
 		CPUSummary:    &v1.CPUSummary{},
 		MemorySummary: &v1.MemorySummary{},
 		PodSummary:    &v1.PodSummary{},
+		GPUSummary:    &v1.GPUSummary{},
 	}
 	for _, clusterItem := range result.Clusters {
 		// handle node summary
@@ -190,6 +191,11 @@ func GetMemberClusterInfo(karmadaClient karmadaclientset.Interface, ds *datasele
 		// handle pod summary
 		memberClusterStatus.PodSummary.TotalPod += clusterItem.AllocatedResources.PodCapacity
 		memberClusterStatus.PodSummary.AllocatedPod += clusterItem.AllocatedResources.AllocatedPods
+
+		// handle gpu summary: per-cluster counts already sum the configured
+		// accelerator resource names.
+		memberClusterStatus.GPUSummary.TotalGPU += clusterItem.AllocatedResources.GPUCapacity
+		memberClusterStatus.GPUSummary.AllocatedGPU += clusterItem.AllocatedResources.AllocatedGPUs
 	}
 	return memberClusterStatus, nil
 }

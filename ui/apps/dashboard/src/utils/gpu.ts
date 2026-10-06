@@ -14,13 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const BYTES_PER_GIB = 1024 ** 3;
+import type { Cluster } from '@/services/cluster';
 
-export function bytesToGiB(bytes: number): number {
-  return bytes / BYTES_PER_GIB;
-}
-
-// formatGiB renders bytes as GiB rounded to 2 decimals, e.g. "2515.04".
-export function formatGiB(bytes: number): string {
-  return bytesToGiB(bytes).toFixed(2);
+// fleetGPUCapacity sums accelerator capacity across all member clusters.
+// GPU UI is shown only when this is greater than zero, so a fleet without
+// accelerators looks exactly as it did before GPU support.
+export function fleetGPUCapacity(clusters: Cluster[] | undefined): number {
+  return (clusters ?? []).reduce(
+    (sum, cluster) => sum + (cluster.allocatedResources?.gpuCapacity ?? 0),
+    0,
+  );
 }

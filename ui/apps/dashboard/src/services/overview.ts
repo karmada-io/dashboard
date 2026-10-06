@@ -43,6 +43,15 @@ export interface MemberClusterStatus {
   cpuSummary: CpuSummary;
   memorySummary: MemorySummary;
   podSummary: PodSummary;
+  // Optional: absent on API versions that predate GPU support.
+  gpuSummary?: GpuSummary;
+}
+
+// Accelerator devices summed over the configured accelerator_resources.
+// totalGPU is 0 when no member cluster has accelerators.
+export interface GpuSummary {
+  totalGPU: number;
+  allocatedGPU: number;
 }
 
 export interface NodeSummary {

@@ -18,6 +18,7 @@ import i18nInstance from '@/utils/i18n';
 import Panel from '@/components/panel';
 import { useQuery } from '@tanstack/react-query';
 import { GetClusters } from '@/services';
+import { fleetGPUCapacity } from '@/utils/gpu';
 import {
   Cluster,
   ClusterDetail,
@@ -68,6 +69,28 @@ const ClusterManagePage = () => {
     mode: 'create',
     open: false,
   });
+  const showGPU = fleetGPUCapacity(data?.clusters) > 0;
+  const gpuColumn: TableColumnProps<Cluster> = {
+    title: i18nInstance.t('1e4ecb9e76fa121276de9191b4aadad3', 'GPU用量'),
+    dataIndex: 'gpuFraction',
+    width: '15%',
+    render: (_, r) => {
+      const { gpuCapacity, allocatedGPUs, gpuFraction } = r.allocatedResources;
+      // Clusters without GPU nodes report zero capacity. Render a dash
+      // instead of an empty gauge, which would read as "0% used".
+      if (!gpuCapacity) {
+        return '—';
+      }
+      const fraction = parseFloat(gpuFraction.toFixed(2));
+      return (
+        <Progress
+          percent={fraction}
+          strokeColor={getPercentColor(fraction)}
+          format={() => `${allocatedGPUs}/${gpuCapacity}`}
+        />
+      );
+    },
+  };
   const columns: TableColumnProps<Cluster>[] = [
     {
       title: i18nInstance.t('c3f28b34bbdec501802fa403584267e6', '集群名称'),
@@ -189,6 +212,8 @@ const ClusterManagePage = () => {
         );
       },
     },
+    // The GPU column only appears when the fleet has accelerator capacity.
+    ...(showGPU ? [gpuColumn] : []),
     {
       title: i18nInstance.t('2b6bc0f293f5ca01b006206c2535ccbc', '操作'),
       key: 'op',

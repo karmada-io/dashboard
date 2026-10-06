@@ -40,6 +40,10 @@ export interface AllocatedResources {
   allocatedPods: number;
   podCapacity: number;
   podFraction: number;
+  // nvidia.com/gpu devices. gpuCapacity is 0 on clusters without GPUs.
+  gpuCapacity: number;
+  allocatedGPUs: number;
+  gpuFraction: number;
 }
 
 export interface Cluster {

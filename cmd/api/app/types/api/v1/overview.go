@@ -59,12 +59,21 @@ type PodSummary struct {
 	AllocatedPod int64 `json:"allocatedPod"`
 }
 
+// GPUSummary provides a summary of accelerator (GPU) device usage, summed
+// over the configured accelerator resource names. TotalGPU is 0 when no
+// member cluster has accelerators.
+type GPUSummary struct {
+	TotalGPU     int64 `json:"totalGPU"`
+	AllocatedGPU int64 `json:"allocatedGPU"`
+}
+
 // MemberClusterStatus represents the status of member clusters.
 type MemberClusterStatus struct {
 	NodeSummary   *NodeSummary   `json:"nodeSummary"`
 	CPUSummary    *CPUSummary    `json:"cpuSummary"`
 	MemorySummary *MemorySummary `json:"memorySummary"`
 	PodSummary    *PodSummary    `json:"podSummary"`
+	GPUSummary    *GPUSummary    `json:"gpuSummary"`
 }
 
 // ClusterResourceStatus represents the status of various resources in the cluster.

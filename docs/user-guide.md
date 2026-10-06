@@ -69,3 +69,18 @@ At this point, the karmada control plane will distribute the workload resources 
 The nginx workload has been distributed to member1 and member2 clusters except member3 cluster.
 ![user-guide-get-pod](./images/user-guide-get-pod.png)
 
+## GPU / accelerator usage
+The dashboard reports accelerator (GPU) devices next to CPU and memory: a "GPU Usage" line on the Overview page (summed over all member clusters), a GPU column in the cluster list, and a GPU card on each member cluster's overview. The numbers come from each cluster's `status.resourceSummary`, which Karmada aggregates from the member cluster's nodes.
+
+Which resources count as accelerators is set by `accelerator_resources` in the dashboard config (the `prod.yaml` key of the `karmada-dashboard-configmap` ConfigMap, e.g. `artifacts/overlays/nodeport-mode/dashboard-config.yaml`):
+
+```yaml
+accelerator_resources:
+  - nvidia.com/gpu
+  - amd.com/gpu
+```
+
+- **Default:** when the key is absent or empty, only `nvidia.com/gpu` is counted.
+- **Summation:** a cluster's GPU capacity and allocation are the sums over all listed resource names. List only resources whose quantity is a device count; a resource such as a memory size in MiB would inflate the totals.
+- **Auto-hide:** GPU figures are shown only when the total accelerator capacity across the fleet is greater than zero. A fleet without accelerators looks exactly as it did before. Inside a GPU fleet, a member cluster without accelerators shows `—`.
+

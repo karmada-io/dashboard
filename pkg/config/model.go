@@ -80,4 +80,9 @@ type DashboardConfig struct {
 	MenuConfigs       []MenuConfig       `yaml:"menu_configs" json:"menu_configs"`
 	PathPrefix        string             `yaml:"path_prefix" json:"path_prefix"`
 	MetricsDashboards []MetricsDashboard `yaml:"metrics_dashboards,omitempty" json:"metrics_dashboards,omitempty"`
+	// AcceleratorResources lists the extended resource names counted as
+	// accelerator devices (e.g. "nvidia.com/gpu", "amd.com/gpu"). Their
+	// quantities are summed into the GPU figures shown for each cluster and
+	// the fleet. Absent or empty means DefaultAcceleratorResources.
+	AcceleratorResources []string `yaml:"accelerator_resources,omitempty" json:"accelerator_resources,omitempty"`
 }
