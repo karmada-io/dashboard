@@ -48,22 +48,23 @@ import OverridePolicyEditorDrawer, {
   OverridePolicyEditorDrawerProps,
 } from './override-policy-editor-drawer.tsx';
 import { GetNamespaces } from '@/services/namespace.ts';
+import { getPolicyKey, PolicyScope } from '@/services/base.ts';
 
-export type PolicyScope = 'namespace-scope' | 'cluster-scope';
 const OverridePolicyManage = () => {
   const [filter, setFilter] = useState<{
     policyScope: PolicyScope;
     selectedWorkSpace: string;
     searchText: string;
   }>({
-    policyScope: 'namespace-scope',
+    policyScope: PolicyScope.Namespace,
     selectedWorkSpace: '',
     searchText: '',
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetOverridePolicies', JSON.stringify(filter)],
     queryFn: async () => {
-      if (filter.policyScope === 'cluster-scope') {
+      if (filter.policyScope === PolicyScope.Cluster) {
         console.log('x');
         const ret = await GetClusterOverridePolicies({
           keyword: filter.searchText,
@@ -102,10 +103,10 @@ const OverridePolicyManage = () => {
     name: '',
     namespace: '',
     overrideContent: '',
-    isClusterScope: filter.policyScope === 'cluster-scope',
+    isClusterScope: filter.policyScope === PolicyScope.Cluster,
   });
   const columns = [
-    filter.policyScope === 'namespace-scope' && {
+    filter.policyScope === PolicyScope.Namespace && {
       title: i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间'),
       key: 'namespaceName',
       width: 200,
@@ -170,7 +171,7 @@ const OverridePolicyManage = () => {
                   name: r.objectMeta.name,
                   namespace: r.objectMeta.namespace,
                   kind:
-                    filter.policyScope === 'namespace-scope'
+                    filter.policyScope === PolicyScope.Namespace
                       ? 'overridepolicy'
                       : 'clusteroverridepolicy',
                 });
@@ -194,7 +195,7 @@ const OverridePolicyManage = () => {
                   name: r.objectMeta.name,
                   namespace: r.objectMeta.namespace,
                   kind:
-                    filter.policyScope === 'namespace-scope'
+                    filter.policyScope === PolicyScope.Namespace
                       ? 'overridepolicy'
                       : 'clusteroverridepolicy',
                 });
@@ -217,7 +218,7 @@ const OverridePolicyManage = () => {
               })}
               onConfirm={async () => {
                 const ret = await DeleteOverridePolicy({
-                  isClusterScope: filter.policyScope === 'cluster-scope',
+                  isClusterScope: filter.policyScope === PolicyScope.Cluster,
                   namespace: r.objectMeta.namespace,
                   name: r.objectMeta.name,
                 });
@@ -228,6 +229,10 @@ const OverridePolicyManage = () => {
                       '删除成功',
                     ),
                   );
+                    setDeletingNames((prev) => {
+                      const key = getPolicyKey(r, filter.policyScope);
+                      return new Set(prev).add(key);
+                    });
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -283,21 +288,21 @@ const OverridePolicyManage = () => {
               'bf15e71b2553d369585ace795d15ac3b',
               '命名空间级别',
             ),
-            value: 'namespace-scope',
+            value: PolicyScope.Namespace,
           },
           {
             label: i18nInstance.t(
               '860f29d8fc7a68113902db52885111d4',
               '集群级别',
             ),
-            value: 'cluster-scope',
+            value: PolicyScope.Cluster,
           },
         ]}
       />
 
       <div className={'flex flex-row mb-4 justify-between'}>
         <div className={'flex flex-row space-x-4'}>
-          {filter.policyScope === 'namespace-scope' && (
+          {filter.policyScope === PolicyScope.Namespace && (
             <>
               <h3 className={'leading-[32px]'}>
                 {i18nInstance.t('a4b28a416f0b6f3c215c51e79e517298', '命名空间')}
@@ -344,11 +349,11 @@ const OverridePolicyManage = () => {
               setEditorDrawerData({
                 open: true,
                 mode: 'create',
-                isClusterScope: filter.policyScope === 'cluster-scope',
+                isClusterScope: filter.policyScope === PolicyScope.Cluster,
               });
             }}
           >
-            {filter.policyScope === 'namespace-scope'
+            {filter.policyScope === PolicyScope.Namespace
               ? i18nInstance.t(
                   '7c7e4becc6e9b2be2a196ed506cdc518',
                   '新增差异化策略',
@@ -361,10 +366,19 @@ const OverridePolicyManage = () => {
         </div>
       </div>
       <Table
-        rowKey={(r: OverridePolicy) => r.objectMeta.name || ''}
+        rowKey={(r: OverridePolicy | ClusterOverridePolicy) =>
+          getPolicyKey(r, filter.policyScope)
+        }
+
         columns={columns}
         loading={isLoading}
-        dataSource={data || []}
+        dataSource={(data || []).filter(
+          (r: OverridePolicy | ClusterOverridePolicy) => {
+            const key = getPolicyKey(r, filter.policyScope);
+
+            return !deletingNames.has(key);
+          },
+        )}
       />
       <OverridePolicyEditorDrawer
         open={editorDrawerData.open}

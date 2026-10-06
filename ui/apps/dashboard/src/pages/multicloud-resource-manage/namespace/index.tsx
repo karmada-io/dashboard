@@ -40,6 +40,7 @@ import TagList, { convertLabelToTags } from '@/components/tag-list';
 
 const NamespacePage = () => {
   const [searchFilter, setSearchFilter] = useState('');
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['GetNamespaces', searchFilter],
     queryFn: async () => {
@@ -130,6 +131,7 @@ const NamespacePage = () => {
                       '删除命名空间成功',
                     ),
                   );
+                  setDeletingNames((prev) => new Set(prev).add(r.objectMeta.name));
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -190,7 +192,11 @@ const NamespacePage = () => {
         rowKey={(r: Namespace) => r.objectMeta.name || ''}
         columns={columns}
         loading={isLoading}
-        dataSource={data?.namespaces || []}
+        dataSource={
+          (data?.namespaces || []).filter(
+            (n: Namespace) => !deletingNames.has(n.objectMeta.name),
+          )
+        }
       />
 
       <NewNamespaceModal
