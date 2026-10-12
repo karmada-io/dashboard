@@ -19,7 +19,7 @@
   "devDependencies": {
     "tsdown": "^0.22.14",
     "vite": "^8.0.16",
-    "vitest": "^4.1.9"
+    "vitest": "^5.0.3"
   },
   "dependencies": {
     "got": "^16.0.0",
