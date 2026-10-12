@@ -35,7 +35,7 @@
     "unrun": "^0.3.1"
   },
   "dependencies": {
-    "dayjs": "^1.11.21"
+    "dayjs": "^1.11.23"
   },
   "packageManager": "pnpm@9.1.2",
   "pnpm": {
