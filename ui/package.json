@@ -26,7 +26,7 @@
   "license": "ISC",
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.6.4",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.4",
     "tsdown": "^0.22.14",
