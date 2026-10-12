@@ -42,8 +42,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/emicklei/go-restful-openapi/v2 v2.12.1 h1:uOPl895M6MeeZdHhuNYX1MA7V1LJ4ujaZ2443ceE5lY=
 github.com/emicklei/go-restful-openapi/v2 v2.12.1/go.mod h1:I/b/Q1A/wpKWJGZJeO4WPaIw0ME4jXp5Yrh5hdB1bBA=
-github.com/emicklei/go-restful/v3 v3.13.0 h1:C4Bl2xDndpU6nJ4bc1jXd+uTmYPVUwkD6bFY/oTyCes=
-github.com/emicklei/go-restful/v3 v3.13.0/go.mod h1:6n3XBCmQQb25CM2LCACGz8ukIrRry+4bhvbpWn3mrbc=
+github.com/emicklei/go-restful/v3 v3.14.0 h1:6V6Ba8/5W1Z7amPinklZeCMlHBMwj53thpfxazCLMX4=
+github.com/emicklei/go-restful/v3 v3.14.0/go.mod h1:6n3XBCmQQb25CM2LCACGz8ukIrRry+4bhvbpWn3mrbc=
 github.com/erraggy/oastools v1.36.1 h1:mNxGZO1w7LCFmZhar9QPOhLFpchE0T9TzNwqa+rENN4=
 github.com/erraggy/oastools v1.36.1/go.mod h1:KVEs42aJN9Z+H9YpxqjGrXJRQdrp1W0aJ4w2R+UId+I=
 github.com/evanphx/json-patch v5.7.0+incompatible h1:vgGkfT/9f8zE6tvSCe74nfpAVDQ2tG6yudJd8LBksgI=

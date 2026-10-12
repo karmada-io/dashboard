@@ -7,7 +7,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/distribution/reference v0.6.0
 	github.com/emicklei/go-restful-openapi/v2 v2.12.1
-	github.com/emicklei/go-restful/v3 v3.13.0
+	github.com/emicklei/go-restful/v3 v3.14.0
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
