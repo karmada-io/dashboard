@@ -17,6 +17,9 @@ package errors_test
 import (
 	"testing"
 
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"github.com/karmada-io/dashboard/pkg/common/errors"
 )
 
@@ -40,6 +43,32 @@ func TestLocalizeError(t *testing.T) {
 		{
 			errors.NewInvalid("empty namespace may not be set"),
 			errors.NewInvalid("MSG_DEPLOY_EMPTY_NAMESPACE_ERROR"),
+		},
+		// Test top-level k8s error type matching
+		{
+			k8serrors.NewNotFound(schema.GroupResource{}, "resource"),
+			errors.NewNotFound("MSG_RESOURCE_NOT_FOUND_ERROR"),
+		},
+		{
+			k8serrors.NewAlreadyExists(schema.GroupResource{}, "resource"),
+			errors.NewAlreadyExists("MSG_RESOURCE_ALREADY_EXISTS_ERROR"),
+		},
+		{
+			k8serrors.NewConflict(schema.GroupResource{}, "resource", nil),
+			errors.NewConflict("MSG_RESOURCE_CONFLICT_ERROR"),
+		},
+		// Test fallback string matching logic
+		{
+			errors.NewBadRequest("resource not found"),
+			errors.NewNotFound("MSG_RESOURCE_NOT_FOUND_ERROR"),
+		},
+		{
+			errors.NewInternal("this resource already exists in cluster"),
+			errors.NewAlreadyExists("MSG_RESOURCE_ALREADY_EXISTS_ERROR"),
+		},
+		{
+			errors.NewInternal("there was a conflict updating the resource"),
+			errors.NewConflict("MSG_RESOURCE_CONFLICT_ERROR"),
 		},
 	}
 	for _, c := range cases {
