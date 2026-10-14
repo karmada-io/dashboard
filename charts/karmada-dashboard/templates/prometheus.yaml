@@ -1,0 +1,208 @@
+{{- if .Values.prometheus.enabled }}
+{{- $name := include "karmada-dashboard.name" . -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $name }}-prometheus
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ $name }}-prometheus
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ $name }}-prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $name }}-prometheus
+subjects:
+  - kind: ServiceAccount
+    name: {{ $name }}-prometheus
+    namespace: {{ include "karmada-dashboard.namespace" . }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-prometheus
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: {{ .Values.prometheus.scrapeInterval }}
+      evaluation_interval: {{ .Values.prometheus.scrapeInterval }}
+    scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets: ["localhost:9090"]
+      {{- range $job := list "karmada-scheduler" "karmada-controller-manager" "karmada-descheduler" "karmada-webhook" "karmada-metrics-adapter" }}
+      - job_name: {{ $job }}
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [{{ $.Values.prometheus.scrapeNamespace | quote }}]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: {{ $job }}
+          - source_labels: [__meta_kubernetes_pod_ip]
+            target_label: __address__
+            replacement: $1:8080
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+      {{- end }}
+      - job_name: karmada-scheduler-estimator
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [{{ .Values.prometheus.scrapeNamespace | quote }}]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: karmada-scheduler-estimator-.+
+          - source_labels: [__meta_kubernetes_pod_ip]
+            target_label: __address__
+            replacement: $1:8080
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            target_label: job
+      - job_name: karmada-kube-controller-manager
+        scheme: https
+        tls_config:
+          insecure_skip_verify: true
+          cert_file: /etc/karmada/pki/karmada.crt
+          key_file: /etc/karmada/pki/karmada.key
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [{{ .Values.prometheus.scrapeNamespace | quote }}]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: kube-controller-manager
+          - source_labels: [__meta_kubernetes_pod_ip]
+            target_label: __address__
+            replacement: $1:10257
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+      {{- range $target := list (dict "job" "karmada-apiserver" "port" 5443) (dict "job" "karmada-aggregated-apiserver" "port" 443) (dict "job" "karmada-search" "port" 443) }}
+      - job_name: {{ $target.job }}
+        scheme: https
+        tls_config:
+          insecure_skip_verify: true
+          cert_file: /etc/karmada/pki/karmada.crt
+          key_file: /etc/karmada/pki/karmada.key
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [{{ $.Values.prometheus.scrapeNamespace | quote }}]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: {{ $target.job }}
+          - source_labels: [__meta_kubernetes_pod_ip]
+            target_label: __address__
+            replacement: $1:{{ $target.port }}
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+      {{- end }}
+      {{- with .Values.prometheus.agentTargets }}
+      - job_name: karmada-agent
+        static_configs:
+          {{- range . }}
+          - targets: [{{ .address | quote }}]
+            labels:
+              cluster: {{ .cluster | quote }}
+              namespace: {{ $.Values.prometheus.scrapeNamespace | quote }}
+              pod: {{ .pod | quote }}
+          {{- end }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-prometheus
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $name }}-prometheus
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ printf "%s:%s" .Chart.Version (dict "scrapeInterval" .Values.prometheus.scrapeInterval "scrapeNamespace" .Values.prometheus.scrapeNamespace "agentTargets" .Values.prometheus.agentTargets | toJson) | sha256sum }}
+      labels:
+        app: {{ $name }}-prometheus
+    spec:
+      serviceAccountName: {{ $name }}-prometheus
+      {{- include "karmada-dashboard.imagePullSecrets" . | nindent 6 }}
+      containers:
+        - name: prometheus
+          image: {{ template "karmada-dashboard.prometheus.image" . }}
+          imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --storage.tsdb.retention.time={{ .Values.prometheus.retention }}
+          ports:
+            - name: http
+              containerPort: 9090
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: http
+          resources:
+            {{- toYaml .Values.prometheus.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: data
+              mountPath: /prometheus
+            - name: karmada-tls
+              mountPath: /etc/karmada/pki
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $name }}-prometheus
+        - name: data
+          {{- toYaml .Values.prometheus.storage | nindent 10 }}
+        - name: karmada-tls
+          secret:
+            secretName: {{ .Values.prometheus.karmadaTLSSecretName }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-prometheus
+  namespace: {{ include "karmada-dashboard.namespace" . }}
+spec:
+  type: {{ .Values.prometheus.service.type }}
+  selector:
+    app: {{ $name }}-prometheus
+  ports:
+    - name: http
+      port: {{ .Values.prometheus.service.port }}
+      targetPort: http
+{{- end }}

@@ -61,6 +61,7 @@ type metricMeta struct {
 // VisualizationMeta is metadata for visualization responses.
 type VisualizationMeta struct {
 	AppName           string `json:"appName"`
+	Provider          string `json:"provider"`
 	Window            string `json:"window"`
 	PodMode           string `json:"podMode"`
 	SampleIntervalSec int    `json:"sampleIntervalSec"`
@@ -179,6 +180,7 @@ func GetSchedulerVisualization(c *gin.Context) {
 	resp := SchedulerVisualizationResponse{
 		Meta: VisualizationMeta{
 			AppName:           appName,
+			Provider:          "sqlite",
 			Window:            window.String(),
 			PodMode:           podMode,
 			SampleIntervalSec: detectSampleInterval(series),

@@ -1,4 +1,10 @@
 {{- $name := include "karmada-dashboard.name" . -}}
+{{- $provider := .Values.metrics_scraper.provider -}}
+{{- $prometheusURL := .Values.metrics_scraper.prometheus.url -}}
+{{- if .Values.prometheus.enabled -}}
+{{- $provider = "prometheus" -}}
+{{- $prometheusURL = printf "http://%s-prometheus:%v" $name .Values.prometheus.service.port -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -66,18 +72,56 @@ spec:
             - name: kubeconfig-secret
               subPath: kubeconfig
               mountPath: /etc/kubeconfig
+            {{- if eq $provider "prometheus" }}
+            {{- if .Values.metrics_scraper.prometheus.bearerTokenSecret.name }}
+            - name: prometheus-token
+              subPath: {{ .Values.metrics_scraper.prometheus.bearerTokenSecret.key }}
+              mountPath: /etc/prometheus-auth/token
+              readOnly: true
+            {{- end }}
+            {{- if .Values.metrics_scraper.prometheus.caSecret.name }}
+            - name: prometheus-ca
+              subPath: {{ .Values.metrics_scraper.prometheus.caSecret.key }}
+              mountPath: /etc/prometheus-auth/ca.crt
+              readOnly: true
+            {{- end }}
+            {{- end }}
           command:
             - karmada-dashboard-metrics-scraper
             - --karmada-kubeconfig=/etc/kubeconfig
             - --karmada-context={{ .Values.metrics_scraper.kubeconfigContext }}
             - --kubeconfig=/etc/kubeconfig
             - --context={{ .Values.metrics_scraper.kubeconfigContext }}
+            - --metrics-provider={{ $provider }}
+            {{- if eq $provider "prometheus" }}
+            - --prometheus-url={{ required "metrics_scraper.prometheus.url is required when using the prometheus provider" $prometheusURL }}
+            - --prometheus-timeout={{ .Values.metrics_scraper.prometheus.timeout }}
+            - --prometheus-insecure-skip-verify={{ .Values.metrics_scraper.prometheus.insecureSkipVerify }}
+            {{- if .Values.metrics_scraper.prometheus.bearerTokenSecret.name }}
+            - --prometheus-bearer-token-file=/etc/prometheus-auth/token
+            {{- end }}
+            {{- if .Values.metrics_scraper.prometheus.caSecret.name }}
+            - --prometheus-ca-file=/etc/prometheus-auth/ca.crt
+            {{- end }}
+            {{- end }}
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
       volumes:
         - name: kubeconfig-secret
           secret:
             secretName: {{ .Values.metrics_scraper.kubeconfigName }}
+        {{- if eq $provider "prometheus" }}
+        {{- if .Values.metrics_scraper.prometheus.bearerTokenSecret.name }}
+        - name: prometheus-token
+          secret:
+            secretName: {{ .Values.metrics_scraper.prometheus.bearerTokenSecret.name }}
+        {{- end }}
+        {{- if .Values.metrics_scraper.prometheus.caSecret.name }}
+        - name: prometheus-ca
+          secret:
+            secretName: {{ .Values.metrics_scraper.prometheus.caSecret.name }}
+        {{- end }}
+        {{- end }}
       {{- with .Values.metrics_scraper.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
