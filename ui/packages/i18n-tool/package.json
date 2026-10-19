@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "bin": "src/index.js",
   "dependencies": {
-    "@babel/generator": "^8.0.0",
+    "@babel/generator": "^8.0.6",
     "@babel/parser": "^8.0.4",
     "@babel/traverse": "^7.29.0",
     "@babel/types": "^8.0.6",
