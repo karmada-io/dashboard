@@ -29,6 +29,7 @@ interface ConfigMapTableProps {
   onViewConfigMapContent: (r: any) => void;
   onEditConfigMapContent: (r: any) => void;
   onDeleteConfigMapContent: (r: Config) => void;
+  deletingNames: Set<string>;
 }
 const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
   const {
@@ -38,6 +39,7 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
     onViewConfigMapContent,
     onEditConfigMapContent,
     onDeleteConfigMapContent,
+    deletingNames,
   } = props;
   const columns: TableColumnProps<Config>[] = [
     {
@@ -169,7 +171,10 @@ const ConfigMapTable: FC<ConfigMapTableProps> = (props) => {
       }
       columns={columns}
       loading={isLoading}
-      dataSource={data?.items || []}
+      dataSource={(data?.items || []).filter(
+        (c: Config) =>
+          !deletingNames.has(`${c.objectMeta.namespace}-${c.objectMeta.name}`),
+      )}
     />
   );
 };
