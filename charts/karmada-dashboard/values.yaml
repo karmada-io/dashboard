@@ -27,6 +27,29 @@ karmadaDashboardImagePullPolicy: &karmadaDashboardImagePullPolicy IfNotPresent
 
 podDisruptionBudget: &podDisruptionBudget { }
 
+## kubectl image used by the hook jobs that create and clean up the
+## karmada-dashboard ServiceAccount on the Karmada control plane.
+## The image must provide `bash` and have `kubectl` on its PATH.
+kubectl:
+  ## @param kubectl.image.registry kubectl image registry
+  ## @param kubectl.image.repository kubectl image repository
+  ## @param kubectl.image.tag kubectl image tag (immutable tags are recommended)
+  ## @param kubectl.image.pullPolicy kubectl image pull policy
+  ## @param kubectl.image.pullSecrets Specify docker-registry secret names as an array
+  ##
+  image:
+    registry: docker.io
+    repository: bitnamisecure/kubectl
+    tag: latest
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: [ ]
+
 ## Default component dashboard layouts persisted in karmada-dashboard-configmap.
 ## @param dashboardConfig.metricsDashboards metrics panels displayed for each Karmada component
 dashboardConfig:
