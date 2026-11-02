@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"regexp"
 	"github.com/gin-gonic/gin"
 
 	"github.com/karmada-io/dashboard/cmd/metrics-scraper/app/scrape"
@@ -96,6 +96,11 @@ func queryWithMetadataFallback(q sqlQueryer, metadataTableName, preferredQuery, 
 }
 
 func queryMetricNames(c *gin.Context, tx *sql.Tx, sanitizedPodName string) {
+	if !isValidTableName(sanitizedPodName) {
+		log.Printf("Invalid table name: %v", sanitizedPodName)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid table name"})
+		return
+	}
 	rows, err := tx.Query(fmt.Sprintf("SELECT DISTINCT name FROM %s", sanitizedPodName))
 	if err != nil {
 		log.Printf("Error querying metric names: %v, SQL Error: %v", err, err)
@@ -116,6 +121,14 @@ func queryMetricNames(c *gin.Context, tx *sql.Tx, sanitizedPodName string) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"metricNames": metricNames})
+}
+
+// isValidTableName checks if the given table name is a valid identifier.
+func isValidTableName(name string) bool {
+    // Only allow table names that start with a letter or underscore, then letters, numbers, underscores, up to 64 chars
+    // Adjust length as per your table name limits (e.g., SQLite, MySQL usually 64)
+    validTableName := regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]{0,63}$`)
+    return validTableName.MatchString(name)
 }
 
 func queryMetricDetailsByName(c *gin.Context, tx *sql.Tx, sanitizedPodName, metricName string) {
