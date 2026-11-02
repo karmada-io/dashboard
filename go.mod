@@ -14,7 +14,7 @@ require (
 	github.com/go-openapi/spec v1.0.1
 	github.com/gobuffalo/flect v1.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/karmada-io/karmada v1.19.0
+	github.com/karmada-io/karmada v1.19.1
 	github.com/mark3labs/mcp-go v1.4.0
 	github.com/prometheus/client_golang v1.25.0
 	github.com/prometheus/common v0.73.0
