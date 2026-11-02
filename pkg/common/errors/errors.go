@@ -54,6 +54,16 @@ func NewBadRequest(reason string) *k8serrors.StatusError {
 	return k8serrors.NewBadRequest(reason)
 }
 
+// NewConflict creates an error that indicates that the request has a conflict.
+func NewConflict(reason string) *k8serrors.StatusError {
+	return k8serrors.NewConflict(schema.GroupResource{}, "", fmt.Errorf("%s", reason))
+}
+
+// NewAlreadyExists creates an error that indicates that the resource already exists.
+func NewAlreadyExists(reason string) *k8serrors.StatusError {
+	return k8serrors.NewAlreadyExists(schema.GroupResource{}, reason)
+}
+
 // NewInvalid return a statusError
 // which is an error intended for consumption by a REST API server; it can also be
 // reconstructed by clients from a REST response. Public to allow easy type switches.
