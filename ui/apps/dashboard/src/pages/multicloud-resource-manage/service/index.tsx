@@ -38,6 +38,7 @@ const ServicePage = () => {
     searchText: '',
     kind: ServiceKind.Service,
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const { nsOptions, isNsDataLoading } = useNamespace({});
   const size = useWindowSize();
   const labelTagNum = size && size.width! > 1800 ? undefined : 1;
@@ -164,7 +165,9 @@ const ServicePage = () => {
                 name: r.objectMeta.name,
                 namespace: r.objectMeta.namespace,
               });
-              if (ret.code !== 200) {
+              if (ret.code === 200) {
+                setDeletingNames((prev) => new Set(prev).add(`${r.objectMeta.namespace}-${r.objectMeta.name}`));
+              } else {
                 await messageApi.error(
                   i18nInstance.t(
                     '1ed71b1211f5d2ba41e4a23331985c7c',
@@ -180,6 +183,7 @@ const ServicePage = () => {
               console.error('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
       {filter.kind === ServiceKind.Ingress && (
@@ -201,7 +205,9 @@ const ServicePage = () => {
                 name: r.objectMeta.name,
                 namespace: r.objectMeta.namespace,
               });
-              if (ret.code !== 200) {
+              if (ret.code === 200) {
+                setDeletingNames((prev) => new Set(prev).add(`${r.objectMeta.namespace}-${r.objectMeta.name}`));
+              } else {
                 await messageApi.error(
                   i18nInstance.t(
                     '1ed71b1211f5d2ba41e4a23331985c7c',
@@ -217,6 +223,7 @@ const ServicePage = () => {
               console.error('error', e);
             }
           }}
+          deletingNames={deletingNames}
         />
       )}
 
