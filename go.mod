@@ -17,7 +17,7 @@ require (
 	github.com/karmada-io/karmada v1.19.0
 	github.com/mark3labs/mcp-go v1.3.0
 	github.com/prometheus/client_golang v1.25.0
-	github.com/prometheus/common v0.72.1
+	github.com/prometheus/common v0.73.0
 	github.com/samber/lo v1.53.0
 	github.com/sashabaranov/go-openai v1.43.0
 	github.com/spf13/cobra v1.10.2
@@ -87,6 +87,7 @@ require (
 	github.com/google/jsonschema-go v0.4.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -105,6 +106,7 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/pandatix/go-abnf v0.5.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
