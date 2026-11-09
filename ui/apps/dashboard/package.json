@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2.1.2",
-    "@chatui/core": "^3.8.0",
+    "@chatui/core": "^3.9.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
