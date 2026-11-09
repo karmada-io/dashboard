@@ -49,7 +49,7 @@ export interface AllocatedResources {
 export interface Cluster {
   objectMeta: ObjectMeta;
   typeMeta: TypeMeta;
-  ready: boolean;
+  ready: 'True' | 'False' | 'Unknown';
   kubernetesVersion: string;
   syncMode: 'Pull' | 'Push';
   nodeSummary: NodeSummary;
