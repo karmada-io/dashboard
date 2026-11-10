@@ -17,6 +17,7 @@ limitations under the License.
 package options
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/spf13/pflag"
@@ -30,6 +31,7 @@ type Options struct {
 	InsecurePort                        int
 	StaticDir                           string
 	I18nDir                             string
+	Namespace                           string
 	EnableAPIProxy                      bool
 	APIProxyEndpoint                    string
 	EnableKubernetesDashboardAPIProxy   bool
@@ -55,11 +57,26 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&o.InsecurePort, "insecure-port", 8000, "port to listen to for incoming HTTP requests")
 	fs.StringVar(&o.StaticDir, "static-dir", "./static", "directory to serve static files")
 	fs.StringVar(&o.I18nDir, "i18n-dir", "./i18n", "directory to serve i18n files")
-	fs.BoolVar(&o.EnableAPIProxy, "enable-api-proxy", true, "whether enable proxy to karmada-dashboard-api, if set true, all requests with /api prefix will be proxied to karmada-dashboard-api.karmada-system.svc.cluster.local")
-	fs.StringVar(&o.APIProxyEndpoint, "api-proxy-endpoint", "http://karmada-dashboard-api.karmada-system.svc.cluster.local:8000", "karmada-dashboard-api endpoint")
-	fs.BoolVar(&o.EnableKubernetesDashboardAPIProxy, "enable-kubernetes-dashboard-api-proxy", true, "whether enable proxy to kubernetes-dashboard-api, if set true, all requests with /clusterapi prefix will be proxied to kubernetes-dashboard-api.karmada-system.svc.cluster.local")
-	fs.StringVar(&o.KubernetesDashboardAPIProxyEndpoint, "kubernetes-dashboard-api-proxy-endpoint", "http://kubernetes-dashboard-api.karmada-system.svc.cluster.local:8000", "kubernetes-dashboard-api endpoint")
+	fs.StringVar(&o.Namespace, "namespace", "karmada-system", "Namespace where the dashboard is installed, used to build the default proxy endpoints")
+	fs.BoolVar(&o.EnableAPIProxy, "enable-api-proxy", true, "whether enable proxy to karmada-dashboard-api, if set true, all requests with /api prefix will be proxied to the karmada-dashboard-api service")
+	fs.StringVar(&o.APIProxyEndpoint, "api-proxy-endpoint", "", "karmada-dashboard-api endpoint (default: http://karmada-dashboard-api.<namespace>.svc.cluster.local:8000)")
+	fs.BoolVar(&o.EnableKubernetesDashboardAPIProxy, "enable-kubernetes-dashboard-api-proxy", true, "whether enable proxy to kubernetes-dashboard-api, if set true, all requests with /clusterapi prefix will be proxied to the kubernetes-dashboard-api service")
+	fs.StringVar(&o.KubernetesDashboardAPIProxyEndpoint, "kubernetes-dashboard-api-proxy-endpoint", "", "kubernetes-dashboard-api endpoint (default: http://kubernetes-dashboard-api.<namespace>.svc.cluster.local:8000)")
 	fs.BoolVar(&o.EnableMetricsScraperProxy, "enable-metrics-scraper-proxy", true, "whether enable proxy to karmada-dashboard-metrics-scraper, if set true, all requests with /metrics-scraper prefix will be proxied to the metrics-scraper endpoint")
-	fs.StringVar(&o.MetricsScraperProxyEndpoint, "metrics-scraper-proxy-endpoint", "http://karmada-dashboard-metrics-scraper.karmada-system.svc.cluster.local:8000", "karmada-dashboard-metrics-scraper endpoint")
+	fs.StringVar(&o.MetricsScraperProxyEndpoint, "metrics-scraper-proxy-endpoint", "", "karmada-dashboard-metrics-scraper endpoint (default: http://karmada-dashboard-metrics-scraper.<namespace>.svc.cluster.local:8000)")
 	fs.StringVar(&o.DashboardConfigPath, "dashboard-config-path", "./config/dashboard-config.yaml", "path to dashboard config file")
+}
+
+// Complete fills in the proxy endpoints that were not set explicitly, using
+// the namespace the dashboard is installed in.
+func (o *Options) Complete() {
+	if o.APIProxyEndpoint == "" {
+		o.APIProxyEndpoint = fmt.Sprintf("http://karmada-dashboard-api.%s.svc.cluster.local:8000", o.Namespace)
+	}
+	if o.KubernetesDashboardAPIProxyEndpoint == "" {
+		o.KubernetesDashboardAPIProxyEndpoint = fmt.Sprintf("http://kubernetes-dashboard-api.%s.svc.cluster.local:8000", o.Namespace)
+	}
+	if o.MetricsScraperProxyEndpoint == "" {
+		o.MetricsScraperProxyEndpoint = fmt.Sprintf("http://karmada-dashboard-metrics-scraper.%s.svc.cluster.local:8000", o.Namespace)
+	}
 }

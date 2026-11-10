@@ -34,10 +34,13 @@ import (
 var dashboardConfig DashboardConfig
 
 const (
-	configName      = "karmada-dashboard-configmap"
-	configNamespace = "karmada-system"
-	defaultEnvName  = "prod"
+	configName     = "karmada-dashboard-configmap"
+	defaultEnvName = "prod"
 )
+
+// configNamespace is the namespace where the dashboard ConfigMap is installed.
+// It defaults to karmada-system and can be overridden through the --namespace flag.
+var configNamespace = "karmada-system"
 
 var (
 	configmapGVR = schema.GroupVersionResource{
@@ -57,7 +60,12 @@ func GetConfigKey() string {
 }
 
 // InitDashboardConfig initializes the dashboard configuration using a Kubernetes client.
-func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}) {
+// The namespace is the one where the dashboard is installed, so callers deployed outside
+// karmada-system can still find the dashboard ConfigMap.
+func InitDashboardConfig(k8sClient kubernetes.Interface, stopper <-chan struct{}, namespace string) {
+	if namespace != "" {
+		configNamespace = namespace
+	}
 	factory := informers.NewSharedInformerFactory(k8sClient, 0)
 	resource, err := factory.ForResource(configmapGVR)
 	if err != nil {
