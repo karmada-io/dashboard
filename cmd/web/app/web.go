@@ -84,6 +84,7 @@ func run(ctx context.Context, opts *options.Options) error {
 	if err != nil {
 		return err
 	}
+	opts.Complete()
 	serve(opts)
 	<-ctx.Done()
 	os.Exit(0)

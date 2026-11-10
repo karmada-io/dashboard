@@ -97,7 +97,7 @@ func run(ctx context.Context, opts *options.Options) error {
 	}
 	serve(opts)
 
-	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
+	config.InitDashboardConfig(client.InClusterClient(), ctx.Done(), opts.Namespace)
 	<-ctx.Done()
 	os.Exit(0)
 	return nil

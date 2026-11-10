@@ -186,7 +186,7 @@ func run(ctx context.Context, opts *options.Options) error {
 	}
 
 	serve(opts, mcpClient)
-	config.InitDashboardConfig(client.InClusterClient(), ctx.Done())
+	config.InitDashboardConfig(client.InClusterClient(), ctx.Done(), opts.Namespace)
 
 	// Cleanup on shutdown
 	if mcpClient != nil {
