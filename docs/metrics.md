@@ -30,7 +30,9 @@ Metrics data source.
 
 The commands below assume the dashboard's kubeconfig Secret already exists and
 that Karmada is installed in `karmada-system`. Adjust the namespace if your
-installation differs. When installing from a clone, run
+installation differs. The chart reads the Karmada kubeconfig from the
+`karmada-kubeconfig` Secret by default; change the components' `kubeconfigName`
+values if your Secret has a different name. When installing from a clone, run
 `helm dependency build charts/karmada-dashboard` once before the first command
 so the chart's `common` dependency is available.
 
@@ -200,11 +202,12 @@ default one from the metrics that the component exposes.
 ## Metrics-scraper flags
 
 The following flags are useful when running the scraper outside the Helm
-chart. They are passed to the `karmada-dashboard-metrics-scraper` binary.
+chart. They are passed to the `karmada-dashboard-metrics-scraper` binary. Pass
+`--namespace` with the namespace where the dashboard ConfigMap is installed;
+the Helm chart does this for you.
 
 | Flag | Default | Description |
 | --- | --- | --- |
-| `--namespace` | `karmada-system` | Namespace of the dashboard ConfigMap. |
 | `--metrics-provider` | `sqlite` | `sqlite` or `prometheus`. |
 | `--scrape-interval` | `10s` | Interval between SQLite scrape cycles. |
 | `--prometheus-url` | empty | Prometheus-compatible query endpoint. Required for the `prometheus` provider. |
