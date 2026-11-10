@@ -69,6 +69,11 @@ At this point, the karmada control plane will distribute the workload resources 
 The nginx workload has been distributed to member1 and member2 clusters except member3 cluster.
 ![user-guide-get-pod](./images/user-guide-get-pod.png)
 
+## Component metrics
+The **Metrics** page charts metrics exposed by Karmada control-plane components. The metrics scraper is deployed with the Helm chart; dashboards installed from `artifacts/` do not include it. By default the scraper keeps the most recent 15 minutes of samples in SQLite; configure the Prometheus provider for longer windows.
+
+You can select a component, a pod scope, and (with Prometheus) a time window, then add, edit, and reorder panels. See [component metrics](./metrics.md) for deployment options, panel customization, and troubleshooting.
+
 ## GPU / accelerator usage
 The dashboard reports accelerator (GPU) devices next to CPU and memory: a "GPU Usage" line on the Overview page (summed over all member clusters), a GPU column in the cluster list, and a GPU card on each member cluster's overview. The numbers come from each cluster's `status.resourceSummary`, which Karmada aggregates from the member cluster's nodes.
 
