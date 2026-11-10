@@ -146,8 +146,8 @@ Select **Customize dashboard** to enter edit mode. In edit mode you can:
 
 **Explore metrics with DSL query** opens the metric explorer, where you can
 search the metric catalog, choose an aggregation (`sum`, `avg`, `max`, `min`,
-or `rate`), add label filters, preview the series, and add the result as a
-panel. Panels can be rendered as a line, area, bar, or gauge chart.
+or `rate`), add label filters, and preview the series before adding the metric
+as a panel. Panels can be rendered as a line, area, bar, or gauge chart.
 
 **Reset to default** discards the customized layout and restores the
 automatically generated panels for the component.
@@ -155,9 +155,10 @@ automatically generated panels for the component.
 ## Persisting and sharing a layout
 
 The initial layout for each component comes from the `metrics_dashboards` list
-in the dashboard ConfigMap (`prod.yaml`). Changes made in edit mode apply to
-the current dashboard session; they are not written back to the ConfigMap, so
-reloading the page or switching to another component can discard them.
+in the dashboard ConfigMap (`prod.yaml`). Changes made through edit mode or the
+metric explorer apply to the current dashboard session; they are not written
+back to the ConfigMap, so reloading the page or switching to another component
+can discard them.
 
 To publish a layout for all users, add it to `metrics_dashboards` in the
 `karmada-dashboard-configmap` ConfigMap, or to
@@ -189,7 +190,6 @@ The fields are:
 | `panels[].title` | Panel title. |
 | `panels[].visible` | Whether the panel is shown. |
 | `panels[].order` | Display order. |
-| `panels[].query` | Optional query with `metric`, `aggregation`, and `label_filters`. |
 
 The dashboard components watch the ConfigMap, so a saved change is available
 without restarting them. The toolbar's copy action copies the
@@ -197,7 +197,7 @@ current component layout as JSON for review or sharing; use the field names
 above when adding it to the ConfigMap.
 
 When no layout is configured for a component, the dashboard generates a
-default one from the metrics that the component exposes.
+default one from a set of common metrics that the component exposes.
 
 ## Metrics-scraper flags
 
