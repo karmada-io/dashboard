@@ -147,8 +147,8 @@ search the metric catalog, choose an aggregation (`sum`, `avg`, `max`, `min`,
 or `rate`), add label filters, preview the series, and add the result as a
 panel. Panels can be rendered as a line, area, bar, or gauge chart.
 
-**Reset to default** discards the customized layout and restores the default
-panels for the component.
+**Reset to default** discards the customized layout and restores the
+automatically generated panels for the component.
 
 ## Persisting and sharing a layout
 
@@ -189,8 +189,8 @@ The fields are:
 | `panels[].order` | Display order. |
 | `panels[].query` | Optional query with `metric`, `aggregation`, and `label_filters`. |
 
-The dashboard watches the ConfigMap, so a saved change is picked up without
-restarting the dashboard components. The toolbar's copy action copies the
+The dashboard components watch the ConfigMap, so a saved change is available
+without restarting them. The toolbar's copy action copies the
 current component layout as JSON for review or sharing; use the field names
 above when adding it to the ConfigMap.
 
