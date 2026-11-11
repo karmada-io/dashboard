@@ -191,8 +191,8 @@ The fields are:
 | `panels[].visible` | Whether the panel is shown. |
 | `panels[].order` | Display order. |
 
-The dashboard components watch the ConfigMap, so a saved change is available
-without restarting them. The toolbar's copy action copies the
+The metrics scraper watches the ConfigMap, so a saved change is available
+without restarting it. The toolbar's copy action copies the
 current component layout as JSON for review or sharing; use the field names
 above when adding it to the ConfigMap.
 
