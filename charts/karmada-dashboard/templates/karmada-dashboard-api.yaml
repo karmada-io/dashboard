@@ -74,6 +74,7 @@ spec:
             - --context={{ .Values.api.kubeconfigContext }}
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
+            - --namespace={{ include "karmada-dashboard.namespace" . }}
       volumes:
         - name: kubeconfig-secret
           secret:

@@ -67,6 +67,7 @@ spec:
             - --insecure-bind-address=0.0.0.0
             - --bind-address=0.0.0.0
             - --dashboard-config-path=/config/dashboard-config.yaml
+            - --namespace={{ include "karmada-dashboard.namespace" . }}
           volumeMounts:
             - name: dashboard-config
               subPath: prod.yaml
