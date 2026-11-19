@@ -86,7 +86,7 @@ func toCluster(cluster *v1alpha1.Cluster) Cluster {
 	return Cluster{
 		ObjectMeta:         types.NewObjectMeta(cluster.ObjectMeta),
 		TypeMeta:           types.NewTypeMeta(types.ResourceKindCluster),
-		Ready:              getClusterConditionStatus(cluster, metav1.ConditionTrue),
+		Ready:              getClusterConditionStatus(cluster, v1alpha1.ClusterConditionReady),
 		KubernetesVersion:  cluster.Status.KubernetesVersion,
 		AllocatedResources: allocatedResources,
 		SyncMode:           cluster.Spec.SyncMode,
@@ -94,9 +94,9 @@ func toCluster(cluster *v1alpha1.Cluster) Cluster {
 	}
 }
 
-func getClusterConditionStatus(cluster *v1alpha1.Cluster, conditionType metav1.ConditionStatus) metav1.ConditionStatus {
+func getClusterConditionStatus(cluster *v1alpha1.Cluster, conditionType string) metav1.ConditionStatus {
 	for _, condition := range cluster.Status.Conditions {
-		if condition.Status == conditionType {
+		if condition.Type == conditionType {
 			return condition.Status
 		}
 	}
