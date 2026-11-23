@@ -79,7 +79,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.KarmadaKubeConfig, "karmada-kubeconfig", "", "Path to the karmada control plane kubeconfig file.")
 	fs.StringVar(&o.KarmadaContext, "karmada-context", "", "The name of the karmada-kubeconfig context to use.")
 	fs.BoolVar(&o.SkipKarmadaApiserverTLSVerify, "skip-karmada-apiserver-tls-verify", false, "enable if connection with remote Karmada API server should skip TLS verify")
-	fs.StringVar(&o.Namespace, "namespace", "karmada-dashboard", "Namespace to use when accessing Dashboard specific resources, i.e. configmap")
+	fs.StringVar(&o.Namespace, "namespace", "karmada-system", "Namespace where the dashboard is installed, used to locate the dashboard ConfigMap")
 	fs.BoolVar(&o.DisableCSRFProtection, "disable-csrf-protection", false, "allows disabling CSRF protection")
 	fs.BoolVar(&o.OpenAPIEnabled, "openapi-enabled", false, "enables OpenAPI v2 endpoint under '/apidocs.json'")
 
