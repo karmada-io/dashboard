@@ -44,8 +44,9 @@ import PropagationPolicyEditorDrawer, {
 import { stringify } from 'yaml';
 import { GetResource } from '@/services/unstructured.ts';
 import { useDebounce } from '@uidotdev/usehooks';
-import { PolicyScope } from '@/services/base.ts';
+import { getPolicyKey, PolicyScope } from '@/services/base.ts';
 import useNamespace from '@/hooks/use-namespace.ts';
+
 
 const PropagationPolicyManage = () => {
   const [filter, setFilter] = useState<{
@@ -57,6 +58,7 @@ const PropagationPolicyManage = () => {
     selectedNamespace: '',
     searchText: '',
   });
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const debouncedSearchText = useDebounce(filter.searchText, 300);
   const { data, isLoading, refetch } = useQuery({
     queryKey: [
@@ -214,6 +216,10 @@ const PropagationPolicyManage = () => {
                       '删除成功',
                     ),
                   );
+                  setDeletingNames((prev) => {
+                    const key = getPolicyKey(r, filter.policyScope);
+                    return new Set(prev).add(key);
+                  });
                   await refetch();
                 } else {
                   await messageApi.error(
@@ -354,10 +360,18 @@ const PropagationPolicyManage = () => {
       </div>
 
       <Table
-        rowKey={(r: PropagationPolicy) => r.objectMeta.name || ''}
+        rowKey={(r: PropagationPolicy | ClusterPropagationPolicy) =>
+          getPolicyKey(r, filter.policyScope)
+        }
+
         columns={columns}
         loading={isLoading}
-        dataSource={data || []}
+        dataSource={(data || []).filter(
+          (r: PropagationPolicy | ClusterPropagationPolicy) => {
+            const key = getPolicyKey(r, filter.policyScope);
+
+          return !deletingNames.has(key);
+        })}
       />
 
       <PropagationPolicyEditorDrawer
