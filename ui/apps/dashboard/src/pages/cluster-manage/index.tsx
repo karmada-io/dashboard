@@ -117,7 +117,7 @@ const ClusterManagePage = () => {
       align: 'center',
       width: 150,
       render: (v) => {
-        if (v) {
+        if (v === 'True') {
           return (
             <Badge
               color={'green'}
