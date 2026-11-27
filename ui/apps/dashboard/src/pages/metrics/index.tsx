@@ -182,28 +182,38 @@ function formatBytes(bytes: number) {
     value /= 1024;
     unitIndex++;
   }
+  // A value that rounds to 1024 (e.g. 1023.999 KB) is shown in the next unit.
+  if (Number(value.toFixed(2)) >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex++;
+  }
   return `${value.toFixed(2)} ${units[unitIndex]}`;
 }
 
 function shortBytes(bytes: number) {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0';
-  if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)}G`;
-  if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)}M`;
-  if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)}K`;
+  // Compare the rounded value, so that e.g. 1023.96 MB is shown as 1.0G, not 1024.0M.
+  if (Number((bytes / 1024 ** 2).toFixed(1)) >= 1024)
+    return `${(bytes / 1024 ** 3).toFixed(1)}G`;
+  if (Number((bytes / 1024).toFixed(1)) >= 1024)
+    return `${(bytes / 1024 ** 2).toFixed(1)}M`;
+  if (Number(bytes.toFixed(0)) >= 1024) return `${(bytes / 1024).toFixed(1)}K`;
   return formatNumber(bytes, 0);
 }
 
 function formatSeconds(value: number) {
   if (!Number.isFinite(value)) return '0 s';
   if (value < 0.001) return `${(value * 1000).toFixed(2)} ms`;
-  if (value < 1) return `${(value * 1000).toFixed(1)} ms`;
+  // Compare the rounded value, so that e.g. 0.99996 s is shown as 1.000 s, not 1000.0 ms.
+  if (Number((value * 1000).toFixed(1)) < 1000)
+    return `${(value * 1000).toFixed(1)} ms`;
   return `${value.toFixed(3)} s`;
 }
 
 function shortSeconds(value: number) {
   if (!Number.isFinite(value)) return '0';
   if (value < 0.001) return `${(value * 1000).toFixed(1)}ms`;
-  if (value < 1) return `${(value * 1000).toFixed(0)}ms`;
+  if (Math.round(value * 1000) < 1000) return `${(value * 1000).toFixed(0)}ms`;
   return `${value.toFixed(2)}s`;
 }
 
